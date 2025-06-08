@@ -6,7 +6,7 @@ export const useInvestmentCalculator = () => {
   const [config, setConfig] = useState<InvestmentConfig>({
     initialCapital: 10000,
     timeHorizon: 1000,
-    dailyReturnRate: 0.02, // 2% giornaliero
+    dailyReturnRate: 0.2, // 0.2% giornaliero
     pacConfig: {
       amount: 100,
       frequency: 'weekly',
