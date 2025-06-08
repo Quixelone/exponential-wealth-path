@@ -28,7 +28,7 @@ const Index = () => {
           <div className="text-center animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
               <Calculator className="inline-block mr-3 h-12 w-12 md:h-16 md:w-16" />
-              Wealth Compass
+              Finanza Creativa
             </h1>
             <p className="text-xl md:text-2xl mb-2 opacity-90">
               Gestore Interesse Composto
