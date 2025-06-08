@@ -31,14 +31,14 @@ const ReturnConfiguration: React.FC<ReturnConfigurationProps> = ({
             id="daily-return"
             value={[dailyReturnRate]}
             onValueChange={(value) => onReturnRateChange(value[0])}
-            min={0.001}
-            max={0.1}
-            step={0.001}
+            min={0.1}
+            max={10}
+            step={0.01}
             className="w-full"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>0.001%</span>
             <span>0.1%</span>
+            <span>10%</span>
           </div>
         </div>
         <div className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
