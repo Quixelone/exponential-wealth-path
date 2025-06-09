@@ -4,10 +4,11 @@ import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import InvestmentChart from '@/components/InvestmentChart';
 import ConfigurationPanel from '@/components/ConfigurationPanel';
 import InvestmentSummary from '@/components/InvestmentSummary';
+import ReportTable from '@/components/ReportTable';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, Settings, TrendingUp, Calculator } from 'lucide-react';
+import { BarChart3, Settings, TrendingUp, Calculator, Table } from 'lucide-react';
 
 const Index = () => {
   const {
@@ -53,7 +54,7 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 md:px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-8">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Dashboard
@@ -61,6 +62,10 @@ const Index = () => {
             <TabsTrigger value="config" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Configurazione
+            </TabsTrigger>
+            <TabsTrigger value="report" className="flex items-center gap-2">
+              <Table className="h-4 w-4" />
+              Report
             </TabsTrigger>
             <TabsTrigger value="scenarios" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -147,6 +152,10 @@ const Index = () => {
                 />
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="report" className="space-y-6">
+            <ReportTable data={investmentData} onExportCSV={exportToCSV} />
           </TabsContent>
 
           <TabsContent value="scenarios" className="space-y-6">
