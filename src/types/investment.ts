@@ -9,6 +9,7 @@ export interface InvestmentData {
   finalCapital: number;
   totalPACInvested: number;
   totalInterest: number;
+  isCustomReturn?: boolean;
 }
 
 export interface PACConfig {
@@ -29,4 +30,10 @@ export interface ScenarioComparison {
   optimistic: InvestmentData[];
   realistic: InvestmentData[];
   pessimistic: InvestmentData[];
+}
+
+export interface DailyReturnEntry {
+  day: number;
+  returnRate: number;
+  date: string;
 }

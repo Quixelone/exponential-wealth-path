@@ -5,17 +5,24 @@ import CapitalConfiguration from '@/components/configuration/CapitalConfiguratio
 import TimeHorizonConfiguration from '@/components/configuration/TimeHorizonConfiguration';
 import ReturnConfiguration from '@/components/configuration/ReturnConfiguration';
 import PACConfiguration from '@/components/configuration/PACConfiguration';
+import DailyReturnTracker from '@/components/configuration/DailyReturnTracker';
 import ExportSection from '@/components/configuration/ExportSection';
 
 interface ConfigurationPanelProps {
   config: InvestmentConfig;
   onConfigChange: (config: Partial<InvestmentConfig>) => void;
+  dailyReturns: { [day: number]: number };
+  onUpdateDailyReturn: (day: number, returnRate: number) => void;
+  onRemoveDailyReturn: (day: number) => void;
   onExportCSV: () => void;
 }
 
 const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   config,
   onConfigChange,
+  dailyReturns,
+  onUpdateDailyReturn,
+  onRemoveDailyReturn,
   onExportCSV
 }) => {
   return (
@@ -38,6 +45,13 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       <PACConfiguration
         pacConfig={config.pacConfig}
         onPACConfigChange={(pacConfig) => onConfigChange({ pacConfig: { ...config.pacConfig, ...pacConfig } })}
+      />
+
+      <DailyReturnTracker
+        timeHorizon={config.timeHorizon}
+        customReturns={dailyReturns}
+        onUpdateDailyReturn={onUpdateDailyReturn}
+        onRemoveDailyReturn={onRemoveDailyReturn}
       />
 
       <ExportSection onExportCSV={onExportCSV} />

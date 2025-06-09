@@ -41,22 +41,23 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
             id="initial-capital"
             value={[initialCapital]}
             onValueChange={(value) => onCapitalChange(value[0])}
-            min={1000}
-            max={100000}
-            step={500}
+            min={50}
+            max={5000}
+            step={50}
             className="w-full"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>€1.000</span>
-            <span>€100.000</span>
+            <span>€50</span>
+            <span>€5.000</span>
           </div>
         </div>
         <Input
           type="number"
           value={initialCapital}
           onChange={(e) => onCapitalChange(Number(e.target.value))}
-          min={0}
-          step={100}
+          min={50}
+          max={5000}
+          step={50}
           className="w-full"
         />
       </CardContent>

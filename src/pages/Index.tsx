@@ -14,6 +14,9 @@ const Index = () => {
     config,
     updateConfig,
     investmentData,
+    dailyReturns,
+    updateDailyReturn,
+    removeDailyReturn,
     exportToCSV,
     summary
   } = useInvestmentCalculator();
@@ -103,9 +106,9 @@ const Index = () => {
                   <CardContent className="pt-6">
                     <div className="text-center">
                       <div className="text-3xl font-bold wealth-gradient-text mb-2">
-                        {investmentData.filter(d => d.pacAmount > 0).length}
+                        {Object.keys(dailyReturns).length}
                       </div>
-                      <div className="text-sm text-muted-foreground">Versamenti PAC</div>
+                      <div className="text-sm text-muted-foreground">Rendimenti personalizzati</div>
                     </div>
                   </CardContent>
                 </Card>
@@ -137,6 +140,9 @@ const Index = () => {
                 <ConfigurationPanel
                   config={config}
                   onConfigChange={updateConfig}
+                  dailyReturns={dailyReturns}
+                  onUpdateDailyReturn={updateDailyReturn}
+                  onRemoveDailyReturn={removeDailyReturn}
                   onExportCSV={exportToCSV}
                 />
               </div>

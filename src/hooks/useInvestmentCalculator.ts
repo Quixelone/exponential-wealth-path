@@ -4,7 +4,7 @@ import { InvestmentConfig, InvestmentData, PACConfig } from '@/types/investment'
 
 export const useInvestmentCalculator = () => {
   const [config, setConfig] = useState<InvestmentConfig>({
-    initialCapital: 10000,
+    initialCapital: 1000,
     timeHorizon: 1000,
     dailyReturnRate: 0.2, // 0.2% giornaliero
     pacConfig: {
@@ -51,6 +51,7 @@ export const useInvestmentCalculator = () => {
 
       // Applica il rendimento giornaliero (custom o standard)
       const dailyReturn = dailyReturns[day] ?? config.dailyReturnRate;
+      const isCustomReturn = dailyReturns.hasOwnProperty(day);
       const interestGained = currentCapital * (dailyReturn / 100);
       currentCapital += interestGained;
 
@@ -65,7 +66,8 @@ export const useInvestmentCalculator = () => {
         dailyReturn,
         finalCapital: currentCapital,
         totalPACInvested,
-        totalInterest
+        totalInterest,
+        isCustomReturn
       });
     }
 
@@ -83,9 +85,17 @@ export const useInvestmentCalculator = () => {
     }));
   }, []);
 
+  const removeDailyReturn = useCallback((day: number) => {
+    setDailyReturns(prev => {
+      const newReturns = { ...prev };
+      delete newReturns[day];
+      return newReturns;
+    });
+  }, []);
+
   const exportToCSV = useCallback(() => {
     const csvContent = [
-      ['Giorno', 'Data', 'Capitale Iniziale', 'PAC', 'Capitale Post-PAC', 'Rendimento %', 'Capitale Finale', 'PAC Totale', 'Interessi'],
+      ['Giorno', 'Data', 'Capitale Iniziale', 'PAC', 'Capitale Post-PAC', 'Rendimento %', 'Custom', 'Capitale Finale', 'PAC Totale', 'Interessi'],
       ...calculateInvestment.map(row => [
         row.day,
         row.date,
@@ -93,6 +103,7 @@ export const useInvestmentCalculator = () => {
         row.pacAmount.toFixed(2),
         row.capitalAfterPAC.toFixed(2),
         row.dailyReturn.toFixed(4),
+        row.isCustomReturn ? 'Sì' : 'No',
         row.finalCapital.toFixed(2),
         row.totalPACInvested.toFixed(2),
         row.totalInterest.toFixed(2)
@@ -112,7 +123,9 @@ export const useInvestmentCalculator = () => {
     config,
     updateConfig,
     investmentData: calculateInvestment,
+    dailyReturns,
     updateDailyReturn,
+    removeDailyReturn,
     exportToCSV,
     summary: {
       finalCapital: calculateInvestment[calculateInvestment.length - 1]?.finalCapital || 0,
