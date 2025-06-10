@@ -19,7 +19,16 @@ const Index = () => {
     updateDailyReturn,
     removeDailyReturn,
     exportToCSV,
-    summary
+    summary,
+    
+    // Nuove funzionalità del database
+    currentConfigId,
+    currentConfigName,
+    savedConfigs,
+    saveCurrentConfiguration,
+    loadSavedConfiguration,
+    deleteConfiguration,
+    supabaseLoading
   } = useInvestmentCalculator();
 
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -149,6 +158,13 @@ const Index = () => {
                   onUpdateDailyReturn={updateDailyReturn}
                   onRemoveDailyReturn={removeDailyReturn}
                   onExportCSV={exportToCSV}
+                  savedConfigs={savedConfigs}
+                  onLoadConfiguration={loadSavedConfiguration}
+                  onDeleteConfiguration={deleteConfiguration}
+                  onSaveConfiguration={saveCurrentConfiguration}
+                  currentConfigId={currentConfigId}
+                  currentConfigName={currentConfigName}
+                  supabaseLoading={supabaseLoading}
                 />
               </div>
             </div>

@@ -1,12 +1,14 @@
 
 import React from 'react';
 import { InvestmentConfig } from '@/types/investment';
+import { SavedConfiguration } from '@/types/database';
 import CapitalConfiguration from '@/components/configuration/CapitalConfiguration';
 import TimeHorizonConfiguration from '@/components/configuration/TimeHorizonConfiguration';
 import ReturnConfiguration from '@/components/configuration/ReturnConfiguration';
 import PACConfiguration from '@/components/configuration/PACConfiguration';
 import DailyReturnTracker from '@/components/configuration/DailyReturnTracker';
 import ExportSection from '@/components/configuration/ExportSection';
+import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
 
 interface ConfigurationPanelProps {
   config: InvestmentConfig;
@@ -15,6 +17,15 @@ interface ConfigurationPanelProps {
   onUpdateDailyReturn: (day: number, returnRate: number) => void;
   onRemoveDailyReturn: (day: number) => void;
   onExportCSV: () => void;
+  
+  // Nuove props per Supabase
+  savedConfigs: SavedConfiguration[];
+  onLoadConfiguration: (config: SavedConfiguration) => void;
+  onDeleteConfiguration: (configId: string) => void;
+  onSaveConfiguration: (name: string) => void;
+  currentConfigId: string | null;
+  currentConfigName: string;
+  supabaseLoading: boolean;
 }
 
 const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
@@ -23,10 +34,27 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   dailyReturns,
   onUpdateDailyReturn,
   onRemoveDailyReturn,
-  onExportCSV
+  onExportCSV,
+  savedConfigs,
+  onLoadConfiguration,
+  onDeleteConfiguration,
+  onSaveConfiguration,
+  currentConfigId,
+  currentConfigName,
+  supabaseLoading
 }) => {
   return (
     <div className="space-y-6">
+      <SavedConfigurationsPanel
+        savedConfigs={savedConfigs}
+        onLoadConfiguration={onLoadConfiguration}
+        onDeleteConfiguration={onDeleteConfiguration}
+        onSaveConfiguration={onSaveConfiguration}
+        currentConfigId={currentConfigId}
+        currentConfigName={currentConfigName}
+        loading={supabaseLoading}
+      />
+
       <CapitalConfiguration
         initialCapital={config.initialCapital}
         onCapitalChange={(capital) => onConfigChange({ initialCapital: capital })}

@@ -1,6 +1,7 @@
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { InvestmentConfig, InvestmentData, PACConfig } from '@/types/investment';
+import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
 
 export const useInvestmentCalculator = () => {
   const [config, setConfig] = useState<InvestmentConfig>({
@@ -15,6 +16,21 @@ export const useInvestmentCalculator = () => {
   });
 
   const [dailyReturns, setDailyReturns] = useState<{ [day: number]: number }>({});
+  const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
+  const [currentConfigName, setCurrentConfigName] = useState<string>('');
+
+  const {
+    loading: supabaseLoading,
+    savedConfigs,
+    saveConfiguration,
+    loadConfigurations,
+    deleteConfiguration
+  } = useSupabaseConfig();
+
+  // Caricare le configurazioni salvate all'avvio
+  useEffect(() => {
+    loadConfigurations();
+  }, [loadConfigurations]);
 
   const isPACDay = useCallback((day: number, pacConfig: PACConfig): boolean => {
     switch (pacConfig.frequency) {
@@ -76,6 +92,7 @@ export const useInvestmentCalculator = () => {
 
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>) => {
     setConfig(prev => ({ ...prev, ...newConfig }));
+    setCurrentConfigId(null); // Indica che la configurazione è stata modificata
   }, []);
 
   const updateDailyReturn = useCallback((day: number, returnRate: number) => {
@@ -83,6 +100,7 @@ export const useInvestmentCalculator = () => {
       ...prev,
       [day]: returnRate
     }));
+    setCurrentConfigId(null); // Indica che la configurazione è stata modificata
   }, []);
 
   const removeDailyReturn = useCallback((day: number) => {
@@ -91,6 +109,23 @@ export const useInvestmentCalculator = () => {
       delete newReturns[day];
       return newReturns;
     });
+    setCurrentConfigId(null); // Indica che la configurazione è stata modificata
+  }, []);
+
+  const saveCurrentConfiguration = useCallback(async (name: string) => {
+    const configId = await saveConfiguration(name, config, dailyReturns);
+    if (configId) {
+      setCurrentConfigId(configId);
+      setCurrentConfigName(name);
+      loadConfigurations(); // Ricarica la lista
+    }
+  }, [config, dailyReturns, saveConfiguration, loadConfigurations]);
+
+  const loadSavedConfiguration = useCallback((savedConfig: any) => {
+    setConfig(savedConfig.config);
+    setDailyReturns(savedConfig.dailyReturns);
+    setCurrentConfigId(savedConfig.id);
+    setCurrentConfigName(savedConfig.name);
   }, []);
 
   const exportToCSV = useCallback(() => {
@@ -127,6 +162,16 @@ export const useInvestmentCalculator = () => {
     updateDailyReturn,
     removeDailyReturn,
     exportToCSV,
+    
+    // Nuove funzionalità del database
+    currentConfigId,
+    currentConfigName,
+    savedConfigs,
+    saveCurrentConfiguration,
+    loadSavedConfiguration,
+    deleteConfiguration,
+    supabaseLoading,
+    
     summary: {
       finalCapital: calculateInvestment[calculateInvestment.length - 1]?.finalCapital || 0,
       totalInvested: config.initialCapital + calculateInvestment[calculateInvestment.length - 1]?.totalPACInvested || 0,

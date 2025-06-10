@@ -9,7 +9,83 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      daily_returns: {
+        Row: {
+          config_id: string
+          created_at: string
+          day: number
+          id: string
+          return_rate: number
+        }
+        Insert: {
+          config_id: string
+          created_at?: string
+          day: number
+          id?: string
+          return_rate: number
+        }
+        Update: {
+          config_id?: string
+          created_at?: string
+          day?: number
+          id?: string
+          return_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_returns_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "investment_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_configs: {
+        Row: {
+          created_at: string
+          daily_return_rate: number
+          id: string
+          initial_capital: number
+          name: string
+          pac_amount: number
+          pac_custom_days: number | null
+          pac_frequency: string
+          pac_start_date: string
+          time_horizon: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          daily_return_rate: number
+          id?: string
+          initial_capital: number
+          name?: string
+          pac_amount: number
+          pac_custom_days?: number | null
+          pac_frequency: string
+          pac_start_date: string
+          time_horizon: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          daily_return_rate?: number
+          id?: string
+          initial_capital?: number
+          name?: string
+          pac_amount?: number
+          pac_custom_days?: number | null
+          pac_frequency?: string
+          pac_start_date?: string
+          time_horizon?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
