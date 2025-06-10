@@ -101,7 +101,7 @@ export const useSupabaseConfig = () => {
           dailyReturnRate: dbConfig.daily_return_rate,
           pacConfig: {
             amount: dbConfig.pac_amount,
-            frequency: dbConfig.pac_frequency,
+            frequency: dbConfig.pac_frequency as 'daily' | 'weekly' | 'monthly' | 'custom',
             customDays: dbConfig.pac_custom_days,
             startDate: new Date(dbConfig.pac_start_date)
           }

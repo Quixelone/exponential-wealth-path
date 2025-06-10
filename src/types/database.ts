@@ -1,4 +1,6 @@
 
+import { InvestmentConfig } from './investment';
+
 export interface DatabaseConfig {
   id: string;
   user_id: string | null;
