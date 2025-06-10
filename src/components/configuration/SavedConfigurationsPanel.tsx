@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Save, FileText, Trash2, Calendar, TrendingUp } from 'lucide-react';
+import { Save, FileText, Trash2, Calendar, TrendingUp, Edit, Crown } from 'lucide-react';
 import { SavedConfiguration } from '@/types/database';
 
 interface SavedConfigurationsPanelProps {
@@ -14,9 +14,11 @@ interface SavedConfigurationsPanelProps {
   onLoadConfiguration: (config: SavedConfiguration) => void;
   onDeleteConfiguration: (configId: string) => void;
   onSaveConfiguration: (name: string) => void;
+  onUpdateConfiguration: (configId: string, name: string) => void;
   currentConfigId: string | null;
   currentConfigName: string;
   loading: boolean;
+  isAdmin?: boolean;
 }
 
 const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
@@ -24,18 +26,42 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
   onLoadConfiguration,
   onDeleteConfiguration,
   onSaveConfiguration,
+  onUpdateConfiguration,
   currentConfigId,
   currentConfigName,
-  loading
+  loading,
+  isAdmin = false
 }) => {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [configName, setConfigName] = useState('');
+  const [editingConfigId, setEditingConfigId] = useState<string | null>(null);
+  const [editingConfigName, setEditingConfigName] = useState('');
 
   const handleSaveConfiguration = () => {
     if (configName.trim()) {
-      onSaveConfiguration(configName.trim());
+      if (currentConfigId) {
+        onUpdateConfiguration(currentConfigId, configName.trim());
+      } else {
+        onSaveConfiguration(configName.trim());
+      }
       setConfigName('');
       setSaveDialogOpen(false);
+    }
+  };
+
+  const handleEditConfiguration = (config: SavedConfiguration) => {
+    setEditingConfigId(config.id);
+    setEditingConfigName(config.name);
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateConfiguration = () => {
+    if (editingConfigId && editingConfigName.trim()) {
+      onUpdateConfiguration(editingConfigId, editingConfigName.trim());
+      setEditDialogOpen(false);
+      setEditingConfigId(null);
+      setEditingConfigName('');
     }
   };
 
@@ -65,17 +91,25 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary" />
             Configurazioni Salvate
+            {isAdmin && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Crown className="h-3 w-3" />
+                Admin
+              </Badge>
+            )}
           </CardTitle>
           <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="flex items-center gap-2">
                 <Save className="h-4 w-4" />
-                Salva Configurazione
+                {currentConfigId ? 'Aggiorna Configurazione' : 'Salva Configurazione'}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Salva Configurazione</DialogTitle>
+                <DialogTitle>
+                  {currentConfigId ? 'Aggiorna Configurazione' : 'Salva Configurazione'}
+                </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
@@ -83,7 +117,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
                   <Input
                     value={configName}
                     onChange={(e) => setConfigName(e.target.value)}
-                    placeholder="Es: Strategia conservativa"
+                    placeholder={currentConfigId ? currentConfigName : "Es: Strategia conservativa"}
                     className="mt-1"
                   />
                 </div>
@@ -95,7 +129,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
                     onClick={handleSaveConfiguration}
                     disabled={!configName.trim() || loading}
                   >
-                    {loading ? 'Salvando...' : 'Salva'}
+                    {loading ? 'Salvando...' : (currentConfigId ? 'Aggiorna' : 'Salva')}
                   </Button>
                 </div>
               </div>
@@ -180,6 +214,15 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
                       >
                         Carica
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditConfiguration(savedConfig)}
+                        disabled={loading}
+                        className="h-7 w-7 p-0"
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -217,6 +260,37 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
             ))
           )}
         </div>
+
+        {/* Dialog per modificare il nome della configurazione */}
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Modifica Nome Configurazione</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Nome della configurazione</label>
+                <Input
+                  value={editingConfigName}
+                  onChange={(e) => setEditingConfigName(e.target.value)}
+                  placeholder="Nome configurazione"
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+                  Annulla
+                </Button>
+                <Button 
+                  onClick={handleUpdateConfiguration}
+                  disabled={!editingConfigName.trim() || loading}
+                >
+                  {loading ? 'Aggiornando...' : 'Aggiorna'}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

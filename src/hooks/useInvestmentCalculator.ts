@@ -23,6 +23,7 @@ export const useInvestmentCalculator = () => {
     loading: supabaseLoading,
     savedConfigs,
     saveConfiguration,
+    updateConfiguration,
     loadConfigurations,
     deleteConfiguration
   } = useSupabaseConfig();
@@ -121,6 +122,15 @@ export const useInvestmentCalculator = () => {
     }
   }, [config, dailyReturns, saveConfiguration, loadConfigurations]);
 
+  const updateCurrentConfiguration = useCallback(async (configId: string, name: string) => {
+    const success = await updateConfiguration(configId, name, config, dailyReturns);
+    if (success) {
+      setCurrentConfigId(configId);
+      setCurrentConfigName(name);
+      loadConfigurations(); // Ricarica la lista
+    }
+  }, [config, dailyReturns, updateConfiguration, loadConfigurations]);
+
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
@@ -168,6 +178,7 @@ export const useInvestmentCalculator = () => {
     currentConfigName,
     savedConfigs,
     saveCurrentConfiguration,
+    updateCurrentConfiguration,
     loadSavedConfiguration,
     deleteConfiguration,
     supabaseLoading,

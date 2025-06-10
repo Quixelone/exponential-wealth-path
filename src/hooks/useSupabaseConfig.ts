@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { InvestmentConfig } from '@/types/investment';
@@ -67,6 +66,74 @@ export const useSupabaseConfig = () => {
         variant: "destructive",
       });
       return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  const updateConfiguration = useCallback(async (
+    configId: string,
+    name: string,
+    config: InvestmentConfig,
+    dailyReturns: { [day: number]: number }
+  ): Promise<boolean> => {
+    try {
+      setLoading(true);
+      
+      // Aggiornare la configurazione principale
+      const { error: configError } = await supabase
+        .from('investment_configs')
+        .update({
+          name,
+          initial_capital: config.initialCapital,
+          time_horizon: config.timeHorizon,
+          daily_return_rate: config.dailyReturnRate,
+          pac_amount: config.pacConfig.amount,
+          pac_frequency: config.pacConfig.frequency,
+          pac_custom_days: config.pacConfig.customDays,
+          pac_start_date: config.pacConfig.startDate.toISOString().split('T')[0]
+        })
+        .eq('id', configId);
+
+      if (configError) throw configError;
+
+      // Rimuovere i vecchi rendimenti giornalieri
+      const { error: deleteError } = await supabase
+        .from('daily_returns')
+        .delete()
+        .eq('config_id', configId);
+
+      if (deleteError) throw deleteError;
+
+      // Inserire i nuovi rendimenti giornalieri
+      if (Object.keys(dailyReturns).length > 0) {
+        const dailyReturnsData = Object.entries(dailyReturns).map(([day, returnRate]) => ({
+          config_id: configId,
+          day: parseInt(day),
+          return_rate: returnRate
+        }));
+
+        const { error: returnsError } = await supabase
+          .from('daily_returns')
+          .insert(dailyReturnsData);
+
+        if (returnsError) throw returnsError;
+      }
+
+      toast({
+        title: "Configurazione aggiornata",
+        description: `"${name}" è stata aggiornata con successo`,
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Errore nell\'aggiornare la configurazione:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiornare la configurazione",
+        variant: "destructive",
+      });
+      return false;
     } finally {
       setLoading(false);
     }
@@ -168,6 +235,7 @@ export const useSupabaseConfig = () => {
     loading,
     savedConfigs,
     saveConfiguration,
+    updateConfiguration,
     loadConfigurations,
     deleteConfiguration
   };

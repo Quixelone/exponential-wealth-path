@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
@@ -18,14 +17,16 @@ interface ConfigurationPanelProps {
   onRemoveDailyReturn: (day: number) => void;
   onExportCSV: () => void;
   
-  // Nuove props per Supabase
+  // Props per Supabase
   savedConfigs: SavedConfiguration[];
   onLoadConfiguration: (config: SavedConfiguration) => void;
   onDeleteConfiguration: (configId: string) => void;
   onSaveConfiguration: (name: string) => void;
+  onUpdateConfiguration: (configId: string, name: string) => void;
   currentConfigId: string | null;
   currentConfigName: string;
   supabaseLoading: boolean;
+  isAdmin?: boolean;
 }
 
 const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
@@ -39,9 +40,11 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   onLoadConfiguration,
   onDeleteConfiguration,
   onSaveConfiguration,
+  onUpdateConfiguration,
   currentConfigId,
   currentConfigName,
-  supabaseLoading
+  supabaseLoading,
+  isAdmin = false
 }) => {
   return (
     <div className="space-y-6">
@@ -50,9 +53,11 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         onLoadConfiguration={onLoadConfiguration}
         onDeleteConfiguration={onDeleteConfiguration}
         onSaveConfiguration={onSaveConfiguration}
+        onUpdateConfiguration={onUpdateConfiguration}
         currentConfigId={currentConfigId}
         currentConfigName={currentConfigName}
         loading={supabaseLoading}
+        isAdmin={isAdmin}
       />
 
       <CapitalConfiguration
