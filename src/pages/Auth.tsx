@@ -34,7 +34,7 @@ const Auth: React.FC = () => {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold flex items-center gap-2 justify-center">
             <Lock className="h-6 w-6 text-primary" />
-            Wealth Compass
+            Finanza Creativa
           </CardTitle>
           <CardDescription>
             Accedi al tuo account per gestire i tuoi investimenti
