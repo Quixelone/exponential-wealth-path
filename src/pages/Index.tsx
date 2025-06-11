@@ -2,11 +2,13 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Users, Bell } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ConfigurationPanel from '@/components/ConfigurationPanel';
 import InvestmentChart from '@/components/InvestmentChart';
 import InvestmentSummary from '@/components/InvestmentSummary';
 import ReportTable from '@/components/ReportTable';
+import PaymentReminders from '@/components/PaymentReminders';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -59,6 +61,10 @@ const Index = () => {
     navigate('/auth');
   };
 
+  const displayName = userProfile?.first_name && userProfile?.last_name 
+    ? `${userProfile.first_name} ${userProfile.last_name}`
+    : userProfile?.email || 'Utente';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
       {/* Header with user info and logout */}
@@ -76,8 +82,18 @@ const Index = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <User className="h-4 w-4" />
-                {userProfile?.email}
+                {displayName}
               </div>
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/user-management')}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Gestione Utenti
+                </Button>
+              )}
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -88,35 +104,51 @@ const Index = () => {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Configuration Panel */}
-          <div className="lg:col-span-1">
-            <ConfigurationPanel
-              config={config}
-              onConfigChange={updateConfig}
-              dailyReturns={dailyReturns}
-              onUpdateDailyReturn={updateDailyReturn}
-              onRemoveDailyReturn={removeDailyReturn}
-              onExportCSV={exportToCSV}
-              savedConfigs={savedConfigs}
-              onLoadConfiguration={loadSavedConfiguration}
-              onDeleteConfiguration={deleteConfiguration}
-              onSaveConfiguration={saveCurrentConfiguration}
-              onUpdateConfiguration={updateCurrentConfiguration}
-              currentConfigId={currentConfigId}
-              currentConfigName={currentConfigName}
-              supabaseLoading={supabaseLoading}
-              isAdmin={isAdmin}
-            />
-          </div>
+        <Tabs defaultValue="investments" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="investments">Investimenti</TabsTrigger>
+            <TabsTrigger value="reminders" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Promemoria
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Charts and Results */}
-          <div className="lg:col-span-2 space-y-6">
-            <InvestmentSummary summary={summary} />
-            <InvestmentChart data={investmentData} />
-            <ReportTable data={investmentData} onExportCSV={exportToCSV} />
-          </div>
-        </div>
+          <TabsContent value="investments">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Configuration Panel */}
+              <div className="lg:col-span-1">
+                <ConfigurationPanel
+                  config={config}
+                  onConfigChange={updateConfig}
+                  dailyReturns={dailyReturns}
+                  onUpdateDailyReturn={updateDailyReturn}
+                  onRemoveDailyReturn={removeDailyReturn}
+                  onExportCSV={exportToCSV}
+                  savedConfigs={savedConfigs}
+                  onLoadConfiguration={loadSavedConfiguration}
+                  onDeleteConfiguration={deleteConfiguration}
+                  onSaveConfiguration={saveCurrentConfiguration}
+                  onUpdateConfiguration={updateCurrentConfiguration}
+                  currentConfigId={currentConfigId}
+                  currentConfigName={currentConfigName}
+                  supabaseLoading={supabaseLoading}
+                  isAdmin={isAdmin}
+                />
+              </div>
+
+              {/* Charts and Results */}
+              <div className="lg:col-span-2 space-y-6">
+                <InvestmentSummary summary={summary} />
+                <InvestmentChart data={investmentData} />
+                <ReportTable data={investmentData} onExportCSV={exportToCSV} />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reminders">
+            <PaymentReminders />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

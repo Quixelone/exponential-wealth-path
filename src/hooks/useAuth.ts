@@ -8,6 +8,13 @@ interface UserProfile {
   id: string;
   email: string | null;
   role: 'admin' | 'user';
+  first_name: string | null;
+  last_name: string | null;
+  phone: string | null;
+  avatar_url: string | null;
+  google_id: string | null;
+  last_login: string | null;
+  login_count: number | null;
 }
 
 export const useAuth = () => {
@@ -31,7 +38,6 @@ export const useAuth = () => {
       
       if (error) {
         console.error('Error fetching profile:', error);
-        // Se il profilo non esiste, creane uno di default
         if (error.code === 'PGRST116') {
           console.log('Profile not found, creating default profile');
           const { data: newProfile, error: createError } = await supabase
@@ -53,7 +59,14 @@ export const useAuth = () => {
             setUserProfile({
               id: newProfile.id,
               email: newProfile.email,
-              role: newProfile.role as 'admin' | 'user'
+              role: newProfile.role as 'admin' | 'user',
+              first_name: newProfile.first_name,
+              last_name: newProfile.last_name,
+              phone: newProfile.phone,
+              avatar_url: newProfile.avatar_url,
+              google_id: newProfile.google_id,
+              last_login: newProfile.last_login,
+              login_count: newProfile.login_count
             });
           }
         }
@@ -65,7 +78,14 @@ export const useAuth = () => {
         setUserProfile({
           id: profile.id,
           email: profile.email,
-          role: profile.role as 'admin' | 'user'
+          role: profile.role as 'admin' | 'user',
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          phone: profile.phone,
+          avatar_url: profile.avatar_url,
+          google_id: profile.google_id,
+          last_login: profile.last_login,
+          login_count: profile.login_count
         });
       }
     } catch (error: any) {
@@ -75,10 +95,25 @@ export const useAuth = () => {
     }
   };
 
+  const updateUserLogin = async (userId: string) => {
+    try {
+      const { error } = await supabase.rpc('update_user_login', {
+        user_uuid: userId
+      });
+      
+      if (error) {
+        console.error('Error updating user login:', error);
+      } else {
+        console.log('User login updated successfully');
+      }
+    } catch (error) {
+      console.error('Unexpected error updating login:', error);
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.id);
@@ -89,7 +124,10 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user && event === 'SIGNED_IN') {
-          await fetchUserProfile(session.user.id);
+          setTimeout(async () => {
+            await fetchUserProfile(session.user.id);
+            await updateUserLogin(session.user.id);
+          }, 0);
         } else if (event === 'SIGNED_OUT') {
           setUserProfile(null);
         }
@@ -98,7 +136,6 @@ export const useAuth = () => {
       }
     );
 
-    // Check for existing session
     const initializeAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -135,17 +172,27 @@ export const useAuth = () => {
     };
   }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      const userData: any = {
         email,
         password,
         options: {
           emailRedirectTo: redirectUrl
         }
-      });
+      };
+
+      if (firstName || lastName || phone) {
+        userData.options.data = {
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone
+        };
+      }
+
+      const { error } = await supabase.auth.signUp(userData);
 
       if (error) {
         if (error.message.includes('User already registered')) {
@@ -218,6 +265,65 @@ export const useAuth = () => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Errore login Google",
+          description: error.message,
+          variant: "destructive",
+        });
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      toast({
+        title: "Errore",
+        description: error.message,
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      const redirectUrl = `${window.location.origin}/auth`;
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl
+      });
+
+      if (error) {
+        toast({
+          title: "Errore reset password",
+          description: error.message,
+          variant: "destructive",
+        });
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      toast({
+        title: "Errore",
+        description: error.message,
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -241,6 +347,8 @@ export const useAuth = () => {
     loading: loading || profileLoading,
     signUp,
     signIn,
+    signInWithGoogle,
+    resetPassword,
     signOut,
     isAdmin: userProfile?.role === 'admin'
   };
