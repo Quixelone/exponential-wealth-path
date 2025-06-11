@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,13 +13,33 @@ const Auth: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user, session } = useAuth();
+  const navigate = useNavigate();
+
+  // Reindirizza automaticamente se l'utente è già autenticato
+  useEffect(() => {
+    if (user && session) {
+      console.log('User authenticated, redirecting to home...');
+      navigate('/', { replace: true });
+    }
+  }, [user, session, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signIn(email, password);
-    setLoading(false);
+    
+    try {
+      const result = await signIn(email, password);
+      
+      if (!result.error) {
+        // Il reindirizzamento avverrà automaticamente tramite useEffect
+        console.log('Login successful, waiting for redirect...');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {

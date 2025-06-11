@@ -32,13 +32,21 @@ const Index = () => {
     summary
   } = useInvestmentCalculator();
 
-  // Redirect to auth if not logged in
+  // Reindirizza alla pagina di auth se non autenticato
   useEffect(() => {
+    console.log('Index: checking auth state...', { 
+      authLoading, 
+      user: !!user, 
+      userProfile: !!userProfile 
+    });
+    
     if (!authLoading && !user) {
+      console.log('User not authenticated, redirecting to auth...');
       navigate('/auth');
     }
   }, [user, authLoading, navigate]);
 
+  // Mostra loading durante l'autenticazione
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -50,8 +58,9 @@ const Index = () => {
     );
   }
 
+  // Se non c'è utente dopo il caricamento, non mostrare nulla (il redirect è in corso)
   if (!user) {
-    return null; // Will redirect to auth
+    return null;
   }
 
   const handleLogout = async () => {
@@ -66,7 +75,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-primary">Wealth Compass</h1>
+              <h1 className="text-xl font-bold text-primary">Finanza Creativa</h1>
               {isAdmin && (
                 <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">
                   Amministratore
@@ -76,7 +85,7 @@ const Index = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <User className="h-4 w-4" />
-                {userProfile?.email}
+                {userProfile?.email || user.email}
               </div>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
