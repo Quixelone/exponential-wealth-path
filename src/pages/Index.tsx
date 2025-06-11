@@ -114,7 +114,7 @@ const Index = () => {
           <div className="lg:col-span-2 space-y-6">
             <InvestmentSummary summary={summary} />
             <InvestmentChart data={investmentData} />
-            <ReportTable data={investmentData} />
+            <ReportTable data={investmentData} onExportCSV={exportToCSV} />
           </div>
         </div>
       </div>

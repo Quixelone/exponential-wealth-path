@@ -32,7 +32,14 @@ export const useAuth = () => {
             .eq('id', session.user.id)
             .single();
           
-          setUserProfile(profile);
+          if (profile) {
+            // Cast the role to the correct type
+            setUserProfile({
+              id: profile.id,
+              email: profile.email,
+              role: profile.role as 'admin' | 'user'
+            });
+          }
         } else {
           setUserProfile(null);
         }
