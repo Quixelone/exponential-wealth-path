@@ -45,9 +45,19 @@ const Auth: React.FC = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signUp(email, password);
-    setLoading(false);
+    try {
+      await signUp(email, password);
+    } catch (error) {
+      console.error('Signup error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Se l'utente è già autenticato, non mostrare nulla durante il redirect
+  if (user && session) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
