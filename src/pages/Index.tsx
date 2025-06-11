@@ -36,8 +36,11 @@ const Index = () => {
 
   // Redirect to auth if not logged in
   useEffect(() => {
+    console.log('Index - useEffect running, authLoading:', authLoading, 'user:', user?.id);
+    
     if (!authLoading && !user) {
-      navigate('/auth');
+      console.log('Index - No user found, redirecting to auth...');
+      navigate('/auth', { replace: true });
     }
   }, [user, authLoading, navigate]);
 
@@ -58,7 +61,7 @@ const Index = () => {
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/auth');
+    navigate('/auth', { replace: true });
   };
 
   const displayName = userProfile?.first_name && userProfile?.last_name 
@@ -106,10 +109,10 @@ const Index = () => {
       <div className="max-w-7xl mx-auto p-6">
         <Tabs defaultValue="investments" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="investments">Investimenti</TabsTrigger>
+            <TabsTrigger value="investments">Dashboard Investimenti</TabsTrigger>
             <TabsTrigger value="reminders" className="flex items-center gap-2">
               <Bell className="h-4 w-4" />
-              Promemoria
+              Promemoria Pagamenti
             </TabsTrigger>
           </TabsList>
 

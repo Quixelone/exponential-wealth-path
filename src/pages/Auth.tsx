@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { Lock, Mail, User, Phone, Eye, EyeOff, ArrowLeft, KeyRound, Home } from 'lucide-react';
+import { Lock, Mail, User, Phone, Eye, EyeOff, ArrowLeft, KeyRound } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Auth: React.FC = () => {
@@ -30,13 +30,23 @@ const Auth: React.FC = () => {
     console.log('Auth page - useEffect running, user:', user?.id, 'session:', !!session);
     
     if (user && session) {
-      console.log('User authenticated, redirecting to home...');
-      // Use a small delay to ensure the state is fully updated
-      setTimeout(() => {
-        navigate('/', { replace: true });
-      }, 100);
+      console.log('User authenticated, redirecting to dashboard...');
+      // Use replace to prevent going back to auth page
+      navigate('/', { replace: true });
     }
   }, [user, session, navigate]);
+
+  // Early return if authenticated - should redirect
+  if (user && session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Accesso alla dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +57,7 @@ const Auth: React.FC = () => {
       
       if (!result.error) {
         console.log('Login successful, waiting for redirect...');
+        // The redirect will happen automatically via useEffect
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -115,45 +126,6 @@ const Auth: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const handleGoToApp = () => {
-    console.log('Manual navigation to home page...');
-    navigate('/', { replace: true });
-  };
-
-  // Show manual navigation button if user is authenticated
-  if (user && session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
-        <Card className="w-full max-w-md relative z-10 shadow-2xl border-0 bg-white/90 backdrop-blur-sm">
-          <CardHeader className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center">
-              <Home className="h-8 w-8 text-white" />
-            </div>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              Sei già autenticato!
-            </CardTitle>
-            <CardDescription>
-              Bentornato! Clicca il pulsante qui sotto per accedere all'applicazione principale.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <Button 
-              onClick={handleGoToApp} 
-              className="w-full h-12 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 transition-all duration-300"
-            >
-              <Home className="h-4 w-4 mr-2" />
-              Vai all'Applicazione
-            </Button>
-            <div className="text-center text-sm text-muted-foreground">
-              Se il redirect automatico non funziona, usa il pulsante sopra.
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   if (resetMode) {
     return (
