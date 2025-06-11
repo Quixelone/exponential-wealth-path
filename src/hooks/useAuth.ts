@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,13 +8,6 @@ interface UserProfile {
   id: string;
   email: string | null;
   role: 'admin' | 'user';
-  first_name: string | null;
-  last_name: string | null;
-  phone: string | null;
-  avatar_url: string | null;
-  google_id: string | null;
-  last_login: string | null;
-  login_count: number | null;
 }
 
 export const useAuth = () => {
@@ -37,6 +31,7 @@ export const useAuth = () => {
       
       if (error) {
         console.error('Error fetching profile:', error);
+        // Se il profilo non esiste, creane uno di default
         if (error.code === 'PGRST116') {
           console.log('Profile not found, creating default profile');
           const { data: newProfile, error: createError } = await supabase
@@ -58,14 +53,7 @@ export const useAuth = () => {
             setUserProfile({
               id: newProfile.id,
               email: newProfile.email,
-              role: newProfile.role as 'admin' | 'user',
-              first_name: newProfile.first_name,
-              last_name: newProfile.last_name,
-              phone: newProfile.phone,
-              avatar_url: newProfile.avatar_url,
-              google_id: newProfile.google_id,
-              last_login: newProfile.last_login,
-              login_count: newProfile.login_count
+              role: newProfile.role as 'admin' | 'user'
             });
           }
         }
@@ -77,14 +65,7 @@ export const useAuth = () => {
         setUserProfile({
           id: profile.id,
           email: profile.email,
-          role: profile.role as 'admin' | 'user',
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          phone: profile.phone,
-          avatar_url: profile.avatar_url,
-          google_id: profile.google_id,
-          last_login: profile.last_login,
-          login_count: profile.login_count
+          role: profile.role as 'admin' | 'user'
         });
       }
     } catch (error: any) {
@@ -94,46 +75,22 @@ export const useAuth = () => {
     }
   };
 
-  const updateUserLogin = async (userId: string) => {
-    try {
-      const { error } = await supabase.rpc('update_user_login', {
-        user_uuid: userId
-      });
-      
-      if (error) {
-        console.error('Error updating user login:', error);
-      } else {
-        console.log('User login updated successfully');
-      }
-    } catch (error) {
-      console.error('Unexpected error updating login:', error);
-    }
-  };
-
   useEffect(() => {
     let mounted = true;
-    console.log('useAuth - Setting up auth state listener...');
 
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('useAuth - Auth state change:', event, 'user:', session?.user?.id, 'session exists:', !!session);
+        console.log('Auth state change:', event, session?.user?.id);
         
-        if (!mounted) {
-          console.log('useAuth - Component unmounted, ignoring auth state change');
-          return;
-        }
+        if (!mounted) return;
 
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user && event === 'SIGNED_IN') {
-          console.log('useAuth - User signed in, fetching profile...');
-          setTimeout(async () => {
-            await fetchUserProfile(session.user.id);
-            await updateUserLogin(session.user.id);
-          }, 0);
+          await fetchUserProfile(session.user.id);
         } else if (event === 'SIGNED_OUT') {
-          console.log('useAuth - User signed out, clearing profile...');
           setUserProfile(null);
         }
         
@@ -141,32 +98,29 @@ export const useAuth = () => {
       }
     );
 
+    // Check for existing session
     const initializeAuth = async () => {
       try {
-        console.log('useAuth - Initializing auth...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('useAuth - Error getting session:', error);
+          console.error('Error getting session:', error);
           setLoading(false);
           return;
         }
-
-        console.log('useAuth - Initial session:', !!session, 'user:', session?.user?.id);
 
         if (mounted) {
           setSession(session);
           setUser(session?.user ?? null);
           
           if (session?.user) {
-            console.log('useAuth - Found existing session, fetching profile...');
             await fetchUserProfile(session.user.id);
           }
           
           setLoading(false);
         }
       } catch (error) {
-        console.error('useAuth - Error initializing auth:', error);
+        console.error('Error initializing auth:', error);
         if (mounted) {
           setLoading(false);
         }
@@ -176,33 +130,22 @@ export const useAuth = () => {
     initializeAuth();
 
     return () => {
-      console.log('useAuth - Cleaning up auth subscription...');
       mounted = false;
       subscription.unsubscribe();
     };
   }, []);
 
-  const signUp = async (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => {
+  const signUp = async (email: string, password: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const userData: any = {
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: redirectUrl
         }
-      };
-
-      if (firstName || lastName || phone) {
-        userData.options.data = {
-          first_name: firstName,
-          last_name: lastName,
-          phone: phone
-        };
-      }
-
-      const { error } = await supabase.auth.signUp(userData);
+      });
 
       if (error) {
         if (error.message.includes('User already registered')) {
@@ -239,7 +182,7 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('useAuth - Attempting to sign in with:', email);
+      console.log('Attempting to sign in with:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -247,7 +190,7 @@ export const useAuth = () => {
       });
 
       if (error) {
-        console.error('useAuth - Sign in error:', error);
+        console.error('Sign in error:', error);
         toast({
           title: "Errore nel login",
           description: error.message,
@@ -256,7 +199,7 @@ export const useAuth = () => {
         return { error };
       }
 
-      console.log('useAuth - Sign in successful:', data.user?.id);
+      console.log('Sign in successful:', data.user?.id);
       
       toast({
         title: "Login effettuato",
@@ -265,66 +208,7 @@ export const useAuth = () => {
 
       return { error: null };
     } catch (error: any) {
-      console.error('useAuth - Unexpected sign in error:', error);
-      toast({
-        title: "Errore",
-        description: error.message,
-        variant: "destructive",
-      });
-      return { error };
-    }
-  };
-
-  const signInWithGoogle = async () => {
-    try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl
-        }
-      });
-
-      if (error) {
-        toast({
-          title: "Errore login Google",
-          description: error.message,
-          variant: "destructive",
-        });
-        return { error };
-      }
-
-      return { error: null };
-    } catch (error: any) {
-      toast({
-        title: "Errore",
-        description: error.message,
-        variant: "destructive",
-      });
-      return { error };
-    }
-  };
-
-  const resetPassword = async (email: string) => {
-    try {
-      const redirectUrl = `${window.location.origin}/auth`;
-      
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl
-      });
-
-      if (error) {
-        toast({
-          title: "Errore reset password",
-          description: error.message,
-          variant: "destructive",
-        });
-        return { error };
-      }
-
-      return { error: null };
-    } catch (error: any) {
+      console.error('Unexpected sign in error:', error);
       toast({
         title: "Errore",
         description: error.message,
@@ -335,7 +219,6 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    console.log('useAuth - Signing out...');
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
@@ -358,8 +241,6 @@ export const useAuth = () => {
     loading: loading || profileLoading,
     signUp,
     signIn,
-    signInWithGoogle,
-    resetPassword,
     signOut,
     isAdmin: userProfile?.role === 'admin'
   };

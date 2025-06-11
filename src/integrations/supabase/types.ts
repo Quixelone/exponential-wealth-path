@@ -86,179 +86,29 @@ export type Database = {
         }
         Relationships: []
       }
-      notification_settings: {
-        Row: {
-          created_at: string
-          id: string
-          notifications_enabled: boolean | null
-          preferred_method: string | null
-          telegram_chat_id: string | null
-          updated_at: string
-          user_id: string
-          whatsapp_number: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          notifications_enabled?: boolean | null
-          preferred_method?: string | null
-          telegram_chat_id?: string | null
-          updated_at?: string
-          user_id: string
-          whatsapp_number?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          notifications_enabled?: boolean | null
-          preferred_method?: string | null
-          telegram_chat_id?: string | null
-          updated_at?: string
-          user_id?: string
-          whatsapp_number?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "notification_settings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payment_reminders: {
-        Row: {
-          amount: number | null
-          created_at: string
-          description: string | null
-          frequency: string
-          id: string
-          is_active: boolean | null
-          next_reminder_date: string
-          payment_day: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          amount?: number | null
-          created_at?: string
-          description?: string | null
-          frequency: string
-          id?: string
-          is_active?: boolean | null
-          next_reminder_date: string
-          payment_day: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number | null
-          created_at?: string
-          description?: string | null
-          frequency?: string
-          id?: string
-          is_active?: boolean | null
-          next_reminder_date?: string
-          payment_day?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payment_reminders_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_profiles: {
         Row: {
-          avatar_url: string | null
           created_at: string | null
           email: string | null
-          first_name: string | null
-          google_id: string | null
           id: string
-          last_login: string | null
-          last_name: string | null
-          login_count: number | null
-          phone: string | null
           role: string | null
           updated_at: string | null
         }
         Insert: {
-          avatar_url?: string | null
           created_at?: string | null
           email?: string | null
-          first_name?: string | null
-          google_id?: string | null
           id: string
-          last_login?: string | null
-          last_name?: string | null
-          login_count?: number | null
-          phone?: string | null
           role?: string | null
           updated_at?: string | null
         }
         Update: {
-          avatar_url?: string | null
           created_at?: string | null
           email?: string | null
-          first_name?: string | null
-          google_id?: string | null
           id?: string
-          last_login?: string | null
-          last_name?: string | null
-          login_count?: number | null
-          phone?: string | null
           role?: string | null
           updated_at?: string | null
         }
         Relationships: []
-      }
-      user_sessions: {
-        Row: {
-          created_at: string
-          id: string
-          ip_address: unknown | null
-          login_time: string
-          logout_time: string | null
-          session_duration: unknown | null
-          user_agent: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          ip_address?: unknown | null
-          login_time?: string
-          logout_time?: string | null
-          session_duration?: unknown | null
-          user_agent?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          ip_address?: unknown | null
-          login_time?: string
-          logout_time?: string | null
-          session_duration?: unknown | null
-          user_agent?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
@@ -268,10 +118,6 @@ export type Database = {
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
-      }
-      update_user_login: {
-        Args: { user_uuid: string }
-        Returns: undefined
       }
     }
     Enums: {
