@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -113,22 +112,28 @@ export const useAuth = () => {
 
   useEffect(() => {
     let mounted = true;
+    console.log('useAuth - Setting up auth state listener...');
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.id);
+        console.log('useAuth - Auth state change:', event, 'user:', session?.user?.id, 'session exists:', !!session);
         
-        if (!mounted) return;
+        if (!mounted) {
+          console.log('useAuth - Component unmounted, ignoring auth state change');
+          return;
+        }
 
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user && event === 'SIGNED_IN') {
+          console.log('useAuth - User signed in, fetching profile...');
           setTimeout(async () => {
             await fetchUserProfile(session.user.id);
             await updateUserLogin(session.user.id);
           }, 0);
         } else if (event === 'SIGNED_OUT') {
+          console.log('useAuth - User signed out, clearing profile...');
           setUserProfile(null);
         }
         
@@ -138,26 +143,30 @@ export const useAuth = () => {
 
     const initializeAuth = async () => {
       try {
+        console.log('useAuth - Initializing auth...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Error getting session:', error);
+          console.error('useAuth - Error getting session:', error);
           setLoading(false);
           return;
         }
+
+        console.log('useAuth - Initial session:', !!session, 'user:', session?.user?.id);
 
         if (mounted) {
           setSession(session);
           setUser(session?.user ?? null);
           
           if (session?.user) {
+            console.log('useAuth - Found existing session, fetching profile...');
             await fetchUserProfile(session.user.id);
           }
           
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('useAuth - Error initializing auth:', error);
         if (mounted) {
           setLoading(false);
         }
@@ -167,6 +176,7 @@ export const useAuth = () => {
     initializeAuth();
 
     return () => {
+      console.log('useAuth - Cleaning up auth subscription...');
       mounted = false;
       subscription.unsubscribe();
     };
@@ -229,7 +239,7 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Attempting to sign in with:', email);
+      console.log('useAuth - Attempting to sign in with:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -237,7 +247,7 @@ export const useAuth = () => {
       });
 
       if (error) {
-        console.error('Sign in error:', error);
+        console.error('useAuth - Sign in error:', error);
         toast({
           title: "Errore nel login",
           description: error.message,
@@ -246,7 +256,7 @@ export const useAuth = () => {
         return { error };
       }
 
-      console.log('Sign in successful:', data.user?.id);
+      console.log('useAuth - Sign in successful:', data.user?.id);
       
       toast({
         title: "Login effettuato",
@@ -255,7 +265,7 @@ export const useAuth = () => {
 
       return { error: null };
     } catch (error: any) {
-      console.error('Unexpected sign in error:', error);
+      console.error('useAuth - Unexpected sign in error:', error);
       toast({
         title: "Errore",
         description: error.message,
@@ -325,6 +335,7 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
+    console.log('useAuth - Signing out...');
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
