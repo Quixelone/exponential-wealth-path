@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
@@ -7,9 +6,8 @@ import TimeHorizonConfiguration from '@/components/configuration/TimeHorizonConf
 import ReturnConfiguration from '@/components/configuration/ReturnConfiguration';
 import PACConfiguration from '@/components/configuration/PACConfiguration';
 import DailyReturnTracker from '@/components/configuration/DailyReturnTracker';
+import ExportSection from '@/components/configuration/ExportSection';
 import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 interface ConfigurationPanelProps {
   config: InvestmentConfig;
@@ -89,13 +87,7 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         onRemoveDailyReturn={onRemoveDailyReturn}
       />
 
-      <Card className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
-        <CardContent className="pt-6">
-          <Button onClick={onExportCSV} className="w-full">
-            Esporta Dati CSV
-          </Button>
-        </CardContent>
-      </Card>
+      <ExportSection onExportCSV={onExportCSV} />
     </div>
   );
 };
