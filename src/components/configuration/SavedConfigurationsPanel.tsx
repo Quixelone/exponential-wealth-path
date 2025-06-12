@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -102,7 +101,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
             <DialogTrigger asChild>
               <Button size="sm" className="flex items-center gap-2">
                 <Save className="h-4 w-4" />
-                {currentConfigId ? 'Aggiorna Configurazione' : 'Salva Configurazione'}
+                Salva
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -261,7 +260,6 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
           )}
         </div>
 
-        {/* Dialog per modificare il nome della configurazione */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
           <DialogContent>
             <DialogHeader>

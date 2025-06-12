@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, TrendingDown, Plus, Trash2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Plus, Trash2, AlertTriangle } from 'lucide-react';
 
 interface DailyReturnTrackerProps {
   timeHorizon: number;
@@ -58,7 +58,7 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="return-rate">Rendimento %</Label>
+            <Label htmlFor="return-rate">Rendimento/Perdita %</Label>
             <Input
               id="return-rate"
               type="number"
@@ -68,6 +68,10 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
               placeholder="Es: 1.5 o -2.3"
               className="w-full"
             />
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <AlertTriangle className="h-3 w-3" />
+              Usa valori negativi per le perdite
+            </div>
           </div>
           <div className="flex items-end">
             <Button 
@@ -90,7 +94,7 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Giorno</TableHead>
-                    <TableHead>Rendimento</TableHead>
+                    <TableHead>Rendimento/Perdita</TableHead>
                     <TableHead className="w-16">Azioni</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -106,7 +110,10 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
                             <TrendingDown className="h-4 w-4 text-red-600" />
                           )}
                           <span className={rate >= 0 ? 'text-green-600' : 'text-red-600'}>
-                            {rate.toFixed(2)}%
+                            {rate >= 0 ? '+' : ''}{rate.toFixed(2)}%
+                          </span>
+                          <span className="text-xs text-muted-foreground ml-1">
+                            {rate >= 0 ? '(guadagno)' : '(perdita)'}
                           </span>
                         </div>
                       </TableCell>
@@ -130,6 +137,7 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
 
         <div className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
           <p><strong>Nota:</strong> I rendimenti personalizzati sovrascriveranno il rendimento giornaliero standard per i giorni specificati.</p>
+          <p className="mt-1"><strong>Suggerimento:</strong> Usa valori positivi per i guadagni e negativi per le perdite (es: -1.5 per una perdita dell'1.5%).</p>
         </div>
       </CardContent>
     </Card>

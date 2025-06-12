@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -137,12 +136,35 @@ const PaymentReminders = () => {
     try {
       setLoading(true);
       
-      // Calcola la prossima data di promemoria
+      // Calcola la prossima data di promemoria in base alla frequenza
       const today = new Date();
-      const nextDate = new Date(today.getFullYear(), today.getMonth(), newReminder.payment_day);
+      let nextDate = new Date(today);
       
-      if (nextDate <= today) {
-        nextDate.setMonth(nextDate.getMonth() + 1);
+      switch (newReminder.frequency) {
+        case 'daily':
+          nextDate.setDate(today.getDate() + 1);
+          break;
+        case 'weekly':
+          nextDate.setDate(today.getDate() + 7);
+          break;
+        case 'monthly':
+          nextDate = new Date(today.getFullYear(), today.getMonth(), newReminder.payment_day);
+          if (nextDate <= today) {
+            nextDate.setMonth(nextDate.getMonth() + 1);
+          }
+          break;
+        case 'quarterly':
+          nextDate = new Date(today.getFullYear(), today.getMonth(), newReminder.payment_day);
+          if (nextDate <= today) {
+            nextDate.setMonth(nextDate.getMonth() + 3);
+          }
+          break;
+        case 'yearly':
+          nextDate = new Date(today.getFullYear(), today.getMonth(), newReminder.payment_day);
+          if (nextDate <= today) {
+            nextDate.setFullYear(nextDate.getFullYear() + 1);
+          }
+          break;
       }
 
       const { error } = await supabase
@@ -238,6 +260,8 @@ const PaymentReminders = () => {
 
   const getFrequencyLabel = (frequency: string) => {
     switch (frequency) {
+      case 'daily': return 'Giornaliera';
+      case 'weekly': return 'Settimanale';
       case 'monthly': return 'Mensile';
       case 'quarterly': return 'Trimestrale';
       case 'yearly': return 'Annuale';
@@ -364,28 +388,6 @@ const PaymentReminders = () => {
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Giorno del Mese</Label>
-                    <Select
-                      value={newReminder.payment_day.toString()}
-                      onValueChange={(value) => setNewReminder(prev => ({ 
-                        ...prev, 
-                        payment_day: parseInt(value) 
-                      }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.from({ length: 31 }, (_, i) => (
-                          <SelectItem key={i + 1} value={(i + 1).toString()}>
-                            {i + 1}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
                     <Label>Frequenza</Label>
                     <Select
                       value={newReminder.frequency}
@@ -398,12 +400,38 @@ const PaymentReminders = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="daily">Giornaliera</SelectItem>
+                        <SelectItem value="weekly">Settimanale</SelectItem>
                         <SelectItem value="monthly">Mensile</SelectItem>
                         <SelectItem value="quarterly">Trimestrale</SelectItem>
                         <SelectItem value="yearly">Annuale</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {['monthly', 'quarterly', 'yearly'].includes(newReminder.frequency) && (
+                    <div className="space-y-2">
+                      <Label>Giorno del Mese</Label>
+                      <Select
+                        value={newReminder.payment_day.toString()}
+                        onValueChange={(value) => setNewReminder(prev => ({ 
+                          ...prev, 
+                          payment_day: parseInt(value) 
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 31 }, (_, i) => (
+                            <SelectItem key={i + 1} value={(i + 1).toString()}>
+                              {i + 1}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <Label>Importo (opzionale)</Label>
@@ -448,8 +476,8 @@ const PaymentReminders = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Giorno</TableHead>
                   <TableHead>Frequenza</TableHead>
+                  <TableHead>Giorno</TableHead>
                   <TableHead>Importo</TableHead>
                   <TableHead>Prossimo Promemoria</TableHead>
                   <TableHead>Stato</TableHead>
@@ -459,9 +487,14 @@ const PaymentReminders = () => {
               <TableBody>
                 {reminders.map((reminder) => (
                   <TableRow key={reminder.id}>
+                    <TableCell>{getFrequencyLabel(reminder.frequency)}</TableCell>
                     <TableCell>
                       <div>
-                        <div className="font-medium">Giorno {reminder.payment_day}</div>
+                        {['monthly', 'quarterly', 'yearly'].includes(reminder.frequency) ? (
+                          <div className="font-medium">Giorno {reminder.payment_day}</div>
+                        ) : (
+                          <div className="font-medium">-</div>
+                        )}
                         {reminder.description && (
                           <div className="text-sm text-muted-foreground">
                             {reminder.description}
@@ -469,7 +502,6 @@ const PaymentReminders = () => {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{getFrequencyLabel(reminder.frequency)}</TableCell>
                     <TableCell>
                       {reminder.amount ? `€${reminder.amount.toFixed(2)}` : '-'}
                     </TableCell>
