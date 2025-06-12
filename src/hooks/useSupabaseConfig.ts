@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { InvestmentConfig } from '@/types/investment';
@@ -17,11 +18,23 @@ export const useSupabaseConfig = () => {
     try {
       setLoading(true);
       
+      // Verificare che l'utente sia autenticato
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Errore",
+          description: "Devi essere autenticato per salvare una configurazione",
+          variant: "destructive",
+        });
+        return null;
+      }
+      
       // Salvare la configurazione principale
       const { data: configData, error: configError } = await supabase
         .from('investment_configs')
         .insert({
           name,
+          user_id: user.id,
           initial_capital: config.initialCapital,
           time_horizon: config.timeHorizon,
           daily_return_rate: config.dailyReturnRate,
@@ -33,7 +46,10 @@ export const useSupabaseConfig = () => {
         .select()
         .single();
 
-      if (configError) throw configError;
+      if (configError) {
+        console.error('Errore salvando la configurazione:', configError);
+        throw configError;
+      }
 
       const configId = configData.id;
 
@@ -49,8 +65,14 @@ export const useSupabaseConfig = () => {
           .from('daily_returns')
           .insert(dailyReturnsData);
 
-        if (returnsError) throw returnsError;
+        if (returnsError) {
+          console.error('Errore salvando i rendimenti:', returnsError);
+          throw returnsError;
+        }
       }
+
+      // Ricaricare le configurazioni dopo il salvataggio
+      await loadConfigurations();
 
       toast({
         title: "Configurazione salvata",
@@ -58,11 +80,11 @@ export const useSupabaseConfig = () => {
       });
 
       return configId;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Errore nel salvare la configurazione:', error);
       toast({
         title: "Errore",
-        description: "Impossibile salvare la configurazione",
+        description: error.message || "Impossibile salvare la configurazione",
         variant: "destructive",
       });
       return null;
@@ -80,6 +102,17 @@ export const useSupabaseConfig = () => {
     try {
       setLoading(true);
       
+      // Verificare che l'utente sia autenticato
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Errore",
+          description: "Devi essere autenticato per aggiornare una configurazione",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
       // Aggiornare la configurazione principale
       const { error: configError } = await supabase
         .from('investment_configs')
@@ -93,9 +126,13 @@ export const useSupabaseConfig = () => {
           pac_custom_days: config.pacConfig.customDays,
           pac_start_date: config.pacConfig.startDate.toISOString().split('T')[0]
         })
-        .eq('id', configId);
+        .eq('id', configId)
+        .eq('user_id', user.id); // Assicurarsi che l'utente possa modificare solo le proprie configurazioni
 
-      if (configError) throw configError;
+      if (configError) {
+        console.error('Errore aggiornando la configurazione:', configError);
+        throw configError;
+      }
 
       // Rimuovere i vecchi rendimenti giornalieri
       const { error: deleteError } = await supabase
@@ -103,7 +140,10 @@ export const useSupabaseConfig = () => {
         .delete()
         .eq('config_id', configId);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('Errore eliminando i vecchi rendimenti:', deleteError);
+        throw deleteError;
+      }
 
       // Inserire i nuovi rendimenti giornalieri
       if (Object.keys(dailyReturns).length > 0) {
@@ -117,8 +157,14 @@ export const useSupabaseConfig = () => {
           .from('daily_returns')
           .insert(dailyReturnsData);
 
-        if (returnsError) throw returnsError;
+        if (returnsError) {
+          console.error('Errore inserendo i nuovi rendimenti:', returnsError);
+          throw returnsError;
+        }
       }
+
+      // Ricaricare le configurazioni dopo l'aggiornamento
+      await loadConfigurations();
 
       toast({
         title: "Configurazione aggiornata",
@@ -126,11 +172,11 @@ export const useSupabaseConfig = () => {
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Errore nell\'aggiornare la configurazione:', error);
       toast({
         title: "Errore",
-        description: "Impossibile aggiornare la configurazione",
+        description: error.message || "Impossibile aggiornare la configurazione",
         variant: "destructive",
       });
       return false;
@@ -143,23 +189,42 @@ export const useSupabaseConfig = () => {
     try {
       setLoading(true);
       
+      // Verificare che l'utente sia autenticato
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log('Utente non autenticato, non carico le configurazioni');
+        setSavedConfigs([]);
+        return;
+      }
+      
+      console.log('Caricamento configurazioni per utente:', user.id);
+      
       const { data: configs, error: configError } = await supabase
         .from('investment_configs')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (configError) throw configError;
+      if (configError) {
+        console.error('Errore caricando le configurazioni:', configError);
+        throw configError;
+      }
+
+      console.log('Configurazioni caricate:', configs?.length || 0);
 
       const savedConfigurations: SavedConfiguration[] = [];
 
-      for (const dbConfig of configs) {
+      for (const dbConfig of configs || []) {
         // Caricare i rendimenti giornalieri per questa configurazione
         const { data: dailyReturns, error: returnsError } = await supabase
           .from('daily_returns')
           .select('*')
           .eq('config_id', dbConfig.id);
 
-        if (returnsError) throw returnsError;
+        if (returnsError) {
+          console.error('Errore caricando i rendimenti per config:', dbConfig.id, returnsError);
+          throw returnsError;
+        }
 
         // Convertire i dati del database nel formato dell'applicazione
         const config: InvestmentConfig = {
@@ -175,7 +240,7 @@ export const useSupabaseConfig = () => {
         };
 
         const dailyReturnsMap: { [day: number]: number } = {};
-        dailyReturns.forEach(dr => {
+        (dailyReturns || []).forEach(dr => {
           dailyReturnsMap[dr.day] = dr.return_rate;
         });
 
@@ -190,13 +255,15 @@ export const useSupabaseConfig = () => {
       }
 
       setSavedConfigs(savedConfigurations);
-    } catch (error) {
+      console.log('Configurazioni salvate nello stato:', savedConfigurations.length);
+    } catch (error: any) {
       console.error('Errore nel caricare le configurazioni:', error);
       toast({
         title: "Errore",
-        description: "Impossibile caricare le configurazioni salvate",
+        description: error.message || "Impossibile caricare le configurazioni salvate",
         variant: "destructive",
       });
+      setSavedConfigs([]);
     } finally {
       setLoading(false);
     }
@@ -206,12 +273,27 @@ export const useSupabaseConfig = () => {
     try {
       setLoading(true);
       
+      // Verificare che l'utente sia autenticato
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Errore",
+          description: "Devi essere autenticato per eliminare una configurazione",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       const { error } = await supabase
         .from('investment_configs')
         .delete()
-        .eq('id', configId);
+        .eq('id', configId)
+        .eq('user_id', user.id); // Assicurarsi che l'utente possa eliminare solo le proprie configurazioni
 
-      if (error) throw error;
+      if (error) {
+        console.error('Errore eliminando la configurazione:', error);
+        throw error;
+      }
 
       setSavedConfigs(prev => prev.filter(config => config.id !== configId));
       
@@ -219,11 +301,11 @@ export const useSupabaseConfig = () => {
         title: "Configurazione eliminata",
         description: "La configurazione è stata eliminata con successo",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Errore nell\'eliminare la configurazione:', error);
       toast({
         title: "Errore",
-        description: "Impossibile eliminare la configurazione",
+        description: error.message || "Impossibile eliminare la configurazione",
         variant: "destructive",
       });
     } finally {
