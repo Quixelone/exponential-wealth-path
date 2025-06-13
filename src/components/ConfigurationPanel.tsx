@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
@@ -35,7 +36,17 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   onConfigChange,
   customReturns,
   onUpdateDailyReturn,
-  onRemoveDailyReturn
+  onRemoveDailyReturn,
+  onExportCSV,
+  savedConfigs,
+  onLoadConfiguration,
+  onDeleteConfiguration,
+  onSaveConfiguration,
+  onUpdateConfiguration,
+  currentConfigId,
+  currentConfigName,
+  supabaseLoading,
+  isAdmin = false
 }) => {
   const handlePACPaymentUpdate = (paymentId: string, newAmount: number, newDate: string) => {
     console.log('Updating PAC payment:', { paymentId, newAmount, newDate });

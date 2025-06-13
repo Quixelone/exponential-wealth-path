@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -120,7 +119,7 @@ const Index = () => {
                 <ConfigurationPanel
                   config={config}
                   onConfigChange={updateConfig}
-                  dailyReturns={dailyReturns}
+                  customReturns={dailyReturns}
                   onUpdateDailyReturn={updateDailyReturn}
                   onRemoveDailyReturn={removeDailyReturn}
                   onExportCSV={exportToCSV}
