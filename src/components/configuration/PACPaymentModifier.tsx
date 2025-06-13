@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -30,7 +31,7 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
   onTogglePayment,
   onAddPayment
 }) => {
-  const [mockPayments, setMockPayments] = useState<PACPayment[]>([
+  const [payments, setPayments] = useState<PACPayment[]>([
     {
       id: '1',
       amount: pacAmount,
@@ -56,6 +57,7 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
       status: 'completed',
     },
   ]);
+  
   const [editingPayment, setEditingPayment] = useState<PACPayment | null>(null);
   const [editingAmount, setEditingAmount] = useState(0);
   const [editingDate, setEditingDate] = useState('');
@@ -135,7 +137,17 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
 
   const handleSaveEdit = () => {
     if (editingPayment && editingAmount > 0 && editingDate) {
+      // Aggiorna lo stato locale
+      setPayments(prev => prev.map(payment => 
+        payment.id === editingPayment.id 
+          ? { ...payment, amount: editingAmount, date: editingDate }
+          : payment
+      ));
+      
+      // Chiama la funzione di callback
       onUpdatePayment(editingPayment.id, editingAmount, editingDate);
+      
+      // Reset form
       setEditingPayment(null);
       setEditingAmount(0);
       setEditingDate('');
@@ -149,13 +161,37 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
   };
 
   const handleToggle = (payment: PACPayment) => {
-    const newStatus = payment.status === 'active' ? false : true;
-    onTogglePayment(payment.id, newStatus);
+    const newStatus: PaymentStatus = payment.status === 'active' ? 'paused' : 'active';
+    const isActive = newStatus === 'active';
+    
+    // Aggiorna lo stato locale
+    setPayments(prev => prev.map(p => 
+      p.id === payment.id 
+        ? { ...p, status: newStatus }
+        : p
+    ));
+    
+    // Chiama la funzione di callback
+    onTogglePayment(payment.id, isActive);
   };
 
   const handleAddNewPayment = () => {
     if (newPaymentAmount > 0 && newPaymentDate) {
+      // Crea nuovo pagamento
+      const newPayment: PACPayment = {
+        id: Date.now().toString(),
+        amount: newPaymentAmount,
+        date: newPaymentDate,
+        status: 'pending'
+      };
+      
+      // Aggiorna lo stato locale
+      setPayments(prev => [...prev, newPayment]);
+      
+      // Chiama la funzione di callback
       onAddPayment(newPaymentAmount, newPaymentDate);
+      
+      // Reset form
       setNewPaymentAmount(pacAmount);
       setNewPaymentDate('');
       setShowAddForm(false);
@@ -231,7 +267,7 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
 
         {/* Payments list */}
         <div className="space-y-3">
-          {mockPayments.map((payment) => (
+          {payments.map((payment) => (
             <Card key={payment.id} className="p-4">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
@@ -327,7 +363,7 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
           ))}
         </div>
 
-        {mockPayments.length === 0 && (
+        {payments.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p>Nessun versamento programmato</p>

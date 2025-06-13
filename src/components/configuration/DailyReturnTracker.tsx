@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, TrendingDown, Plus, Trash2, AlertTriangle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Trash2, AlertTriangle } from 'lucide-react';
 
 interface DailyReturnTrackerProps {
   timeHorizon: number;
@@ -77,7 +77,6 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
                 className="w-full h-10"
                 disabled={selectedDay < 1 || selectedDay > timeHorizon}
               >
-                <Plus className="h-4 w-4 mr-2" />
                 Aggiungi
               </Button>
             </div>
