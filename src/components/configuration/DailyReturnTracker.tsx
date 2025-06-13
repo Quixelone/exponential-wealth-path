@@ -45,7 +45,7 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
       <CardContent className="space-y-6">
         {/* Input per aggiungere nuovi rendimenti */}
         <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-4">
             <div className="space-y-2">
               <Label htmlFor="day-select">Giorno</Label>
               <Input
@@ -69,12 +69,6 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
                 placeholder="Es: 1.5 o -2.3"
                 className="w-full"
               />
-            </div>
-            <div className="space-y-2">
-              <div className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                <AlertTriangle className="h-3 w-3" />
-                Usa valori negativi per le perdite
-              </div>
             </div>
             <div className="space-y-2">
               <Label className="invisible">Azione</Label>
