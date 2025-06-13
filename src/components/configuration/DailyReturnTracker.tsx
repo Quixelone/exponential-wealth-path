@@ -43,10 +43,10 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Input per aggiungere nuovi rendimenti - Fixed Layout */}
+        {/* Input per aggiungere nuovi rendimenti */}
         <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-4 lg:items-end">
-            <div className="lg:col-span-3 space-y-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+            <div className="space-y-2">
               <Label htmlFor="day-select">Giorno</Label>
               <Input
                 id="day-select"
@@ -58,7 +58,7 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
                 className="w-full"
               />
             </div>
-            <div className="lg:col-span-4 space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="return-rate">Rendimento/Perdita %</Label>
               <Input
                 id="return-rate"
@@ -70,16 +70,17 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
                 className="w-full"
               />
             </div>
-            <div className="lg:col-span-3 space-y-2">
+            <div className="space-y-2">
               <div className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
                 <AlertTriangle className="h-3 w-3" />
                 Usa valori negativi per le perdite
               </div>
             </div>
-            <div className="lg:col-span-2">
+            <div className="space-y-2">
+              <Label className="invisible">Azione</Label>
               <Button 
                 onClick={handleAddReturn}
-                className="w-full"
+                className="w-full h-10"
                 disabled={selectedDay < 1 || selectedDay > timeHorizon}
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -89,7 +90,7 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
           </div>
         </div>
 
-        {/* Tabella dei rendimenti personalizzati - Fixed Layout */}
+        {/* Tabella dei rendimenti personalizzati */}
         {customReturnEntries.length > 0 && (
           <div className="space-y-3">
             <Label className="text-base font-medium">
