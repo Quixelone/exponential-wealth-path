@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Bell, Calendar, Trash2, Plus, MessageCircle, Phone } from 'lucide-react';
+import { Bell, Calendar, Trash2, Plus, MessageCircle, Phone, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface PaymentReminder {
@@ -20,6 +20,7 @@ interface PaymentReminder {
   amount: number | null;
   description: string | null;
   next_reminder_date: string;
+  reminder_time: string;
   is_active: boolean;
 }
 
@@ -45,7 +46,8 @@ const PaymentReminders = () => {
     payment_day: 1,
     frequency: 'monthly',
     amount: '',
-    description: ''
+    description: '',
+    reminder_time: '09:00'
   });
   const { toast } = useToast();
 
@@ -175,7 +177,8 @@ const PaymentReminders = () => {
           frequency: newReminder.frequency,
           amount: newReminder.amount ? parseFloat(newReminder.amount) : null,
           description: newReminder.description || null,
-          next_reminder_date: nextDate.toISOString().split('T')[0]
+          next_reminder_date: nextDate.toISOString().split('T')[0],
+          reminder_time: newReminder.reminder_time
         });
 
       if (error) {
@@ -193,7 +196,7 @@ const PaymentReminders = () => {
         description: "Il promemoria è stato creato con successo",
       });
 
-      setNewReminder({ payment_day: 1, frequency: 'monthly', amount: '', description: '' });
+      setNewReminder({ payment_day: 1, frequency: 'monthly', amount: '', description: '', reminder_time: '09:00' });
       setShowAddForm(false);
       fetchReminders();
     } catch (error) {
@@ -386,7 +389,7 @@ const PaymentReminders = () => {
           {showAddForm && (
             <Card className="mb-6 border-dashed">
               <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label>Frequenza</Label>
                     <Select
@@ -434,6 +437,22 @@ const PaymentReminders = () => {
                   )}
 
                   <div className="space-y-2">
+                    <Label>Orario Promemoria</Label>
+                    <div className="relative">
+                      <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="time"
+                        value={newReminder.reminder_time}
+                        onChange={(e) => setNewReminder(prev => ({ 
+                          ...prev, 
+                          reminder_time: e.target.value 
+                        }))}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label>Importo (opzionale)</Label>
                     <Input
                       type="number"
@@ -446,7 +465,7 @@ const PaymentReminders = () => {
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 md:col-span-2">
                     <Label>Descrizione</Label>
                     <Textarea
                       placeholder="Rata del piano..."
@@ -478,6 +497,7 @@ const PaymentReminders = () => {
                 <TableRow>
                   <TableHead>Frequenza</TableHead>
                   <TableHead>Giorno</TableHead>
+                  <TableHead>Orario</TableHead>
                   <TableHead>Importo</TableHead>
                   <TableHead>Prossimo Promemoria</TableHead>
                   <TableHead>Stato</TableHead>
@@ -500,6 +520,12 @@ const PaymentReminders = () => {
                             {reminder.description}
                           </div>
                         )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        {reminder.reminder_time || '09:00'}
                       </div>
                     </TableCell>
                     <TableCell>
