@@ -61,8 +61,10 @@ export const useInvestmentCalculator = () => {
 
       // Use custom PAC amount if set for this day, else default logic
       let pacAmount = 0;
+      let isCustomPAC = false;
       if (dailyPACOverrides.hasOwnProperty(day)) {
         pacAmount = dailyPACOverrides[day];
+        isCustomPAC = true;
       } else if (isPACDay(day, config.pacConfig)) {
         pacAmount = config.pacConfig.amount;
       }
@@ -92,7 +94,7 @@ export const useInvestmentCalculator = () => {
         totalPACInvested,
         totalInterest,
         isCustomReturn,
-        isCustomPAC: dailyPACOverrides.hasOwnProperty(day),
+        isCustomPAC, // FIX: added key here!
       });
     }
 
@@ -205,8 +207,6 @@ export const useInvestmentCalculator = () => {
     dailyPACOverrides,
     updatePACForDay,
     removePACOverride,
-
-    // ... keep existing code the same ...
     currentConfigId,
     currentConfigName,
     savedConfigs,

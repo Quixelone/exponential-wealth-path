@@ -1,3 +1,4 @@
+
 export interface InvestmentData {
   day: number;
   date: string;
@@ -5,11 +6,12 @@ export interface InvestmentData {
   pacAmount: number;
   capitalAfterPAC: number;
   dailyReturn: number;
-  interestEarnedDaily: number; // Added this for clarity
+  interestEarnedDaily: number;
   finalCapital: number;
   totalPACInvested: number;
   totalInterest: number;
   isCustomReturn?: boolean;
+  isCustomPAC?: boolean; // FIX: Added property for custom PAC editing
 }
 
 export interface PACConfig {
