@@ -28,11 +28,12 @@ const StatCard: React.FC<StatCardProps> = ({
     danger: 'danger-gradient'
   };
 
+  // Use CSS variables for text colors to align with the theme
   const textColors = {
-    success: 'text-lime-700',
-    warning: 'text-amber-700',
-    info: 'text-sky-700',
-    danger: 'text-red-700'
+    success: 'text-[hsl(var(--success-base))]',
+    warning: 'text-[hsl(var(--warning-base))]',
+    info: 'text-[hsl(var(--info-base))]',
+    danger: 'text-[hsl(var(--danger-base))]' // Corresponds to --destructive
   };
 
   return (
@@ -44,7 +45,7 @@ const StatCard: React.FC<StatCardProps> = ({
             {value}
           </p>
           {subtitle && (
-            <p className="text-xs text-gray-500">{subtitle}</p>
+            <p className="text-xs text-muted-foreground">{subtitle}</p>
           )}
         </div>
         <div className={`p-3 rounded-xl ${gradientClasses[color]} shadow-lg group-hover:shadow-xl transition-shadow`}>
@@ -56,8 +57,8 @@ const StatCard: React.FC<StatCardProps> = ({
         <div className="mt-4 flex items-center">
           <div className={`text-xs px-2 py-1 rounded-full ${
             trend === 'up' 
-              ? 'bg-green-100 text-green-700' 
-              : 'bg-red-100 text-red-700'
+              ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
+              : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
           }`}>
             {trend === 'up' ? '↗' : '↘'} Trend
           </div>
