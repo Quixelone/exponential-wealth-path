@@ -1,4 +1,4 @@
-
+import React from 'react';
 import { useMemo, useCallback } from 'react';
 import { InvestmentConfig, InvestmentData } from '@/types/investment';
 import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
