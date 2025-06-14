@@ -3,76 +3,76 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design system per Wealth Compass */
+/* Design system inspired by Vuexy */
 
 @layer base {
   :root {
-    --background: 210 100% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 240 67% 99%; /* #F8F7FA */
+    --foreground: 249 11% 40%; /* #5E5873 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 249 11% 40%; /* #5E5873 */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 249 11% 40%;
 
-    --primary: 210 100% 50%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 245 84% 70%; /* #7367F0 */
+    --primary-foreground: 210 40% 98%; /* #FAFAFE */
 
-    --secondary: 168 76% 36%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 250 100% 77%; /* #9C88FF */
+    --secondary-foreground: 0 0% 98%; /* #F9F9FC */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 20% 95%; /* #F1F1F3 */
+    --muted-foreground: 251 5% 48%; /* #6E6B7B */
 
-    --accent: 168 76% 42%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 250 100% 80%; /* Lighter shade of secondary for accents */
+    --accent-foreground: 249 11% 25%; /* Darker for contrast on accent */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%; /* Slightly adjusted red for Vuexy feel: #EA5455 */
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 210 100% 50%;
+    --border: 240 10% 90%; /* #E0E0E6 */
+    --input: 240 10% 90%; /* #E0E0E6 */
+    --ring: 245 84% 70%; /* #7367F0 */
 
-    --radius: 0.75rem;
+    --radius: 0.5rem; /* Vuexy uses ~6px radius */
 
-    /* Custom gradient colors */
-    --wealth-gradient-start: 210 100% 56%;
-    --wealth-gradient-end: 168 76% 42%;
+    /* Custom gradient colors based on new palette */
+    --wealth-gradient-start: 245 84% 70%; /* primary */
+    --wealth-gradient-end: 250 100% 77%; /* secondary */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 249 11% 15%; /* Darker background for dark mode */
+    --foreground: 240 67% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 249 11% 20%; /* Darker card */
+    --card-foreground: 240 67% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 249 11% 15%;
+    --popover-foreground: 240 67% 95%;
 
-    --primary: 210 100% 60%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 245 84% 75%; /* Slightly lighter primary for dark mode */
+    --primary-foreground: 249 11% 10%;
 
-    --secondary: 168 76% 46%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 250 100% 80%; /* Slightly lighter secondary */
+    --secondary-foreground: 249 11% 10%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 249 11% 25%;
+    --muted-foreground: 240 20% 75%;
 
-    --accent: 168 76% 52%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 250 100% 82%;
+    --accent-foreground: 249 11% 10%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 210 100% 60%;
+    --border: 249 11% 30%;
+    --input: 249 11% 30%;
+    --ring: 245 84% 75%;
 
-    --wealth-gradient-start: 210 100% 66%;
-    --wealth-gradient-end: 168 76% 52%;
+    --wealth-gradient-start: 245 84% 75%;
+    --wealth-gradient-end: 250 100% 80%;
   }
 }
 
@@ -84,6 +84,34 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Inter', sans-serif; /* Common font in Vuexy-like themes */
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-foreground;
+  }
+}
+
+@layer components {
+  /* Custom card styling for Vuexy feel */
+  .card {
+    @apply rounded-lg border bg-card text-card-foreground shadow-lg; /* Default to a more prominent shadow */
+  }
+   /* Custom button styling for Vuexy feel */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary;
+  }
+  .btn-outline-primary {
+     @apply border-primary text-primary bg-transparent hover:bg-primary/10;
+  }
+
+  /* Input styling */
+  .input {
+    @apply h-10 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
+    @apply transition-colors duration-200 ease-in-out; /* Smooth transition for focus */
+  }
+  .input:focus-visible {
+    @apply border-primary; /* Use primary color for border on focus */
   }
 }
 
@@ -98,23 +126,31 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Added subtle shadow for hover effects on interactive elements */
+  .hover-shadow-sm {
+    @apply transition-shadow duration-200 hover:shadow-sm;
+  }
+  .hover-shadow-md {
+    @apply transition-shadow duration-200 hover:shadow-md;
+  }
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(10px); } /* Adjusted Y transform */
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.9); }
+  from { opacity: 0; transform: scale(0.95); } /* Adjusted scale */
   to { opacity: 1; transform: scale(1); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeIn 0.5s ease-out; /* Slightly adjusted duration */
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.4s ease-out;
+  animation: scaleIn 0.3s ease-out; /* Slightly adjusted duration */
 }
