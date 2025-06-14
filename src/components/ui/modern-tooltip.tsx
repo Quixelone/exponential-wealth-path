@@ -22,6 +22,40 @@ const ModernTooltip: React.FC<ModernTooltipProps> = ({
   const triggerRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
+  const getTransform = () => {
+    switch (position) {
+      case 'top':
+        return 'translate(-50%, -100%)';
+      case 'bottom':
+        return 'translate(-50%, 0%)';
+      case 'left':
+        return 'translate(-100%, -50%)';
+      case 'right':
+        return 'translate(0%, -50%)';
+      default:
+        return 'translate(-50%, -100%)';
+    }
+  };
+
+  const getArrowPosition = () => {
+    switch (position) {
+      case 'top':
+        return 'top-full left-1/2 -translate-x-1/2 -translate-y-1/2';
+      case 'bottom':
+        return 'bottom-full left-1/2 -translate-x-1/2 translate-y-1/2';
+      case 'left':
+        return 'left-full top-1/2 -translate-y-1/2 -translate-x-1/2';
+      case 'right':
+        return 'right-full top-1/2 -translate-y-1/2 translate-x-1/2';
+      default:
+        return 'top-full left-1/2 -translate-x-1/2 -translate-y-1/2';
+    }
+  };
+
+  const getArrowStyle = () => {
+    return {};
+  };
+
   const showTooltip = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -88,21 +122,6 @@ const ModernTooltip: React.FC<ModernTooltipProps> = ({
     return baseStyle;
   };
 
-  const getTransform = () => {
-    switch (position) {
-      case 'top':
-        return 'translate(-50%, -100%)';
-      case 'bottom':
-        return 'translate(-50%, 0%)';
-      case 'left':
-        return 'translate(-100%, -50%)';
-      case 'right':
-        return 'translate(0%, -50%)';
-      default:
-        return 'translate(-50%, -100%)';
-    }
-  };
-
   const tooltipElement = isVisible && (
     <div style={getTooltipStyle()} className={`tooltip-content ${className}`}>
       {content}
@@ -112,25 +131,6 @@ const ModernTooltip: React.FC<ModernTooltipProps> = ({
       />
     </div>
   );
-
-  const getArrowPosition = () => {
-    switch (position) {
-      case 'top':
-        return 'top-full left-1/2 -translate-x-1/2 -translate-y-1/2';
-      case 'bottom':
-        return 'bottom-full left-1/2 -translate-x-1/2 translate-y-1/2';
-      case 'left':
-        return 'left-full top-1/2 -translate-y-1/2 -translate-x-1/2';
-      case 'right':
-        return 'right-full top-1/2 -translate-y-1/2 translate-x-1/2';
-      default:
-        return 'top-full left-1/2 -translate-x-1/2 -translate-y-1/2';
-    }
-  };
-
-  const getArrowStyle = () => {
-    return {};
-  };
 
   return (
     <>
