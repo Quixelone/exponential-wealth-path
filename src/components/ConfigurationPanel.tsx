@@ -9,7 +9,7 @@ import PACConfiguration from '@/components/configuration/PACConfiguration';
 import DailyReturnTracker from '@/components/configuration/DailyReturnTracker';
 import ExportSection from '@/components/configuration/ExportSection';
 import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
-import { Settings } from 'lucide-react';
+import PACPaymentModifier from '@/components/configuration/PACPaymentModifier';
 
 interface ConfigurationPanelProps {
   config: InvestmentConfig;
@@ -48,32 +48,34 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   supabaseLoading,
   isAdmin = false
 }) => {
+  const handlePACPaymentUpdate = (paymentId: string, newAmount: number, newDate: string) => {
+    console.log('Updating PAC payment:', { paymentId, newAmount, newDate });
+    // This would typically update the backend and refresh the data
+  };
+
+  const handlePACPaymentToggle = (paymentId: string, isActive: boolean) => {
+    console.log('Toggling PAC payment:', { paymentId, isActive });
+    // This would typically update the payment status in the backend
+  };
+
+  const handleAddPACPayment = (amount: number, date: string) => {
+    console.log('Adding new PAC payment:', { amount, date });
+    // This would typically add a new payment to the backend
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="config-card">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 success-gradient rounded-xl flex items-center justify-center">
-            <Settings className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Configurazione</h2>
-            <p className="text-sm text-gray-600">Personalizza i parametri di investimento</p>
-          </div>
-        </div>
-
-        <SavedConfigurationsPanel
-          savedConfigs={savedConfigs}
-          onLoadConfiguration={onLoadConfiguration}
-          onDeleteConfiguration={onDeleteConfiguration}
-          onSaveConfiguration={onSaveConfiguration}
-          onUpdateConfiguration={onUpdateConfiguration}
-          currentConfigId={currentConfigId}
-          currentConfigName={currentConfigName}
-          loading={supabaseLoading}
-          isAdmin={isAdmin}
-        />
-      </div>
+      <SavedConfigurationsPanel
+        savedConfigs={savedConfigs}
+        onLoadConfiguration={onLoadConfiguration}
+        onDeleteConfiguration={onDeleteConfiguration}
+        onSaveConfiguration={onSaveConfiguration}
+        onUpdateConfiguration={onUpdateConfiguration}
+        currentConfigId={currentConfigId}
+        currentConfigName={currentConfigName}
+        loading={supabaseLoading}
+        isAdmin={isAdmin}
+      />
 
       <CapitalConfiguration
         initialCapital={config.initialCapital}
@@ -94,6 +96,16 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         pacConfig={config.pacConfig}
         onPACConfigChange={(pacConfig) => onConfigChange({ pacConfig: { ...config.pacConfig, ...pacConfig } })}
       />
+
+      {config.pacConfig.amount > 0 && (
+        <PACPaymentModifier
+          pacAmount={config.pacConfig.amount}
+          pacFrequency={config.pacConfig.frequency}
+          onUpdatePayment={handlePACPaymentUpdate}
+          onTogglePayment={handlePACPaymentToggle}
+          onAddPayment={handleAddPACPayment}
+        />
+      )}
 
       <DailyReturnTracker
         timeHorizon={config.timeHorizon}

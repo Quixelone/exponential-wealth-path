@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { TrendingUp } from 'lucide-react';
@@ -14,17 +15,16 @@ const ReturnConfiguration: React.FC<ReturnConfigurationProps> = ({
   onReturnRateChange
 }) => {
   return (
-    <div className="config-card animate-slide-in-left" style={{ animationDelay: '0.3s' }}>
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-8 h-8 warning-gradient rounded-lg flex items-center justify-center">
-          <TrendingUp className="h-4 w-4 text-white" />
-        </div>
-        <h3 className="text-lg font-semibold text-gray-900">Rendimento Giornaliero</h3>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="space-y-3">
-          <Label htmlFor="daily-return" className="text-sm font-medium text-gray-700">
+    <Card className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <TrendingUp className="h-5 w-5 text-primary" />
+          Rendimento Giornaliero
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="daily-return">
             Tasso: {dailyReturnRate.toFixed(3)}% al giorno
           </Label>
           <Slider
@@ -34,18 +34,18 @@ const ReturnConfiguration: React.FC<ReturnConfigurationProps> = ({
             min={0.1}
             max={10}
             step={0.01}
-            className="modern-slider"
+            className="w-full"
           />
-          <div className="flex justify-between text-xs text-gray-500">
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>0.1%</span>
             <span>10%</span>
           </div>
         </div>
-        <div className="text-sm text-gray-600 bg-amber-50 p-4 rounded-xl border border-amber-100">
+        <div className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
           <p><strong>Rendimento annuale stimato:</strong> {((1 + dailyReturnRate / 100) ** 365 - 1) * 100}%</p>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

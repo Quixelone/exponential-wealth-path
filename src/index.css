@@ -3,90 +3,74 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Vuexy-inspired design system */
+/* Design system moderno ispirato a Vuexy */
 
 @layer base {
   :root {
-    --background: 248 247 250; /* #F8F7FA - Vuexy body background */
-    --foreground: 94 88 115; /* #5E5873 - Vuexy default text */
+    --background: 248 250 252;
+    --foreground: 15 23 42;
 
-    --card: 255 255 255; /* White */
-    --card-foreground: 94 88 115;
+    --card: 255 255 255;
+    --card-foreground: 15 23 42;
 
     --popover: 255 255 255;
-    --popover-foreground: 94 88 115;
+    --popover-foreground: 15 23 42;
 
-    /* Vuexy Palette */
-    --primary: 115 103 240; /* #7367F0 */
+    --primary: 139 92 246;
     --primary-foreground: 255 255 255;
 
-    --secondary: 130 134 139; /* #82868B - Vuexy secondary text/elements */
-    --secondary-foreground: 255 255 255;
+    --secondary: 236 254 255;
+    --secondary-foreground: 14 116 144;
 
-    --muted: 243 243 243; /* #F3F3F3 - Light gray for muted backgrounds */
-    --muted-foreground: 185 185 195; /* #B9B9C3 - Light gray for muted text */
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
 
-    --accent: 233 231 253; /* #E9E7FD - Light purple for accents (e.g., hover) */
-    --accent-foreground: 115 103 240; /* Primary color for text on accent */
+    --accent: 236 254 255;
+    --accent-foreground: 14 116 144;
 
-    --destructive: 234 84 85; /* #EA5455 - Vuexy Danger */
+    --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
-    --border: 235 233 241; /* #EBE9F1 - Vuexy border color */
-    --input: 216 214 222; /* #D8D6DE - Vuexy input border color */
-    --ring: 115 103 240; /* Primary color for focus rings */
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 139 92 246;
 
-    --radius: 8px; /* Vuexy default ~0.5rem */
+    --radius: 12px;
 
-    /* Gradient colors from Vuexy palette */
-    --success-base: 40 199 111; /* #28C76F */
-    --warning-base: 255 159 67; /* #FF9F43 */
-    --info-base: 0 207 232; /* #00CFE8 */
-    --danger-base: 234 84 85; /* #EA5455 */
-
-    --success-gradient-start: var(--success-base);
-    --success-gradient-end: 33 168 95; /* Darker shade #21A85F */
-    
-    --warning-gradient-start: var(--warning-base);
-    --warning-gradient-end: 232 145 58; /* Darker shade #E8913A */
-    
-    --info-gradient-start: var(--info-base);
-    --info-gradient-end: 0 184 208; /* Darker shade #00B8D0 */
-    
-    --danger-gradient-start: var(--danger-base);
-    --danger-gradient-end: 211 75 76;   /* Darker shade #D34B4C */
+    /* Modern gradient colors */
+    --modern-gradient-start: 139 92 246;
+    --modern-gradient-end: 59 130 246;
+    --modern-gradient-accent: 16 185 129;
   }
 
   .dark {
-    --background: 22 29 49; /* #161D31 - Vuexy dark background */
-    --foreground: 208 210 214; /* #D0D2D6 - Vuexy dark text */
+    --background: 15 23 42;
+    --foreground: 248 250 252;
 
-    --card: 40 48 70; /* #283046 - Vuexy dark card */
-    --card-foreground: 208 210 214;
+    --card: 30 41 59;
+    --card-foreground: 248 250 252;
 
-    --popover: 40 48 70;
-    --popover-foreground: 208 210 214;
+    --popover: 30 41 59;
+    --popover-foreground: 248 250 252;
 
-    --primary: 115 103 240; /* #7367F0 */
+    --primary: 139 92 246;
     --primary-foreground: 255 255 255;
 
-    --secondary: 130 134 139; /* #82868B */
-    --secondary-foreground: 255 255 255;
+    --secondary: 30 41 59;
+    --secondary-foreground: 148 163 184;
 
-    --muted: 40 48 70; /* Similar to card bg */
-    --muted-foreground: 130 134 139; /* Mid gray for muted text */
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
 
-    --accent: 48 57 86; /* #303956 - Darker purple for accents */
-    --accent-foreground: 115 103 240; /* Primary color text on accent */
+    --accent: 30 41 59;
+    --accent-foreground: 148 163 184;
 
-    --destructive: 234 84 85; /* #EA5455 */
+    --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
-    --border: 59 66 83; /* #3B4253 - Vuexy dark border */
-    --input: 59 66 83; /* Vuexy dark input border */
-    --ring: 115 103 240;
-
-    /* Gradients will use the same base colors, assuming they appear vibrant enough on dark BG */
+    --border: 51 65 85;
+    --input: 51 65 85;
+    --ring: 139 92 246;
   }
 }
 
@@ -99,81 +83,149 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: rgb(var(--background)); /* Solid background */
   }
 }
 
 @layer utilities {
-  /* Gradient utilities reflecting updated palette */
-  .success-gradient {
-    background: linear-gradient(135deg, rgb(var(--success-gradient-start)), rgb(var(--success-gradient-end)));
+  .modern-gradient {
+    background: linear-gradient(135deg, rgb(139 92 246), rgb(59 130 246));
   }
   
-  .warning-gradient {
-    background: linear-gradient(135deg, rgb(var(--warning-gradient-start)), rgb(var(--warning-gradient-end)));
+  .modern-gradient-accent {
+    background: linear-gradient(135deg, rgb(16 185 129), rgb(59 130 246));
   }
   
-  .info-gradient {
-    background: linear-gradient(135deg, rgb(var(--info-gradient-start)), rgb(var(--info-gradient-end)));
-  }
-  
-  .danger-gradient {
-    background: linear-gradient(135deg, rgb(var(--danger-gradient-start)), rgb(var(--danger-gradient-end)));
-  }
-
-  .primary-gradient-text {
-    background: linear-gradient(135deg, rgb(var(--primary)), rgb(96 82 208)); /* Primary to darker primary #6052D0 */
+  .modern-gradient-text {
+    background: linear-gradient(135deg, rgb(139 92 246), rgb(59 130 246));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* Modern card styles */
-  .modern-card {
-    @apply bg-card shadow-lg rounded-lg; /* Updated to rounded-lg (8px with new --radius) */
-    /* Vuexy cards usually have a border too, which is covered by '*' rule */
-    /* box-shadow from previous theme: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1); */
-    /* Vuexy shadow: 0 4px 24px 0 rgba(34, 41, 47, 0.1) */
-    box-shadow: 0 4px 24px 0 rgba(var(--foreground), 0.1);
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20 shadow-xl;
   }
 
-  .stat-card {
-    @apply modern-card p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  .modern-shadow {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
   }
 
-  .config-card {
-    @apply modern-card p-6;
-  }
-
-  /* Enhanced hover effects */
   .hover-lift {
-    @apply transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-2xl; /* Adjusted to -1 from -2 */
-  }
-
-  /* Stats number styling */
-  .stat-number {
-    @apply text-4xl font-bold tracking-tight;
-  }
-
-  .stat-label {
-    @apply text-sm font-medium text-muted-foreground; /* Using muted-foreground for less emphasis */
-  }
-
-  /* Input and control styling */
-  .modern-input {
-    @apply bg-card border-[hsl(var(--input))] text-foreground rounded-md focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-primary dark:bg-card dark:border-[hsl(var(--input))];
-    /* Removed dark:bg-slate-800/80, using bg-card now which adapts to dark mode */
-  }
-
-  .modern-slider {
-    @apply h-2 bg-muted rounded-full; /* Use muted for slider track */
-  }
-
-  .modern-slider [role="slider"] {
-    @apply bg-primary border-primary shadow-lg; /* Using primary color */
+    @apply transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-2xl;
   }
 }
 
-/* ... keep existing code (Enhanced animations) */
-/* ... keep existing code (Custom scrollbar with new theme) */
-/* ... keep existing code (Enhanced tooltip styles) */
+/* Modern animations */
+@keyframes slideInFromTop {
+  from { 
+    opacity: 0; 
+    transform: translateY(-30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from { 
+    opacity: 0; 
+    transform: translateX(-30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from { 
+    opacity: 0; 
+    transform: translateX(30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgb(139 92 246 / 0.3); }
+  50% { box-shadow: 0 0 40px rgb(139 92 246 / 0.6); }
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop 0.6s ease-out;
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInFromLeft 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInFromRight 0.6s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.4s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(248 250 252);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(203 213 225);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 184);
+}
+
+/* Tooltip styles */
+.tooltip-content {
+  @apply bg-gray-900 text-white text-sm rounded-lg px-3 py-2 shadow-lg z-50;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.tooltip-arrow {
+  @apply absolute w-2 h-2 bg-gray-900 transform rotate-45;
+}
