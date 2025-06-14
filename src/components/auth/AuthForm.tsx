@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +21,7 @@ const AuthForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [resetMode, setResetMode] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
-  const { signIn, signUp, signInWithGoogle, resetPassword, user, session } = useAuth();
+  const { signIn, signUp, signInWithGoogle, signInWithFacebook, signInWithTwitter, resetPassword, user, session } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -88,6 +87,28 @@ const AuthForm: React.FC = () => {
       await signInWithGoogle();
     } catch (error) {
       console.error('Google login error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    setLoading(true);
+    try {
+      await signInWithFacebook!();
+    } catch (error) {
+      console.error('Facebook login error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTwitterSignIn = async () => {
+    setLoading(true);
+    try {
+      await signInWithTwitter!();
+    } catch (error) {
+      console.error('Twitter login error:', error);
     } finally {
       setLoading(false);
     }
@@ -289,6 +310,7 @@ const AuthForm: React.FC = () => {
                 <Button
                   type="button"
                   variant="outline"
+                  onClick={handleFacebookSignIn}
                   className="h-12 border-2 hover:bg-muted/50 transition-colors"
                   disabled={loading}
                 >
@@ -299,6 +321,7 @@ const AuthForm: React.FC = () => {
                 <Button
                   type="button"
                   variant="outline"
+                  onClick={handleTwitterSignIn}
                   className="h-12 border-2 hover:bg-muted/50 transition-colors"
                   disabled={loading}
                 >
@@ -454,6 +477,7 @@ const AuthForm: React.FC = () => {
                 <Button
                   type="button"
                   variant="outline"
+                  onClick={handleFacebookSignIn}
                   className="h-12 border-2 hover:bg-muted/50 transition-colors"
                   disabled={loading}
                 >
@@ -464,6 +488,7 @@ const AuthForm: React.FC = () => {
                 <Button
                   type="button"
                   variant="outline"
+                  onClick={handleTwitterSignIn}
                   className="h-12 border-2 hover:bg-muted/50 transition-colors"
                   disabled={loading}
                 >
