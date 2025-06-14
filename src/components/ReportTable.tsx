@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { InvestmentData } from '@/types/investment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +12,7 @@ import { ModernTooltip, ModernTooltipContent, ModernTooltipProvider, ModernToolt
 interface ReportTableProps {
   data: InvestmentData[];
   onExportCSV: () => void;
-  onUpdateDailyReturnInReport: (day: number, newReturn: number) => void; // New prop
+  onUpdateDailyReturnInReport: (day: number, newReturn: number) => void;
 }
 
 const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDailyReturnInReport }) => {
@@ -36,13 +35,6 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit', day: '2-digit'});
   };
-
-  // Recalculate daily gain based on current item and previous item's final capital
-  const calculateDailyGain = (item: InvestmentData, prevItemFinalCapital: number | undefined) => {
-    const capitalBeforeInterest = item.capitalAfterPAC; // Capital after PAC, before daily interest
-    const interestForDay = item.finalCapital - capitalBeforeInterest;
-    return interestForDay;
-  };
   
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
@@ -54,7 +46,6 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
   }, [data, searchTerm]);
 
   useEffect(() => {
-    // Reset editing state if data changes (e.g. new calculation)
     setEditingDay(null);
     setEditValue('');
   }, [data]);
@@ -134,10 +125,8 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedData.map((item, index) => {
-                  const actualIndex = startIndex + index;
-                  const prevItem = actualIndex > 0 ? filteredData[actualIndex - 1] : null;
-                  const dailyGain = calculateDailyGain(item, prevItem?.finalCapital);
+                paginatedData.map((item) => {
+                  const dailyGain = item.interestEarnedDaily; // Use the new property
                   const isPositiveGain = dailyGain >= 0;
                   const isEditingThisRow = editingDay === item.day;
                   
@@ -145,7 +134,8 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
                     <TableRow key={item.day} className={`hover:bg-muted/50 ${isEditingThisRow ? 'bg-primary/5' : ''}`}>
                       <TableCell className="font-medium text-center">{item.day}</TableCell>
                       <TableCell className="text-sm">{formatDate(item.date)}</TableCell>
-                      <TableCell className="text-right font-mono">{formatCurrency(item.initialCapital)}</TableCell>
+                      {/* Use capitalBeforePAC for "Capitale Iniziale" */}
+                      <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC)}</TableCell>
                       <TableCell className="text-right font-mono">
                         {item.pacAmount > 0 ? formatCurrency(item.pacAmount) : '-'}
                       </TableCell>
@@ -153,7 +143,8 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
                       <TableCell className={`text-right font-mono ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
                         <div className="flex items-center justify-end gap-1">
                           {isPositiveGain ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                          {formatCurrency(item.interestEarned)} {/* Displaying interestEarned directly */}
+                          {/* Use dailyGain (which is item.interestEarnedDaily) */}
+                          {formatCurrency(dailyGain)}
                         </div>
                       </TableCell>
                       <TableCell className={`text-right font-mono ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>

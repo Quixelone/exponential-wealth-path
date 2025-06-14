@@ -59,18 +59,18 @@ export const useInvestmentCalculator = () => {
 
       const capitalBeforePAC = currentCapital;
       
-      // Aggiungi PAC se è il giorno giusto
       const pacAmount = isPACDay(day, config.pacConfig) ? config.pacConfig.amount : 0;
       currentCapital += pacAmount;
       totalPACInvested += pacAmount;
 
       const capitalAfterPAC = currentCapital;
 
-      // Applica il rendimento giornaliero (custom o standard)
       const dailyReturn = dailyReturns[day] ?? config.dailyReturnRate;
       const isCustomReturn = dailyReturns.hasOwnProperty(day);
-      const interestGained = currentCapital * (dailyReturn / 100);
-      currentCapital += interestGained;
+      
+      // Calculate interest earned for the day
+      const interestEarnedDaily = capitalAfterPAC * (dailyReturn / 100);
+      currentCapital += interestEarnedDaily;
 
       const totalInterest = currentCapital - config.initialCapital - totalPACInvested;
 
@@ -81,6 +81,7 @@ export const useInvestmentCalculator = () => {
         pacAmount,
         capitalAfterPAC,
         dailyReturn,
+        interestEarnedDaily, // Added this field
         finalCapital: currentCapital,
         totalPACInvested,
         totalInterest,
@@ -140,13 +141,14 @@ export const useInvestmentCalculator = () => {
 
   const exportToCSV = useCallback(() => {
     const csvContent = [
-      ['Giorno', 'Data', 'Capitale Iniziale', 'PAC', 'Capitale Post-PAC', 'Rendimento %', 'Custom', 'Capitale Finale', 'PAC Totale', 'Interessi'],
+      ['Giorno', 'Data', 'Capitale Iniziale', 'PAC', 'Capitale Post-PAC', 'Ricavo Giorno', '% Ricavo', 'Custom', 'Capitale Finale', 'PAC Totale', 'Interessi Totali'],
       ...calculateInvestment.map(row => [
         row.day,
         row.date,
         row.capitalBeforePAC.toFixed(2),
         row.pacAmount.toFixed(2),
         row.capitalAfterPAC.toFixed(2),
+        row.interestEarnedDaily.toFixed(2), // Updated to use interestEarnedDaily
         row.dailyReturn.toFixed(4),
         row.isCustomReturn ? 'Sì' : 'No',
         row.finalCapital.toFixed(2),
@@ -185,9 +187,11 @@ export const useInvestmentCalculator = () => {
     
     summary: {
       finalCapital: calculateInvestment[calculateInvestment.length - 1]?.finalCapital || 0,
-      totalInvested: config.initialCapital + calculateInvestment[calculateInvestment.length - 1]?.totalPACInvested || 0,
+      totalInvested: config.initialCapital + (calculateInvestment[calculateInvestment.length - 1]?.totalPACInvested || 0),
       totalInterest: calculateInvestment[calculateInvestment.length - 1]?.totalInterest || 0,
-      totalReturn: ((calculateInvestment[calculateInvestment.length - 1]?.finalCapital || 0) / (config.initialCapital + (calculateInvestment[calculateInvestment.length - 1]?.totalPACInvested || 0)) - 1) * 100
+      // Make sure totalPACInvested is correctly accessed for summary
+      totalReturn: ((calculateInvestment[calculateInvestment.length - 1]?.finalCapital || 0) / 
+                   (config.initialCapital + (calculateInvestment[calculateInvestment.length - 1]?.totalPACInvested || 0)) - 1) * 100 || 0
     }
   };
 };

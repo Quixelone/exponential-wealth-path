@@ -1,4 +1,3 @@
-
 export interface InvestmentData {
   day: number;
   date: string;
@@ -6,6 +5,7 @@ export interface InvestmentData {
   pacAmount: number;
   capitalAfterPAC: number;
   dailyReturn: number;
+  interestEarnedDaily: number; // Added this for clarity
   finalCapital: number;
   totalPACInvested: number;
   totalInterest: number;
