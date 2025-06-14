@@ -145,9 +145,9 @@ const ReportTable: React.FC<ReportTableProps> = ({
                 <TableHead className="text-right">Capitale Iniziale</TableHead>
                 <TableHead className="text-right">PAC</TableHead>
                 <TableHead className="text-right">Capitale Post PAC</TableHead>
-                <TableHead className="text-right">Ricavo Giorno</TableHead>
                 <TableHead className="text-right">% Ricavo</TableHead>
-                <TableHead className="text-right">Capitale Finale</TableHead>
+                <TableHead className="text-right">Ricavo Giorno</TableHead>
+                <TableHead className="text-right font-mono">Capitale Finale</TableHead>
                 <TableHead className="w-24 text-center">Tipo/Azioni</TableHead>
               </TableRow>
             </TableHeader>
@@ -214,13 +214,8 @@ const ReportTable: React.FC<ReportTableProps> = ({
                         )}
                       </TableCell>
                       <TableCell className="text-right font-mono">{formatCurrency(item.capitalAfterPAC)}</TableCell>
-                      <TableCell className={`text-right font-mono ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
-                        <div className="flex items-center justify-end gap-1">
-                          {isPositiveGain ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                          {/* Use dailyGain (which is item.interestEarnedDaily) */}
-                          {formatCurrency(dailyGain)}
-                        </div>
-                      </TableCell>
+                      
+                      {/* % Ricavo */}
                       <TableCell className={`text-right font-mono ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {isEditingThisRow ? (
                           <Input
@@ -235,6 +230,16 @@ const ReportTable: React.FC<ReportTableProps> = ({
                           `${item.dailyReturn.toFixed(3)}%`
                         )}
                       </TableCell>
+                      
+                      {/* Ricavo Giorno */}
+                      <TableCell className={`text-right font-mono ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className="flex items-center justify-end gap-1">
+                          {isPositiveGain ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                          {/* Use dailyGain (which is item.interestEarnedDaily) */}
+                          {formatCurrency(dailyGain)}
+                        </div>
+                      </TableCell>
+
                       <TableCell className="text-right font-mono font-semibold">{formatCurrency(item.finalCapital)}</TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-1">
