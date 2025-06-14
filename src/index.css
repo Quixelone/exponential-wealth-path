@@ -7,8 +7,8 @@
 
 @layer base {
   :root {
-    --background: 250 252 249;
-    --foreground: 15 23 42;
+    --background: 250 252 249; /* Light cream background */
+    --foreground: 15 23 42; /* slate-900 */
 
     --card: 255 255 255;
     --card-foreground: 15 23 42;
@@ -16,65 +16,70 @@
     --popover: 255 255 255;
     --popover-foreground: 15 23 42;
 
-    /* New yellow/lime primary palette */
+    /* Yellow/Lime primary palette from reference */
     --primary: 163 230 53; /* lime-400 */
-    --primary-foreground: 22 26 28;
+    --primary-foreground: 22 26 28; /* Darker text for primary */
 
-    --secondary: 254 240 138; /* yellow-200 */
-    --secondary-foreground: 120 113 108;
+    --secondary: 253 224 71; /* yellow-400 */
+    --secondary-foreground: 51 65 85; /* slate-600 for secondary text */
 
-    --muted: 248 250 252;
-    --muted-foreground: 100 116 139;
+    --muted: 241 245 249; /* slate-100 */
+    --muted-foreground: 100 116 139; /* slate-500 */
 
-    --accent: 254 240 138;
-    --accent-foreground: 120 113 108;
+    --accent: 227 250 170; /* Lighter lime for accents */
+    --accent-foreground: 66 91 22; /* Darker lime text */
 
-    --destructive: 239 68 68;
+    --destructive: 234 88 12; /* orange-600 */
     --destructive-foreground: 255 255 255;
 
-    --border: 226 232 240;
-    --input: 226 232 240;
-    --ring: 163 230 53;
+    --border: 226 232 240; /* slate-200 */
+    --input: 226 232 240; /* slate-200 */
+    --ring: 163 230 53; /* lime-400 for focus rings */
 
-    --radius: 16px;
+    --radius: 16px; /* More rounded corners */
 
     /* Modern gradient colors - yellow/lime theme */
     --success-gradient-start: 163 230 53; /* lime-400 */
     --success-gradient-end: 132 204 22; /* lime-500 */
+    
     --warning-gradient-start: 251 191 36; /* amber-400 */
     --warning-gradient-end: 245 158 11; /* amber-500 */
-    --info-gradient-start: 56 189 248; /* sky-400 */
-    --info-gradient-end: 14 165 233; /* sky-500 */
-    --danger-gradient-start: 248 113 113; /* red-400 */
-    --danger-gradient-end: 239 68 68; /* red-500 */
+    
+    /* Updated info gradient to yellow based */
+    --info-gradient-start: 253 230 138; /* yellow-300 */
+    --info-gradient-end: 250 204 21;   /* yellow-400 */
+    
+    /* Updated danger gradient to orange based */
+    --danger-gradient-start: 249 115 22; /* orange-500 */
+    --danger-gradient-end: 234 88 12;   /* orange-600 */
   }
 
   .dark {
-    --background: 15 23 42;
-    --foreground: 248 250 252;
+    --background: 15 23 42; /* slate-900 */
+    --foreground: 248 250 252; /* slate-50 */
 
-    --card: 30 41 59;
+    --card: 30 41 59; /* slate-800 */
     --card-foreground: 248 250 252;
 
     --popover: 30 41 59;
     --popover-foreground: 248 250 252;
 
-    --primary: 163 230 53;
+    --primary: 163 230 53; /* lime-400 */
     --primary-foreground: 22 26 28;
 
-    --secondary: 30 41 59;
-    --secondary-foreground: 148 163 184;
+    --secondary: 250 204 21; /* yellow-400 */
+    --secondary-foreground: 248 250 252;
 
     --muted: 30 41 59;
-    --muted-foreground: 148 163 184;
+    --muted-foreground: 148 163 184; /* slate-400 */
 
-    --accent: 30 41 59;
-    --accent-foreground: 148 163 184;
+    --accent: 132 204 22; /* lime-500 */
+    --accent-foreground: 248 250 252;
 
-    --destructive: 239 68 68;
+    --destructive: 234 88 12; /* orange-600 */
     --destructive-foreground: 255 255 255;
 
-    --border: 51 65 85;
+    --border: 51 65 85; /* slate-700 */
     --input: 51 65 85;
     --ring: 163 230 53;
   }
@@ -89,30 +94,33 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, rgb(250 252 249) 0%, rgb(240 253 244) 100%);
+    /* Updated background to a subtle gradient matching the palette */
+    background: linear-gradient(135deg, rgb(var(--background)) 0%, hsl(80, 60%, 96%) 100%);
   }
 }
 
 @layer utilities {
-  /* New gradient utilities */
+  /* Gradient utilities reflecting updated palette */
   .success-gradient {
-    background: linear-gradient(135deg, rgb(163 230 53), rgb(132 204 22));
+    background: linear-gradient(135deg, rgb(var(--success-gradient-start)), rgb(var(--success-gradient-end)));
   }
   
   .warning-gradient {
-    background: linear-gradient(135deg, rgb(251 191 36), rgb(245 158 11));
+    background: linear-gradient(135deg, rgb(var(--warning-gradient-start)), rgb(var(--warning-gradient-end)));
   }
   
+  /* Updated info gradient class */
   .info-gradient {
-    background: linear-gradient(135deg, rgb(56 189 248), rgb(14 165 233));
+    background: linear-gradient(135deg, rgb(var(--info-gradient-start)), rgb(var(--info-gradient-end)));
   }
   
+  /* Updated danger gradient class */
   .danger-gradient {
-    background: linear-gradient(135deg, rgb(248 113 113), rgb(239 68 68));
+    background: linear-gradient(135deg, rgb(var(--danger-gradient-start)), rgb(var(--danger-gradient-end)));
   }
 
   .primary-gradient-text {
-    background: linear-gradient(135deg, rgb(163 230 53), rgb(132 204 22));
+    background: linear-gradient(135deg, rgb(var(--primary)), rgb(var(--success-gradient-end))); /* Using primary and a darker lime */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -120,7 +128,7 @@
 
   /* Modern card styles */
   .modern-card {
-    @apply bg-white/90 backdrop-blur-sm border-0 shadow-lg rounded-2xl;
+    @apply bg-card/90 backdrop-blur-sm border-0 shadow-lg rounded-2xl; /* Using card color */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
@@ -143,136 +151,23 @@
   }
 
   .stat-label {
-    @apply text-sm font-medium text-gray-600;
+    @apply text-sm font-medium text-gray-600 dark:text-slate-400;
   }
 
   /* Input and control styling */
   .modern-input {
-    @apply bg-white/80 border-gray-200 rounded-xl focus:ring-2 focus:ring-lime-400 focus:border-transparent;
+    @apply bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent;
   }
 
   .modern-slider {
-    @apply h-2 bg-gray-200 rounded-full;
+    @apply h-2 bg-gray-200 dark:bg-slate-700 rounded-full;
   }
 
   .modern-slider [role="slider"] {
-    @apply bg-lime-400 border-lime-500 shadow-lg;
+    @apply bg-primary border-lime-500 dark:border-lime-300 shadow-lg; /* Using primary color */
   }
 }
 
-/* Enhanced animations */
-@keyframes slideInFromTop {
-  from { 
-    opacity: 0; 
-    transform: translateY(-40px);
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInFromBottom {
-  from { 
-    opacity: 0; 
-    transform: translateY(40px);
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInFromLeft {
-  from { 
-    opacity: 0; 
-    transform: translateX(-40px);
-  }
-  to { 
-    opacity: 1; 
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInFromRight {
-  from { 
-    opacity: 0; 
-    transform: translateX(40px);
-  }
-  to { 
-    opacity: 1; 
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from { 
-    opacity: 0; 
-    transform: scale(0.9);
-  }
-  to { 
-    opacity: 1; 
-    transform: scale(1);
-  }
-}
-
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(163, 230, 53, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(163, 230, 53, 0.6); }
-}
-
-.animate-slide-in-top {
-  animation: slideInFromTop 0.6s ease-out;
-}
-
-.animate-slide-in-bottom {
-  animation: slideInFromBottom 0.6s ease-out;
-}
-
-.animate-slide-in-left {
-  animation: slideInFromLeft 0.6s ease-out;
-}
-
-.animate-slide-in-right {
-  animation: slideInFromRight 0.6s ease-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.4s ease-out;
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 2s ease-in-out infinite;
-}
-
-/* Custom scrollbar with new theme */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgb(250 252 249);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgb(163 230 53);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(132 204 22);
-}
-
-/* Enhanced tooltip styles */
-.tooltip-content {
-  @apply bg-gray-900 text-white text-sm rounded-xl px-4 py-3 shadow-xl z-50;
-  animation: fadeIn 0.2s ease-out;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.tooltip-arrow {
-  @apply absolute w-2 h-2 bg-gray-900 transform rotate-45;
-}
+/* ... keep existing code (Enhanced animations) */
+/* ... keep existing code (Custom scrollbar with new theme) */
+/* ... keep existing code (Enhanced tooltip styles) */
