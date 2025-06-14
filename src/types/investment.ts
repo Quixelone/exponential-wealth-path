@@ -19,6 +19,9 @@ export interface PACConfig {
   startDate: Date;
 }
 
+// New: Record for editing PAC per day
+export type DailyPACOverrides = { [day: number]: number };
+
 export interface InvestmentConfig {
   initialCapital: number;
   timeHorizon: number; // giorni

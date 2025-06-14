@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { InvestmentConfig, InvestmentData, PACConfig } from '@/types/investment';
 import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
@@ -16,6 +15,7 @@ export const useInvestmentCalculator = () => {
   });
 
   const [dailyReturns, setDailyReturns] = useState<{ [day: number]: number }>({});
+  const [dailyPACOverrides, setDailyPACOverrides] = useState<{ [day: number]: number }>({});
   const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
   const [currentConfigName, setCurrentConfigName] = useState<string>('');
 
@@ -58,8 +58,14 @@ export const useInvestmentCalculator = () => {
       currentDate.setDate(currentDate.getDate() + day);
 
       const capitalBeforePAC = currentCapital;
-      
-      const pacAmount = isPACDay(day, config.pacConfig) ? config.pacConfig.amount : 0;
+
+      // Use custom PAC amount if set for this day, else default logic
+      let pacAmount = 0;
+      if (dailyPACOverrides.hasOwnProperty(day)) {
+        pacAmount = dailyPACOverrides[day];
+      } else if (isPACDay(day, config.pacConfig)) {
+        pacAmount = config.pacConfig.amount;
+      }
       currentCapital += pacAmount;
       totalPACInvested += pacAmount;
 
@@ -67,7 +73,7 @@ export const useInvestmentCalculator = () => {
 
       const dailyReturn = dailyReturns[day] ?? config.dailyReturnRate;
       const isCustomReturn = dailyReturns.hasOwnProperty(day);
-      
+
       // Calculate interest earned for the day
       const interestEarnedDaily = capitalAfterPAC * (dailyReturn / 100);
       currentCapital += interestEarnedDaily;
@@ -81,16 +87,17 @@ export const useInvestmentCalculator = () => {
         pacAmount,
         capitalAfterPAC,
         dailyReturn,
-        interestEarnedDaily, // Added this field
+        interestEarnedDaily,
         finalCapital: currentCapital,
         totalPACInvested,
         totalInterest,
-        isCustomReturn
+        isCustomReturn,
+        isCustomPAC: dailyPACOverrides.hasOwnProperty(day),
       });
     }
 
     return results;
-  }, [config, dailyReturns, isPACDay]);
+  }, [config, dailyReturns, dailyPACOverrides, isPACDay]);
 
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>) => {
     setConfig(prev => ({ ...prev, ...newConfig }));
@@ -148,7 +155,7 @@ export const useInvestmentCalculator = () => {
         row.capitalBeforePAC.toFixed(2),
         row.pacAmount.toFixed(2),
         row.capitalAfterPAC.toFixed(2),
-        row.interestEarnedDaily.toFixed(2), // Updated to use interestEarnedDaily
+        row.interestEarnedDaily.toFixed(2),
         row.dailyReturn.toFixed(4),
         row.isCustomReturn ? 'Sì' : 'No',
         row.finalCapital.toFixed(2),
@@ -166,6 +173,25 @@ export const useInvestmentCalculator = () => {
     window.URL.revokeObjectURL(url);
   }, [calculateInvestment]);
 
+  // New: update PAC for a given day
+  const updatePACForDay = useCallback((day: number, pacAmount: number) => {
+    setDailyPACOverrides(prev => ({
+      ...prev,
+      [day]: pacAmount
+    }));
+    setCurrentConfigId(null);
+  }, []);
+
+  // New: remove PAC override for a given day (restore default)
+  const removePACOverride = useCallback((day: number) => {
+    setDailyPACOverrides(prev => {
+      const updated = { ...prev };
+      delete updated[day];
+      return updated;
+    });
+    setCurrentConfigId(null);
+  }, []);
+
   return {
     config,
     updateConfig,
@@ -174,8 +200,13 @@ export const useInvestmentCalculator = () => {
     updateDailyReturn,
     removeDailyReturn,
     exportToCSV,
-    
-    // Nuove funzionalità del database
+
+    // NEW exports for PAC overrides
+    dailyPACOverrides,
+    updatePACForDay,
+    removePACOverride,
+
+    // ... keep existing code the same ...
     currentConfigId,
     currentConfigName,
     savedConfigs,
@@ -184,12 +215,11 @@ export const useInvestmentCalculator = () => {
     loadSavedConfiguration,
     deleteConfiguration,
     supabaseLoading,
-    
+
     summary: {
       finalCapital: calculateInvestment[calculateInvestment.length - 1]?.finalCapital || 0,
       totalInvested: config.initialCapital + (calculateInvestment[calculateInvestment.length - 1]?.totalPACInvested || 0),
       totalInterest: calculateInvestment[calculateInvestment.length - 1]?.totalInterest || 0,
-      // Make sure totalPACInvested is correctly accessed for summary
       totalReturn: ((calculateInvestment[calculateInvestment.length - 1]?.finalCapital || 0) / 
                    (config.initialCapital + (calculateInvestment[calculateInvestment.length - 1]?.totalPACInvested || 0)) - 1) * 100 || 0
     }

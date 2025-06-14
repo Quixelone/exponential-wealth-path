@@ -8,20 +8,30 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, TrendingDown, Edit3, Save, XCircle, Info } from 'lucide-react';
 import { ModernTooltip, ModernTooltipContent, ModernTooltipProvider, ModernTooltipTrigger } from '@/components/ui/ModernTooltip';
 
-
 interface ReportTableProps {
   data: InvestmentData[];
   onExportCSV: () => void;
   onUpdateDailyReturnInReport: (day: number, newReturn: number) => void;
+  onUpdatePACInReport: (day: number, newPAC: number) => void;
+  onRemovePACOverride?: (day: number) => void;
 }
 
-const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDailyReturnInReport }) => {
+const ReportTable: React.FC<ReportTableProps> = ({
+  data,
+  onExportCSV,
+  onUpdateDailyReturnInReport,
+  onUpdatePACInReport,
+  onRemovePACOverride
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const itemsPerPage = 20;
 
   const [editingDay, setEditingDay] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>('');
+
+  const [editingPACDay, setEditingPACDay] = useState<number | null>(null);
+  const [editPACValue, setEditPACValue] = useState<string>('');
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('it-IT', {
@@ -50,6 +60,11 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
     setEditValue('');
   }, [data]);
 
+  useEffect(() => {
+    setEditingPACDay(null);
+    setEditPACValue('');
+  }, [data]);
+
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
@@ -70,6 +85,25 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
   const handleCancel = () => {
     setEditingDay(null);
     setEditValue('');
+  };
+
+  const handleEditPAC = (item: InvestmentData) => {
+    setEditingPACDay(item.day);
+    setEditPACValue(item.pacAmount.toFixed(2));
+  };
+
+  const handleSavePAC = (day: number) => {
+    const newPAC = parseFloat(editPACValue);
+    if (!isNaN(newPAC)) {
+      onUpdatePACInReport(day, newPAC);
+    }
+    setEditingPACDay(null);
+    setEditPACValue('');
+  };
+
+  const handleCancelPAC = () => {
+    setEditingPACDay(null);
+    setEditPACValue('');
   };
 
   return (
@@ -129,6 +163,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
                   const dailyGain = item.interestEarnedDaily; // Use the new property
                   const isPositiveGain = dailyGain >= 0;
                   const isEditingThisRow = editingDay === item.day;
+                  const isEditingThisPACRow = editingPACDay === item.day;
                   
                   return (
                     <TableRow key={item.day} className={`hover:bg-muted/50 ${isEditingThisRow ? 'bg-primary/5' : ''}`}>
@@ -136,8 +171,47 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
                       <TableCell className="text-sm">{formatDate(item.date)}</TableCell>
                       {/* Use capitalBeforePAC for "Capitale Iniziale" */}
                       <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC)}</TableCell>
-                      <TableCell className="text-right font-mono">
-                        {item.pacAmount > 0 ? formatCurrency(item.pacAmount) : '-'}
+                      <TableCell className="text-right font-mono group">
+                        {isEditingThisPACRow ? (
+                          <Input
+                            type="number"
+                            value={editPACValue}
+                            min={0}
+                            step="0.01"
+                            onChange={(e) => setEditPACValue(e.target.value)}
+                            className="h-8 text-right w-24"
+                            autoFocus
+                          />
+                        ) : (
+                          <span className="flex items-center gap-1 justify-end">
+                            {formatCurrency(item.pacAmount)}
+                            <ModernTooltip>
+                              <ModernTooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-primary hover:text-primary/80 opacity-60 group-hover:opacity-100"
+                                  onClick={() => handleEditPAC(item)}
+                                >
+                                  <Edit3 className="h-4 w-4" />
+                                </Button>
+                              </ModernTooltipTrigger>
+                              <ModernTooltipContent>
+                                <p>Modifica PAC per il giorno {item.day}</p>
+                              </ModernTooltipContent>
+                            </ModernTooltip>
+                            {item.isCustomPAC && (
+                              <ModernTooltip>
+                                <ModernTooltipTrigger>
+                                  <Badge variant="secondary" className="text-xs cursor-default">Custom</Badge>
+                                </ModernTooltipTrigger>
+                                <ModernTooltipContent>
+                                  <p>Importo PAC personalizzato</p>
+                                </ModernTooltipContent>
+                              </ModernTooltip>
+                            )}
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right font-mono">{formatCurrency(item.capitalAfterPAC)}</TableCell>
                       <TableCell className={`text-right font-mono ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
@@ -164,19 +238,19 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
                       <TableCell className="text-right font-mono font-semibold">{formatCurrency(item.finalCapital)}</TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-1">
-                          {isEditingThisRow ? (
+                          {isEditingThisPACRow ? (
                             <>
                               <ModernTooltip>
                                 <ModernTooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-700" onClick={() => handleSave(item.day)}>
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-700" onClick={() => handleSavePAC(item.day)}>
                                     <Save className="h-4 w-4" />
                                   </Button>
                                 </ModernTooltipTrigger>
-                                <ModernTooltipContent><p>Salva Modifiche</p></ModernTooltipContent>
+                                <ModernTooltipContent><p>Salva Modifica PAC</p></ModernTooltipContent>
                               </ModernTooltip>
                               <ModernTooltip>
                                 <ModernTooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700" onClick={handleCancel}>
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700" onClick={handleCancelPAC}>
                                     <XCircle className="h-4 w-4" />
                                   </Button>
                                 </ModernTooltipTrigger>
@@ -184,30 +258,70 @@ const ReportTable: React.FC<ReportTableProps> = ({ data, onExportCSV, onUpdateDa
                               </ModernTooltip>
                             </>
                           ) : (
-                            <ModernTooltip>
-                              <ModernTooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-7 w-7 text-primary hover:text-primary/80" onClick={() => handleEdit(item)}>
-                                  <Edit3 className="h-4 w-4" />
-                                </Button>
-                              </ModernTooltipTrigger>
-                              <ModernTooltipContent><p>Modifica % Ricavo per Giorno {item.day}</p></ModernTooltipContent>
-                            </ModernTooltip>
-                          )}
-                          {item.isCustomReturn && !isEditingThisRow && (
-                            <ModernTooltip>
-                                <ModernTooltipTrigger>
-                                     <Badge variant="secondary" className="text-xs cursor-default">Custom</Badge>
-                                </ModernTooltipTrigger>
-                                <ModernTooltipContent><p>Rendimento personalizzato</p></ModernTooltipContent>
-                            </ModernTooltip>
-                          )}
-                          {item.pacAmount > 0 && !isEditingThisRow && (
-                            <ModernTooltip>
-                                <ModernTooltipTrigger>
-                                    <Badge variant="outline" className="text-xs cursor-default">PAC</Badge>
-                                </ModernTooltipTrigger>
-                                <ModernTooltipContent><p>Versamento PAC eseguito</p></ModernTooltipContent>
-                            </ModernTooltip>
+                            <>
+                              {editingDay === item.day ? (
+                                <>
+                                  <ModernTooltip>
+                                    <ModernTooltipTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600 hover:text-green-700" onClick={() => handleSave(item.day)}>
+                                        <Save className="h-4 w-4" />
+                                      </Button>
+                                    </ModernTooltipTrigger>
+                                    <ModernTooltipContent><p>Salva Modifiche % Ricavo</p></ModernTooltipContent>
+                                  </ModernTooltip>
+                                  <ModernTooltip>
+                                    <ModernTooltipTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700" onClick={handleCancel}>
+                                        <XCircle className="h-4 w-4" />
+                                      </Button>
+                                    </ModernTooltipTrigger>
+                                    <ModernTooltipContent><p>Annulla</p></ModernTooltipContent>
+                                  </ModernTooltip>
+                                </>
+                              ) : (
+                                <>
+                                  <ModernTooltip>
+                                    <ModernTooltipTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-7 w-7 text-primary hover:text-primary/80" onClick={() => handleEdit(item)}>
+                                        <Edit3 className="h-4 w-4" />
+                                      </Button>
+                                    </ModernTooltipTrigger>
+                                    <ModernTooltipContent><p>Modifica % Ricavo per Giorno {item.day}</p></ModernTooltipContent>
+                                  </ModernTooltip>
+                                  {item.isCustomReturn && (
+                                    <ModernTooltip>
+                                      <ModernTooltipTrigger>
+                                        <Badge variant="secondary" className="text-xs cursor-default">Custom</Badge>
+                                      </ModernTooltipTrigger>
+                                      <ModernTooltipContent><p>Rendimento personalizzato</p></ModernTooltipContent>
+                                    </ModernTooltip>
+                                  )}
+                                  {item.pacAmount > 0 && !item.isCustomPAC && (
+                                    <ModernTooltip>
+                                      <ModernTooltipTrigger>
+                                        <Badge variant="outline" className="text-xs cursor-default">PAC</Badge>
+                                      </ModernTooltipTrigger>
+                                      <ModernTooltipContent><p>Versamento PAC eseguito</p></ModernTooltipContent>
+                                    </ModernTooltip>
+                                  )}
+                                  {item.isCustomPAC && typeof onRemovePACOverride === 'function' && (
+                                    <ModernTooltip>
+                                      <ModernTooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-7 w-7 text-yellow-600 hover:text-yellow-700"
+                                          onClick={() => onRemovePACOverride(item.day)}
+                                        >
+                                          <XCircle className="h-4 w-4" />
+                                        </Button>
+                                      </ModernTooltipTrigger>
+                                      <ModernTooltipContent><p>Ripristina PAC da default</p></ModernTooltipContent>
+                                    </ModernTooltip>
+                                  )}
+                                </>
+                              )}
+                            </>
                           )}
                         </div>
                       </TableCell>

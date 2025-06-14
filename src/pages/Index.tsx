@@ -31,7 +31,10 @@ const Index = () => {
     loadSavedConfiguration,
     deleteConfiguration,
     supabaseLoading,
-    summary
+    summary,
+    dailyPACOverrides,
+    updatePACForDay,
+    removePACOverride
   } = useInvestmentCalculator();
 
   // Redirect to auth if not logged in
@@ -69,6 +72,16 @@ const Index = () => {
   const handleUpdateDailyReturnInReport = (day: number, newReturn: number) => {
     // Directly use the updateDailyReturn from the hook, which also triggers recalculation
     updateDailyReturn(day, newReturn); 
+  };
+
+  // New: inline PAC day update handler
+  const handleUpdatePACInReport = (day: number, newPAC: number) => {
+    updatePACForDay(day, newPAC);
+  };
+
+  // New: handler for restoring default PAC value for a day
+  const handleRemovePACOverride = (day: number) => {
+    removePACOverride(day);
   };
 
   return (
@@ -156,6 +169,8 @@ const Index = () => {
                     data={investmentData} 
                     onExportCSV={exportToCSV}
                     onUpdateDailyReturnInReport={handleUpdateDailyReturnInReport}
+                    onUpdatePACInReport={handleUpdatePACInReport}
+                    onRemovePACOverride={handleRemovePACOverride}
                   />
                 </div>
               </div>

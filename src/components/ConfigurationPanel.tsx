@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
@@ -9,7 +8,6 @@ import PACConfiguration from '@/components/configuration/PACConfiguration';
 import DailyReturnTracker from '@/components/configuration/DailyReturnTracker';
 import ExportSection from '@/components/configuration/ExportSection';
 import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
-import PACPaymentModifier from '@/components/configuration/PACPaymentModifier';
 
 interface ConfigurationPanelProps {
   config: InvestmentConfig;
@@ -48,21 +46,6 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   supabaseLoading,
   isAdmin = false
 }) => {
-  const handlePACPaymentUpdate = (paymentId: string, newAmount: number, newDate: string) => {
-    console.log('Updating PAC payment:', { paymentId, newAmount, newDate });
-    // This would typically update the backend and refresh the data
-  };
-
-  const handlePACPaymentToggle = (paymentId: string, isActive: boolean) => {
-    console.log('Toggling PAC payment:', { paymentId, isActive });
-    // This would typically update the payment status in the backend
-  };
-
-  const handleAddPACPayment = (amount: number, date: string) => {
-    console.log('Adding new PAC payment:', { amount, date });
-    // This would typically add a new payment to the backend
-  };
-
   return (
     <div className="space-y-6">
       <SavedConfigurationsPanel
@@ -96,16 +79,6 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         pacConfig={config.pacConfig}
         onPACConfigChange={(pacConfig) => onConfigChange({ pacConfig: { ...config.pacConfig, ...pacConfig } })}
       />
-
-      {config.pacConfig.amount > 0 && (
-        <PACPaymentModifier
-          pacAmount={config.pacConfig.amount}
-          pacFrequency={config.pacConfig.frequency}
-          onUpdatePayment={handlePACPaymentUpdate}
-          onTogglePayment={handlePACPaymentToggle}
-          onAddPayment={handleAddPACPayment}
-        />
-      )}
 
       <DailyReturnTracker
         timeHorizon={config.timeHorizon}
