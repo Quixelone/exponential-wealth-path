@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -25,16 +24,17 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
   };
 
   return (
-    <Card className="animate-fade-in">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <DollarSign className="h-5 w-5 text-primary" />
-          Capitale Iniziale
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="initial-capital">
+    <div className="config-card animate-slide-in-left" style={{ animationDelay: '0.1s' }}>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-8 h-8 success-gradient rounded-lg flex items-center justify-center">
+          <DollarSign className="h-4 w-4 text-white" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900">Capitale Iniziale</h3>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <Label htmlFor="initial-capital" className="text-sm font-medium text-gray-700">
             Importo: {formatCurrency(initialCapital)}
           </Label>
           <Slider
@@ -44,9 +44,9 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
             min={50}
             max={5000}
             step={50}
-            className="w-full"
+            className="modern-slider"
           />
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex justify-between text-xs text-gray-500">
             <span>€50</span>
             <span>€5.000</span>
           </div>
@@ -58,10 +58,11 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
           min={50}
           max={5000}
           step={50}
-          className="w-full"
+          className="modern-input"
+          placeholder="Inserisci importo"
         />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

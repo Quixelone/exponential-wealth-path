@@ -9,6 +9,7 @@ import PACConfiguration from '@/components/configuration/PACConfiguration';
 import DailyReturnTracker from '@/components/configuration/DailyReturnTracker';
 import ExportSection from '@/components/configuration/ExportSection';
 import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
+import { Settings } from 'lucide-react';
 
 interface ConfigurationPanelProps {
   config: InvestmentConfig;
@@ -49,17 +50,30 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      <SavedConfigurationsPanel
-        savedConfigs={savedConfigs}
-        onLoadConfiguration={onLoadConfiguration}
-        onDeleteConfiguration={onDeleteConfiguration}
-        onSaveConfiguration={onSaveConfiguration}
-        onUpdateConfiguration={onUpdateConfiguration}
-        currentConfigId={currentConfigId}
-        currentConfigName={currentConfigName}
-        loading={supabaseLoading}
-        isAdmin={isAdmin}
-      />
+      {/* Header */}
+      <div className="config-card">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 success-gradient rounded-xl flex items-center justify-center">
+            <Settings className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Configurazione</h2>
+            <p className="text-sm text-gray-600">Personalizza i parametri di investimento</p>
+          </div>
+        </div>
+
+        <SavedConfigurationsPanel
+          savedConfigs={savedConfigs}
+          onLoadConfiguration={onLoadConfiguration}
+          onDeleteConfiguration={onDeleteConfiguration}
+          onSaveConfiguration={onSaveConfiguration}
+          onUpdateConfiguration={onUpdateConfiguration}
+          currentConfigId={currentConfigId}
+          currentConfigName={currentConfigName}
+          loading={supabaseLoading}
+          isAdmin={isAdmin}
+        />
+      </div>
 
       <CapitalConfiguration
         initialCapital={config.initialCapital}
