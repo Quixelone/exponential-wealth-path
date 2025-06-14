@@ -6,8 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { Lock, Mail, User, Phone, Eye, EyeOff, ArrowLeft, KeyRound, Heart } from 'lucide-react';
+import { Lock, Mail, User, Phone, Eye, EyeOff, ArrowLeft, KeyRound } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import Logo from '@/components/brand/Logo';
+import Claim from '@/components/brand/Claim';
+
 const AuthForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -174,13 +177,11 @@ const AuthForm: React.FC = () => {
   }
   return <div className="flex items-center justify-center min-h-screen p-4 lg:p-8">
       <Card className="w-full max-w-md shadow-xl border-0 bg-white">
-        <CardHeader className="text-center space-y-4 pb-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-            <Heart className="h-8 w-8 text-white fill-current" />
-          </div>
-          <div>
-            <CardTitle className="text-2xl font-bold text-foreground mb-2">Comincia oggi, domani è gia tardi🚀</CardTitle>
-            <CardDescription className="text-muted-foreground">il magico mondo dell'interesse composto</CardDescription>
+        <CardHeader className="text-center space-y-6 pb-8">
+          <Logo variant="vertical" size="lg" className="mx-auto" />
+          <div className="space-y-2">
+            <CardTitle className="text-2xl font-bold text-foreground">Comincia oggi, domani è già tardi 🚀</CardTitle>
+            <Claim variant="main" className="text-center" />
           </div>
         </CardHeader>
         <CardContent>

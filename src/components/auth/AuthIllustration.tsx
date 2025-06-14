@@ -1,23 +1,23 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, Users, ShoppingCart, DollarSign, Activity } from 'lucide-react';
+import { TrendingUp, Users, ShoppingCart, DollarSign } from 'lucide-react';
+import Logo from '@/components/brand/Logo';
+import Claim from '@/components/brand/Claim';
 
 const AuthIllustration: React.FC = () => {
   return (
     <div className="hidden lg:flex flex-col justify-center items-center bg-gradient-to-br from-primary/5 to-secondary/10 p-12 min-h-screen">
       <div className="max-w-lg w-full space-y-8">
         {/* Hero Section */}
-        <div className="text-center space-y-4">
-          <div className="mx-auto w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mb-6">
-            <Activity className="h-16 w-16 text-white" />
+        <div className="text-center space-y-6">
+          <Logo variant="vertical" size="xl" className="mx-auto" />
+          <div className="space-y-3">
+            <h2 className="text-3xl font-bold text-foreground">
+              Gestisci i tuoi investimenti
+            </h2>
+            <Claim variant="social" size="lg" className="text-center" />
           </div>
-          <h2 className="text-3xl font-bold text-foreground">
-            Gestisci i tuoi investimenti
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Piattaforma avanzata per il controllo delle tue finanze
-          </p>
         </div>
 
         {/* Stats Cards */}
