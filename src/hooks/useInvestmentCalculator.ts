@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { InvestmentConfig, InvestmentData, PACConfig } from '@/types/investment';
 import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
@@ -34,15 +35,17 @@ export const useInvestmentCalculator = () => {
   }, [loadConfigurations]);
 
   const isPACDay = useCallback((day: number, pacConfig: PACConfig): boolean => {
+    // La logica PAC ora inizia dal primo periodo completo, non dal giorno 0
     switch (pacConfig.frequency) {
       case 'daily':
-        return true;
+        return day >= 1; // Primo pagamento dal giorno 1
       case 'weekly':
-        return day % 7 === 0;
+        return day >= 7 && day % 7 === 0; // Primo pagamento al giorno 7, poi ogni 7 giorni
       case 'monthly':
-        return day % 30 === 0;
+        return day >= 30 && day % 30 === 0; // Primo pagamento al giorno 30, poi ogni 30 giorni
       case 'custom':
-        return pacConfig.customDays ? day % pacConfig.customDays === 0 : false;
+        const customDays = pacConfig.customDays || 10;
+        return day >= customDays && day % customDays === 0; // Primo pagamento al giorno personalizzato
       default:
         return false;
     }
@@ -94,16 +97,43 @@ export const useInvestmentCalculator = () => {
         totalPACInvested,
         totalInterest,
         isCustomReturn,
-        isCustomPAC, // FIX: added key here!
+        isCustomPAC,
       });
     }
 
     return results;
   }, [config, dailyReturns, dailyPACOverrides, isPACDay]);
 
-  const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>) => {
+  const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>, resetCustomData: boolean = false) => {
     setConfig(prev => ({ ...prev, ...newConfig }));
     setCurrentConfigId(null); // Indica che la configurazione è stata modificata
+    
+    // Se resetCustomData è true o se stiamo cambiando parametri fondamentali, azzera i dati personalizzati
+    if (resetCustomData || 
+        newConfig.initialCapital !== undefined || 
+        newConfig.timeHorizon !== undefined ||
+        newConfig.pacConfig?.frequency !== undefined) {
+      setDailyReturns({});
+      setDailyPACOverrides({});
+    }
+  }, []);
+
+  const createNewConfiguration = useCallback(() => {
+    // Crea una nuova configurazione pulita azzerando tutti i dati personalizzati
+    setDailyReturns({});
+    setDailyPACOverrides({});
+    setCurrentConfigId(null);
+    setCurrentConfigName('');
+    setConfig({
+      initialCapital: 1000,
+      timeHorizon: 1000,
+      dailyReturnRate: 0.2,
+      pacConfig: {
+        amount: 100,
+        frequency: 'weekly',
+        startDate: new Date()
+      }
+    });
   }, []);
 
   const updateDailyReturn = useCallback((day: number, returnRate: number) => {
@@ -144,6 +174,7 @@ export const useInvestmentCalculator = () => {
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
+    setDailyPACOverrides({}); // Azzera sempre gli override PAC quando si carica una configurazione salvata
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
   }, []);
@@ -175,7 +206,6 @@ export const useInvestmentCalculator = () => {
     window.URL.revokeObjectURL(url);
   }, [calculateInvestment]);
 
-  // New: update PAC for a given day
   const updatePACForDay = useCallback((day: number, pacAmount: number) => {
     setDailyPACOverrides(prev => ({
       ...prev,
@@ -184,7 +214,6 @@ export const useInvestmentCalculator = () => {
     setCurrentConfigId(null);
   }, []);
 
-  // New: remove PAC override for a given day (restore default)
   const removePACOverride = useCallback((day: number) => {
     setDailyPACOverrides(prev => {
       const updated = { ...prev };
@@ -194,16 +223,43 @@ export const useInvestmentCalculator = () => {
     setCurrentConfigId(null);
   }, []);
 
+  // Funzione helper per ottenere informazioni su quando inizierà il primo pagamento PAC
+  const getNextPACInfo = useCallback(() => {
+    const { frequency, customDays } = config.pacConfig;
+    let nextPACDay = 0;
+    let description = '';
+
+    switch (frequency) {
+      case 'daily':
+        nextPACDay = 1;
+        description = 'Il primo versamento PAC avverrà dal giorno 1';
+        break;
+      case 'weekly':
+        nextPACDay = 7;
+        description = 'Il primo versamento PAC avverrà al giorno 7, poi ogni settimana';
+        break;
+      case 'monthly':
+        nextPACDay = 30;
+        description = 'Il primo versamento PAC avverrà al giorno 30, poi ogni mese';
+        break;
+      case 'custom':
+        nextPACDay = customDays || 10;
+        description = `Il primo versamento PAC avverrà al giorno ${nextPACDay}, poi ogni ${nextPACDay} giorni`;
+        break;
+    }
+
+    return { nextPACDay, description };
+  }, [config.pacConfig]);
+
   return {
     config,
     updateConfig,
+    createNewConfiguration,
     investmentData: calculateInvestment,
     dailyReturns,
     updateDailyReturn,
     removeDailyReturn,
     exportToCSV,
-
-    // NEW exports for PAC overrides
     dailyPACOverrides,
     updatePACForDay,
     removePACOverride,
@@ -215,6 +271,7 @@ export const useInvestmentCalculator = () => {
     loadSavedConfiguration,
     deleteConfiguration,
     supabaseLoading,
+    getNextPACInfo,
 
     summary: {
       finalCapital: calculateInvestment[calculateInvestment.length - 1]?.finalCapital || 0,

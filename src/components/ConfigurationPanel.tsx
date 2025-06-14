@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
@@ -27,6 +28,9 @@ interface ConfigurationPanelProps {
   currentConfigName: string;
   supabaseLoading: boolean;
   isAdmin?: boolean;
+  
+  // Nuova prop per informazioni PAC
+  nextPACInfo?: { nextPACDay: number; description: string };
 }
 
 const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
@@ -44,7 +48,8 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   currentConfigId,
   currentConfigName,
   supabaseLoading,
-  isAdmin = false
+  isAdmin = false,
+  nextPACInfo
 }) => {
   return (
     <div className="space-y-6">
@@ -78,6 +83,7 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       <PACConfiguration
         pacConfig={config.pacConfig}
         onPACConfigChange={(pacConfig) => onConfigChange({ pacConfig: { ...config.pacConfig, ...pacConfig } })}
+        nextPACInfo={nextPACInfo}
       />
 
       <DailyReturnTracker
