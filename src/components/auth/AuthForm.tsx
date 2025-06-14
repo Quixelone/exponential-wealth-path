@@ -180,9 +180,7 @@ const AuthForm: React.FC = () => {
           </div>
           <div>
             <CardTitle className="text-2xl font-bold text-foreground mb-2">Comincia oggi, domani è gia tardi🚀</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Make your app management easy and fun!
-            </CardDescription>
+            <CardDescription className="text-muted-foreground">il magico mondo dell'interesse composto</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
