@@ -65,49 +65,35 @@ const Index = () => {
     : userProfile?.email || 'Utente';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Modern Header */}
-      <div className="glass-card border-0 shadow-lg">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
+      {/* Header with user info and logout */}
+      <div className="bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 modern-gradient rounded-xl flex items-center justify-center shadow-lg">
-                <div className="w-6 h-6 bg-white rounded-md opacity-90"></div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold modern-gradient-text">Finanza Creativa</h1>
-                <p className="text-sm text-muted-foreground">Dashboard Investimenti</p>
-              </div>
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-primary">Finanza Creativa</h1>
               {isAdmin && (
-                <span className="px-3 py-1 modern-gradient text-white text-xs rounded-full font-medium shadow-lg">
-                  Admin
+                <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">
+                  Amministratore
                 </span>
               )}
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 text-sm text-muted-foreground bg-white/50 rounded-xl px-4 py-2 backdrop-blur-sm">
-                <div className="w-8 h-8 modern-gradient rounded-lg flex items-center justify-center">
-                  <User className="h-4 w-4 text-white" />
-                </div>
-                <span className="font-medium">{displayName}</span>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                {displayName}
               </div>
               {isAdmin && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => navigate('/user-management')}
-                  className="bg-white/50 backdrop-blur-sm border-white/30 hover:bg-white/70"
                 >
                   <Users className="h-4 w-4 mr-2" />
                   Gestione Utenti
                 </Button>
               )}
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleLogout}
-                className="bg-white/50 backdrop-blur-sm border-white/30 hover:bg-white/70"
-              >
+              <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
@@ -118,31 +104,18 @@ const Index = () => {
 
       <div className="max-w-7xl mx-auto p-6">
         <Tabs defaultValue="investments" className="w-full">
-          <TabsList className="glass-card grid w-full grid-cols-2 mb-8 p-2 h-auto">
-            <TabsTrigger 
-              value="investments" 
-              className="data-[state=active]:modern-gradient data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg py-3"
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 bg-current rounded opacity-80"></div>
-                Investimenti
-              </div>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="reminders" 
-              className="data-[state=active]:modern-gradient data-[state=active]:text-white data-[state=active]:shadow-lg rounded-lg py-3"
-            >
-              <div className="flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                Promemoria
-              </div>
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="investments">Investimenti</TabsTrigger>
+            <TabsTrigger value="reminders" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Promemoria
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="investments">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Configuration Panel */}
-              <div className="lg:col-span-1 animate-slide-in-left">
+              <div className="lg:col-span-1">
                 <ConfigurationPanel
                   config={config}
                   onConfigChange={updateConfig}
@@ -163,21 +136,15 @@ const Index = () => {
               </div>
 
               {/* Charts and Results */}
-              <div className="lg:col-span-2 space-y-8 animate-slide-in-right">
-                <div className="animate-slide-in-top" style={{ animationDelay: '0.1s' }}>
-                  <InvestmentSummary summary={summary} />
-                </div>
-                <div className="animate-slide-in-top" style={{ animationDelay: '0.2s' }}>
-                  <InvestmentChart data={investmentData} />
-                </div>
-                <div className="animate-slide-in-top" style={{ animationDelay: '0.3s' }}>
-                  <ReportTable data={investmentData} onExportCSV={exportToCSV} />
-                </div>
+              <div className="lg:col-span-2 space-y-6">
+                <InvestmentSummary summary={summary} />
+                <InvestmentChart data={investmentData} />
+                <ReportTable data={investmentData} onExportCSV={exportToCSV} />
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="reminders" className="animate-slide-in-bottom">
+          <TabsContent value="reminders">
             <PaymentReminders />
           </TabsContent>
         </Tabs>
