@@ -3,76 +3,74 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design system per Wealth Compass */
+/* Design system moderno ispirato a Vuexy */
 
 @layer base {
   :root {
-    --background: 210 100% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 248 250 252;
+    --foreground: 15 23 42;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 255 255 255;
+    --card-foreground: 15 23 42;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 255 255 255;
+    --popover-foreground: 15 23 42;
 
-    --primary: 210 100% 50%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 139 92 246;
+    --primary-foreground: 255 255 255;
 
-    --secondary: 168 76% 36%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 236 254 255;
+    --secondary-foreground: 14 116 144;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
 
-    --accent: 168 76% 42%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 236 254 255;
+    --accent-foreground: 14 116 144;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 210 100% 50%;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 139 92 246;
 
-    --radius: 0.75rem;
+    --radius: 12px;
 
-    /* Custom gradient colors */
-    --wealth-gradient-start: 210 100% 56%;
-    --wealth-gradient-end: 168 76% 42%;
+    /* Modern gradient colors */
+    --modern-gradient-start: 139 92 246;
+    --modern-gradient-end: 59 130 246;
+    --modern-gradient-accent: 16 185 129;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 15 23 42;
+    --foreground: 248 250 252;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 30 41 59;
+    --card-foreground: 248 250 252;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 30 41 59;
+    --popover-foreground: 248 250 252;
 
-    --primary: 210 100% 60%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 139 92 246;
+    --primary-foreground: 255 255 255;
 
-    --secondary: 168 76% 46%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 30 41 59;
+    --secondary-foreground: 148 163 184;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
 
-    --accent: 168 76% 52%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 30 41 59;
+    --accent-foreground: 148 163 184;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 210 100% 60%;
-
-    --wealth-gradient-start: 210 100% 66%;
-    --wealth-gradient-end: 168 76% 52%;
+    --border: 51 65 85;
+    --input: 51 65 85;
+    --ring: 139 92 246;
   }
 }
 
@@ -84,37 +82,150 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
 @layer utilities {
-  .wealth-gradient {
-    background: linear-gradient(135deg, hsl(var(--wealth-gradient-start)), hsl(var(--wealth-gradient-end)));
+  .modern-gradient {
+    background: linear-gradient(135deg, rgb(139 92 246), rgb(59 130 246));
   }
   
-  .wealth-gradient-text {
-    background: linear-gradient(135deg, hsl(var(--wealth-gradient-start)), hsl(var(--wealth-gradient-end)));
+  .modern-gradient-accent {
+    background: linear-gradient(135deg, rgb(16 185 129), rgb(59 130 246));
+  }
+  
+  .modern-gradient-text {
+    background: linear-gradient(135deg, rgb(139 92 246), rgb(59 130 246));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20 shadow-xl;
+  }
+
+  .modern-shadow {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-2xl;
+  }
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Modern animations */
+@keyframes slideInFromTop {
+  from { 
+    opacity: 0; 
+    transform: translateY(-30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from { 
+    opacity: 0; 
+    transform: translateX(-30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from { 
+    opacity: 0; 
+    transform: translateX(30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from { 
+    opacity: 0; 
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1);
+  }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out;
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgb(139 92 246 / 0.3); }
+  50% { box-shadow: 0 0 40px rgb(139 92 246 / 0.6); }
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop 0.6s ease-out;
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInFromLeft 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInFromRight 0.6s ease-out;
 }
 
 .animate-scale-in {
   animation: scaleIn 0.4s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(248 250 252);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(203 213 225);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 184);
+}
+
+/* Tooltip styles */
+.tooltip-content {
+  @apply bg-gray-900 text-white text-sm rounded-lg px-3 py-2 shadow-lg z-50;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.tooltip-arrow {
+  @apply absolute w-2 h-2 bg-gray-900 transform rotate-45;
 }
