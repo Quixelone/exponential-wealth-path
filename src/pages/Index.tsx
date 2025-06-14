@@ -163,15 +163,15 @@ const Index = () => {
                 />
                 <StatCard
                   title="Valore Finale"
-                  value={formatCurrency(summary.finalValue)}
-                  subtitle={`+${formatCurrency(summary.totalProfit)}`}
+                  value={formatCurrency(summary.finalCapital)}
+                  subtitle={`+${formatCurrency(summary.totalInterest)}`}
                   icon={Target}
                   color="info"
                   trend="up"
                 />
                 <StatCard
                   title="Rendimento"
-                  value={`${summary.totalReturnPercentage.toFixed(1)}%`}
+                  value={`${summary.totalReturn.toFixed(1)}%`}
                   subtitle="Totale"
                   icon={TrendingUp}
                   color="warning"
