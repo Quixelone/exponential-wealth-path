@@ -1,6 +1,7 @@
 
 import { InvestmentConfig, InvestmentData, PACConfig } from '@/types/investment';
 
+// Calcola se è un giorno di PAC
 export const isPACDay = (
   day: number,
   pacConfig: PACConfig
@@ -34,14 +35,15 @@ export const calculateInvestment = ({
   const results: InvestmentData[] = [];
   let currentCapital = config.initialCapital;
   let totalPACInvested = 0;
+  // startDate deve essere la data di oggi per day 0
+  const baseDate = new Date(config.pacConfig.startDate);
 
   for (let day = 0; day <= config.timeHorizon; day++) {
-    const currentDate = new Date(config.pacConfig.startDate);
-    currentDate.setDate(currentDate.getDate() + day);
+    const currentDate = new Date(baseDate);
+    currentDate.setDate(baseDate.getDate() + day); // sempre dalla data base
 
     const capitalBeforePAC = currentCapital;
 
-    // Use custom PAC amount if set for this day, else default logic
     let pacAmount = 0;
     let isCustomPAC = false;
     if (dailyPACOverrides.hasOwnProperty(day)) {
@@ -58,7 +60,6 @@ export const calculateInvestment = ({
     const dailyReturn = dailyReturns[day] ?? config.dailyReturnRate;
     const isCustomReturn = dailyReturns.hasOwnProperty(day);
 
-    // Calculate interest earned for the day
     const interestEarnedDaily = capitalAfterPAC * (dailyReturn / 100);
     currentCapital += interestEarnedDaily;
 

@@ -1,9 +1,15 @@
+
 import React from 'react';
 import { useMemo, useCallback } from 'react';
 import { InvestmentConfig, InvestmentData } from '@/types/investment';
 import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
 import { useInvestmentConfigState, getDefaultConfig } from './investmentConfigState';
 import { calculateInvestment, isPACDay, getNextPACInfo } from './investmentCalculationUtils';
+
+// funzione di deep compare (shallow per oggetti semplici)
+const deepEqual = (a: any, b: any): boolean => {
+  return JSON.stringify(a) === JSON.stringify(b);
+};
 
 // Custom hook principale per usare il calcolatore d'investimento e tutte le sue API
 export const useInvestmentCalculator = () => {
@@ -27,10 +33,9 @@ export const useInvestmentCalculator = () => {
     deleteConfiguration
   } = useSupabaseConfig();
 
-  // Carica configurazioni salvate al primo render
   React.useEffect(() => { loadConfigurations(); }, [loadConfigurations]);
 
-  // Calcula l'investimento e risultati memo-izzati
+  // Calcolo investimento
   const investmentData: InvestmentData[] = useMemo(() => {
     return calculateInvestment({
       config: configState.config,
@@ -39,11 +44,31 @@ export const useInvestmentCalculator = () => {
     });
   }, [configState.config, configState.dailyReturns, configState.dailyPACOverrides]);
 
-  // Aggiorna configurazione, resettando se richiesto (o su cambio profondo)
+  // Determina configurazione "salvata" attuale
+  const savedConfig = React.useMemo(() =>
+    configState.currentConfigId
+      ? savedConfigs.find(c => c.id === configState.currentConfigId)
+      : null,
+    [savedConfigs, configState.currentConfigId]
+  );
+
+  // True se lo stato corrente differisce dalla versione salvata
+  const hasUnsavedChanges = React.useMemo(() => {
+    if (!savedConfig) return false;
+    const stateToCompare = {
+      config: configState.config,
+      dailyReturns: configState.dailyReturns,
+    };
+    const savedToCompare = {
+      config: savedConfig.config,
+      dailyReturns: savedConfig.dailyReturns,
+    };
+    return !deepEqual(stateToCompare, savedToCompare);
+  }, [configState.config, configState.dailyReturns, savedConfig]);
+
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>, reset: boolean = false) => {
     setConfig(prev => ({ ...prev, ...newConfig }));
     setCurrentConfigId(null);
-    // Reset custom data se fondamentale
     if (
       reset ||
       newConfig.initialCapital !== undefined ||
@@ -172,7 +197,7 @@ export const useInvestmentCalculator = () => {
     deleteConfiguration,
     supabaseLoading,
     getNextPACInfo: () => nextPACInfo,
-
+    hasUnsavedChanges,
     summary: {
       finalCapital: investmentData[investmentData.length - 1]?.finalCapital || 0,
       totalInvested:
