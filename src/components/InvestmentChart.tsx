@@ -50,7 +50,7 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
               <YAxis 
                 stroke="hsl(var(--muted-foreground))"
                 tick={{ fontSize: 12 }}
-                tickFormatter={formatCurrency}
+                tickFormatter={(value) => formatCurrency(value)}
                 label={{ value: 'Capitale (€)', angle: -90, position: 'insideLeft' }}
               />
               <Tooltip 
@@ -111,3 +111,4 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
 };
 
 export default InvestmentChart;
+
