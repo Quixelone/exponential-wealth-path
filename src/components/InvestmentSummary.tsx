@@ -14,6 +14,9 @@ interface InvestmentSummaryProps {
 }
 
 const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
+  // Debug: log to make sure the value is correctly formatted and received
+  console.log('[InvestmentSummary] - finalCapital:', summary.finalCapital, 'formatted:', formatCurrencyWhole(summary.finalCapital));
+
   const formatPercentage = (value: number) => {
     return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
   };
@@ -81,3 +84,4 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
 };
 
 export default InvestmentSummary;
+

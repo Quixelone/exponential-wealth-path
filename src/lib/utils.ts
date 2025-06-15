@@ -1,4 +1,3 @@
-
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -11,6 +10,7 @@ export function formatCurrency(
   value: number,
   options?: { decimals?: number }
 ): string {
+  // Use "it-IT" locale and force grouping/decimal
   return new Intl.NumberFormat("it-IT", {
     style: "currency",
     currency: "EUR",
@@ -22,5 +22,12 @@ export function formatCurrency(
 
 // Utility function to format whole numbers as currency (no decimals)
 export function formatCurrencyWhole(value: number): string {
-  return formatCurrency(value, { decimals: 0 })
+  // Explicitly force 0 decimals
+  return new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  }).format(value)
 }
