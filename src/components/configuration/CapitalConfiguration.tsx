@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { DollarSign } from 'lucide-react';
+import { formatCurrencyWhole } from '@/lib/utils';
 
 interface CapitalConfigurationProps {
   initialCapital: number;
@@ -15,15 +16,6 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
   initialCapital,
   onCapitalChange
 }) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('it-IT', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   return (
     <Card className="animate-fade-in">
       <CardHeader className="pb-3">
@@ -35,7 +27,7 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="initial-capital">
-            Importo: {formatCurrency(initialCapital)}
+            Importo: {formatCurrencyWhole(initialCapital)}
           </Label>
           <Slider
             id="initial-capital"

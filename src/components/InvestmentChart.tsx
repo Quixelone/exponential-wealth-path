@@ -3,6 +3,7 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { InvestmentData } from '@/types/investment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/utils';
 
 interface InvestmentChartProps {
   data: InvestmentData[];
@@ -13,15 +14,6 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
   data, 
   showProjections = false 
 }) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('it-IT', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   const formatTooltip = (value: any, name: string) => {
     if (name === 'finalCapital') {
       return [formatCurrency(value), 'Capitale Totale'];
@@ -71,8 +63,6 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                 }}
               />
-              
-              {/* Linea principale del capitale */}
               <Line
                 type="monotone"
                 dataKey="finalCapital"
@@ -81,8 +71,6 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
                 dot={false}
                 activeDot={{ r: 6, fill: 'hsl(var(--primary))' }}
               />
-              
-              {/* Linea del PAC investito */}
               <Line
                 type="monotone"
                 dataKey="totalPACInvested"
@@ -91,8 +79,6 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
                 strokeDasharray="5 5"
                 dot={false}
               />
-
-              {/* Indicatori per i giorni PAC */}
               {pacDays.map((pacDay, index) => (
                 <ReferenceLine 
                   key={`pac-${index}`}
@@ -105,8 +91,6 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
             </LineChart>
           </ResponsiveContainer>
         </div>
-        
-        {/* Legenda */}
         <div className="flex flex-wrap gap-6 mt-4 justify-center">
           <div className="flex items-center gap-2">
             <div className="w-4 h-0.5 bg-primary"></div>

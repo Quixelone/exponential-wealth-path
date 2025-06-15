@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, PiggyBank, Target, Percent } from 'lucide-react';
+import { formatCurrency, formatCurrencyWhole } from '@/lib/utils';
 
 interface InvestmentSummaryProps {
   summary: {
@@ -13,15 +14,6 @@ interface InvestmentSummaryProps {
 }
 
 const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('it-IT', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   const formatPercentage = (value: number) => {
     return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
   };
@@ -29,7 +21,7 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
   const summaryCards = [
     {
       title: 'Capitale Finale',
-      value: formatCurrency(summary.finalCapital),
+      value: formatCurrencyWhole(summary.finalCapital),
       icon: Target,
       color: 'text-primary',
       bgColor: 'bg-primary/10',
@@ -37,7 +29,7 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
     },
     {
       title: 'Totale Investito',
-      value: formatCurrency(summary.totalInvested),
+      value: formatCurrencyWhole(summary.totalInvested),
       icon: PiggyBank,
       color: 'text-secondary',
       bgColor: 'bg-secondary/10',
@@ -45,7 +37,7 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
     },
     {
       title: 'Interessi Maturati',
-      value: formatCurrency(summary.totalInterest),
+      value: formatCurrencyWhole(summary.totalInterest),
       icon: TrendingUp,
       color: 'text-accent',
       bgColor: 'bg-accent/10',

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Calendar, TrendingUp, Edit, Trash2 } from 'lucide-react';
 import { SavedConfiguration } from '@/types/database';
+import { formatCurrencyWhole } from '@/lib/utils';
 
 interface SavedConfigCardProps {
   savedConfig: SavedConfiguration;
@@ -24,15 +25,6 @@ const formatDate = (dateString: string) => {
     hour: '2-digit',
     minute: '2-digit'
   });
-};
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('it-IT', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
 };
 
 const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
@@ -70,7 +62,7 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
         <div className="grid grid-cols-2 gap-2 text-xs mb-3">
           <div>
             <span className="text-muted-foreground">Capitale:</span>
-            <div className="font-medium">{formatCurrency(savedConfig.config.initialCapital)}</div>
+            <div className="font-medium">{formatCurrencyWhole(savedConfig.config.initialCapital)}</div>
           </div>
           <div>
             <span className="text-muted-foreground">Giorni:</span>
@@ -78,7 +70,7 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
           </div>
           <div>
             <span className="text-muted-foreground">PAC:</span>
-            <div className="font-medium">{formatCurrency(savedConfig.config.pacConfig.amount)}</div>
+            <div className="font-medium">{formatCurrencyWhole(savedConfig.config.pacConfig.amount)}</div>
           </div>
           <div>
             <span className="text-muted-foreground">Frequenza:</span>

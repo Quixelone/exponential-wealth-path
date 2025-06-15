@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -6,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Settings, Plus, Save, X, Edit, PauseCircle, PlayCircle, Calendar } from 'lucide-react';
+import { formatCurrency, formatCurrencyWhole } from '@/lib/utils';
 
 interface PACPayment {
   id: string;
@@ -65,13 +65,8 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
   const [newPaymentAmount, setNewPaymentAmount] = useState(pacAmount);
   const [newPaymentDate, setNewPaymentDate] = useState('');
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('it-IT', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
+  const formatCurrencyValue = (value: number, whole = false) => {
+    return whole ? formatCurrencyWhole(value) : formatCurrency(value);
   };
 
   const calculateNextPaymentDate = (startDate: string, frequency: string): string => {
