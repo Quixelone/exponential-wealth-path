@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Save, FileText, Crown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Save, FileText, Trash2, Calendar, TrendingUp, Edit, Crown, AlertTriangle } from 'lucide-react';
+import SavedConfigCard from './SavedConfigCard';
+import SaveConfigDialog from './SaveConfigDialog';
+import EditConfigDialog from './EditConfigDialog';
+import UnsavedChangesAlert from './UnsavedChangesAlert';
 import { SavedConfiguration } from '@/types/database';
 
 interface SavedConfigurationsPanelProps {
@@ -42,8 +42,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
   const [pendingLoadConfig, setPendingLoadConfig] = useState<SavedConfiguration | null>(null);
   const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
 
-  // Mantieni il valore predefinito del nome config: 
-  // Se la config corrente è una salvata, usa il nome attuale
+  // Aggiorna il valore predefinito del nome config
   React.useEffect(() => {
     if (currentConfigId && currentConfigName) {
       setConfigName(currentConfigName);
@@ -79,26 +78,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('it-IT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('it-IT', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
-  // Alert per modifiche non salvate quando si tenta il cambio config
+  // Gestione alert per modifiche non salvate
   const handleLoadConfigWithCheck = (config: SavedConfiguration) => {
     if (hasUnsavedChanges) {
       setPendingLoadConfig(config);
@@ -139,51 +119,18 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
             {hasUnsavedChanges && (
               <Badge variant="destructive" className="animate-pulse">Modificato</Badge>
             )}
-            <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="flex items-center gap-2">
-                  <Save className="h-4 w-4" />
-                  {currentConfigId
-                    ? (hasUnsavedChanges ? "Salva modifiche" : "Aggiorna")
-                    : "Salva"}
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>
-                    {currentConfigId
-                      ? (hasUnsavedChanges ? "Salva modifiche alla Configurazione" : "Aggiorna Configurazione")
-                      : "Salva Configurazione"}
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium">Nome della configurazione</label>
-                    <Input
-                      value={configName}
-                      onChange={(e) => setConfigName(e.target.value)}
-                      placeholder={currentConfigId ? currentConfigName : "Es: Strategia conservativa"}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => setSaveDialogOpen(false)}>
-                      Annulla
-                    </Button>
-                    <Button
-                      onClick={handleSaveConfiguration}
-                      disabled={!configName.trim() || loading}
-                    >
-                      {loading
-                        ? 'Salvando...'
-                        : (currentConfigId
-                          ? (hasUnsavedChanges ? 'Salva modifiche' : 'Aggiorna')
-                          : 'Salva')}
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <SaveConfigDialog
+              open={saveDialogOpen}
+              onOpenChange={setSaveDialogOpen}
+              configName={configName}
+              setConfigName={setConfigName}
+              onSave={handleSaveConfiguration}
+              loading={loading}
+              isUpdate={!!currentConfigId}
+              hasUnsavedChanges={hasUnsavedChanges}
+              currentConfigName={currentConfigName}
+              currentConfigId={currentConfigId}
+            />
           </div>
         </div>
       </CardHeader>
@@ -209,163 +156,36 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
             </div>
           ) : (
             savedConfigs.map((savedConfig) => (
-              <Card key={savedConfig.id} className="border border-gray-200 hover:border-primary/30 transition-colors">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm mb-1">{savedConfig.name}</h4>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {formatDate(savedConfig.created_at)}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="h-3 w-3" />
-                          {savedConfig.config.dailyReturnRate.toFixed(3)}%
-                        </div>
-                      </div>
-                    </div>
-                    {currentConfigId === savedConfig.id && (
-                      <Badge variant="secondary" className="text-xs">
-                        Attuale
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                    <div>
-                      <span className="text-muted-foreground">Capitale:</span>
-                      <div className="font-medium">{formatCurrency(savedConfig.config.initialCapital)}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Giorni:</span>
-                      <div className="font-medium">{savedConfig.config.timeHorizon}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">PAC:</span>
-                      <div className="font-medium">{formatCurrency(savedConfig.config.pacConfig.amount)}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Frequenza:</span>
-                      <div className="font-medium capitalize">{savedConfig.config.pacConfig.frequency}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <div className="text-xs text-muted-foreground">
-                      {Object.keys(savedConfig.dailyReturns).length} rendimenti personalizzati
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleLoadConfigWithCheck(savedConfig)}
-                        disabled={loading}
-                        className="h-7 px-2 text-xs"
-                      >
-                        Carica
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditConfiguration(savedConfig)}
-                        disabled={loading}
-                        className="h-7 w-7 p-0"
-                      >
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
-                            disabled={loading}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Elimina Configurazione</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Sei sicuro di voler eliminare la configurazione "{savedConfig.name}"? 
-                              Questa azione non può essere annullata.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Annulla</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => onDeleteConfiguration(savedConfig.id)}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Elimina
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <SavedConfigCard
+                key={savedConfig.id}
+                savedConfig={savedConfig}
+                onLoad={() => handleLoadConfigWithCheck(savedConfig)}
+                onEdit={() => handleEditConfiguration(savedConfig)}
+                onDelete={() => onDeleteConfiguration(savedConfig.id)}
+                isCurrent={currentConfigId === savedConfig.id}
+                loading={loading}
+              />
             ))
           )}
         </div>
 
-        {/* Prompt modifiche non salvate */}
-        <AlertDialog open={showUnsavedAlert}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
-                Modifiche non salvate
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                Hai modifiche non salvate nella configurazione corrente. Se cambi configurazione, perderai queste modifiche. Vuoi continuare?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={cancelLoadConfig}>Annulla</AlertDialogCancel>
-              <AlertDialogAction className="bg-green-600 hover:bg-green-700" onClick={continueLoadConfig}>
-                Continua
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <UnsavedChangesAlert
+          open={showUnsavedAlert}
+          onContinue={continueLoadConfig}
+          onCancel={cancelLoadConfig}
+        />
 
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Modifica Nome Configurazione</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Nome della configurazione</label>
-                <Input
-                  value={editingConfigName}
-                  onChange={(e) => setEditingConfigName(e.target.value)}
-                  placeholder="Nome configurazione"
-                  className="mt-1"
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-                  Annulla
-                </Button>
-                <Button 
-                  onClick={handleUpdateConfiguration}
-                  disabled={!editingConfigName.trim() || loading}
-                >
-                  {loading ? 'Aggiornando...' : 'Aggiorna'}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <EditConfigDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          configName={editingConfigName}
+          setConfigName={setEditingConfigName}
+          onUpdate={handleUpdateConfiguration}
+          loading={loading}
+        />
       </CardContent>
     </Card>
   );
 };
 
 export default SavedConfigurationsPanel;
-
