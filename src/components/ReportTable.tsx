@@ -34,8 +34,6 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const [editingPACDay, setEditingPACDay] = useState<number | null>(null);
   const [editPACValue, setEditPACValue] = useState<string>('');
 
-  const formatCurrency_2dec = formatCurrency; // 2 decimals, used for all currency
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit', day: '2-digit'});
   };
@@ -164,7 +162,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                       <TableCell className="font-medium text-center">{item.day}</TableCell>
                       <TableCell className="text-sm">{formatDate(item.date)}</TableCell>
                       {/* Use capitalBeforePAC for "Capitale Iniziale" */}
-                      <TableCell className="text-right font-mono">{formatCurrency_2dec(item.capitalBeforePAC)}</TableCell>
+                      <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC)}</TableCell>
                       <TableCell className="text-right font-mono group">
                         {isEditingThisPACRow ? (
                           <Input
@@ -178,7 +176,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                           />
                         ) : (
                           <span className="flex items-center gap-1 justify-end">
-                            {formatCurrency_2dec(item.pacAmount)}
+                            {formatCurrency(item.pacAmount)}
                             <ModernTooltip>
                               <ModernTooltipTrigger asChild>
                                 <Button
@@ -207,7 +205,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="text-right font-mono">{formatCurrency_2dec(item.capitalAfterPAC)}</TableCell>
+                      <TableCell className="text-right font-mono">{formatCurrency(item.capitalAfterPAC)}</TableCell>
                       
                       {/* % Ricavo */}
                       <TableCell className={`text-right font-mono ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -230,11 +228,10 @@ const ReportTable: React.FC<ReportTableProps> = ({
                         <div className="flex items-center justify-end gap-1">
                           {isPositiveGain ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                           {/* Use dailyGain (which is item.interestEarnedDaily) */}
-                          {formatCurrency_2dec(dailyGain)}
+                          {formatCurrency(dailyGain)}
                         </div>
                       </TableCell>
-
-                      <TableCell className="text-right font-mono font-semibold">{formatCurrency_2dec(item.finalCapital)}</TableCell>
+                      <TableCell className="text-right font-mono font-semibold">{formatCurrency(item.finalCapital)}</TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-1">
                           {isEditingThisPACRow ? (
