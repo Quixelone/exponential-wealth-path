@@ -42,6 +42,16 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
   const [pendingLoadConfig, setPendingLoadConfig] = useState<SavedConfiguration | null>(null);
   const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
 
+  // Mantieni il valore predefinito del nome config: 
+  // Se la config corrente è una salvata, usa il nome attuale
+  React.useEffect(() => {
+    if (currentConfigId && currentConfigName) {
+      setConfigName(currentConfigName);
+    } else {
+      setConfigName('');
+    }
+  }, [currentConfigId, currentConfigName, saveDialogOpen]);
+
   const handleSaveConfiguration = () => {
     if (configName.trim()) {
       if (currentConfigId) {
@@ -133,13 +143,17 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
               <DialogTrigger asChild>
                 <Button size="sm" className="flex items-center gap-2">
                   <Save className="h-4 w-4" />
-                  {currentConfigId ? (hasUnsavedChanges ? "Salva modifiche" : "Aggiorna") : "Salva"}
+                  {currentConfigId
+                    ? (hasUnsavedChanges ? "Salva modifiche" : "Aggiorna")
+                    : "Salva"}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>
-                    {currentConfigId ? (hasUnsavedChanges ? "Salva modifiche alla Configurazione" : "Aggiorna Configurazione") : "Salva Configurazione"}
+                    {currentConfigId
+                      ? (hasUnsavedChanges ? "Salva modifiche alla Configurazione" : "Aggiorna Configurazione")
+                      : "Salva Configurazione"}
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -156,13 +170,15 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
                     <Button variant="outline" onClick={() => setSaveDialogOpen(false)}>
                       Annulla
                     </Button>
-                    <Button 
+                    <Button
                       onClick={handleSaveConfiguration}
                       disabled={!configName.trim() || loading}
                     >
                       {loading
                         ? 'Salvando...'
-                        : (currentConfigId ? (hasUnsavedChanges ? 'Salva modifiche' : 'Aggiorna') : 'Salva')}
+                        : (currentConfigId
+                          ? (hasUnsavedChanges ? 'Salva modifiche' : 'Aggiorna')
+                          : 'Salva')}
                     </Button>
                   </div>
                 </div>
@@ -352,3 +368,4 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
 };
 
 export default SavedConfigurationsPanel;
+

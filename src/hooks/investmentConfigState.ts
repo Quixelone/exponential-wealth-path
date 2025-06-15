@@ -10,7 +10,7 @@ export const getDefaultConfig = (): InvestmentConfig => ({
   pacConfig: {
     amount: 100,
     frequency: 'weekly',
-    startDate: new Date() // <-- sempre oggi
+    startDate: new Date(), // Sempre oggi
   }
 });
 
@@ -34,7 +34,7 @@ export const useInvestmentConfigState = () => {
     setCurrentConfigName('');
     setConfig({
       ...getDefaultConfig(),
-      pacConfig: { ...getDefaultConfig().pacConfig, startDate: new Date() }, // aggiorna anche startDate
+      pacConfig: { ...getDefaultConfig().pacConfig, startDate: new Date() }, // startDate sempre oggi
     });
   }, [resetCustomData]);
 
@@ -49,3 +49,4 @@ export const useInvestmentConfigState = () => {
     resetCustomData,
   };
 };
+

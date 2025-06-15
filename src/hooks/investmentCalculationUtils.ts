@@ -36,11 +36,17 @@ export const calculateInvestment = ({
   let currentCapital = config.initialCapital;
   let totalPACInvested = 0;
   // startDate deve essere la data di oggi per day 0
-  const baseDate = new Date(config.pacConfig.startDate);
+  const baseDate = new Date(
+    typeof config.pacConfig.startDate === "string"
+      ? config.pacConfig.startDate
+      : config.pacConfig.startDate
+  );
+  baseDate.setHours(0, 0, 0, 0); // elimina possibili problemi di ora
 
   for (let day = 0; day <= config.timeHorizon; day++) {
     const currentDate = new Date(baseDate);
-    currentDate.setDate(baseDate.getDate() + day); // sempre dalla data base
+    currentDate.setDate(baseDate.getDate() + day);
+    // Deve essere sempre dalla baseDate
 
     const capitalBeforePAC = currentCapital;
 

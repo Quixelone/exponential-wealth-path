@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useMemo, useCallback } from 'react';
 import { InvestmentConfig, InvestmentData } from '@/types/investment';
@@ -56,11 +55,28 @@ export const useInvestmentCalculator = () => {
   const hasUnsavedChanges = React.useMemo(() => {
     if (!savedConfig) return false;
     const stateToCompare = {
-      config: configState.config,
+      config: {
+        ...configState.config,
+        // for deep compare, stringifiy PAC startDate for safety
+        pacConfig: {
+          ...configState.config.pacConfig,
+          startDate: (typeof configState.config.pacConfig.startDate === "string"
+            ? configState.config.pacConfig.startDate
+            : configState.config.pacConfig.startDate.toISOString().split('T')[0])
+        },
+      },
       dailyReturns: configState.dailyReturns,
     };
     const savedToCompare = {
-      config: savedConfig.config,
+      config: {
+        ...savedConfig.config,
+        pacConfig: {
+          ...savedConfig.config.pacConfig,
+          startDate: (typeof savedConfig.config.pacConfig.startDate === "string"
+            ? savedConfig.config.pacConfig.startDate
+            : savedConfig.config.pacConfig.startDate.toISOString().split('T')[0])
+        },
+      },
       dailyReturns: savedConfig.dailyReturns,
     };
     return !deepEqual(stateToCompare, savedToCompare);
