@@ -1,17 +1,20 @@
+
 import React from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
+import { Currency } from '@/lib/utils';
 import CapitalConfiguration from '@/components/configuration/CapitalConfiguration';
 import TimeHorizonConfiguration from '@/components/configuration/TimeHorizonConfiguration';
 import ReturnConfiguration from '@/components/configuration/ReturnConfiguration';
 import PACConfiguration from '@/components/configuration/PACConfiguration';
+import CurrencyConfiguration from '@/components/configuration/CurrencyConfiguration';
 import DailyReturnTracker from '@/components/configuration/DailyReturnTracker';
 import ExportSection from '@/components/configuration/ExportSection';
 import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
 
 interface ConfigurationPanelProps {
-  config: InvestmentConfig;
-  onConfigChange: (config: Partial<InvestmentConfig>) => void;
+  config: InvestmentConfig & { currency: Currency };
+  onConfigChange: (config: Partial<InvestmentConfig & { currency: Currency }>) => void;
   customReturns: { [day: number]: number };
   onUpdateDailyReturn: (day: number, returnRate: number) => void;
   onRemoveDailyReturn: (day: number) => void;
@@ -69,8 +72,14 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         hasUnsavedChanges={hasUnsavedChanges}
       />
 
+      <CurrencyConfiguration
+        selectedCurrency={config.currency}
+        onCurrencyChange={(currency) => onConfigChange({ currency })}
+      />
+
       <CapitalConfiguration
         initialCapital={config.initialCapital}
+        currency={config.currency}
         onCapitalChange={(capital) => onConfigChange({ initialCapital: capital })}
       />
 
