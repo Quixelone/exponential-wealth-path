@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { InvestmentData } from '@/types/investment';
 import { TableRow, TableCell } from '@/components/ui/table';
@@ -7,10 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, TrendingDown, Edit3, Save, XCircle, Info } from 'lucide-react';
 import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/ModernTooltip';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, Currency } from '@/lib/utils';
 
 interface ReportTableRowProps {
   item: InvestmentData;
+  currency: Currency;
   editingDay: number | null;
   setEditingDay: (day: number | null) => void;
   editValue: string;
@@ -33,6 +33,7 @@ interface ReportTableRowProps {
 
 const ReportTableRow: React.FC<ReportTableRowProps> = ({
   item,
+  currency,
   editingDay,
   setEditingDay,
   editValue,
@@ -59,7 +60,7 @@ const ReportTableRow: React.FC<ReportTableRowProps> = ({
     <TableRow key={item.day} className={`hover:bg-muted/50 ${isEditingThisRow ? 'bg-primary/5' : ''}`}>
       <TableCell className="font-medium text-center">{item.day}</TableCell>
       <TableCell className="text-sm">{formatDate(item.date)}</TableCell>
-      <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC)}</TableCell>
+      <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</TableCell>
       <TableCell className="text-right font-mono group">
         {isEditingThisPACRow ? (
           <Input
@@ -73,7 +74,7 @@ const ReportTableRow: React.FC<ReportTableRowProps> = ({
           />
         ) : (
           <span className="flex items-center gap-1 justify-end">
-            {formatCurrency(item.pacAmount)}
+            {formatCurrency(item.pacAmount, currency)}
             <ModernTooltip>
               <ModernTooltipTrigger asChild>
                 <Button
@@ -102,7 +103,7 @@ const ReportTableRow: React.FC<ReportTableRowProps> = ({
           </span>
         )}
       </TableCell>
-      <TableCell className="text-right font-mono">{formatCurrency(item.capitalAfterPAC)}</TableCell>
+      <TableCell className="text-right font-mono">{formatCurrency(item.capitalAfterPAC, currency)}</TableCell>
       <TableCell className={`text-right font-mono ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
         {isEditingThisRow ? (
           <Input
@@ -120,10 +121,10 @@ const ReportTableRow: React.FC<ReportTableRowProps> = ({
       <TableCell className={`text-right font-mono ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
         <div className="flex items-center justify-end gap-1">
           {isPositiveGain ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-          {formatCurrency(dailyGain)}
+          {formatCurrency(dailyGain, currency)}
         </div>
       </TableCell>
-      <TableCell className="text-right font-mono font-semibold">{formatCurrency(item.finalCapital)}</TableCell>
+      <TableCell className="text-right font-mono font-semibold">{formatCurrency(item.finalCapital, currency)}</TableCell>
       <TableCell className="text-center">
         <div className="flex items-center justify-center gap-1">
           {isEditingThisPACRow ? (

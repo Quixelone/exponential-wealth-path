@@ -163,10 +163,11 @@ const Index = () => {
 
                 {/* Charts and Results */}
                 <div className="xl:col-span-2 space-y-6">
-                  <InvestmentSummary summary={summary} />
-                  <InvestmentChart data={investmentData} />
+                  <InvestmentSummary summary={summary} currency={config.currency} />
+                  <InvestmentChart data={investmentData} currency={config.currency} />
                   <ReportTable 
                     data={investmentData} 
+                    currency={config.currency}
                     onExportCSV={exportToCSV}
                     onUpdateDailyReturnInReport={handleUpdateDailyReturnInReport}
                     onUpdatePACInReport={handleUpdatePACInReport}

@@ -1,17 +1,17 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { InvestmentData } from '@/types/investment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
-//                                      ^^^^^^^^^^ added TableCell import here ^
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChevronLeft, ChevronRight, Search, Download, TrendingUp } from 'lucide-react';
 import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
+import { Currency } from '@/lib/utils';
 import ReportTableRow from './ReportTableRow';
 
 interface ReportTableProps {
   data: InvestmentData[];
+  currency: Currency;
   onExportCSV: () => void;
   onUpdateDailyReturnInReport: (day: number, newReturn: number) => void;
   onUpdatePACInReport: (day: number, newPAC: number) => void;
@@ -20,6 +20,7 @@ interface ReportTableProps {
 
 const ReportTable: React.FC<ReportTableProps> = ({
   data,
+  currency,
   onExportCSV,
   onUpdateDailyReturnInReport,
   onUpdatePACInReport,
@@ -29,7 +30,6 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const itemsPerPage = 20;
 
-  // Move all row editing logic to state at the table level -- keep as before!
   const [editingDay, setEditingDay] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>('');
   const [editingPACDay, setEditingPACDay] = useState<number | null>(null);
@@ -61,7 +61,6 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
-  // Handlers now stay here, but called by row component via props!
   const handleEdit = (item: InvestmentData) => {
     setEditingDay(item.day);
     setEditValue(item.dailyReturn.toFixed(3));
@@ -151,6 +150,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                     <ReportTableRow
                       key={item.day}
                       item={item}
+                      currency={currency}
                       editingDay={editingDay}
                       setEditingDay={setEditingDay}
                       editValue={editValue}

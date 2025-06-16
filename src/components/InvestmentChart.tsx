@@ -3,23 +3,25 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { InvestmentData } from '@/types/investment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, Currency } from '@/lib/utils';
 
 interface InvestmentChartProps {
   data: InvestmentData[];
+  currency: Currency;
   showProjections?: boolean;
 }
 
 const InvestmentChart: React.FC<InvestmentChartProps> = ({ 
   data, 
+  currency,
   showProjections = false 
 }) => {
   const formatTooltip = (value: any, name: string) => {
     if (name === 'finalCapital') {
-      return [formatCurrency(value), 'Capitale Totale'];
+      return [formatCurrency(value, currency), 'Capitale Totale'];
     }
     if (name === 'totalPACInvested') {
-      return [formatCurrency(value), 'PAC Investito'];
+      return [formatCurrency(value, currency), 'PAC Investito'];
     }
     return [value, name];
   };
@@ -50,8 +52,8 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
               <YAxis 
                 stroke="hsl(var(--muted-foreground))"
                 tick={{ fontSize: 12 }}
-                tickFormatter={(value) => formatCurrency(value)}
-                label={{ value: 'Capitale (€)', angle: -90, position: 'insideLeft' }}
+                tickFormatter={(value) => formatCurrency(value, currency)}
+                label={{ value: `Capitale (${currency})`, angle: -90, position: 'insideLeft' }}
               />
               <Tooltip 
                 formatter={formatTooltip}
@@ -111,4 +113,3 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
 };
 
 export default InvestmentChart;
-

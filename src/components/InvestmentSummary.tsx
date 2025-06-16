@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, PiggyBank, Target, Percent } from 'lucide-react';
-import { formatCurrency, formatCurrencyWhole } from '@/lib/utils';
+import { formatCurrency, formatCurrencyWhole, Currency } from '@/lib/utils';
 
 interface InvestmentSummaryProps {
   summary: {
@@ -11,11 +11,12 @@ interface InvestmentSummaryProps {
     totalInterest: number;
     totalReturn: number;
   };
+  currency: Currency;
 }
 
-const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
+const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary, currency }) => {
   // Debug: log to make sure the value is correctly formatted and received
-  console.log('[InvestmentSummary] - finalCapital:', summary.finalCapital, 'formatted:', formatCurrencyWhole(summary.finalCapital));
+  console.log('[InvestmentSummary] - finalCapital:', summary.finalCapital, 'formatted:', formatCurrencyWhole(summary.finalCapital, currency));
 
   const formatPercentage = (value: number) => {
     return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
@@ -24,7 +25,7 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
   const summaryCards = [
     {
       title: 'Capitale Finale',
-      value: formatCurrencyWhole(summary.finalCapital),
+      value: formatCurrencyWhole(summary.finalCapital, currency),
       icon: Target,
       color: 'text-primary',
       bgColor: 'bg-primary/10',
@@ -32,7 +33,7 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
     },
     {
       title: 'Totale Investito',
-      value: formatCurrencyWhole(summary.totalInvested),
+      value: formatCurrencyWhole(summary.totalInvested, currency),
       icon: PiggyBank,
       color: 'text-secondary',
       bgColor: 'bg-secondary/10',
@@ -40,7 +41,7 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
     },
     {
       title: 'Interessi Maturati',
-      value: formatCurrencyWhole(summary.totalInterest),
+      value: formatCurrencyWhole(summary.totalInterest, currency),
       icon: TrendingUp,
       color: 'text-accent',
       bgColor: 'bg-accent/10',
@@ -84,4 +85,3 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary }) => {
 };
 
 export default InvestmentSummary;
-
