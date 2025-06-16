@@ -5,15 +5,17 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { DollarSign } from 'lucide-react';
-import { formatCurrencyWhole } from '@/lib/utils';
+import { formatCurrencyWhole, Currency } from '@/lib/utils';
 
 interface CapitalConfigurationProps {
   initialCapital: number;
+  currency: Currency;
   onCapitalChange: (capital: number) => void;
 }
 
 const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
   initialCapital,
+  currency,
   onCapitalChange
 }) => {
   return (
@@ -27,7 +29,7 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="initial-capital">
-            Importo: {formatCurrencyWhole(initialCapital)}
+            Importo: {formatCurrencyWhole(initialCapital, currency)}
           </Label>
           <Slider
             id="initial-capital"
@@ -39,8 +41,8 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
             className="w-full"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>€50</span>
-            <span>€5.000</span>
+            <span>{formatCurrencyWhole(50, currency)}</span>
+            <span>{formatCurrencyWhole(5000, currency)}</span>
           </div>
         </div>
         <Input

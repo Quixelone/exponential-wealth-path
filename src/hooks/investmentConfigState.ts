@@ -1,12 +1,14 @@
 
 import { useState, useCallback } from 'react';
 import { InvestmentConfig } from '@/types/investment';
+import { Currency } from '@/lib/utils';
 
 // Stato di default configurazione investimento
-export const getDefaultConfig = (): InvestmentConfig => ({
+export const getDefaultConfig = (): InvestmentConfig & { currency: Currency } => ({
   initialCapital: 1000,
   timeHorizon: 1000,
   dailyReturnRate: 0.2,
+  currency: 'EUR' as Currency,
   pacConfig: {
     amount: 100,
     frequency: 'weekly',
@@ -15,7 +17,7 @@ export const getDefaultConfig = (): InvestmentConfig => ({
 });
 
 export const useInvestmentConfigState = () => {
-  const [config, setConfig] = useState<InvestmentConfig>(getDefaultConfig());
+  const [config, setConfig] = useState<InvestmentConfig & { currency: Currency }>(getDefaultConfig());
   const [dailyReturns, setDailyReturns] = useState<{ [day: number]: number }>({});
   const [dailyPACOverrides, setDailyPACOverrides] = useState<{ [day: number]: number }>({});
   const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
@@ -49,4 +51,3 @@ export const useInvestmentConfigState = () => {
     resetCustomData,
   };
 };
-

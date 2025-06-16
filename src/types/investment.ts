@@ -26,8 +26,9 @@ export type DailyPACOverrides = { [day: number]: number };
 
 export interface InvestmentConfig {
   initialCapital: number;
-  timeHorizon: number; // giorni
-  dailyReturnRate: number; // percentuale giornaliera
+  timeHorizon: number;
+  dailyReturnRate: number;
+  currency?: 'EUR' | 'USD' | 'USDT';
   pacConfig: PACConfig;
 }
 
