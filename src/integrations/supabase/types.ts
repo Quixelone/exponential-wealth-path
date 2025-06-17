@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      daily_pac_overrides: {
+        Row: {
+          config_id: string
+          created_at: string
+          day: number
+          id: string
+          pac_amount: number
+        }
+        Insert: {
+          config_id: string
+          created_at?: string
+          day: number
+          id?: string
+          pac_amount: number
+        }
+        Update: {
+          config_id?: string
+          created_at?: string
+          day?: number
+          id?: string
+          pac_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_pac_overrides_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "investment_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_returns: {
         Row: {
           config_id: string

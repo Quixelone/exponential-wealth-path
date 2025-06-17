@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { InvestmentConfig } from '@/types/investment';
-import { DatabaseConfig, DatabaseDailyReturn, SavedConfiguration } from '@/types/database';
+import { DatabaseConfig, DatabaseDailyReturn, DatabaseDailyPACOverride, SavedConfiguration } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
 
 export const useSupabaseConfig = () => {
@@ -13,7 +13,8 @@ export const useSupabaseConfig = () => {
   const saveConfiguration = useCallback(async (
     name: string,
     config: InvestmentConfig,
-    dailyReturns: { [day: number]: number }
+    dailyReturns: { [day: number]: number },
+    dailyPACOverrides: { [day: number]: number } = {}
   ): Promise<string | null> => {
     try {
       setLoading(true);
@@ -71,6 +72,24 @@ export const useSupabaseConfig = () => {
         }
       }
 
+      // Salvare le modifiche PAC giornaliere personalizzate
+      if (Object.keys(dailyPACOverrides).length > 0) {
+        const dailyPACOverridesData = Object.entries(dailyPACOverrides).map(([day, pacAmount]) => ({
+          config_id: configId,
+          day: parseInt(day),
+          pac_amount: pacAmount
+        }));
+
+        const { error: pacOverridesError } = await supabase
+          .from('daily_pac_overrides')
+          .insert(dailyPACOverridesData);
+
+        if (pacOverridesError) {
+          console.error('Errore salvando le modifiche PAC:', pacOverridesError);
+          throw pacOverridesError;
+        }
+      }
+
       // Ricaricare le configurazioni dopo il salvataggio
       await loadConfigurations();
 
@@ -97,7 +116,8 @@ export const useSupabaseConfig = () => {
     configId: string,
     name: string,
     config: InvestmentConfig,
-    dailyReturns: { [day: number]: number }
+    dailyReturns: { [day: number]: number },
+    dailyPACOverrides: { [day: number]: number } = {}
   ): Promise<boolean> => {
     try {
       setLoading(true);
@@ -135,14 +155,25 @@ export const useSupabaseConfig = () => {
       }
 
       // Rimuovere i vecchi rendimenti giornalieri
-      const { error: deleteError } = await supabase
+      const { error: deleteReturnsError } = await supabase
         .from('daily_returns')
         .delete()
         .eq('config_id', configId);
 
-      if (deleteError) {
-        console.error('Errore eliminando i vecchi rendimenti:', deleteError);
-        throw deleteError;
+      if (deleteReturnsError) {
+        console.error('Errore eliminando i vecchi rendimenti:', deleteReturnsError);
+        throw deleteReturnsError;
+      }
+
+      // Rimuovere le vecchie modifiche PAC
+      const { error: deletePACError } = await supabase
+        .from('daily_pac_overrides')
+        .delete()
+        .eq('config_id', configId);
+
+      if (deletePACError) {
+        console.error('Errore eliminando le vecchie modifiche PAC:', deletePACError);
+        throw deletePACError;
       }
 
       // Inserire i nuovi rendimenti giornalieri
@@ -160,6 +191,24 @@ export const useSupabaseConfig = () => {
         if (returnsError) {
           console.error('Errore inserendo i nuovi rendimenti:', returnsError);
           throw returnsError;
+        }
+      }
+
+      // Inserire le nuove modifiche PAC
+      if (Object.keys(dailyPACOverrides).length > 0) {
+        const dailyPACOverridesData = Object.entries(dailyPACOverrides).map(([day, pacAmount]) => ({
+          config_id: configId,
+          day: parseInt(day),
+          pac_amount: pacAmount
+        }));
+
+        const { error: pacOverridesError } = await supabase
+          .from('daily_pac_overrides')
+          .insert(dailyPACOverridesData);
+
+        if (pacOverridesError) {
+          console.error('Errore inserendo le nuove modifiche PAC:', pacOverridesError);
+          throw pacOverridesError;
         }
       }
 
@@ -226,6 +275,17 @@ export const useSupabaseConfig = () => {
           throw returnsError;
         }
 
+        // Caricare le modifiche PAC giornaliere per questa configurazione
+        const { data: dailyPACOverrides, error: pacOverridesError } = await supabase
+          .from('daily_pac_overrides')
+          .select('*')
+          .eq('config_id', dbConfig.id);
+
+        if (pacOverridesError) {
+          console.error('Errore caricando le modifiche PAC per config:', dbConfig.id, pacOverridesError);
+          throw pacOverridesError;
+        }
+
         // Convertire i dati del database nel formato dell'applicazione
         const config: InvestmentConfig = {
           initialCapital: dbConfig.initial_capital,
@@ -244,11 +304,17 @@ export const useSupabaseConfig = () => {
           dailyReturnsMap[dr.day] = dr.return_rate;
         });
 
+        const dailyPACOverridesMap: { [day: number]: number } = {};
+        (dailyPACOverrides || []).forEach(po => {
+          dailyPACOverridesMap[po.day] = po.pac_amount;
+        });
+
         savedConfigurations.push({
           id: dbConfig.id,
           name: dbConfig.name,
           config,
           dailyReturns: dailyReturnsMap,
+          dailyPACOverrides: dailyPACOverridesMap,
           created_at: dbConfig.created_at,
           updated_at: dbConfig.updated_at
         });

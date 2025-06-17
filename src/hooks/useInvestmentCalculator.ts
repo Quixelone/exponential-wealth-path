@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useMemo, useCallback } from 'react';
 import { InvestmentConfig, InvestmentData } from '@/types/investment';
@@ -66,6 +67,7 @@ export const useInvestmentCalculator = () => {
         },
       },
       dailyReturns: configState.dailyReturns,
+      dailyPACOverrides: configState.dailyPACOverrides,
     };
     const savedToCompare = {
       config: {
@@ -78,9 +80,10 @@ export const useInvestmentCalculator = () => {
         },
       },
       dailyReturns: savedConfig.dailyReturns,
+      dailyPACOverrides: savedConfig.dailyPACOverrides || {},
     };
     return !deepEqual(stateToCompare, savedToCompare);
-  }, [configState.config, configState.dailyReturns, savedConfig]);
+  }, [configState.config, configState.dailyReturns, configState.dailyPACOverrides, savedConfig]);
 
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>, reset: boolean = false) => {
     setConfig(prev => ({ ...prev, ...newConfig }));
@@ -159,29 +162,29 @@ export const useInvestmentCalculator = () => {
 
   // Salva una nuova configurazione nelle tabelle
   const saveCurrentConfiguration = useCallback(async (name: string) => {
-    const configId = await saveConfiguration(name, configState.config, configState.dailyReturns);
+    const configId = await saveConfiguration(name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
     if (configId) {
       setCurrentConfigId(configId);
       setCurrentConfigName(name);
       loadConfigurations();
     }
-  }, [saveConfiguration, configState.config, configState.dailyReturns, setCurrentConfigId, setCurrentConfigName, loadConfigurations]);
+  }, [saveConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName, loadConfigurations]);
 
   // Aggiorna una configurazione esistente
   const updateCurrentConfiguration = useCallback(async (configId: string, name: string) => {
-    const success = await updateConfiguration(configId, name, configState.config, configState.dailyReturns);
+    const success = await updateConfiguration(configId, name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
     if (success) {
       setCurrentConfigId(configId);
       setCurrentConfigName(name);
       loadConfigurations();
     }
-  }, [updateConfiguration, configState.config, configState.dailyReturns, setCurrentConfigId, setCurrentConfigName, loadConfigurations]);
+  }, [updateConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName, loadConfigurations]);
 
   // Carica config salvata da DB
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
-    setDailyPACOverrides({});
+    setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
   }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);

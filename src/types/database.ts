@@ -24,11 +24,20 @@ export interface DatabaseDailyReturn {
   created_at: string;
 }
 
+export interface DatabaseDailyPACOverride {
+  id: string;
+  config_id: string;
+  day: number;
+  pac_amount: number;
+  created_at: string;
+}
+
 export interface SavedConfiguration {
   id: string;
   name: string;
   config: InvestmentConfig;
   dailyReturns: { [day: number]: number };
+  dailyPACOverrides: { [day: number]: number };
   created_at: string;
   updated_at: string;
 }
