@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef } from 'react';
 import { InvestmentConfig, InvestmentData } from '@/types/investment';
 import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
 import { useInvestmentConfigState, getDefaultConfig } from './investmentConfigState';
@@ -33,7 +33,15 @@ export const useInvestmentCalculator = () => {
     deleteConfiguration
   } = useSupabaseConfig();
 
-  React.useEffect(() => { loadConfigurations(); }, [loadConfigurations]);
+  const loadInitialized = useRef(false);
+
+  // Load configurations only once on mount
+  React.useEffect(() => {
+    if (!loadInitialized.current) {
+      loadInitialized.current = true;
+      loadConfigurations();
+    }
+  }, [loadConfigurations]);
 
   // Calcolo investimento
   const investmentData: InvestmentData[] = useMemo(() => {
@@ -144,90 +152,50 @@ export const useInvestmentCalculator = () => {
   }, [investmentData]);
 
   const updatePACForDay = useCallback((day: number, pacAmount: number) => {
-    console.log('🔄 updatePACForDay chiamato:', { day, pacAmount });
-    console.log('📊 PAC overrides prima dell\'aggiornamento:', configState.dailyPACOverrides);
-    
     setDailyPACOverrides(prev => {
       const updated = {
         ...prev,
         [day]: pacAmount
       };
-      console.log('📊 PAC overrides dopo l\'aggiornamento:', updated);
       return updated;
     });
     setCurrentConfigId(null);
-    console.log('✅ Stato aggiornato, config ID azzerato');
-  }, [setDailyPACOverrides, setCurrentConfigId, configState.dailyPACOverrides]);
+  }, [setDailyPACOverrides, setCurrentConfigId]);
 
   const removePACOverride = useCallback((day: number) => {
-    console.log('🗑️ removePACOverride chiamato per giorno:', day);
-    console.log('📊 PAC overrides prima della rimozione:', configState.dailyPACOverrides);
-    
     setDailyPACOverrides(prev => {
       const updated = { ...prev };
       delete updated[day];
-      console.log('📊 PAC overrides dopo la rimozione:', updated);
       return updated;
     });
     setCurrentConfigId(null);
-    console.log('✅ PAC override rimosso, config ID azzerato');
-  }, [setDailyPACOverrides, setCurrentConfigId, configState.dailyPACOverrides]);
+  }, [setDailyPACOverrides, setCurrentConfigId]);
 
   // Salva una nuova configurazione nelle tabelle
   const saveCurrentConfiguration = useCallback(async (name: string) => {
-    console.log('💾 saveCurrentConfiguration chiamato:', { 
-      name, 
-      dailyPACOverrides: configState.dailyPACOverrides,
-      numPACOverrides: Object.keys(configState.dailyPACOverrides).length 
-    });
-    
     const configId = await saveConfiguration(name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
     if (configId) {
       setCurrentConfigId(configId);
       setCurrentConfigName(name);
-      loadConfigurations();
-      console.log('✅ Configurazione salvata con ID:', configId);
-    } else {
-      console.error('❌ Salvataggio fallito - nessun ID restituito');
     }
-  }, [saveConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName, loadConfigurations]);
+  }, [saveConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
 
   // Aggiorna una configurazione esistente
   const updateCurrentConfiguration = useCallback(async (configId: string, name: string) => {
-    console.log('🔄 updateCurrentConfiguration chiamato:', { 
-      configId, 
-      name, 
-      dailyPACOverrides: configState.dailyPACOverrides,
-      numPACOverrides: Object.keys(configState.dailyPACOverrides).length 
-    });
-    
     const success = await updateConfiguration(configId, name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
     if (success) {
       setCurrentConfigId(configId);
       setCurrentConfigName(name);
-      loadConfigurations();
-      console.log('✅ Configurazione aggiornata con successo');
-    } else {
-      console.error('❌ Aggiornamento fallito');
     }
-  }, [updateConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName, loadConfigurations]);
+  }, [updateConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
 
   // Carica config salvata da DB
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
-    console.log('📥 loadSavedConfiguration chiamato:', { 
-      configId: savedConfig.id, 
-      name: savedConfig.name,
-      dailyPACOverrides: savedConfig.dailyPACOverrides,
-      numPACOverrides: Object.keys(savedConfig.dailyPACOverrides || {}).length 
-    });
-    
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
-    
-    console.log('✅ Configurazione caricata nello stato');
   }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
 
   // Calcola info prossimo PAC

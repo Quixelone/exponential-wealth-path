@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { SavedConfiguration } from '@/types/database';
 import { useConfigSaver } from './supabase/configSaver';
 import { useConfigUpdater } from './supabase/configUpdater';
@@ -9,6 +9,7 @@ import { useConfigDeleter } from './supabase/configDeleter';
 export const useSupabaseConfig = () => {
   const [loading, setLoading] = useState(false);
   const [savedConfigs, setSavedConfigs] = useState<SavedConfiguration[]>([]);
+  const loadingRef = useRef(false);
 
   const { saveConfiguration: saveConfig } = useConfigSaver();
   const { updateConfiguration: updateConfig } = useConfigUpdater();
@@ -53,12 +54,22 @@ export const useSupabaseConfig = () => {
   }, [updateConfig]);
 
   const loadConfigurations = useCallback(async (): Promise<void> => {
+    // Prevent multiple simultaneous calls
+    if (loadingRef.current) {
+      console.log('🚫 LoadConfigurations già in corso, saltando chiamata duplicata');
+      return;
+    }
+    
+    loadingRef.current = true;
     setLoading(true);
     try {
+      console.log('🔄 Caricamento configurazioni...');
       const configs = await loadConfigs();
       setSavedConfigs(configs);
+      console.log('✅ Configurazioni caricate:', configs.length);
     } finally {
       setLoading(false);
+      loadingRef.current = false;
     }
   }, [loadConfigs]);
 
