@@ -9,6 +9,7 @@ import ReturnConfiguration from '@/components/configuration/ReturnConfiguration'
 import PACConfiguration from '@/components/configuration/PACConfiguration';
 import CurrencyConfiguration from '@/components/configuration/CurrencyConfiguration';
 import DailyReturnTracker from '@/components/configuration/DailyReturnTracker';
+import DailyPACTracker from '@/components/configuration/DailyPACTracker';
 import ExportSection from '@/components/configuration/ExportSection';
 import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
 
@@ -31,10 +32,15 @@ interface ConfigurationPanelProps {
   supabaseLoading: boolean;
   isAdmin?: boolean;
   
-  // Nuova prop per informazioni PAC
+  // Nuove props per PAC tracking
+  dailyPACOverrides: { [day: number]: number };
+  onUpdatePACForDay: (day: number, pacAmount: number) => void;
+  onRemovePACOverride: (day: number) => void;
+  
+  // Informazioni PAC
   nextPACInfo?: { nextPACDay: number; description: string };
   
-  // NEW PROP
+  // Unsaved changes
   hasUnsavedChanges?: boolean;
 }
 
@@ -54,6 +60,9 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   currentConfigName,
   supabaseLoading,
   isAdmin = false,
+  dailyPACOverrides,
+  onUpdatePACForDay,
+  onRemovePACOverride,
   nextPACInfo,
   hasUnsavedChanges = false
 }) => {
@@ -104,6 +113,15 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         customReturns={customReturns}
         onUpdateDailyReturn={onUpdateDailyReturn}
         onRemoveDailyReturn={onRemoveDailyReturn}
+      />
+
+      <DailyPACTracker
+        timeHorizon={config.timeHorizon}
+        dailyPACOverrides={dailyPACOverrides}
+        onUpdatePACForDay={onUpdatePACForDay}
+        onRemovePACOverride={onRemovePACOverride}
+        defaultPACAmount={config.pacConfig.amount}
+        currency={config.currency}
       />
 
       <ExportSection onExportCSV={onExportCSV} />

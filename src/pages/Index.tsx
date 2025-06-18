@@ -34,7 +34,8 @@ const Index = () => {
     summary,
     dailyPACOverrides,
     updatePACForDay,
-    removePACOverride
+    removePACOverride,
+    hasUnsavedChanges
   } = useInvestmentCalculator();
 
   // Redirect to auth if not logged in
@@ -158,6 +159,10 @@ const Index = () => {
                     currentConfigName={currentConfigName}
                     supabaseLoading={supabaseLoading}
                     isAdmin={isAdmin}
+                    dailyPACOverrides={dailyPACOverrides}
+                    onUpdatePACForDay={updatePACForDay}
+                    onRemovePACOverride={removePACOverride}
+                    hasUnsavedChanges={hasUnsavedChanges}
                   />
                 </div>
 
