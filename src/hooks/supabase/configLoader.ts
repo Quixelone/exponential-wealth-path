@@ -23,7 +23,7 @@ export const useConfigLoader = () => {
         .order('created_at', { ascending: false });
 
       if (configError) {
-        console.error('❌ Errore caricando le configurazioni:', configError);
+        console.error('Errore caricando le configurazioni:', configError);
         throw configError;
       }
 
@@ -37,7 +37,7 @@ export const useConfigLoader = () => {
           .eq('config_id', dbConfig.id);
 
         if (returnsError) {
-          console.error('❌ Errore caricando i rendimenti per config:', dbConfig.id, returnsError);
+          console.error('Errore caricando i rendimenti per config:', dbConfig.id, returnsError);
           throw returnsError;
         }
 
@@ -48,7 +48,7 @@ export const useConfigLoader = () => {
           .eq('config_id', dbConfig.id);
 
         if (pacOverridesError) {
-          console.error('❌ Errore caricando le modifiche PAC per config:', dbConfig.id, pacOverridesError);
+          console.error('Errore caricando le modifiche PAC per config:', dbConfig.id, pacOverridesError);
           throw pacOverridesError;
         }
 
@@ -88,7 +88,7 @@ export const useConfigLoader = () => {
       
       return savedConfigurations;
     } catch (error: any) {
-      console.error('💥 Errore nel caricare le configurazioni:', error);
+      console.error('Errore nel caricare le configurazioni:', error);
       toast({
         title: "Errore",
         description: error.message || "Impossibile caricare le configurazioni salvate",

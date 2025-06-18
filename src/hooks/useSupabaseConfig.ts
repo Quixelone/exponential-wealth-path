@@ -54,19 +54,17 @@ export const useSupabaseConfig = () => {
   }, [updateConfig]);
 
   const loadConfigurations = useCallback(async (): Promise<void> => {
-    // Prevent multiple simultaneous calls
+    // Prevent multiple simultaneous calls with a more robust check
     if (loadingRef.current) {
-      console.log('🚫 LoadConfigurations già in corso, saltando chiamata duplicata');
       return;
     }
     
     loadingRef.current = true;
     setLoading(true);
+    
     try {
-      console.log('🔄 Caricamento configurazioni...');
       const configs = await loadConfigs();
       setSavedConfigs(configs);
-      console.log('✅ Configurazioni caricate:', configs.length);
     } finally {
       setLoading(false);
       loadingRef.current = false;

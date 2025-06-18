@@ -41,7 +41,7 @@ export const useInvestmentCalculator = () => {
       loadInitialized.current = true;
       loadConfigurations();
     }
-  }, [loadConfigurations]);
+  }, []); // Empty dependency array - only run once
 
   // Calcolo investimento
   const investmentData: InvestmentData[] = useMemo(() => {
