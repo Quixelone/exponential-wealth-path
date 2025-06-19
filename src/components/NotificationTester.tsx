@@ -192,7 +192,7 @@ const NotificationTester = () => {
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
               <strong>Nota:</strong> Assicurati che il numero WhatsApp sia registrato nella sandbox di Twilio 
-              e che abbia inviato il messaggio di conferma "join {sandbox-name}" al numero +1 415 523 8886.
+              e che abbia inviato il messaggio di conferma "join sandbox-xxxxxxx" al numero +1 415 523 8886.
             </AlertDescription>
           </Alert>
 
