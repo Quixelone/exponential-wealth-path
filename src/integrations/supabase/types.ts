@@ -304,6 +304,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_user_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       update_user_login: {
         Args: { user_uuid: string }
         Returns: undefined

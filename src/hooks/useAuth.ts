@@ -21,13 +21,11 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [profileLoading, setProfileLoading] = useState(false);
   const { toast } = useToast();
 
   const fetchUserProfile = useCallback(async (userId: string) => {
     try {
-      setProfileLoading(true);
-      console.log('Fetching user profile for:', userId);
+      console.log('🔍 Fetching user profile for:', userId);
       
       const { data: profile, error } = await supabase
         .from('user_profiles')
@@ -36,9 +34,9 @@ export const useAuth = () => {
         .single();
       
       if (error) {
-        console.error('Error fetching profile:', error);
+        console.error('❌ Error fetching profile:', error);
         if (error.code === 'PGRST116') {
-          console.log('Profile not found, creating default profile');
+          console.log('📝 Profile not found, creating default profile');
           const { data: newProfile, error: createError } = await supabase
             .from('user_profiles')
             .insert({
@@ -50,11 +48,12 @@ export const useAuth = () => {
             .single();
           
           if (createError) {
-            console.error('Error creating profile:', createError);
+            console.error('❌ Error creating profile:', createError);
             return;
           }
           
           if (newProfile) {
+            console.log('✅ New profile created:', newProfile);
             setUserProfile({
               id: newProfile.id,
               email: newProfile.email,
@@ -73,7 +72,8 @@ export const useAuth = () => {
       }
       
       if (profile) {
-        console.log('Profile loaded:', profile);
+        console.log('✅ Profile loaded successfully:', profile);
+        console.log('👤 User role:', profile.role);
         setUserProfile({
           id: profile.id,
           email: profile.email,
@@ -88,9 +88,7 @@ export const useAuth = () => {
         });
       }
     } catch (error: any) {
-      console.error('Unexpected error fetching profile:', error);
-    } finally {
-      setProfileLoading(false);
+      console.error('💥 Unexpected error fetching profile:', error);
     }
   }, [user?.email]);
 
@@ -101,31 +99,31 @@ export const useAuth = () => {
       });
       
       if (error) {
-        console.error('Error updating user login:', error);
+        console.error('❌ Error updating user login:', error);
       } else {
-        console.log('User login updated successfully');
+        console.log('✅ User login updated successfully');
       }
     } catch (error) {
-      console.error('Unexpected error updating login:', error);
+      console.error('💥 Unexpected error updating login:', error);
     }
   }, []);
 
   useEffect(() => {
     let mounted = true;
-    let profileFetched = false;
+    console.log('🚀 Initializing auth...');
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.id);
+        console.log('🔄 Auth state change:', event, 'User ID:', session?.user?.id);
         
         if (!mounted) return;
 
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Only fetch profile once per session to avoid multiple calls
-        if (session?.user && !profileFetched) {
-          profileFetched = true;
+        if (session?.user) {
+          console.log('👤 User authenticated, fetching profile...');
+          // Use setTimeout to avoid blocking the auth state change
           setTimeout(async () => {
             if (mounted) {
               await fetchUserProfile(session.user.id);
@@ -134,8 +132,8 @@ export const useAuth = () => {
               }
             }
           }, 0);
-        } else if (event === 'SIGNED_OUT') {
-          profileFetched = false;
+        } else {
+          console.log('🚪 User signed out, clearing profile');
           setUserProfile(null);
         }
         
@@ -145,27 +143,28 @@ export const useAuth = () => {
 
     const initializeAuth = async () => {
       try {
+        console.log('🔄 Getting initial session...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Error getting session:', error);
+          console.error('❌ Error getting session:', error);
           setLoading(false);
           return;
         }
 
         if (mounted) {
+          console.log('📋 Initial session:', session?.user?.id ? 'Found' : 'Not found');
           setSession(session);
           setUser(session?.user ?? null);
           
-          if (session?.user && !profileFetched) {
-            profileFetched = true;
+          if (session?.user) {
             await fetchUserProfile(session.user.id);
           }
           
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('💥 Error initializing auth:', error);
         if (mounted) {
           setLoading(false);
         }
@@ -237,7 +236,7 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Attempting to sign in with:', email);
+      console.log('🔐 Attempting to sign in with:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -245,7 +244,7 @@ export const useAuth = () => {
       });
 
       if (error) {
-        console.error('Sign in error:', error);
+        console.error('❌ Sign in error:', error);
         toast({
           title: "Errore nel login",
           description: error.message,
@@ -254,7 +253,7 @@ export const useAuth = () => {
         return { error };
       }
 
-      console.log('Sign in successful:', data.user?.id);
+      console.log('✅ Sign in successful:', data.user?.id);
       
       toast({
         title: "Login effettuato",
@@ -263,7 +262,7 @@ export const useAuth = () => {
 
       return { error: null };
     } catch (error: any) {
-      console.error('Unexpected sign in error:', error);
+      console.error('💥 Unexpected sign in error:', error);
       toast({
         title: "Errore",
         description: error.message,
@@ -410,11 +409,22 @@ export const useAuth = () => {
     }
   };
 
+  // Calcola isAdmin in modo più semplice e diretto
+  const isAdmin = userProfile?.role === 'admin';
+  
+  console.log('🔍 Current auth state:', {
+    userExists: !!user,
+    userProfileExists: !!userProfile,
+    userRole: userProfile?.role,
+    isAdmin,
+    loading
+  });
+
   return {
     user,
     session,
     userProfile,
-    loading: loading || profileLoading,
+    loading,
     signUp,
     signIn,
     signInWithGoogle,
@@ -422,6 +432,6 @@ export const useAuth = () => {
     signInWithTwitter,
     resetPassword,
     signOut,
-    isAdmin: userProfile?.role === 'admin'
+    isAdmin
   };
 };
