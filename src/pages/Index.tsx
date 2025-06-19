@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -87,11 +86,6 @@ const Index = () => {
     console.log('🔧 USER MANAGEMENT BUTTON CLICKED');
     console.log('Current admin status:', isAdmin);
     console.log('User role:', userProfile?.role);
-    
-    if (!isAdmin) {
-      console.error('❌ ACCESS DENIED: User is not admin');
-      return;
-    }
     
     try {
       console.log('🚀 Navigating to /user-management');
