@@ -1,10 +1,9 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, MessageSquare } from 'lucide-react';
+import { Users } from 'lucide-react';
 import UserStatsCards from './UserStatsCards';
 import UsersTable from './UsersTable';
-import NotificationTester from '@/components/NotificationTester';
 
 interface UserData {
   id: string;
@@ -25,29 +24,12 @@ interface UserManagementTabsProps {
 
 const UserManagementTabs = ({ users, onUpdateUserRole }: UserManagementTabsProps) => {
   return (
-    <Tabs defaultValue="users" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 mb-6">
-        <TabsTrigger value="users" className="flex items-center gap-2">
-          <Users className="h-4 w-4" />
-          Gestione Utenti
-        </TabsTrigger>
-        <TabsTrigger value="notifications" className="flex items-center gap-2">
-          <MessageSquare className="h-4 w-4" />
-          Test Notifiche
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="users">
-        <div className="space-y-8">
-          <UserStatsCards users={users} />
-          <UsersTable users={users} onUpdateUserRole={onUpdateUserRole} />
-        </div>
-      </TabsContent>
-
-      <TabsContent value="notifications">
-        <NotificationTester />
-      </TabsContent>
-    </Tabs>
+    <div className="w-full">
+      <div className="space-y-8">
+        <UserStatsCards users={users} />
+        <UsersTable users={users} onUpdateUserRole={onUpdateUserRole} />
+      </div>
+    </div>
   );
 };
 

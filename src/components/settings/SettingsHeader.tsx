@@ -2,9 +2,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, Settings } from 'lucide-react';
 
-const UserManagementHeader = () => {
+const SettingsHeader = () => {
   const navigate = useNavigate();
 
   return (
@@ -22,8 +22,8 @@ const UserManagementHeader = () => {
             </Button>
             <div className="h-6 w-px bg-gray-300"></div>
             <h1 className="text-xl font-bold text-primary flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Gestione Utenti
+              <Settings className="h-5 w-5" />
+              Impostazioni Sistema
             </h1>
           </div>
         </div>
@@ -32,4 +32,4 @@ const UserManagementHeader = () => {
   );
 };
 
-export default UserManagementHeader;
+export default SettingsHeader;

@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -105,6 +106,10 @@ const Index = () => {
     }
   };
 
+  const handleSettingsClick = () => {
+    navigate('/settings');
+  };
+
   const displayName = userProfile?.first_name && userProfile?.last_name 
     ? `${userProfile.first_name} ${userProfile.last_name}`
     : userProfile?.email || 'Utente';
@@ -144,6 +149,17 @@ const Index = () => {
                   <User className="h-5 w-5 text-primary" />
                   {displayName}
                 </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSettingsClick}
+                  className="border-primary text-primary hover:bg-primary/10"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Impostazioni
+                </Button>
+
                 {isAdmin && (
                   <button
                     onClick={handleUserManagementClick}
