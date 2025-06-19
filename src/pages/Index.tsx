@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,12 @@ import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
 const Index = () => {
   const navigate = useNavigate();
   const { user, userProfile, loading: authLoading, signOut, isAdmin } = useAuth();
+  
+  // Debug logging for admin status
+  console.log('Index component - isAdmin:', isAdmin);
+  console.log('Index component - user:', user);
+  console.log('Index component - userProfile:', userProfile);
+
   const {
     config,
     updateConfig,
@@ -66,6 +73,22 @@ const Index = () => {
     navigate('/auth');
   };
 
+  // Debug handler for user management navigation
+  const handleUserManagementClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log('User Management button clicked!');
+    console.log('Current location:', window.location.href);
+    console.log('isAdmin status:', isAdmin);
+    console.log('About to navigate to /user-management');
+    
+    try {
+      navigate('/user-management');
+      console.log('Navigate called successfully');
+    } catch (error) {
+      console.error('Error during navigation:', error);
+    }
+  };
+
   const displayName = userProfile?.first_name && userProfile?.last_name 
     ? `${userProfile.first_name} ${userProfile.last_name}`
     : userProfile?.email || 'Utente';
@@ -107,13 +130,13 @@ const Index = () => {
                   {displayName}
                 </div>
                 {isAdmin && (
-                  <Link 
-                    to="/user-management"
+                  <button
+                    onClick={handleUserManagementClick}
                     className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 border-primary text-primary hover:bg-primary/10"
                   >
                     <Users className="h-4 w-4 mr-2" />
                     Gestione Utenti
-                  </Link>
+                  </button>
                 )}
                 <Button variant="outline" size="sm" onClick={handleLogout} className="border-primary text-primary hover:bg-primary/10">
                   <LogOut className="h-4 w-4 mr-2" />
