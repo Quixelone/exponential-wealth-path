@@ -1,5 +1,6 @@
+
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Users, Bell, Settings, TrendingUp } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -110,11 +111,13 @@ const Index = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => navigate('/user-management')}
+                    asChild
                     className="border-primary text-primary hover:bg-primary/10"
                   >
-                    <Users className="h-4 w-4 mr-2" />
-                    Gestione Utenti
+                    <Link to="/user-management">
+                      <Users className="h-4 w-4 mr-2" />
+                      Gestione Utenti
+                    </Link>
                   </Button>
                 )}
                 <Button variant="outline" size="sm" onClick={handleLogout} className="border-primary text-primary hover:bg-primary/10">
