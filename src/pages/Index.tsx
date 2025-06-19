@@ -35,7 +35,8 @@ const Index = () => {
     dailyPACOverrides,
     updatePACForDay,
     removePACOverride,
-    hasUnsavedChanges
+    hasUnsavedChanges,
+    currentDayIndex
   } = useInvestmentCalculator();
 
   // Redirect to auth if not logged in

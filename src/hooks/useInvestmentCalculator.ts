@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useMemo, useCallback, useRef } from 'react';
 import { InvestmentConfig, InvestmentData } from '@/types/investment';
@@ -51,6 +50,25 @@ export const useInvestmentCalculator = () => {
       dailyPACOverrides: configState.dailyPACOverrides
     });
   }, [configState.config, configState.dailyReturns, configState.dailyPACOverrides]);
+
+  // Calcolo del giorno attuale basato sulla data di inizio
+  const currentDayIndex = useMemo(() => {
+    const startDate = new Date(
+      typeof configState.config.pacConfig.startDate === "string"
+        ? configState.config.pacConfig.startDate
+        : configState.config.pacConfig.startDate
+    );
+    startDate.setHours(0, 0, 0, 0);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const diffTime = today.getTime() - startDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Assicuriamoci che sia un indice valido
+    return Math.max(0, Math.min(diffDays, configState.config.timeHorizon));
+  }, [configState.config.pacConfig.startDate, configState.config.timeHorizon]);
 
   // Determina configurazione "salvata" attuale
   const savedConfig = React.useMemo(() =>
@@ -171,7 +189,6 @@ export const useInvestmentCalculator = () => {
     setCurrentConfigId(null);
   }, [setDailyPACOverrides, setCurrentConfigId]);
 
-  // Salva una nuova configurazione nelle tabelle
   const saveCurrentConfiguration = useCallback(async (name: string) => {
     const configId = await saveConfiguration(name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
     if (configId) {
@@ -180,7 +197,6 @@ export const useInvestmentCalculator = () => {
     }
   }, [saveConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
 
-  // Aggiorna una configurazione esistente
   const updateCurrentConfiguration = useCallback(async (configId: string, name: string) => {
     const success = await updateConfiguration(configId, name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
     if (success) {
@@ -189,7 +205,6 @@ export const useInvestmentCalculator = () => {
     }
   }, [updateConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
 
-  // Carica config salvata da DB
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
@@ -203,6 +218,10 @@ export const useInvestmentCalculator = () => {
     () => getNextPACInfo(configState.config.pacConfig),
     [configState.config.pacConfig]
   );
+
+  // Dati attuali e finali
+  const currentData = investmentData[currentDayIndex] || investmentData[0];
+  const finalData = investmentData[investmentData.length - 1] || investmentData[0];
 
   return {
     config: configState.config,
@@ -226,18 +245,28 @@ export const useInvestmentCalculator = () => {
     supabaseLoading,
     getNextPACInfo: () => nextPACInfo,
     hasUnsavedChanges,
+    currentDayIndex,
     summary: {
-      finalCapital: investmentData[investmentData.length - 1]?.finalCapital || 0,
-      totalInvested:
-        configState.config.initialCapital +
-        (investmentData[investmentData.length - 1]?.totalPACInvested || 0),
-      totalInterest: investmentData[investmentData.length - 1]?.totalInterest || 0,
-      totalReturn:
-        ((investmentData[investmentData.length - 1]?.finalCapital || 0) /
-          (configState.config.initialCapital +
-            (investmentData[investmentData.length - 1]?.totalPACInvested || 0)) -
-          1) *
-          100 || 0,
+      // Situazione attuale (fino ad oggi)
+      current: {
+        finalCapital: currentData?.finalCapital || 0,
+        totalInvested: configState.config.initialCapital + (currentData?.totalPACInvested || 0),
+        totalInterest: currentData?.totalInterest || 0,
+        totalReturn: currentData 
+          ? ((currentData.finalCapital / (configState.config.initialCapital + currentData.totalPACInvested) - 1) * 100)
+          : 0,
+        day: currentDayIndex
+      },
+      // Proiezione finale (risultato completo)
+      final: {
+        finalCapital: finalData?.finalCapital || 0,
+        totalInvested: configState.config.initialCapital + (finalData?.totalPACInvested || 0),
+        totalInterest: finalData?.totalInterest || 0,
+        totalReturn: finalData
+          ? ((finalData.finalCapital / (configState.config.initialCapital + finalData.totalPACInvested) - 1) * 100)
+          : 0,
+        day: configState.config.timeHorizon
+      }
     }
   };
 };
