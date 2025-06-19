@@ -32,28 +32,38 @@ const UserManagement = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log('🔍 UserManagement useEffect - Auth state:', {
+    console.log('🔍 UserManagement mounted - Auth state check:', {
       authLoading,
       isAdmin,
-      shouldRedirect: !authLoading && isAdmin === false
+      isAdminType: typeof isAdmin,
+      shouldWaitForAuth: authLoading,
+      shouldRedirect: !authLoading && isAdmin === false,
+      shouldFetchUsers: !authLoading && isAdmin === true
     });
 
-    // CORREZIONE CRITICA: Cambiato da !isAdmin a isAdmin === false
-    // Questo evita il redirect quando isAdmin è undefined durante il caricamento
-    if (!authLoading && isAdmin === false) {
-      console.log('🚪 Redirecting to home - user is not admin');
+    // Se stiamo ancora caricando l'autenticazione, aspettiamo
+    if (authLoading) {
+      console.log('⏳ Auth still loading, waiting...');
+      return;
+    }
+
+    // Solo ora che l'auth è caricata, controlliamo se NON è admin
+    if (isAdmin === false) {
+      console.log('🚪 User is confirmed NOT admin, redirecting to home');
       navigate('/');
       return;
     }
 
-    if (!authLoading && isAdmin === true) {
-      console.log('✅ User is admin, fetching users');
+    // Se è admin, carichiamo gli utenti
+    if (isAdmin === true) {
+      console.log('✅ User is confirmed admin, fetching users');
       fetchUsers();
     }
   }, [isAdmin, authLoading, navigate]);
 
   const fetchUsers = async () => {
     try {
+      console.log('📊 Fetching users data...');
       setLoading(true);
       const { data, error } = await supabase
         .from('user_profiles')
@@ -61,7 +71,7 @@ const UserManagement = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching users:', error);
+        console.error('❌ Error fetching users:', error);
         toast({
           title: "Errore",
           description: "Impossibile caricare gli utenti",
@@ -70,9 +80,10 @@ const UserManagement = () => {
         return;
       }
 
+      console.log('✅ Users data loaded successfully:', data?.length, 'users');
       setUsers(data || []);
     } catch (error) {
-      console.error('Unexpected error:', error);
+      console.error('💥 Unexpected error:', error);
     } finally {
       setLoading(false);
     }
@@ -128,7 +139,9 @@ const UserManagement = () => {
     }
   };
 
+  // Mostra loading mentre l'auth si sta caricando O mentre stiamo caricando i dati
   if (authLoading || loading) {
+    console.log('⏳ Showing loading screen - authLoading:', authLoading, 'loading:', loading);
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -139,10 +152,28 @@ const UserManagement = () => {
     );
   }
 
-  // CORREZIONE: Ora controlla esplicitamente se isAdmin è false invece di undefined
-  if (isAdmin === false) {
+  // Solo se l'auth è caricata E l'utente NON è admin, non mostrare nulla (il redirect dovrebbe essere già avvenuto)
+  if (!authLoading && isAdmin === false) {
+    console.log('❌ Access denied - user is not admin');
     return null;
   }
+
+  // Se l'auth è caricata ma isAdmin è undefined (caso improbabile), mostra errore
+  if (!authLoading && isAdmin === undefined) {
+    console.log('⚠️ Auth loaded but isAdmin is undefined');
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500">Errore nel caricamento dei permessi utente</p>
+          <Button onClick={() => navigate('/')} className="mt-4">
+            Torna alla Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  console.log('🎯 Rendering UserManagement page - isAdmin:', isAdmin);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">

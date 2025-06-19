@@ -86,10 +86,20 @@ const Index = () => {
     console.log('🔧 USER MANAGEMENT BUTTON CLICKED');
     console.log('Current admin status:', isAdmin);
     console.log('User role:', userProfile?.role);
+    console.log('Auth loading:', authLoading);
+    console.log('User exists:', !!user);
+    console.log('User profile exists:', !!userProfile);
     
     try {
-      console.log('🚀 Navigating to /user-management');
+      console.log('🚀 Attempting navigation to /user-management');
+      console.log('Current location:', window.location.pathname);
       navigate('/user-management');
+      console.log('✅ Navigation call completed');
+      
+      // Aggiungiamo un timeout per verificare se la navigazione è avvenuta
+      setTimeout(() => {
+        console.log('🔍 Post-navigation check - Current location:', window.location.pathname);
+      }, 100);
     } catch (error) {
       console.error('💥 Error during navigation:', error);
     }
