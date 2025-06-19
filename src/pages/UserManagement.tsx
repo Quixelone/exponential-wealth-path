@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -32,32 +33,17 @@ const UserManagement = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log('🔍 UserManagement mounted - Auth state check:', {
-      authLoading,
-      isAdmin,
-      isAdminType: typeof isAdmin,
-      shouldWaitForAuth: authLoading,
-      shouldRedirect: !authLoading && isAdmin === false,
-      shouldFetchUsers: !authLoading && isAdmin === true
-    });
-
-    // Se stiamo ancora caricando l'autenticazione, aspettiamo
-    if (authLoading) {
-      console.log('⏳ Auth still loading, waiting...');
-      return;
-    }
-
-    // Solo ora che l'auth è caricata, controlliamo se NON è admin
-    if (isAdmin === false) {
-      console.log('🚪 User is confirmed NOT admin, redirecting to home');
-      navigate('/');
-      return;
-    }
-
-    // Se è admin, carichiamo gli utenti
-    if (isAdmin === true) {
-      console.log('✅ User is confirmed admin, fetching users');
-      fetchUsers();
+    console.log('🔍 UserManagement mounted - isAdmin:', isAdmin, 'authLoading:', authLoading);
+    
+    // SEMPLIFICATO: Solo un controllo dopo che l'auth è caricata
+    if (!authLoading) {
+      if (isAdmin === false) {
+        console.log('🚪 User is not admin, redirecting');
+        navigate('/');
+      } else if (isAdmin === true) {
+        console.log('✅ User is admin, fetching users');
+        fetchUsers();
+      }
     }
   }, [isAdmin, authLoading, navigate]);
 
@@ -139,9 +125,9 @@ const UserManagement = () => {
     }
   };
 
-  // Mostra loading mentre l'auth si sta caricando O mentre stiamo caricando i dati
+  // SEMPLIFICATO: Solo loading se necessario
   if (authLoading || loading) {
-    console.log('⏳ Showing loading screen - authLoading:', authLoading, 'loading:', loading);
+    console.log('⏳ Showing loading screen');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -152,28 +138,7 @@ const UserManagement = () => {
     );
   }
 
-  // Solo se l'auth è caricata E l'utente NON è admin, non mostrare nulla (il redirect dovrebbe essere già avvenuto)
-  if (!authLoading && isAdmin === false) {
-    console.log('❌ Access denied - user is not admin');
-    return null;
-  }
-
-  // Se l'auth è caricata ma isAdmin è undefined (caso improbabile), mostra errore
-  if (!authLoading && isAdmin === undefined) {
-    console.log('⚠️ Auth loaded but isAdmin is undefined');
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500">Errore nel caricamento dei permessi utente</p>
-          <Button onClick={() => navigate('/')} className="mt-4">
-            Torna alla Dashboard
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  console.log('🎯 Rendering UserManagement page - isAdmin:', isAdmin);
+  console.log('🎯 Rendering UserManagement page');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
