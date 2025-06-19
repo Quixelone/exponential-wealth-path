@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +24,7 @@ export const useAuth = () => {
   const [profileLoading, setProfileLoading] = useState(false);
   const { toast } = useToast();
 
-  const fetchUserProfile = async (userId: string) => {
+  const fetchUserProfile = useCallback(async (userId: string) => {
     try {
       setProfileLoading(true);
       console.log('Fetching user profile for:', userId);
@@ -92,9 +92,9 @@ export const useAuth = () => {
     } finally {
       setProfileLoading(false);
     }
-  };
+  }, [user?.email]);
 
-  const updateUserLogin = async (userId: string) => {
+  const updateUserLogin = useCallback(async (userId: string) => {
     try {
       const { error } = await supabase.rpc('update_user_login', {
         user_uuid: userId
@@ -108,10 +108,11 @@ export const useAuth = () => {
     } catch (error) {
       console.error('Unexpected error updating login:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
+    let profileFetched = false;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -122,12 +123,19 @@ export const useAuth = () => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        if (session?.user && event === 'SIGNED_IN') {
+        // Only fetch profile once per session to avoid multiple calls
+        if (session?.user && !profileFetched) {
+          profileFetched = true;
           setTimeout(async () => {
-            await fetchUserProfile(session.user.id);
-            await updateUserLogin(session.user.id);
+            if (mounted) {
+              await fetchUserProfile(session.user.id);
+              if (event === 'SIGNED_IN') {
+                await updateUserLogin(session.user.id);
+              }
+            }
           }, 0);
         } else if (event === 'SIGNED_OUT') {
+          profileFetched = false;
           setUserProfile(null);
         }
         
@@ -149,7 +157,8 @@ export const useAuth = () => {
           setSession(session);
           setUser(session?.user ?? null);
           
-          if (session?.user) {
+          if (session?.user && !profileFetched) {
+            profileFetched = true;
             await fetchUserProfile(session.user.id);
           }
           
@@ -169,7 +178,7 @@ export const useAuth = () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchUserProfile, updateUserLogin]);
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => {
     try {

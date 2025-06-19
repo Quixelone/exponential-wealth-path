@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -17,10 +16,12 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, userProfile, loading: authLoading, signOut, isAdmin } = useAuth();
   
-  // Debug logging for admin status
-  console.log('Index component - isAdmin:', isAdmin);
-  console.log('Index component - user:', user);
-  console.log('Index component - userProfile:', userProfile);
+  // Enhanced debug logging
+  console.log('Index component render - authLoading:', authLoading);
+  console.log('Index component render - user exists:', !!user);
+  console.log('Index component render - userProfile:', userProfile);
+  console.log('Index component render - isAdmin:', isAdmin);
+  console.log('Index component render - should show admin button:', isAdmin && userProfile?.role === 'admin');
 
   const {
     config,
@@ -48,12 +49,15 @@ const Index = () => {
 
   // Redirect to auth if not logged in
   useEffect(() => {
+    console.log('Auth check effect - authLoading:', authLoading, 'user:', !!user);
     if (!authLoading && !user) {
+      console.log('Redirecting to auth page - no user found');
       navigate('/auth');
     }
   }, [user, authLoading, navigate]);
 
   if (authLoading) {
+    console.log('Showing loading screen - auth still loading');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -65,21 +69,34 @@ const Index = () => {
   }
 
   if (!user) {
+    console.log('No user found, component will redirect via useEffect');
     return null; // Will redirect to auth via useEffect
   }
 
   const handleLogout = async () => {
+    console.log('Logout initiated');
     await signOut();
     navigate('/auth');
   };
 
-  // Debug handler for user management navigation
+  // Enhanced debug handler for user management navigation
   const handleUserManagementClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    console.log('User Management button clicked!');
+    console.log('=== USER MANAGEMENT BUTTON CLICKED ===');
+    console.log('Current user:', user?.id);
+    console.log('Current userProfile:', userProfile);
+    console.log('isAdmin flag:', isAdmin);
+    console.log('userProfile.role:', userProfile?.role);
     console.log('Current location:', window.location.href);
-    console.log('isAdmin status:', isAdmin);
     console.log('About to navigate to /user-management');
+    
+    // Double check admin status
+    if (!isAdmin || userProfile?.role !== 'admin') {
+      console.error('ACCESS DENIED: User is not admin');
+      console.error('isAdmin:', isAdmin);
+      console.error('userProfile.role:', userProfile?.role);
+      return;
+    }
     
     try {
       navigate('/user-management');
@@ -109,6 +126,14 @@ const Index = () => {
     removePACOverride(day);
   };
 
+  // Debug the admin button visibility
+  const shouldShowAdminButton = isAdmin && userProfile?.role === 'admin';
+  console.log('Admin button visibility check:', {
+    isAdmin,
+    userProfileRole: userProfile?.role,
+    shouldShowAdminButton
+  });
+
   return (
     <ModernTooltipProvider>
       <div className="min-h-screen bg-background text-foreground">
@@ -118,7 +143,7 @@ const Index = () => {
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center gap-3">
                 <span className="wealth-gradient-text text-2xl font-bold">Finanza Creativa</span>
-                {isAdmin && (
+                {shouldShowAdminButton && (
                   <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full font-medium">
                     Admin
                   </span>
@@ -129,10 +154,11 @@ const Index = () => {
                   <User className="h-5 w-5 text-primary" />
                   {displayName}
                 </div>
-                {isAdmin && (
+                {shouldShowAdminButton && (
                   <button
                     onClick={handleUserManagementClick}
                     className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 border-primary text-primary hover:bg-primary/10"
+                    style={{ backgroundColor: '#f0f9ff', borderColor: '#3b82f6' }}
                   >
                     <Users className="h-4 w-4 mr-2" />
                     Gestione Utenti
