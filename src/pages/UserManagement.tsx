@@ -32,12 +32,22 @@ const UserManagement = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
+    console.log('🔍 UserManagement useEffect - Auth state:', {
+      authLoading,
+      isAdmin,
+      shouldRedirect: !authLoading && isAdmin === false
+    });
+
+    // CORREZIONE CRITICA: Cambiato da !isAdmin a isAdmin === false
+    // Questo evita il redirect quando isAdmin è undefined durante il caricamento
+    if (!authLoading && isAdmin === false) {
+      console.log('🚪 Redirecting to home - user is not admin');
       navigate('/');
       return;
     }
 
-    if (isAdmin) {
+    if (!authLoading && isAdmin === true) {
+      console.log('✅ User is admin, fetching users');
       fetchUsers();
     }
   }, [isAdmin, authLoading, navigate]);
@@ -129,7 +139,8 @@ const UserManagement = () => {
     );
   }
 
-  if (!isAdmin) {
+  // CORREZIONE: Ora controlla esplicitamente se isAdmin è false invece di undefined
+  if (isAdmin === false) {
     return null;
   }
 
