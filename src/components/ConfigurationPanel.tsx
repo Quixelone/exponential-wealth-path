@@ -87,20 +87,20 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
           <div className="grid grid-cols-1 gap-4">
             <CapitalConfiguration
               initialCapital={config.initialCapital}
-              onChange={(value) => onConfigChange({ initialCapital: value })}
+              onCapitalChange={(value) => onConfigChange({ initialCapital: value })}
               currency={config.currency || 'EUR'}
             />
             <TimeHorizonConfiguration
               timeHorizon={config.timeHorizon}
-              onChange={(value) => onConfigChange({ timeHorizon: value }, true)}
+              onTimeHorizonChange={(value) => onConfigChange({ timeHorizon: value }, true)}
             />
             <ReturnConfiguration
               dailyReturnRate={config.dailyReturnRate || 0}
               onReturnRateChange={(value) => onConfigChange({ dailyReturnRate: value })}
             />
             <CurrencyConfiguration
-              currency={config.currency || 'EUR'}
-              onChange={(value) => onConfigChange({ currency: value })}
+              selectedCurrency={config.currency || 'EUR'}
+              onCurrencyChange={(value) => onConfigChange({ currency: value })}
             />
           </div>
         </CardContent>
