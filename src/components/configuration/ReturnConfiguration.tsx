@@ -11,9 +11,12 @@ interface ReturnConfigurationProps {
 }
 
 const ReturnConfiguration: React.FC<ReturnConfigurationProps> = ({
-  dailyReturnRate,
+  dailyReturnRate = 0,
   onReturnRateChange
 }) => {
+  // Ensure dailyReturnRate is always a valid number
+  const safeReturnRate = typeof dailyReturnRate === 'number' && !isNaN(dailyReturnRate) ? dailyReturnRate : 0;
+
   return (
     <Card className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
       <CardHeader className="pb-3">
@@ -25,11 +28,11 @@ const ReturnConfiguration: React.FC<ReturnConfigurationProps> = ({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="daily-return">
-            Tasso: {dailyReturnRate.toFixed(3)}% al giorno
+            Tasso: {safeReturnRate.toFixed(3)}% al giorno
           </Label>
           <Slider
             id="daily-return"
-            value={[dailyReturnRate]}
+            value={[safeReturnRate]}
             onValueChange={(value) => onReturnRateChange(value[0])}
             min={0.1}
             max={10}
@@ -42,7 +45,7 @@ const ReturnConfiguration: React.FC<ReturnConfigurationProps> = ({
           </div>
         </div>
         <div className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
-          <p><strong>Rendimento annuale stimato:</strong> {((1 + dailyReturnRate / 100) ** 365 - 1) * 100}%</p>
+          <p><strong>Rendimento annuale stimato:</strong> {((1 + safeReturnRate / 100) ** 365 - 1) * 100).toFixed(2)}%</p>
         </div>
       </CardContent>
     </Card>

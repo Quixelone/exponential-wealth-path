@@ -86,20 +86,20 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
             <CapitalConfiguration
-              value={config.initialCapital}
+              initialCapital={config.initialCapital}
               onChange={(value) => onConfigChange({ initialCapital: value })}
               currency={config.currency || 'EUR'}
             />
             <TimeHorizonConfiguration
-              value={config.timeHorizon}
+              timeHorizon={config.timeHorizon}
               onChange={(value) => onConfigChange({ timeHorizon: value }, true)}
             />
             <ReturnConfiguration
-              value={config.dailyReturnRate}
-              onChange={(value) => onConfigChange({ dailyReturnRate: value })}
+              dailyReturnRate={config.dailyReturnRate || 0}
+              onReturnRateChange={(value) => onConfigChange({ dailyReturnRate: value })}
             />
             <CurrencyConfiguration
-              value={config.currency || 'EUR'}
+              currency={config.currency || 'EUR'}
               onChange={(value) => onConfigChange({ currency: value })}
             />
           </div>
@@ -110,11 +110,13 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       <PACConfiguration
         pacConfig={config.pacConfig}
         onPACConfigChange={(pacConfig) => onConfigChange({ pacConfig }, true)}
-        currency={config.currency || 'EUR'}
       />
 
       {/* Nuova Configurazione */}
-      <NewConfigurationButton />
+      <NewConfigurationButton 
+        onCreateNew={() => onConfigChange({}, true)}
+        hasCustomData={hasUnsavedChanges}
+      />
 
       {/* Configurazioni Salvate */}
       <SavedConfigurationsPanel
