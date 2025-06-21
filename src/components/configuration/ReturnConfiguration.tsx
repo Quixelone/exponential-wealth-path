@@ -45,7 +45,7 @@ const ReturnConfiguration: React.FC<ReturnConfigurationProps> = ({
           </div>
         </div>
         <div className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
-          <p><strong>Rendimento annuale stimato:</strong> {((1 + safeReturnRate / 100) ** 365 - 1) * 100).toFixed(2)}%</p>
+          <p><strong>Rendimento annuale stimato:</strong> {(((1 + safeReturnRate / 100) ** 365 - 1) * 100).toFixed(2)}%</p>
         </div>
       </CardContent>
     </Card>
