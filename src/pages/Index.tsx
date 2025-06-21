@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -59,6 +58,20 @@ const Index = () => {
     }
   }, [user, authLoading, navigate]);
 
+  // Enhanced unsaved changes warning
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'Hai modifiche non salvate. Sei sicuro di voler uscire?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   if (authLoading) {
     console.log('⏳ Showing loading screen - auth still loading');
     return (
@@ -77,6 +90,13 @@ const Index = () => {
   }
 
   const handleLogout = async () => {
+    if (hasUnsavedChanges) {
+      const confirmLogout = window.confirm(
+        'Hai modifiche non salvate. Sei sicuro di voler uscire senza salvare?'
+      );
+      if (!confirmLogout) return;
+    }
+    
     console.log('🚪 Logout initiated');
     await signOut();
     navigate('/auth');
@@ -127,6 +147,17 @@ const Index = () => {
     removePACOverride(day);
   };
 
+  // Enhanced configuration loading with unsaved changes check
+  const handleLoadConfigWithWarning = (savedConfig: any) => {
+    if (hasUnsavedChanges) {
+      const confirmLoad = window.confirm(
+        'Hai modifiche non salvate nella configurazione corrente. Caricando una nuova configurazione perderai queste modifiche. Vuoi continuare?'
+      );
+      if (!confirmLoad) return;
+    }
+    loadSavedConfiguration(savedConfig);
+  };
+
   console.log('🎯 Admin button should show:', isAdmin);
 
   return (
@@ -141,6 +172,11 @@ const Index = () => {
                 {isAdmin && (
                   <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full font-medium">
                     Admin
+                  </span>
+                )}
+                {hasUnsavedChanges && (
+                  <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-xs rounded-full font-medium animate-pulse">
+                    Modifiche non salvate
                   </span>
                 )}
               </div>
@@ -204,7 +240,7 @@ const Index = () => {
                     onRemoveDailyReturn={removeDailyReturn}
                     onExportCSV={exportToCSV}
                     savedConfigs={savedConfigs}
-                    onLoadConfiguration={loadSavedConfiguration}
+                    onLoadConfiguration={handleLoadConfigWithWarning}
                     onDeleteConfiguration={deleteConfiguration}
                     onSaveConfiguration={saveCurrentConfiguration}
                     onUpdateConfiguration={updateCurrentConfiguration}
@@ -230,6 +266,7 @@ const Index = () => {
                     onUpdateDailyReturnInReport={handleUpdateDailyReturnInReport}
                     onUpdatePACInReport={handleUpdatePACInReport}
                     onRemovePACOverride={handleRemovePACOverride}
+                    defaultPACAmount={config.pacConfig.amount}
                   />
                 </div>
               </div>

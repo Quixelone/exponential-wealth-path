@@ -40,7 +40,7 @@ export const useInvestmentCalculator = () => {
       loadInitialized.current = true;
       loadConfigurations();
     }
-  }, []); // Empty dependency array - only run once
+  }, []);
 
   // Calcolo investimento
   const investmentData: InvestmentData[] = useMemo(() => {
@@ -66,7 +66,6 @@ export const useInvestmentCalculator = () => {
     const diffTime = today.getTime() - startDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    // Assicuriamoci che sia un indice valido
     return Math.max(0, Math.min(diffDays, configState.config.timeHorizon));
   }, [configState.config.pacConfig.startDate, configState.config.timeHorizon]);
 
@@ -78,13 +77,24 @@ export const useInvestmentCalculator = () => {
     [savedConfigs, configState.currentConfigId]
   );
 
-  // True se lo stato corrente differisce dalla versione salvata
+  // Enhanced unsaved changes detection
   const hasUnsavedChanges = React.useMemo(() => {
-    if (!savedConfig) return false;
+    if (!savedConfig) {
+      // Se non c'è una configurazione salvata corrente, controlla se ci sono dati personalizzati
+      const hasCustomReturns = Object.keys(configState.dailyReturns).length > 0;
+      const hasCustomPAC = Object.keys(configState.dailyPACOverrides).length > 0;
+      const hasNonDefaultConfig = 
+        configState.config.initialCapital !== 1000 ||
+        configState.config.timeHorizon !== 365 ||
+        configState.config.dailyReturnRate !== 0.1 ||
+        configState.config.pacConfig.amount !== 100;
+      
+      return hasCustomReturns || hasCustomPAC || hasNonDefaultConfig;
+    }
+    
     const stateToCompare = {
       config: {
         ...configState.config,
-        // for deep compare, stringifiy PAC startDate for safety
         pacConfig: {
           ...configState.config.pacConfig,
           startDate: (typeof configState.config.pacConfig.startDate === "string"
@@ -111,9 +121,15 @@ export const useInvestmentCalculator = () => {
     return !deepEqual(stateToCompare, savedToCompare);
   }, [configState.config, configState.dailyReturns, configState.dailyPACOverrides, savedConfig]);
 
+  // Enhanced updateConfig with unsaved changes tracking
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>, reset: boolean = false) => {
     setConfig(prev => ({ ...prev, ...newConfig }));
-    setCurrentConfigId(null);
+    
+    // Mark as unsaved if we have a current config
+    if (configState.currentConfigId) {
+      setCurrentConfigId(null);
+    }
+    
     if (
       reset ||
       newConfig.initialCapital !== undefined ||
@@ -123,15 +139,19 @@ export const useInvestmentCalculator = () => {
       setDailyReturns({});
       setDailyPACOverrides({});
     }
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId]);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId]);
 
   const updateDailyReturn = useCallback((day: number, returnRate: number) => {
     setDailyReturns(prev => ({
       ...prev,
       [day]: returnRate
     }));
-    setCurrentConfigId(null);
-  }, [setDailyReturns, setCurrentConfigId]);
+    
+    // Mark as unsaved
+    if (configState.currentConfigId) {
+      setCurrentConfigId(null);
+    }
+  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId]);
 
   const removeDailyReturn = useCallback((day: number) => {
     setDailyReturns(prev => {
@@ -139,8 +159,12 @@ export const useInvestmentCalculator = () => {
       delete newReturns[day];
       return newReturns;
     });
-    setCurrentConfigId(null);
-  }, [setDailyReturns, setCurrentConfigId]);
+    
+    // Mark as unsaved
+    if (configState.currentConfigId) {
+      setCurrentConfigId(null);
+    }
+  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId]);
 
   const exportToCSV = useCallback(() => {
     const csvContent = [
@@ -177,8 +201,12 @@ export const useInvestmentCalculator = () => {
       };
       return updated;
     });
-    setCurrentConfigId(null);
-  }, [setDailyPACOverrides, setCurrentConfigId]);
+    
+    // Mark as unsaved
+    if (configState.currentConfigId) {
+      setCurrentConfigId(null);
+    }
+  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId]);
 
   const removePACOverride = useCallback((day: number) => {
     setDailyPACOverrides(prev => {
@@ -186,8 +214,12 @@ export const useInvestmentCalculator = () => {
       delete updated[day];
       return updated;
     });
-    setCurrentConfigId(null);
-  }, [setDailyPACOverrides, setCurrentConfigId]);
+    
+    // Mark as unsaved
+    if (configState.currentConfigId) {
+      setCurrentConfigId(null);
+    }
+  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId]);
 
   const saveCurrentConfiguration = useCallback(async (name: string) => {
     const configId = await saveConfiguration(name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
@@ -247,7 +279,6 @@ export const useInvestmentCalculator = () => {
     hasUnsavedChanges,
     currentDayIndex,
     summary: {
-      // Situazione attuale (fino ad oggi)
       current: {
         finalCapital: currentData?.finalCapital || 0,
         totalInvested: configState.config.initialCapital + (currentData?.totalPACInvested || 0),
@@ -257,7 +288,6 @@ export const useInvestmentCalculator = () => {
           : 0,
         day: currentDayIndex
       },
-      // Proiezione finale (risultato completo)
       final: {
         finalCapital: finalData?.finalCapital || 0,
         totalInvested: configState.config.initialCapital + (finalData?.totalPACInvested || 0),

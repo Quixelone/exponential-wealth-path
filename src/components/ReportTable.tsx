@@ -1,13 +1,14 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { InvestmentData } from '@/types/investment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ChevronLeft, ChevronRight, Search, Download, TrendingUp } from 'lucide-react';
-import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
-import { Currency } from '@/lib/utils';
-import ReportTableRow from './ReportTableRow';
+import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3 } from 'lucide-react';
+import { ModernTooltipProvider, ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/ModernTooltip';
+import { Currency, formatCurrency } from '@/lib/utils';
+import RowEditDialog from './RowEditDialog';
 
 interface ReportTableProps {
   data: InvestmentData[];
@@ -16,6 +17,7 @@ interface ReportTableProps {
   onUpdateDailyReturnInReport: (day: number, newReturn: number) => void;
   onUpdatePACInReport: (day: number, newPAC: number) => void;
   onRemovePACOverride?: (day: number) => void;
+  defaultPACAmount: number;
 }
 
 const ReportTable: React.FC<ReportTableProps> = ({
@@ -24,16 +26,14 @@ const ReportTable: React.FC<ReportTableProps> = ({
   onExportCSV,
   onUpdateDailyReturnInReport,
   onUpdatePACInReport,
-  onRemovePACOverride
+  onRemovePACOverride,
+  defaultPACAmount
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InvestmentData | null>(null);
   const itemsPerPage = 20;
-
-  const [editingDay, setEditingDay] = useState<number | null>(null);
-  const [editValue, setEditValue] = useState<string>('');
-  const [editingPACDay, setEditingPACDay] = useState<number | null>(null);
-  const [editPACValue, setEditPACValue] = useState<string>('');
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit', day: '2-digit'});
@@ -48,49 +48,13 @@ const ReportTable: React.FC<ReportTableProps> = ({
     );
   }, [data, searchTerm]);
 
-  useEffect(() => {
-    setEditingDay(null);
-    setEditValue('');
-  }, [data]);
-  useEffect(() => {
-    setEditingPACDay(null);
-    setEditPACValue('');
-  }, [data]);
-
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleEdit = (item: InvestmentData) => {
-    setEditingDay(item.day);
-    setEditValue(item.dailyReturn.toFixed(3));
-  };
-  const handleSave = (day: number) => {
-    const newReturnRate = parseFloat(editValue);
-    if (!isNaN(newReturnRate)) {
-      onUpdateDailyReturnInReport(day, newReturnRate);
-    }
-    setEditingDay(null);
-  };
-  const handleCancel = () => {
-    setEditingDay(null);
-    setEditValue('');
-  };
-  const handleEditPAC = (item: InvestmentData) => {
-    setEditingPACDay(item.day);
-    setEditPACValue(item.pacAmount.toFixed(2));
-  };
-  const handleSavePAC = (day: number) => {
-    const newPAC = parseFloat(editPACValue);
-    if (!isNaN(newPAC)) {
-      onUpdatePACInReport(day, newPAC);
-    }
-    setEditingPACDay(null);
-    setEditPACValue('');
-  };
-  const handleCancelPAC = () => {
-    setEditingPACDay(null);
-    setEditPACValue('');
+  const handleEditRow = (item: InvestmentData) => {
+    setSelectedItem(item);
+    setEditDialogOpen(true);
   };
 
   return (
@@ -135,7 +99,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                   <TableHead className="text-right">% Ricavo</TableHead>
                   <TableHead className="text-right">Ricavo Giorno</TableHead>
                   <TableHead className="text-right font-mono">Capitale Finale</TableHead>
-                  <TableHead className="w-24 text-center">Tipo/Azioni</TableHead>
+                  <TableHead className="w-24 text-center">Azioni</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -146,29 +110,44 @@ const ReportTable: React.FC<ReportTableProps> = ({
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedData.map((item) => (
-                    <ReportTableRow
-                      key={item.day}
-                      item={item}
-                      currency={currency}
-                      editingDay={editingDay}
-                      setEditingDay={setEditingDay}
-                      editValue={editValue}
-                      setEditValue={setEditValue}
-                      handleEdit={handleEdit}
-                      handleSave={handleSave}
-                      handleCancel={handleCancel}
-                      editingPACDay={editingPACDay}
-                      setEditingPACDay={setEditingPACDay}
-                      editPACValue={editPACValue}
-                      setEditPACValue={setEditPACValue}
-                      handleEditPAC={handleEditPAC}
-                      handleSavePAC={handleSavePAC}
-                      handleCancelPAC={handleCancelPAC}
-                      onRemovePACOverride={onRemovePACOverride}
-                      formatDate={formatDate}
-                    />
-                  ))
+                  paginatedData.map((item) => {
+                    const dailyGain = item.interestEarnedDaily;
+                    const isPositiveGain = dailyGain >= 0;
+
+                    return (
+                      <TableRow key={item.day} className="hover:bg-muted/50">
+                        <TableCell className="font-medium text-center">{item.day}</TableCell>
+                        <TableCell className="text-sm">{formatDate(item.date)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(item.pacAmount, currency)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(item.capitalAfterPAC, currency)}</TableCell>
+                        <TableCell className={`text-right font-mono ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {item.dailyReturn.toFixed(3)}%
+                        </TableCell>
+                        <TableCell className={`text-right font-mono ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatCurrency(dailyGain, currency)}
+                        </TableCell>
+                        <TableCell className="text-right font-mono font-semibold">{formatCurrency(item.finalCapital, currency)}</TableCell>
+                        <TableCell className="text-center">
+                          <ModernTooltip>
+                            <ModernTooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditRow(item)}
+                                className="h-8 px-2 text-primary hover:text-primary/80 hover:bg-primary/10"
+                              >
+                                <Edit3 className="h-4 w-4" />
+                              </Button>
+                            </ModernTooltipTrigger>
+                            <ModernTooltipContent>
+                              <p>Modifica rendimento e PAC per il giorno {item.day}</p>
+                            </ModernTooltipContent>
+                          </ModernTooltip>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
@@ -206,6 +185,16 @@ const ReportTable: React.FC<ReportTableProps> = ({
           )}
         </CardContent>
       </Card>
+
+      <RowEditDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        item={selectedItem}
+        currency={currency}
+        onUpdateDailyReturn={onUpdateDailyReturnInReport}
+        onUpdatePAC={onUpdatePACInReport}
+        defaultPACAmount={defaultPACAmount}
+      />
     </ModernTooltipProvider>
   );
 };
