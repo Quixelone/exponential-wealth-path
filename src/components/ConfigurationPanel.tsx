@@ -109,7 +109,7 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       {/* Configurazione PAC */}
       <PACConfiguration
         pacConfig={config.pacConfig}
-        onPACConfigChange={(pacConfig) => onConfigChange({ pacConfig }, true)}
+        onPACConfigChange={(pacConfigUpdate) => onConfigChange({ pacConfig: { ...config.pacConfig, ...pacConfigUpdate } }, true)}
       />
 
       {/* Nuova Configurazione */}
