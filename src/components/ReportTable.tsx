@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3, Calendar } from 'lucide-react';
 import { ModernTooltipProvider, ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/ModernTooltip';
 import { Currency, formatCurrency } from '@/lib/utils';
 import RowEditDialog from './RowEditDialog';
@@ -18,6 +18,7 @@ interface ReportTableProps {
   onUpdatePACInReport: (day: number, newPAC: number) => void;
   onRemovePACOverride?: (day: number) => void;
   defaultPACAmount: number;
+  investmentStartDate: string | Date;
 }
 
 const ReportTable: React.FC<ReportTableProps> = ({
@@ -27,7 +28,8 @@ const ReportTable: React.FC<ReportTableProps> = ({
   onUpdateDailyReturnInReport,
   onUpdatePACInReport,
   onRemovePACOverride,
-  defaultPACAmount
+  defaultPACAmount,
+  investmentStartDate
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,6 +40,20 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit', day: '2-digit'});
   };
+
+  // Calcola il giorno corrente dell'investimento
+  const currentInvestmentDay = useMemo(() => {
+    const startDate = new Date(investmentStartDate);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const diffTime = today.getTime() - startDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 perché il primo giorno è il giorno 1
+    
+    return diffDays > 0 ? diffDays : null; // null se l'investimento non è ancora iniziato
+  }, [investmentStartDate]);
 
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
@@ -52,9 +68,27 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
+  // Naviga automaticamente alla pagina contenente il giorno corrente
+  useEffect(() => {
+    if (currentInvestmentDay && !searchTerm) {
+      const currentDayItem = data.find(item => item.day === currentInvestmentDay);
+      if (currentDayItem) {
+        const currentDayIndex = data.indexOf(currentDayItem);
+        const pageWithCurrentDay = Math.floor(currentDayIndex / itemsPerPage) + 1;
+        if (pageWithCurrentDay !== currentPage) {
+          setCurrentPage(pageWithCurrentDay);
+        }
+      }
+    }
+  }, [currentInvestmentDay, data, searchTerm, itemsPerPage, currentPage]);
+
   const handleEditRow = (item: InvestmentData) => {
     setSelectedItem(item);
     setEditDialogOpen(true);
+  };
+
+  const isCurrentDay = (dayNumber: number) => {
+    return currentInvestmentDay === dayNumber;
   };
 
   return (
@@ -65,6 +99,12 @@ const ReportTable: React.FC<ReportTableProps> = ({
             <CardTitle className="flex items-center gap-2 text-lg">
               <TrendingUp className="h-6 w-6 text-primary" />
               Report Giornaliero Dettagliato
+              {currentInvestmentDay && (
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span>Giorno corrente: {currentInvestmentDay}</span>
+                </div>
+              )}
             </CardTitle>
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <div className="relative">
@@ -113,11 +153,34 @@ const ReportTable: React.FC<ReportTableProps> = ({
                   paginatedData.map((item) => {
                     const dailyGain = item.interestEarnedDaily;
                     const isPositiveGain = dailyGain >= 0;
+                    const isToday = isCurrentDay(item.day);
 
                     return (
-                      <TableRow key={item.day} className="hover:bg-muted/50">
-                        <TableCell className="font-medium text-center">{item.day}</TableCell>
-                        <TableCell className="text-sm">{formatDate(item.date)}</TableCell>
+                      <TableRow 
+                        key={item.day} 
+                        className={`
+                          hover:bg-muted/50 
+                          ${isToday ? 'bg-primary/5 border-primary/20 border-2 animate-pulse-gentle' : ''}
+                        `}
+                      >
+                        <TableCell className="font-medium text-center relative">
+                          <div className="flex items-center justify-center gap-1">
+                            {item.day}
+                            {isToday && (
+                              <ModernTooltip>
+                                <ModernTooltipTrigger asChild>
+                                  <Calendar className="h-4 w-4 text-primary animate-pulse" />
+                                </ModernTooltipTrigger>
+                                <ModernTooltipContent>
+                                  <p>Giorno corrente dell'investimento</p>
+                                </ModernTooltipContent>
+                              </ModernTooltip>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className={`text-sm ${isToday ? 'font-semibold text-primary' : ''}`}>
+                          {formatDate(item.date)}
+                        </TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(item.pacAmount, currency)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(item.capitalAfterPAC, currency)}</TableCell>
@@ -127,7 +190,9 @@ const ReportTable: React.FC<ReportTableProps> = ({
                         <TableCell className={`text-right font-mono ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
                           {formatCurrency(dailyGain, currency)}
                         </TableCell>
-                        <TableCell className="text-right font-mono font-semibold">{formatCurrency(item.finalCapital, currency)}</TableCell>
+                        <TableCell className={`text-right font-mono font-semibold ${isToday ? 'text-primary' : ''}`}>
+                          {formatCurrency(item.finalCapital, currency)}
+                        </TableCell>
                         <TableCell className="text-center">
                           <ModernTooltip>
                             <ModernTooltipTrigger asChild>

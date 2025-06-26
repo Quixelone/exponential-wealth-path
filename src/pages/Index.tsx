@@ -267,6 +267,7 @@ const Index = () => {
                     onUpdatePACInReport={handleUpdatePACInReport}
                     onRemovePACOverride={handleRemovePACOverride}
                     defaultPACAmount={config.pacConfig.amount}
+                    investmentStartDate={config.pacConfig.startDate}
                   />
                 </div>
               </div>
