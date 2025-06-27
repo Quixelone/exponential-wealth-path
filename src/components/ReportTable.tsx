@@ -91,6 +91,38 @@ const ReportTable: React.FC<ReportTableProps> = ({
     return currentInvestmentDay === dayNumber;
   };
 
+  const handleNextPage = () => {
+    console.log('🔄 Next page clicked - Current page:', currentPage, 'Total pages:', totalPages);
+    if (currentPage < totalPages) {
+      const newPage = currentPage + 1;
+      console.log('📄 Moving to page:', newPage);
+      setCurrentPage(newPage);
+    } else {
+      console.log('⚠️ Already on last page');
+    }
+  };
+
+  const handlePrevPage = () => {
+    console.log('🔄 Previous page clicked - Current page:', currentPage);
+    if (currentPage > 1) {
+      const newPage = currentPage - 1;
+      console.log('📄 Moving to page:', newPage);
+      setCurrentPage(newPage);
+    } else {
+      console.log('⚠️ Already on first page');
+    }
+  };
+
+  // Debug pagination state
+  console.log('📊 ReportTable pagination state:', {
+    currentPage,
+    totalPages,
+    filteredDataLength: filteredData.length,
+    itemsPerPage,
+    startIndex,
+    paginatedDataLength: paginatedData.length
+  });
+
   return (
     <ModernTooltipProvider>
       <Card className="animate-fade-in">
@@ -227,7 +259,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  onClick={handlePrevPage}
                   disabled={currentPage === 1}
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
@@ -239,7 +271,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  onClick={handleNextPage}
                   disabled={currentPage === totalPages}
                 >
                   Successiva
