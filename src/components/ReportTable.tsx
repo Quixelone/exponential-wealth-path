@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { InvestmentData } from '@/types/investment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
@@ -35,6 +34,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InvestmentData | null>(null);
+  const hasManuallyNavigated = useRef(false);
   const itemsPerPage = 20;
 
   const formatDate = (dateString: string) => {
@@ -68,19 +68,20 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
-  // Naviga automaticamente alla pagina contenente il giorno corrente
+  // Naviga automaticamente alla pagina contenente il giorno corrente SOLO se l'utente non ha mai navigato manualmente
   useEffect(() => {
-    if (currentInvestmentDay && !searchTerm) {
+    if (currentInvestmentDay && !searchTerm && !hasManuallyNavigated.current) {
       const currentDayItem = data.find(item => item.day === currentInvestmentDay);
       if (currentDayItem) {
         const currentDayIndex = data.indexOf(currentDayItem);
         const pageWithCurrentDay = Math.floor(currentDayIndex / itemsPerPage) + 1;
         if (pageWithCurrentDay !== currentPage) {
+          console.log('🎯 Auto-navigating to page with current day:', pageWithCurrentDay);
           setCurrentPage(pageWithCurrentDay);
         }
       }
     }
-  }, [currentInvestmentDay, data, searchTerm, itemsPerPage, currentPage]);
+  }, [currentInvestmentDay, data, searchTerm, itemsPerPage]);
 
   const handleEditRow = (item: InvestmentData) => {
     setSelectedItem(item);
@@ -93,6 +94,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
 
   const handleNextPage = () => {
     console.log('🔄 Next page clicked - Current page:', currentPage, 'Total pages:', totalPages);
+    hasManuallyNavigated.current = true; // Segna che l'utente ha navigato manualmente
     if (currentPage < totalPages) {
       const newPage = currentPage + 1;
       console.log('📄 Moving to page:', newPage);
@@ -104,6 +106,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
 
   const handlePrevPage = () => {
     console.log('🔄 Previous page clicked - Current page:', currentPage);
+    hasManuallyNavigated.current = true; // Segna che l'utente ha navigato manualmente
     if (currentPage > 1) {
       const newPage = currentPage - 1;
       console.log('📄 Moving to page:', newPage);
@@ -113,6 +116,13 @@ const ReportTable: React.FC<ReportTableProps> = ({
     }
   };
 
+  // Reset del flag quando si cambia il filtro di ricerca
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+    hasManuallyNavigated.current = false; // Reset del flag quando si filtra
+  };
+
   // Debug pagination state
   console.log('📊 ReportTable pagination state:', {
     currentPage,
@@ -120,7 +130,8 @@ const ReportTable: React.FC<ReportTableProps> = ({
     filteredDataLength: filteredData.length,
     itemsPerPage,
     startIndex,
-    paginatedDataLength: paginatedData.length
+    paginatedDataLength: paginatedData.length,
+    hasManuallyNavigated: hasManuallyNavigated.current
   });
 
   return (
@@ -144,10 +155,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                 <Input
                   placeholder="Cerca giorno, data, %..."
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-9 w-full sm:w-56"
                 />
               </div>
