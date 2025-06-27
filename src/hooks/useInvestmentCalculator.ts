@@ -35,6 +35,15 @@ export const useInvestmentCalculator = () => {
   const loadInitialized = useRef(false);
   const autoLoadAttempted = useRef(false);
 
+  // Move loadSavedConfiguration function definition before it's used
+  const loadSavedConfiguration = useCallback((savedConfig: any) => {
+    setConfig(savedConfig.config);
+    setDailyReturns(savedConfig.dailyReturns);
+    setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
+    setCurrentConfigId(savedConfig.id);
+    setCurrentConfigName(savedConfig.name);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
+
   // Load configurations only once on mount
   React.useEffect(() => {
     if (!loadInitialized.current) {
@@ -260,14 +269,6 @@ export const useInvestmentCalculator = () => {
       setCurrentConfigName(name);
     }
   }, [updateConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
-
-  const loadSavedConfiguration = useCallback((savedConfig: any) => {
-    setConfig(savedConfig.config);
-    setDailyReturns(savedConfig.dailyReturns);
-    setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
-    setCurrentConfigId(savedConfig.id);
-    setCurrentConfigName(savedConfig.name);
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
 
   // Calcola info prossimo PAC
   const nextPACInfo = useMemo(
