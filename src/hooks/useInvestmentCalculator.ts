@@ -33,6 +33,7 @@ export const useInvestmentCalculator = () => {
   } = useSupabaseConfig();
 
   const loadInitialized = useRef(false);
+  const autoLoadAttempted = useRef(false);
 
   // Load configurations only once on mount
   React.useEffect(() => {
@@ -41,6 +42,29 @@ export const useInvestmentCalculator = () => {
       loadConfigurations();
     }
   }, []);
+
+  // Auto-load first configuration after configurations are loaded
+  React.useEffect(() => {
+    if (
+      !autoLoadAttempted.current && 
+      !supabaseLoading && 
+      savedConfigs.length > 0 && 
+      !configState.currentConfigId
+    ) {
+      autoLoadAttempted.current = true;
+      
+      // Sort configurations by creation date (oldest first) and load the first one
+      const sortedConfigs = [...savedConfigs].sort((a, b) => 
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+      
+      if (sortedConfigs.length > 0) {
+        const firstConfig = sortedConfigs[0];
+        console.log('🔄 Auto-loading first configuration:', firstConfig.name);
+        loadSavedConfiguration(firstConfig);
+      }
+    }
+  }, [savedConfigs, supabaseLoading, configState.currentConfigId, loadSavedConfiguration]);
 
   // Calcolo investimento
   const investmentData: InvestmentData[] = useMemo(() => {

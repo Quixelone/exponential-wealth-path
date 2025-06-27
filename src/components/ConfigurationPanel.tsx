@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
@@ -57,31 +56,54 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   onRemovePACOverride,
   hasUnsavedChanges = false,
 }) => {
+  const handleCreateNewConfiguration = (name: string, copyFromCurrent: boolean) => {
+    if (copyFromCurrent) {
+      // Keep current config but reset IDs and name
+      onSaveConfiguration(name);
+    } else {
+      // Reset to default configuration
+      onConfigChange({}, true);
+    }
+  };
+
+  const displayConfigTitle = currentConfigName || "Nuova Configurazione";
+  const hasCurrentConfig = !!currentConfigId;
+
   return (
     <div className="space-y-6 h-fit">
-      {/* Header con stato configurazione */}
+      {/* Enhanced Header con titolo configurazione */}
       <Card className="animate-fade-in border-primary/20">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-primary" />
-              <span>Configurazione</span>
+          <div className="space-y-3">
+            {/* Titolo configurazione attiva */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-primary">
+                  {displayConfigTitle}
+                </h2>
+                {hasCurrentConfig && !hasUnsavedChanges && (
+                  <Badge variant="secondary" className="text-xs">
+                    <Save className="h-3 w-3 mr-1" />
+                    Salvato
+                  </Badge>
+                )}
+                {hasUnsavedChanges && (
+                  <Badge variant="destructive" className="animate-pulse text-xs">
+                    <Save className="h-3 w-3 mr-1" />
+                    Non salvato
+                  </Badge>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              {hasUnsavedChanges && (
-                <Badge variant="destructive" className="animate-pulse text-xs">
-                  <Save className="h-3 w-3 mr-1" />
-                  Non salvato
-                </Badge>
-              )}
-              {currentConfigId && !hasUnsavedChanges && (
-                <Badge variant="secondary" className="text-xs">
-                  <Save className="h-3 w-3 mr-1" />
-                  Salvato
-                </Badge>
-              )}
-            </div>
-          </CardTitle>
+            
+            {/* Sottotitolo configurazione */}
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-primary" />
+                <span>Parametri di Configurazione</span>
+              </div>
+            </CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
@@ -114,8 +136,9 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
 
       {/* Nuova Configurazione */}
       <NewConfigurationButton 
-        onCreateNew={() => onConfigChange({}, true)}
-        hasCustomData={hasUnsavedChanges}
+        onCreateNew={handleCreateNewConfiguration}
+        hasCurrentConfig={hasCurrentConfig}
+        currentConfigName={displayConfigTitle}
       />
 
       {/* Configurazioni Salvate */}

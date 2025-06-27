@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -22,12 +21,33 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
   onRemoveDailyReturn
 }) => {
   const [selectedDay, setSelectedDay] = useState<number>(1);
-  const [returnRate, setReturnRate] = useState<number>(0);
+  const [returnRate, setReturnRate] = useState<string>('0');
+  const returnInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddReturn = () => {
-    if (selectedDay >= 1 && selectedDay <= timeHorizon) {
-      onUpdateDailyReturn(selectedDay, returnRate);
-      setReturnRate(0); // Reset input after adding
+    const numericValue = parseFloat(returnRate);
+    if (selectedDay >= 1 && selectedDay <= timeHorizon && !isNaN(numericValue)) {
+      onUpdateDailyReturn(selectedDay, numericValue);
+      setReturnRate('0'); // Reset input after adding
+      // Focus back to input for quick entry
+      setTimeout(() => {
+        returnInputRef.current?.focus();
+        returnInputRef.current?.select();
+      }, 100);
+    }
+  };
+
+  const handleReturnRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow empty string, numbers, decimal point, and negative sign
+    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+      setReturnRate(value);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleAddReturn();
     }
   };
 
@@ -63,19 +83,21 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="return-rate">Rendimento/Perdita %</Label>
                 <Input
+                  ref={returnInputRef}
                   id="return-rate"
-                  type="number"
+                  type="text"
                   value={returnRate}
-                  onChange={(e) => setReturnRate(Number(e.target.value))}
-                  step={0.01}
+                  onChange={handleReturnRateChange}
+                  onKeyPress={handleKeyPress}
                   placeholder="Es: 1.5 o -2.3"
                   className="w-full"
+                  onFocus={(e) => e.target.select()}
                 />
               </div>
               <Button 
                 onClick={handleAddReturn}
-                className="w-full h-10" // Matched height with input
-                disabled={selectedDay < 1 || selectedDay > timeHorizon || selectedDay === undefined || returnRate === undefined}
+                className="w-full h-10"
+                disabled={selectedDay < 1 || selectedDay > timeHorizon || returnRate === '' || isNaN(parseFloat(returnRate))}
               >
                 Aggiungi
               </Button>
