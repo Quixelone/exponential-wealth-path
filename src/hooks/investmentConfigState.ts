@@ -43,7 +43,12 @@ export const useInvestmentConfigState = () => {
   const undoConfiguration = useCallback(() => {
     const snapshot = undo();
     if (snapshot) {
-      setConfig(snapshot.config);
+      // Ensure currency is always present when restoring from history
+      const configWithCurrency = {
+        ...snapshot.config,
+        currency: snapshot.config.currency || 'EUR' as Currency
+      };
+      setConfig(configWithCurrency);
       setDailyReturns(snapshot.dailyReturns);
       setDailyPACOverrides(snapshot.dailyPACOverrides);
       return snapshot;
@@ -55,7 +60,12 @@ export const useInvestmentConfigState = () => {
   const redoConfiguration = useCallback(() => {
     const snapshot = redo();
     if (snapshot) {
-      setConfig(snapshot.config);
+      // Ensure currency is always present when restoring from history
+      const configWithCurrency = {
+        ...snapshot.config,
+        currency: snapshot.config.currency || 'EUR' as Currency
+      };
+      setConfig(configWithCurrency);
       setDailyReturns(snapshot.dailyReturns);
       setDailyPACOverrides(snapshot.dailyPACOverrides);
       return snapshot;
