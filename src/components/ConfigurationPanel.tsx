@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
@@ -11,6 +12,7 @@ import CurrencyConfiguration from './configuration/CurrencyConfiguration';
 import SavedConfigurationsPanel from './configuration/SavedConfigurationsPanel';
 import NewConfigurationButton from './configuration/NewConfigurationButton';
 import ExportSection from './configuration/ExportSection';
+import UndoRedoControls from './configuration/UndoRedoControls';
 import { Badge } from '@/components/ui/badge';
 
 interface ConfigurationPanelProps {
@@ -33,6 +35,11 @@ interface ConfigurationPanelProps {
   onUpdatePACForDay: (day: number, pacAmount: number) => void;
   onRemovePACOverride: (day: number) => void;
   hasUnsavedChanges?: boolean;
+  // History operations
+  onUndo?: () => any;
+  onRedo?: () => any;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
@@ -55,6 +62,11 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   onUpdatePACForDay,
   onRemovePACOverride,
   hasUnsavedChanges = false,
+  // History operations
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
 }) => {
   const handleCreateNewConfiguration = (name: string, copyFromCurrent: boolean) => {
     if (copyFromCurrent) {
@@ -94,6 +106,16 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                   </Badge>
                 )}
               </div>
+              
+              {/* Undo/Redo Controls */}
+              {onUndo && onRedo && (
+                <UndoRedoControls
+                  canUndo={canUndo}
+                  canRedo={canRedo}
+                  onUndo={onUndo}
+                  onRedo={onRedo}
+                />
+              )}
             </div>
             
             {/* Sottotitolo configurazione */}

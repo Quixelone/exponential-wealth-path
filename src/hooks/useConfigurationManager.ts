@@ -18,6 +18,14 @@ export const useConfigurationManager = () => {
     setCurrentConfigName,
     createNewConfiguration,
     resetCustomData,
+    // History operations
+    saveConfigurationToHistory,
+    undoConfiguration,
+    redoConfiguration,
+    canUndo,
+    canRedo,
+    clearHistory,
+    getCurrentSnapshot,
   } = useInvestmentConfigState();
 
   const {
@@ -31,12 +39,15 @@ export const useConfigurationManager = () => {
 
   // Move loadSavedConfiguration function definition before it's used
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
+    // Save current state to history before loading new configuration
+    saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
+    
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
   // Determina configurazione "salvata" attuale
   const savedConfig = React.useMemo(() =>
@@ -95,16 +106,18 @@ export const useConfigurationManager = () => {
     if (configId) {
       setCurrentConfigId(configId);
       setCurrentConfigName(name);
+      saveConfigurationToHistory(`Salvataggio configurazione: ${name}`);
     }
-  }, [saveConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
+  }, [saveConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
   const updateCurrentConfiguration = useCallback(async (configId: string, name: string) => {
     const success = await updateConfiguration(configId, name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
     if (success) {
       setCurrentConfigId(configId);
       setCurrentConfigName(name);
+      saveConfigurationToHistory(`Aggiornamento configurazione: ${name}`);
     }
-  }, [updateConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
+  }, [updateConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
   return {
     configState,
@@ -122,6 +135,14 @@ export const useConfigurationManager = () => {
     loadSavedConfiguration,
     hasUnsavedChanges,
     saveCurrentConfiguration,
-    updateCurrentConfiguration
+    updateCurrentConfiguration,
+    // History operations
+    saveConfigurationToHistory,
+    undoConfiguration,
+    redoConfiguration,
+    canUndo,
+    canRedo,
+    clearHistory,
+    getCurrentSnapshot,
   };
 };

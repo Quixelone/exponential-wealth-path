@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { Currency } from '@/lib/utils';
+import { useConfigurationHistory } from './useConfigurationHistory';
 
 // Stato di default configurazione investimento
 export const getDefaultConfig = (): InvestmentConfig & { currency: Currency } => ({
@@ -23,14 +24,55 @@ export const useInvestmentConfigState = () => {
   const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
   const [currentConfigName, setCurrentConfigName] = useState<string>('');
 
+  const {
+    saveToHistory,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    clearHistory,
+    getCurrentSnapshot
+  } = useConfigurationHistory();
+
+  // Funzione per salvare automaticamente nello stack
+  const saveConfigurationToHistory = useCallback((description: string) => {
+    saveToHistory(config, dailyReturns, dailyPACOverrides, description);
+  }, [config, dailyReturns, dailyPACOverrides, saveToHistory]);
+
+  // Undo operation
+  const undoConfiguration = useCallback(() => {
+    const snapshot = undo();
+    if (snapshot) {
+      setConfig(snapshot.config);
+      setDailyReturns(snapshot.dailyReturns);
+      setDailyPACOverrides(snapshot.dailyPACOverrides);
+      return snapshot;
+    }
+    return null;
+  }, [undo]);
+
+  // Redo operation
+  const redoConfiguration = useCallback(() => {
+    const snapshot = redo();
+    if (snapshot) {
+      setConfig(snapshot.config);
+      setDailyReturns(snapshot.dailyReturns);
+      setDailyPACOverrides(snapshot.dailyPACOverrides);
+      return snapshot;
+    }
+    return null;
+  }, [redo]);
+
   // Resetta completamente i dati personalizzati
   const resetCustomData = useCallback(() => {
+    saveConfigurationToHistory('Reset dati personalizzati');
     setDailyReturns({});
     setDailyPACOverrides({});
-  }, []);
+  }, [saveConfigurationToHistory]);
 
   // Quando vuoi azzerare tutto e ripartire da 0
   const createNewConfiguration = useCallback(() => {
+    saveConfigurationToHistory('Creazione nuova configurazione');
     resetCustomData();
     setCurrentConfigId(null);
     setCurrentConfigName('');
@@ -38,7 +80,8 @@ export const useInvestmentConfigState = () => {
       ...getDefaultConfig(),
       pacConfig: { ...getDefaultConfig().pacConfig, startDate: new Date() }, // startDate sempre oggi
     });
-  }, [resetCustomData]);
+    clearHistory(); // Reset history when creating new configuration
+  }, [resetCustomData, saveConfigurationToHistory, clearHistory]);
 
   return {
     configState: { config, dailyReturns, dailyPACOverrides, currentConfigId, currentConfigName },
@@ -49,5 +92,13 @@ export const useInvestmentConfigState = () => {
     setCurrentConfigName,
     createNewConfiguration,
     resetCustomData,
+    // History operations
+    saveConfigurationToHistory,
+    undoConfiguration,
+    redoConfiguration,
+    canUndo,
+    canRedo,
+    clearHistory,
+    getCurrentSnapshot,
   };
 };

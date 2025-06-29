@@ -21,7 +21,15 @@ export const useInvestmentCalculator = () => {
     loadSavedConfiguration,
     hasUnsavedChanges,
     saveCurrentConfiguration,
-    updateCurrentConfiguration
+    updateCurrentConfiguration,
+    // History operations
+    saveConfigurationToHistory,
+    undoConfiguration,
+    redoConfiguration,
+    canUndo,
+    canRedo,
+    clearHistory,
+    getCurrentSnapshot,
   } = useConfigurationManager();
 
   const loadInitialized = useRef(false);
@@ -77,7 +85,8 @@ export const useInvestmentCalculator = () => {
     setDailyReturns,
     setDailyPACOverrides,
     setCurrentConfigId,
-    investmentData
+    investmentData,
+    saveConfigurationToHistory
   });
 
   return {
@@ -103,6 +112,13 @@ export const useInvestmentCalculator = () => {
     getNextPACInfo: () => nextPACInfo,
     hasUnsavedChanges,
     currentDayIndex,
-    summary
+    summary,
+    // History operations
+    undoConfiguration,
+    redoConfiguration,
+    canUndo,
+    canRedo,
+    clearHistory,
+    getCurrentSnapshot,
   };
 };

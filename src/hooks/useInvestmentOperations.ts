@@ -15,6 +15,7 @@ interface UseInvestmentOperationsProps {
   setDailyPACOverrides: (overrides: { [day: number]: number } | ((prev: { [day: number]: number }) => { [day: number]: number })) => void;
   setCurrentConfigId: (id: string | null) => void;
   investmentData: any[];
+  saveConfigurationToHistory: (description: string) => void;
 }
 
 export const useInvestmentOperations = ({
@@ -23,10 +24,15 @@ export const useInvestmentOperations = ({
   setDailyReturns,
   setDailyPACOverrides,
   setCurrentConfigId,
-  investmentData
+  investmentData,
+  saveConfigurationToHistory
 }: UseInvestmentOperationsProps) => {
   
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>, reset: boolean = false) => {
+    // Save to history before making changes
+    const description = getConfigUpdateDescription(newConfig);
+    saveConfigurationToHistory(description);
+    
     setConfig(prev => ({ ...prev, ...newConfig }));
     
     // Mark as unsaved if we have a current config
@@ -43,9 +49,11 @@ export const useInvestmentOperations = ({
       setDailyReturns({});
       setDailyPACOverrides({});
     }
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId]);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const updateDailyReturn = useCallback((day: number, returnRate: number) => {
+    saveConfigurationToHistory(`Modifica rendimento giorno ${day}: ${returnRate}%`);
+    
     setDailyReturns(prev => ({
       ...prev,
       [day]: returnRate
@@ -55,9 +63,11 @@ export const useInvestmentOperations = ({
     if (configState.currentConfigId) {
       setCurrentConfigId(null);
     }
-  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId]);
+  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const removeDailyReturn = useCallback((day: number) => {
+    saveConfigurationToHistory(`Rimozione rendimento personalizzato giorno ${day}`);
+    
     setDailyReturns(prev => {
       const newReturns = { ...prev };
       delete newReturns[day];
@@ -68,9 +78,11 @@ export const useInvestmentOperations = ({
     if (configState.currentConfigId) {
       setCurrentConfigId(null);
     }
-  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId]);
+  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const updatePACForDay = useCallback((day: number, pacAmount: number) => {
+    saveConfigurationToHistory(`Modifica PAC giorno ${day}: €${pacAmount}`);
+    
     setDailyPACOverrides(prev => {
       const updated = {
         ...prev,
@@ -83,9 +95,11 @@ export const useInvestmentOperations = ({
     if (configState.currentConfigId) {
       setCurrentConfigId(null);
     }
-  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId]);
+  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const removePACOverride = useCallback((day: number) => {
+    saveConfigurationToHistory(`Rimozione PAC personalizzato giorno ${day}`);
+    
     setDailyPACOverrides(prev => {
       const updated = { ...prev };
       delete updated[day];
@@ -96,7 +110,7 @@ export const useInvestmentOperations = ({
     if (configState.currentConfigId) {
       setCurrentConfigId(null);
     }
-  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId]);
+  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const exportToCSV = useCallback(() => {
     const csvContent = [
@@ -124,6 +138,26 @@ export const useInvestmentOperations = ({
     link.click();
     window.URL.revokeObjectURL(url);
   }, [investmentData]);
+
+  // Helper function to generate meaningful descriptions for config updates
+  const getConfigUpdateDescription = (newConfig: Partial<InvestmentConfig>): string => {
+    if (newConfig.initialCapital !== undefined) {
+      return `Modifica capitale iniziale: €${newConfig.initialCapital}`;
+    }
+    if (newConfig.timeHorizon !== undefined) {
+      return `Modifica orizzonte temporale: ${newConfig.timeHorizon} giorni`;
+    }
+    if (newConfig.dailyReturnRate !== undefined) {
+      return `Modifica tasso rendimento: ${newConfig.dailyReturnRate}%`;
+    }
+    if (newConfig.pacConfig !== undefined) {
+      return `Modifica configurazione PAC`;
+    }
+    if (newConfig.currency !== undefined) {
+      return `Modifica valuta: ${newConfig.currency}`;
+    }
+    return 'Modifica configurazione generale';
+  };
 
   return {
     updateConfig,
