@@ -3,76 +3,81 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design system inspired by Vuexy */
+/* Design system inspired by Modernize Admin Template */
 
 @layer base {
   :root {
-    --background: 240 67% 99%; /* #F8F7FA */
-    --foreground: 249 11% 40%; /* #5E5873 */
+    --background: 248 250 252; /* #F8FAFC - Light blue-gray background */
+    --foreground: 30 41 59; /* #1E293B - Slate 800 */
 
-    --card: 0 0% 100%; /* #FFFFFF */
-    --card-foreground: 249 11% 40%; /* #5E5873 */
+    --card: 255 255 255; /* #FFFFFF - Pure white for cards */
+    --card-foreground: 30 41 59; /* #1E293B */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 249 11% 40%;
+    --popover: 255 255 255;
+    --popover-foreground: 30 41 59;
 
-    --primary: 245 84% 70%; /* #7367F0 */
-    --primary-foreground: 210 40% 98%; /* #FAFAFE */
+    --primary: 239 68 68; /* #EF4444 - Modern red primary */
+    --primary-foreground: 255 255 255; /* #FFFFFF */
 
-    --secondary: 250 100% 77%; /* #9C88FF */
-    --secondary-foreground: 0 0% 98%; /* #F9F9FC */
+    --secondary: 99 102 241; /* #6366F1 - Indigo secondary */
+    --secondary-foreground: 255 255 255; /* #FFFFFF */
 
-    --muted: 240 20% 95%; /* #F1F1F3 */
-    --muted-foreground: 251 5% 48%; /* #6E6B7B */
+    --muted: 241 245 249; /* #F1F5F9 - Slate 100 */
+    --muted-foreground: 100 116 139; /* #64748B - Slate 500 */
 
-    --accent: 250 100% 80%; /* Lighter shade of secondary for accents */
-    --accent-foreground: 249 11% 25%; /* Darker for contrast on accent */
+    --accent: 34 197 94; /* #22C55E - Green accent */
+    --accent-foreground: 255 255 255; /* #FFFFFF */
 
-    --destructive: 0 72% 51%; /* Slightly adjusted red for Vuexy feel: #EA5455 */
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 239 68 68; /* #EF4444 - Red for destructive actions */
+    --destructive-foreground: 255 255 255;
 
-    --border: 240 10% 90%; /* #E0E0E6 */
-    --input: 240 10% 90%; /* #E0E0E6 */
-    --ring: 245 84% 70%; /* #7367F0 */
+    --border: 226 232 240; /* #E2E8F0 - Slate 200 */
+    --input: 226 232 240; /* #E2E8F0 */
+    --ring: 239 68 68; /* #EF4444 - Primary for focus rings */
 
-    --radius: 0.5rem; /* Vuexy uses ~6px radius */
+    --radius: 0.75rem; /* 12px - More rounded corners */
 
-    /* Custom gradient colors based on new palette */
-    --wealth-gradient-start: 245 84% 70%; /* primary */
-    --wealth-gradient-end: 250 100% 77%; /* secondary */
+    /* Modern gradient colors */
+    --wealth-gradient-start: 239 68 68; /* primary red */
+    --wealth-gradient-end: 99 102 241; /* secondary indigo */
+    
+    /* Additional modern colors */
+    --success: 34 197 94; /* #22C55E - Green */
+    --warning: 245 158 11; /* #F59E0B - Amber */
+    --info: 59 130 246; /* #3B82F6 - Blue */
   }
 
   .dark {
-    --background: 249 11% 15%; /* Darker background for dark mode */
-    --foreground: 240 67% 95%;
+    --background: 2 6 23; /* #020617 - Very dark blue */
+    --foreground: 248 250 252; /* #F8FAFC */
 
-    --card: 249 11% 20%; /* Darker card */
-    --card-foreground: 240 67% 95%;
+    --card: 15 23 42; /* #0F172A - Dark slate */
+    --card-foreground: 248 250 252;
 
-    --popover: 249 11% 15%;
-    --popover-foreground: 240 67% 95%;
+    --popover: 15 23 42;
+    --popover-foreground: 248 250 252;
 
-    --primary: 245 84% 75%; /* Slightly lighter primary for dark mode */
-    --primary-foreground: 249 11% 10%;
+    --primary: 248 113 113; /* #F87171 - Lighter red for dark mode */
+    --primary-foreground: 15 23 42;
 
-    --secondary: 250 100% 80%; /* Slightly lighter secondary */
-    --secondary-foreground: 249 11% 10%;
+    --secondary: 129 140 248; /* #818CF8 - Lighter indigo */
+    --secondary-foreground: 15 23 42;
 
-    --muted: 249 11% 25%;
-    --muted-foreground: 240 20% 75%;
+    --muted: 30 41 59; /* #1E293B */
+    --muted-foreground: 148 163 184; /* #94A3B8 */
 
-    --accent: 250 100% 82%;
-    --accent-foreground: 249 11% 10%;
+    --accent: 74 222 128; /* #4ADE80 - Lighter green */
+    --accent-foreground: 15 23 42;
 
-    --destructive: 0 72% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 248 113 113;
+    --destructive-foreground: 248 250 252;
 
-    --border: 249 11% 30%;
-    --input: 249 11% 30%;
-    --ring: 245 84% 75%;
+    --border: 30 41 59;
+    --input: 30 41 59;
+    --ring: 248 113 113;
 
-    --wealth-gradient-start: 245 84% 75%;
-    --wealth-gradient-end: 250 100% 80%;
+    --wealth-gradient-start: 248 113 113;
+    --wealth-gradient-end: 129 140 248;
   }
 }
 
@@ -84,38 +89,84 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: 'Inter', sans-serif; /* Common font in Vuexy-like themes */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold text-foreground;
+    line-height: 1.2;
   }
+
+  h1 { @apply text-3xl lg:text-4xl; }
+  h2 { @apply text-2xl lg:text-3xl; }
+  h3 { @apply text-xl lg:text-2xl; }
+  h4 { @apply text-lg; }
 }
 
 @layer components {
-  /* Custom card styling for Vuexy feel */
+  /* Modern card styling */
   .card {
-    @apply rounded-lg border bg-card text-card-foreground shadow-lg; /* Default to a more prominent shadow */
+    @apply rounded-xl border bg-card text-card-foreground shadow-xl shadow-slate-200/50 backdrop-blur-sm;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-   /* Custom button styling for Vuexy feel */
-  .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary;
-  }
-  .btn-outline-primary {
-     @apply border-primary text-primary bg-transparent hover:bg-primary/10;
+  
+  .card:hover {
+    @apply shadow-2xl shadow-slate-300/60 -translate-y-1;
   }
 
-  /* Input styling */
-  .input {
-    @apply h-10 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
-    @apply transition-colors duration-200 ease-in-out; /* Smooth transition for focus */
+  /* Modern button styling */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:from-primary/90 hover:to-primary/80 focus:ring-primary shadow-lg shadow-primary/25;
+    transition: all 0.2s ease-in-out;
   }
+  
+  .btn-primary:hover {
+    @apply shadow-xl shadow-primary/40 -translate-y-0.5;
+  }
+  
+  .btn-outline-primary {
+    @apply border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground shadow-md hover:shadow-lg;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-secondary {
+    @apply bg-gradient-to-r from-secondary to-secondary/90 text-secondary-foreground hover:from-secondary/90 hover:to-secondary/80 shadow-lg shadow-secondary/25;
+  }
+
+  .btn-accent {
+    @apply bg-gradient-to-r from-accent to-accent/90 text-accent-foreground hover:from-accent/90 hover:to-accent/80 shadow-lg shadow-accent/25;
+  }
+
+  /* Enhanced input styling */
+  .input {
+    @apply h-12 rounded-xl border-2 border-input bg-background px-4 py-3 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  }
+  
   .input:focus-visible {
-    @apply border-primary; /* Use primary color for border on focus */
+    @apply border-primary shadow-lg shadow-primary/20;
+  }
+
+  /* Modern dialog styling */
+  .dialog-content {
+    @apply rounded-2xl border-0 bg-card/95 backdrop-blur-md shadow-2xl;
+  }
+
+  /* Enhanced badge styling */
+  .badge {
+    @apply rounded-full px-3 py-1 text-xs font-semibold shadow-sm;
+  }
+
+  /* Modern separator */
+  .separator {
+    @apply bg-gradient-to-r from-transparent via-border to-transparent;
   }
 }
 
 @layer utilities {
+  /* Modern gradients */
   .wealth-gradient {
     background: linear-gradient(135deg, hsl(var(--wealth-gradient-start)), hsl(var(--wealth-gradient-end)));
   }
@@ -127,30 +178,146 @@
     background-clip: text;
   }
 
-  /* Added subtle shadow for hover effects on interactive elements */
-  .hover-shadow-sm {
-    @apply transition-shadow duration-200 hover:shadow-sm;
+  .success-gradient {
+    background: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success))/90%);
   }
-  .hover-shadow-md {
-    @apply transition-shadow duration-200 hover:shadow-md;
+
+  .warning-gradient {
+    background: linear-gradient(135deg, hsl(var(--warning)), hsl(var(--warning))/90%);
+  }
+
+  .info-gradient {
+    background: linear-gradient(135deg, hsl(var(--info)), hsl(var(--info))/90%);
+  }
+
+  /* Enhanced shadow utilities */
+  .shadow-modern {
+    box-shadow: 0 10px 25px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+  }
+
+  .shadow-modern-lg {
+    box-shadow: 0 20px 40px -4px rgb(0 0 0 / 0.1), 0 8px 16px -4px rgb(0 0 0 / 0.07);
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.3);
+  }
+
+  /* Hover effect utilities */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 ease-out hover:shadow-glow;
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+
+  /* Spacing utilities for modern layouts */
+  .section-padding {
+    @apply px-6 py-8 lg:px-8 lg:py-12;
+  }
+
+  .container-modern {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); } /* Adjusted Y transform */
-  to { opacity: 1; transform: translateY(0); }
+/* Enhanced animations */
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); } /* Adjusted scale */
-  to { opacity: 1; transform: scale(1); }
+@keyframes scaleInBounce {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.8); 
+  }
+  60% { 
+    opacity: 1; 
+    transform: scale(1.05); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out; /* Slightly adjusted duration */
+@keyframes slideInRight {
+  from { 
+    opacity: 0; 
+    transform: translateX(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
 }
 
-.animate-scale-in {
-  animation: scaleIn 0.3s ease-out; /* Slightly adjusted duration */
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.3); 
+  }
+  50% { 
+    box-shadow: 0 0 30px -5px hsl(var(--primary) / 0.5); 
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-scale-in-bounce {
+  animation: scaleInBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Staggered animation delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* Modern scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+
+/* Selection styling */
+::selection {
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--primary-foreground));
 }

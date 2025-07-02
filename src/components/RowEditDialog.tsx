@@ -31,12 +31,14 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   defaultPACAmount
 }) => {
   const [returnRate, setReturnRate] = useState<number>(0);
+  const [returnInputValue, setReturnInputValue] = useState<string>('');
   const [pacAmount, setPacAmount] = useState<number>(0);
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (item) {
       setReturnRate(item.dailyReturn);
+      setReturnInputValue(item.dailyReturn.toString());
       setPacAmount(item.pacAmount);
       setHasChanges(false);
     }
@@ -72,9 +74,28 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   const handleCancel = () => {
     setReturnRate(item.dailyReturn);
+    setReturnInputValue(item.dailyReturn.toString());
     setPacAmount(item.pacAmount);
     setHasChanges(false);
     onOpenChange(false);
+  };
+
+  const handleReturnInputChange = (value: string) => {
+    setReturnInputValue(value);
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      setReturnRate(numValue);
+    }
+  };
+
+  const handleReturnInputBlur = () => {
+    const numValue = parseFloat(returnInputValue);
+    if (isNaN(numValue)) {
+      setReturnInputValue(returnRate.toString());
+    } else {
+      setReturnRate(numValue);
+      setReturnInputValue(numValue.toString());
+    }
   };
 
   // Calcolo preview dei risultati
@@ -125,11 +146,12 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                   <Label htmlFor="return-input" className="text-sm">Percentuale (%)</Label>
                   <Input
                     id="return-input"
-                    type="number"
-                    value={returnRate.toFixed(3)}
-                    onChange={(e) => setReturnRate(Number(e.target.value))}
-                    step={0.001}
+                    type="text"
+                    value={returnInputValue}
+                    onChange={(e) => handleReturnInputChange(e.target.value)}
+                    onBlur={handleReturnInputBlur}
                     className="font-mono"
+                    placeholder="0.000"
                   />
                 </div>
                 <div className="flex items-end">
@@ -146,7 +168,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                 <Label className="text-sm text-muted-foreground">Regola con il cursore</Label>
                 <Slider
                   value={[returnRate]}
-                  onValueChange={(value) => setReturnRate(value[0])}
+                  onValueChange={(value) => {
+                    setReturnRate(value[0]);
+                    setReturnInputValue(value[0].toString());
+                  }}
                   min={-10}
                   max={10}
                   step={0.01}
