@@ -280,20 +280,6 @@
 }
 
 @layer utilities {
-  /* Modernize color utilities */
-  .text-primary { @apply text-primary; }
-  .text-secondary { @apply text-slate-600; }
-  .text-muted { @apply text-slate-500; }
-  .text-success { @apply text-green-600; }
-  .text-warning { @apply text-yellow-600; }
-  .text-danger { @apply text-red-600; }
-
-  .bg-primary { @apply bg-primary; }
-  .bg-secondary { @apply bg-slate-100; }
-  .bg-success { @apply bg-green-100; }
-  .bg-warning { @apply bg-yellow-100; }
-  .bg-danger { @apply bg-red-100; }
-
   /* Modernize spacing */
   .space-modernize { @apply space-y-6; }
   .gap-modernize { @apply gap-6; }
