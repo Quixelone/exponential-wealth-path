@@ -3,48 +3,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Modernize Design System - Complete Clean Redesign */
+/* RESET CSS AGGRESSIVO - Eliminazione definitiva colori gialli */
+* {
+  background-color: inherit !important;
+}
 
+*:not(.bg-primary):not(.bg-green-500):not(.bg-green-600):not(.bg-red-500):not(.bg-red-600):not(.bg-blue-500):not(.bg-blue-600):not(.bg-orange-500):not(.bg-orange-600) {
+  background-color: white !important;
+}
+
+/* Forza background bianco su tutti gli elementi principali */
+html, body, #root {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+/* Modernize Design System - Pulito e Professionale */
 @layer base {
   :root {
-    /* Modernize Official Color Palette - Clean & Professional */
-    --background: 248 250 252; /* #f8fafc - Ultra clean background */
-    --foreground: 30 41 59; /* #1e293b - Professional dark text */
+    /* Modernize Official Color Palette - Senza gialli */
+    --background: 255 255 255; /* Bianco puro */
+    --foreground: 30 41 59; /* #1e293b - Testo scuro professionale */
 
-    --card: 255 255 255; /* Pure white cards */
+    --card: 255 255 255; /* Bianco puro per le carte */
     --card-foreground: 30 41 59; 
 
     --popover: 255 255 255;
     --popover-foreground: 30 41 59;
 
-    /* Primary - Modernize Blue (No more yellow!) */
-    --primary: 93 135 255; /* #5D87FF - Modernize signature blue */
+    /* Primary - Modernize Blue */
+    --primary: 59 130 246; /* #3b82f6 - Blue moderno */
     --primary-foreground: 255 255 255; 
 
-    /* Secondary - Professional Gray */
-    --secondary: 100 116 139; /* #64748b - Clean gray */
+    /* Secondary - Grigio professionale */
+    --secondary: 71 85 105; /* #475569 - Grigio slate */
     --secondary-foreground: 255 255 255; 
 
-    --muted: 248 250 252; 
+    --muted: 248 250 252; /* #f8fafc - Grigio molto chiaro */
     --muted-foreground: 100 116 139; 
 
-    /* Accent - Subtle Blue Accent */
-    --accent: 239 246 255; /* #eff6ff - Very light blue */
+    /* Accent - Blue chiaro */
+    --accent: 239 246 255; /* #eff6ff - Blue molto chiaro */
     --accent-foreground: 30 41 59; 
 
-    --destructive: 239 68 68; /* #ef4444 - Clean red */
+    --destructive: 239 68 68; /* #ef4444 - Rosso pulito */
     --destructive-foreground: 255 255 255;
 
-    --border: 226 232 240; /* #e2e8f0 - Subtle border */
-    --input: 255 255 255; /* White input background */
-    --ring: 93 135 255; 
+    --border: 226 232 240; /* #e2e8f0 - Bordo sottile */
+    --input: 255 255 255; /* Input bianco */
+    --ring: 59 130 246; /* Ring blue */
 
-    --radius: 0.5rem; /* Clean 8px radius */
+    --radius: 0.5rem;
 
-    /* Status Colors - Professional */
-    --success: 16 185 129; /* #10b981 - Clean green */
-    --warning: 245 158 11; /* #f59e0b - Subtle orange (not yellow!) */
-    --info: 59 130 246; /* #3b82f6 - Clean blue */
+    /* Status Colors - Senza gialli */
+    --success: 34 197 94; /* #22c55e - Verde pulito */
+    --warning: 251 146 60; /* #fb923c - Arancione elegante */
+    --info: 59 130 246; /* #3b82f6 - Blue informativo */
   }
 
   .dark {
@@ -54,7 +68,7 @@
     --card-foreground: 248 250 252;
     --popover: 30 41 59;
     --popover-foreground: 248 250 252;
-    --primary: 129 140 248; 
+    --primary: 99 102 241; 
     --primary-foreground: 15 23 42;
     --secondary: 51 65 85; 
     --secondary-foreground: 248 250 252;
@@ -66,193 +80,96 @@
     --destructive-foreground: 248 250 252;
     --border: 51 65 85;
     --input: 30 41 59;
-    --ring: 129 140 248;
+    --ring: 99 102 241;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    background-color: inherit !important;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white text-slate-900 !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    line-height: 1.6;
+    background-color: #ffffff !important;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold text-foreground;
-    line-height: 1.4;
+  /* Forza stili su elementi specifici */
+  .main-container {
+    background-color: #ffffff !important;
   }
 
-  h1 { @apply text-2xl md:text-3xl; }
-  h2 { @apply text-xl md:text-2xl; }
-  h3 { @apply text-lg md:text-xl; }
-  h4 { @apply text-base md:text-lg; }
+  .card-container {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+  }
 }
 
 @layer components {
-  /* Clean Card System - Minimalist Modernize Style */
-  .modernize-card {
-    @apply bg-white rounded-lg border border-slate-200 shadow-sm;
-    transition: all 0.2s ease;
-  }
-  
-  .modernize-card:hover {
-    @apply shadow-md border-slate-300;
+  /* Sistema di Carte Pulite */
+  .clean-card {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm p-6 !important;
+    background-color: #ffffff !important;
   }
 
-  .modernize-card-elevated {
-    @apply bg-white rounded-lg border border-slate-200 shadow-lg;
+  .clean-card:hover {
+    @apply shadow-md !important;
   }
 
-  /* Clean Button System - Professional */
-  .modernize-btn-primary {
-    @apply bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-md font-medium;
-    @apply transition-colors duration-200 shadow-sm;
+  /* Bottoni Puliti */
+  .clean-btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md font-medium !important;
+    @apply transition-colors duration-200 shadow-sm !important;
+    background-color: #2563eb !important;
   }
 
-  .modernize-btn-secondary {
-    @apply bg-white text-slate-700 border border-slate-300 hover:bg-slate-50;
-    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200 shadow-sm;
+  .clean-btn-secondary {
+    @apply bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 !important;
+    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200 shadow-sm !important;
+    background-color: #ffffff !important;
   }
 
-  .modernize-btn-outline {
-    @apply bg-transparent text-primary border border-primary hover:bg-primary hover:text-white;
-    @apply px-4 py-2 rounded-md font-medium transition-all duration-200;
+  /* Header Pulito */
+  .clean-header {
+    @apply bg-white border-b border-slate-200 shadow-sm !important;
+    background-color: #ffffff !important;
   }
 
-  /* Clean Input System */
-  .modernize-input {
-    @apply w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-md;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
-    @apply placeholder:text-slate-400 transition-colors duration-200;
+  /* Sidebar Pulita */
+  .clean-sidebar {
+    @apply bg-white border-r border-slate-200 !important;
+    background-color: #ffffff !important;
   }
 
-  /* Professional Header */
-  .modernize-header {
-    @apply bg-white border-b border-slate-200 shadow-sm;
+  /* Badge Puliti - Senza gialli */
+  .clean-badge-success {
+    @apply bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium !important;
   }
 
-  /* Clean Stats Cards */
-  .modernize-stats-card {
-    @apply bg-white rounded-lg p-6 border border-slate-200 shadow-sm;
-    transition: all 0.2s ease;
+  .clean-badge-warning {
+    @apply bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium !important;
   }
 
-  .modernize-stats-card:hover {
-    @apply shadow-md;
-  }
-
-  /* Professional Badge System */
-  .modernize-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  .modernize-badge-primary {
-    @apply bg-primary/10 text-primary;
-  }
-
-  .modernize-badge-success {
-    @apply bg-green-100 text-green-800;
-  }
-
-  .modernize-badge-warning {
-    @apply bg-orange-100 text-orange-800;
-  }
-
-  .modernize-badge-danger {
-    @apply bg-red-100 text-red-800;
-  }
-
-  /* Clean Container System */
-  .modernize-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  .modernize-section {
-    @apply py-8;
-  }
-
-  .modernize-grid {
-    @apply grid gap-6;
-  }
-
-  .modernize-grid-cols-1 { @apply grid-cols-1; }
-  .modernize-grid-cols-2 { @apply grid-cols-1 lg:grid-cols-2; }
-  .modernize-grid-cols-3 { @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3; }
-
-  /* Clean Table System */
-  .modernize-table {
-    @apply w-full bg-white rounded-lg border border-slate-200 overflow-hidden;
-  }
-
-  .modernize-table th {
-    @apply px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider;
-    @apply bg-slate-50 border-b border-slate-200;
-  }
-
-  .modernize-table td {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-slate-900 border-b border-slate-100;
-  }
-
-  .modernize-table tbody tr:hover {
-    @apply bg-slate-50;
-  }
-
-  /* Dialog System */
-  .modernize-dialog {
-    @apply bg-white rounded-lg border border-slate-200 shadow-xl;
-  }
-
-  .modernize-dialog-header {
-    @apply px-6 py-4 border-b border-slate-200;
-  }
-
-  .modernize-dialog-content {
-    @apply px-6 py-4;
-  }
-
-  .modernize-dialog-footer {
-    @apply px-6 py-4 border-t border-slate-200 flex justify-end gap-3;
+  .clean-badge-info {
+    @apply bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium !important;
   }
 }
 
-@layer utilities {
-  /* Clean Shadow System */
-  .shadow-modernize { 
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  }
-  
-  .shadow-modernize-md { 
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  }
-  
-  .shadow-modernize-lg { 
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  }
-
-  /* Clean Animations */
-  .animate-modernize-fade-in {
-    animation: fadeIn 0.3s ease-out;
-  }
+/* Forza eliminazione di tutti i background gialli */
+[class*="yellow"], [class*="amber"] {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
 }
 
-/* Clean Keyframes */
-@keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(10px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
+/* Forza stili specifici per warning in arancione */
+.warning-bg {
+  background-color: #fed7aa !important; /* orange-200 */
+  color: #ea580c !important; /* orange-600 */
 }
 
-/* Clean Scrollbar */
+/* Scrollbar pulita */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -268,10 +185,4 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-/* Professional Selection */
-::selection {
-  background: rgb(93 135 255 / 0.2);
-  color: rgb(93 135 255);
 }

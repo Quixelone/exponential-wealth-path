@@ -15,10 +15,10 @@ const UnsavedChangesAlert: React.FC<UnsavedChangesAlertProps> = ({
   onCancel,
 }) => (
   <AlertDialog open={open}>
-    <AlertDialogContent>
+    <AlertDialogContent className="clean-card">
       <AlertDialogHeader>
         <AlertDialogTitle className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-orange-500" />
+          <AlertTriangle className="h-5 w-5 text-orange-600" />
           Modifiche non salvate
         </AlertDialogTitle>
         <AlertDialogDescription>
@@ -26,8 +26,10 @@ const UnsavedChangesAlert: React.FC<UnsavedChangesAlertProps> = ({
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel onClick={onCancel}>Annulla</AlertDialogCancel>
-        <AlertDialogAction className="bg-green-600 hover:bg-green-700" onClick={onContinue}>
+        <AlertDialogCancel onClick={onCancel} className="clean-btn-secondary">
+          Annulla
+        </AlertDialogCancel>
+        <AlertDialogAction className="clean-btn-primary" onClick={onContinue}>
           Continua
         </AlertDialogAction>
       </AlertDialogFooter>

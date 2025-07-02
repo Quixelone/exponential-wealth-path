@@ -34,15 +34,15 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2">
+        <Button className="clean-btn-primary flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Nuova Configurazione
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="clean-card sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5 text-primary" />
+            <Plus className="h-5 w-5 text-blue-600" />
             Crea Nuova Configurazione
           </DialogTitle>
         </DialogHeader>
@@ -76,7 +76,7 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
             </div>
           )}
 
-          <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+          <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg warning-bg">
             <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
             <p className="text-sm text-orange-800">
               Le modifiche non salvate della configurazione corrente andranno perse.
@@ -84,12 +84,13 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" onClick={() => setOpen(false)} className="clean-btn-secondary">
               Annulla
             </Button>
             <Button
               onClick={handleCreate}
               disabled={!configName.trim()}
+              className="clean-btn-primary"
             >
               Crea Configurazione
             </Button>
