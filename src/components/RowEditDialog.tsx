@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { TrendingUp, TrendingDown, Calendar, PiggyBank, Percent, Save, X, Sparkles } from 'lucide-react';
+import { TrendingUp, TrendingDown, Calendar, PiggyBank, Percent, Save, X, Info } from 'lucide-react';
 import { InvestmentData } from '@/types/investment';
 import { formatCurrency, Currency } from '@/lib/utils';
 
@@ -82,7 +82,6 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   const handleReturnInputChange = (value: string) => {
     setReturnInputValue(value);
-    // Allow free typing - only update returnRate if it's a valid number
     const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
       setReturnRate(numValue);
@@ -92,10 +91,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   const handleReturnInputBlur = () => {
     const numValue = parseFloat(returnInputValue);
     if (isNaN(numValue)) {
-      // Reset to current returnRate if invalid
       setReturnInputValue(returnRate.toString());
     } else {
-      // Update both values to ensure consistency
       setReturnRate(numValue);
       setReturnInputValue(numValue.toString());
     }
@@ -109,45 +106,45 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="modernize-dialog max-w-4xl animate-modernize-scale-in">
+      <DialogContent className="modernize-dialog max-w-3xl">
         <div className="modernize-dialog-header">
-          <DialogTitle className="flex items-center gap-4 text-2xl font-bold text-slate-800">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
-              <Calendar className="h-6 w-6 text-white" />
+          <DialogTitle className="flex items-center gap-3 text-xl font-bold text-slate-900">
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+              <h2 className="text-xl font-bold text-slate-900">
                 Modifica Giorno {item.day}
               </h2>
-              <p className="text-slate-500 text-base font-medium mt-1">{formatDate(item.date)}</p>
+              <p className="text-slate-500 text-sm font-normal mt-1">{formatDate(item.date)}</p>
             </div>
           </DialogTitle>
         </div>
 
-        <div className="modernize-dialog-content space-y-10">
-          {/* Premium Current Info Cards */}
-          <div className="grid grid-cols-2 gap-6">
+        <div className="modernize-dialog-content space-y-6">
+          {/* Current Info Cards */}
+          <div className="grid grid-cols-2 gap-4">
             <div className="modernize-stats-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                  <Sparkles className="h-5 w-5 text-white" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Info className="h-4 w-4 text-blue-600" />
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Capitale Iniziale</div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                  <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Capitale Iniziale</div>
+                  <div className="text-lg font-bold text-slate-900">
                     {formatCurrency(item.capitalBeforePAC, currency)}
                   </div>
                 </div>
               </div>
             </div>
             <div className="modernize-stats-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-white" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="h-4 w-4 text-green-600" />
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Capitale Finale Attuale</div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                  <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">Capitale Finale Attuale</div>
+                  <div className="text-lg font-bold text-slate-900">
                     {formatCurrency(item.finalCapital, currency)}
                   </div>
                 </div>
@@ -155,171 +152,165 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             </div>
           </div>
 
-          <div className="border-t border-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+          <Separator />
 
-          {/* Premium Return Rate Section */}
-          <div className="modernize-form-section">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <Percent className="h-6 w-6 text-white" />
+          {/* Return Rate Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <Percent className="h-4 w-4 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-800">Rendimento Giornaliero</h3>
-                <p className="text-slate-500 mt-1">Personalizza il rendimento per questo giorno specifico</p>
+                <h3 className="text-lg font-semibold text-slate-900">Rendimento Giornaliero</h3>
+                <p className="text-slate-500 text-sm">Personalizza il rendimento per questo giorno specifico</p>
                 {item.isCustomReturn && (
-                  <span className="modernize-badge modernize-badge-primary mt-2 inline-flex items-center gap-1">
-                    <Sparkles className="h-3 w-3" />
+                  <Badge className="modernize-badge-primary mt-1">
                     Personalizzato
-                  </span>
+                  </Badge>
                 )}
               </div>
             </div>
             
-            <div className="modernize-form-group">
-              <div className="grid grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <Label className="modernize-form-label text-base">Percentuale (%)</Label>
-                  <Input
-                    type="text"
-                    value={returnInputValue}
-                    onChange={(e) => handleReturnInputChange(e.target.value)}
-                    onBlur={handleReturnInputBlur}
-                    className="modernize-input text-lg font-mono h-14"
-                    placeholder="0.000"
-                  />
-                </div>
-                <div className="flex items-end">
-                  <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 w-full">
-                    <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Ricavo Stimato</div>
-                    <div className={`flex items-center gap-3 text-2xl font-bold ${
-                      returnRate >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {returnRate >= 0 ? 
-                        <TrendingUp className="h-6 w-6" /> : 
-                        <TrendingDown className="h-6 w-6" />
-                      }
-                      <span>
-                        {returnRate >= 0 ? '+' : ''}{formatCurrency(newDailyGain, currency)}
-                      </span>
-                    </div>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-slate-700">Percentuale (%)</Label>
+                <Input
+                  type="text"
+                  value={returnInputValue}
+                  onChange={(e) => handleReturnInputChange(e.target.value)}
+                  onBlur={handleReturnInputBlur}
+                  className="modernize-input font-mono"
+                  placeholder="0.000"
+                />
+              </div>
+              <div className="flex items-end">
+                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 w-full">
+                  <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Ricavo Stimato</div>
+                  <div className={`flex items-center gap-2 text-lg font-bold ${
+                    returnRate >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {returnRate >= 0 ? 
+                      <TrendingUp className="h-4 w-4" /> : 
+                      <TrendingDown className="h-4 w-4" />
+                    }
+                    <span>
+                      {returnRate >= 0 ? '+' : ''}{formatCurrency(newDailyGain, currency)}
+                    </span>
                   </div>
                 </div>
               </div>
-              
-              <div className="mt-8">
-                <Label className="modernize-form-label text-base mb-4 block">Regola con il cursore</Label>
-                <div className="px-4">
-                  <Slider
-                    value={[returnRate]}
-                    onValueChange={(value) => {
-                      setReturnRate(value[0]);
-                      setReturnInputValue(value[0].toString());
-                    }}
-                    min={-10}
-                    max={10}
-                    step={0.01}
-                    className="w-full h-3"
-                  />
-                  <div className="flex justify-between text-sm font-semibold text-slate-400 mt-3">
-                    <span>-10%</span>
-                    <span>0%</span>
-                    <span>+10%</span>
-                  </div>
+            </div>
+            
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-slate-700">Regola con il cursore</Label>
+              <div className="px-2">
+                <Slider
+                  value={[returnRate]}
+                  onValueChange={(value) => {
+                    setReturnRate(value[0]);
+                    setReturnInputValue(value[0].toString());
+                  }}
+                  min={-10}
+                  max={10}
+                  step={0.01}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-slate-400 mt-2">
+                  <span>-10%</span>
+                  <span>0%</span>
+                  <span>+10%</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+          <Separator />
 
-          {/* Premium PAC Section */}
-          <div className="modernize-form-section">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <PiggyBank className="h-6 w-6 text-white" />
+          {/* PAC Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <PiggyBank className="h-4 w-4 text-green-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-800">Versamento PAC</h3>
-                <p className="text-slate-500 mt-1">Modifica l'importo del versamento per questo giorno</p>
+                <h3 className="text-lg font-semibold text-slate-900">Versamento PAC</h3>
+                <p className="text-slate-500 text-sm">Modifica l'importo del versamento per questo giorno</p>
                 {item.isCustomPAC && (
-                  <span className="modernize-badge modernize-badge-success mt-2 inline-flex items-center gap-1">
-                    <Sparkles className="h-3 w-3" />
+                  <Badge className="modernize-badge-success mt-1">
                     Personalizzato
-                  </span>
+                  </Badge>
                 )}
               </div>
             </div>
             
-            <div className="modernize-form-group">
-              <div className="grid grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <Label className="modernize-form-label text-base">Importo ({currency})</Label>
-                  <Input
-                    type="number"
-                    value={pacAmount.toFixed(2)}
-                    onChange={(e) => setPacAmount(Number(e.target.value))}
-                    min={0}
-                    step={1}
-                    className="modernize-input text-lg font-mono h-14"
-                  />
-                </div>
-                <div className="flex items-end">
-                  <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 w-full">
-                    <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Differenza da Default</div>
-                    <div className={`text-2xl font-bold ${
-                      pacDifference > 0 ? 'text-green-600' : 
-                      pacDifference < 0 ? 'text-red-600' : 'text-slate-500'
-                    }`}>
-                      {pacDifference > 0 ? '+' : ''}{formatCurrency(pacDifference, currency)}
-                    </div>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-slate-700">Importo ({currency})</Label>
+                <Input
+                  type="number"
+                  value={pacAmount.toFixed(2)}
+                  onChange={(e) => setPacAmount(Number(e.target.value))}
+                  min={0}
+                  step={1}
+                  className="modernize-input font-mono"
+                />
+              </div>
+              <div className="flex items-end">
+                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 w-full">
+                  <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Differenza da Default</div>
+                  <div className={`text-lg font-bold ${
+                    pacDifference > 0 ? 'text-green-600' : 
+                    pacDifference < 0 ? 'text-red-600' : 'text-slate-500'
+                  }`}>
+                    {pacDifference > 0 ? '+' : ''}{formatCurrency(pacDifference, currency)}
                   </div>
                 </div>
               </div>
-              
-              <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <div className="text-sm font-semibold text-blue-800">
-                  💡 PAC predefinito: {formatCurrency(defaultPACAmount, currency)}
-                </div>
+            </div>
+            
+            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="text-sm font-medium text-blue-800">
+                💡 PAC predefinito: {formatCurrency(defaultPACAmount, currency)}
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+          <Separator />
 
-          {/* Premium Preview Results */}
-          <div className="modernize-form-section">
-            <h3 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-3">
-              <Sparkles className="h-5 w-5 text-primary" />
+          {/* Preview Results */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+              <Info className="h-4 w-4 text-primary" />
               Anteprima Risultati
             </h3>
-            <div className="grid grid-cols-3 gap-6">
-              <div className="modernize-stats-card bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200">
-                <div className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Capitale Post-PAC</div>
-                <div className="text-xl font-bold text-blue-800 font-mono">{formatCurrency(newCapitalAfterPAC, currency)}</div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="modernize-stats-card bg-blue-50 border-blue-200">
+                <div className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1">Capitale Post-PAC</div>
+                <div className="text-lg font-bold text-blue-800 font-mono">{formatCurrency(newCapitalAfterPAC, currency)}</div>
               </div>
-              <div className="modernize-stats-card bg-gradient-to-br from-emerald-50 to-teal-100 border-emerald-200">
-                <div className="text-sm font-semibold text-emerald-600 uppercase tracking-wide mb-2">Ricavo Giorno</div>
-                <div className={`text-xl font-bold font-mono ${newDailyGain >= 0 ? 'text-emerald-800' : 'text-red-600'}`}>
+              <div className="modernize-stats-card bg-green-50 border-green-200">
+                <div className="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">Ricavo Giorno</div>
+                <div className={`text-lg font-bold font-mono ${newDailyGain >= 0 ? 'text-green-800' : 'text-red-600'}`}>
                   {formatCurrency(newDailyGain, currency)}
                 </div>
               </div>
-              <div className="modernize-stats-card bg-gradient-to-br from-purple-50 to-pink-100 border-purple-200">
-                <div className="text-sm font-semibold text-purple-600 uppercase tracking-wide mb-2">Capitale Finale</div>
-                <div className="text-xl font-bold text-purple-800 font-mono">{formatCurrency(newFinalCapital, currency)}</div>
+              <div className="modernize-stats-card bg-purple-50 border-purple-200">
+                <div className="text-xs font-medium text-purple-600 uppercase tracking-wide mb-1">Capitale Finale</div>
+                <div className="text-lg font-bold text-purple-800 font-mono">{formatCurrency(newFinalCapital, currency)}</div>
               </div>
             </div>
           </div>
         </div>
 
         <div className="modernize-dialog-footer">
-          <Button variant="outline" onClick={handleCancel} className="modernize-btn-secondary h-12 px-8">
+          <Button variant="outline" onClick={handleCancel} className="modernize-btn-secondary">
             <X className="h-4 w-4 mr-2" />
             Annulla
           </Button>
           <Button 
             onClick={handleSave} 
             disabled={!hasChanges}
-            className="modernize-btn-primary h-12 px-8"
+            className="modernize-btn-primary"
           >
             <Save className="h-4 w-4 mr-2" />
             {hasChanges ? 'Salva Modifiche' : 'Nessuna Modifica'}

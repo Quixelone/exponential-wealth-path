@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -75,9 +76,9 @@ const Index = () => {
   if (authLoading) {
     console.log('⏳ Showing loading screen - auth still loading');
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary mx-auto mb-6"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary/20 border-t-primary mx-auto mb-4"></div>
           <p className="text-slate-600 font-medium">Caricamento dati utente...</p>
         </div>
       </div>
@@ -162,109 +163,109 @@ const Index = () => {
 
   return (
     <ModernTooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-100/30">
-        {/* Premium Modernize Header */}
-        <div className="modernize-header backdrop-blur-sm bg-white/90 sticky top-0 z-50">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <TrendingUp className="h-5 w-5 text-white" />
+      <div className="min-h-screen bg-background">
+        {/* Clean Professional Header */}
+        <div className="modernize-header sticky top-0 z-50">
+          <div className="modernize-container">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                    <TrendingUp className="h-4 w-4 text-white" />
+                  </div>
+                  <h1 className="text-xl font-bold text-slate-900">
+                    Finanza Creativa
+                  </h1>
+                </div>
+                {isAdmin && (
+                  <span className="modernize-badge modernize-badge-primary">
+                    <User className="h-3 w-3 mr-1" />
+                    Admin
+                  </span>
+                )}
+                {hasUnsavedChanges && (
+                  <span className="modernize-badge modernize-badge-warning animate-pulse">
+                    <Bell className="h-3 w-3 mr-1" />
+                    Modifiche non salvate
+                  </span>
+                )}
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                Finanza Creativa
-              </h1>
-            </div>
-            {isAdmin && (
-              <span className="modernize-badge modernize-badge-primary animate-modernize-bounce-in">
-                <User className="h-3 w-3 mr-1" />
-                Admin
-              </span>
-            )}
-            {hasUnsavedChanges && (
-              <span className="modernize-badge modernize-badge-warning animate-pulse">
-                <Bell className="h-3 w-3 mr-1" />
-                Modifiche non salvate
-              </span>
-            )}
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-xl border border-slate-200">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <User className="h-4 w-4 text-white" />
-              </div>
-              <span className="text-sm font-semibold text-slate-700">{displayName}</span>
-            </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSettingsClick}
-              className="modernize-btn-secondary h-11"
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Impostazioni
-            </Button>
+              
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-md border border-slate-200">
+                  <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
+                    <User className="h-3 w-3 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-slate-700">{displayName}</span>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSettingsClick}
+                  className="modernize-btn-secondary"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Impostazioni
+                </Button>
 
-            {isAdmin && (
-              <button
-                onClick={handleUserManagementClick}
-                className="modernize-btn-secondary h-11 flex items-center gap-2"
-              >
-                <Users className="h-4 w-4" />
-                Gestione Utenti
-              </button>
-            )}
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleLogout} 
-              className="modernize-btn-outline h-11"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
+                {isAdmin && (
+                  <button
+                    onClick={handleUserManagementClick}
+                    className="modernize-btn-secondary flex items-center gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    Gestione Utenti
+                  </button>
+                )}
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleLogout} 
+                  className="modernize-btn-outline"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Premium Main Content */}
+        {/* Clean Main Content */}
         <div className="modernize-container modernize-section">
-          <div className="modernize-tabs animate-modernize-fade-in">
+          <div className="modernize-card animate-modernize-fade-in">
             <Tabs defaultValue="investments" className="w-full">
-              <div className="modernize-tab-header">
-                <TabsList className="bg-transparent border-0 p-0 h-auto gap-12">
+              <div className="px-6 py-4 border-b border-slate-200">
+                <TabsList className="bg-slate-100 p-1 rounded-md">
                   <TabsTrigger 
                     value="investments" 
-                    className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-3 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none pb-4 border-b-3 border-transparent text-base font-semibold transition-all duration-300 hover:text-primary/70"
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm px-4 py-2 text-sm font-medium transition-all"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                        <TrendingUp className="h-4 w-4 text-white" />
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
                       Dashboard Investimenti
                     </div>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="reminders" 
-                    className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-3 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none pb-4 border-b-3 border-transparent text-base font-semibold transition-all duration-300 hover:text-primary/70"
+                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm px-4 py-2 text-sm font-medium transition-all"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-orange to-warning rounded-lg flex items-center justify-center">
-                        <Bell className="h-4 w-4 text-white" />
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-4 w-4" />
                       Promemoria Pagamenti
                     </div>
                   </TabsTrigger>
                 </TabsList>
               </div>
               
-              <div className="modernize-tab-content">
+              <div className="p-6">
                 <TabsContent value="investments" className="mt-0">
-                  <div className="modernize-grid modernize-grid-cols-3 gap-8">
-                    {/* Premium Configuration Panel */}
+                  <div className="modernize-grid modernize-grid-cols-3">
+                    {/* Clean Configuration Panel */}
                     <div className="lg:col-span-1">
-                      <div className="modernize-card-elevated animate-modernize-slide-up">
+                      <div className="modernize-card-elevated">
                         <ConfigurationPanel
                           config={config}
                           onConfigChange={updateConfig}
@@ -289,17 +290,17 @@ const Index = () => {
                       </div>
                     </div>
 
-                    {/* Premium Charts and Results */}
-                    <div className="lg:col-span-2 space-modernize">
-                      <div className="modernize-card-elevated animate-modernize-scale-in">
+                    {/* Clean Charts and Results */}
+                    <div className="lg:col-span-2 space-y-6">
+                      <div className="modernize-card-elevated">
                         <InvestmentSummary summary={summary} currency={config.currency} />
                       </div>
                       
-                      <div className="modernize-chart-container animate-modernize-fade-in" style={{ animationDelay: '0.2s' }}>
+                      <div className="modernize-card-elevated">
                         <InvestmentChart data={investmentData} currency={config.currency} />
                       </div>
                       
-                      <div className="modernize-card-elevated animate-modernize-slide-up" style={{ animationDelay: '0.4s' }}>
+                      <div className="modernize-card-elevated">
                         <ReportTable 
                           data={investmentData} 
                           currency={config.currency}
@@ -316,7 +317,7 @@ const Index = () => {
                 </TabsContent>
 
                 <TabsContent value="reminders" className="mt-0">
-                  <div className="modernize-card-elevated animate-modernize-fade-in">
+                  <div className="modernize-card-elevated">
                     <PaymentReminders />
                   </div>
                 </TabsContent>
