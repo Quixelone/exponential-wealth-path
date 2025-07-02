@@ -82,6 +82,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   const handleReturnInputChange = (value: string) => {
     setReturnInputValue(value);
+    // Allow free typing - only update returnRate if it's a valid number
     const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
       setReturnRate(numValue);
@@ -91,14 +92,16 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   const handleReturnInputBlur = () => {
     const numValue = parseFloat(returnInputValue);
     if (isNaN(numValue)) {
+      // Reset to current returnRate if invalid
       setReturnInputValue(returnRate.toString());
     } else {
+      // Update both values to ensure consistency
       setReturnRate(numValue);
       setReturnInputValue(numValue.toString());
     }
   };
 
-  // Calcolo preview dei risultati
+  // Preview calculations
   const newCapitalAfterPAC = item.capitalBeforePAC + pacAmount;
   const newDailyGain = newCapitalAfterPAC * (returnRate / 100);
   const newFinalCapital = newCapitalAfterPAC + newDailyGain;
@@ -106,66 +109,71 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Calendar className="h-6 w-6 text-primary" />
+      <DialogContent className="modernize-dialog max-w-2xl">
+        <div className="modernize-dialog-header">
+          <DialogTitle className="flex items-center gap-3 text-xl font-semibold text-slate-800">
+            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+              <Calendar className="h-4 w-4 text-primary" />
+            </div>
             Modifica Giorno {item.day}
           </DialogTitle>
-          <p className="text-muted-foreground">{formatDate(item.date)}</p>
-        </DialogHeader>
+          <p className="text-slate-500 mt-1">{formatDate(item.date)}</p>
+        </div>
 
-        <div className="space-y-6">
-          {/* Informazioni attuali */}
-          <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">Capitale Iniziale</Label>
-              <p className="text-lg font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</p>
+        <div className="modernize-dialog-content space-y-6">
+          {/* Current Info Cards */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="modernize-stats-card">
+              <div className="text-sm text-slate-500 mb-1">Capitale Iniziale</div>
+              <div className="text-lg font-semibold text-slate-800">{formatCurrency(item.capitalBeforePAC, currency)}</div>
             </div>
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">Capitale Finale Attuale</Label>
-              <p className="text-lg font-mono">{formatCurrency(item.finalCapital, currency)}</p>
+            <div className="modernize-stats-card">
+              <div className="text-sm text-slate-500 mb-1">Capitale Finale Attuale</div>
+              <div className="text-lg font-semibold text-slate-800">{formatCurrency(item.finalCapital, currency)}</div>
             </div>
           </div>
 
-          <Separator />
+          <div className="border-t border-slate-200"></div>
 
-          {/* Modifica Rendimento */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Percent className="h-5 w-5 text-primary" />
-              <Label className="text-base font-medium">Rendimento Giornaliero</Label>
-              {item.isCustomReturn && (
-                <Badge variant="secondary" className="text-xs">Personalizzato</Badge>
-              )}
+          {/* Return Rate Section */}
+          <div className="modernize-form-section">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Percent className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-800">Rendimento Giornaliero</h3>
+                {item.isCustomReturn && (
+                  <span className="modernize-badge modernize-badge-primary text-xs mt-1">Personalizzato</span>
+                )}
+              </div>
             </div>
             
-            <div className="space-y-3">
+            <div className="modernize-form-group">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="return-input" className="text-sm">Percentuale (%)</Label>
+                  <Label className="modernize-form-label">Percentuale (%)</Label>
                   <Input
-                    id="return-input"
                     type="text"
                     value={returnInputValue}
                     onChange={(e) => handleReturnInputChange(e.target.value)}
                     onBlur={handleReturnInputBlur}
-                    className="font-mono"
+                    className="modernize-input font-mono"
                     placeholder="0.000"
                   />
                 </div>
                 <div className="flex items-end">
-                  <div className={`flex items-center gap-1 ${returnRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className={`flex items-center gap-2 ${returnRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {returnRate >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                    <span className="font-medium">
+                    <span className="font-semibold">
                       {returnRate >= 0 ? '+' : ''}{formatCurrency(newDailyGain, currency)}
                     </span>
                   </div>
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Regola con il cursore</Label>
+              <div className="mt-4">
+                <Label className="modernize-form-label text-xs text-slate-500">Regola con il cursore</Label>
                 <Slider
                   value={[returnRate]}
                   onValueChange={(value) => {
@@ -175,9 +183,9 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                   min={-10}
                   max={10}
                   step={0.01}
-                  className="w-full"
+                  className="w-full mt-2"
                 />
-                <div className="flex justify-between text-xs text-muted-foreground">
+                <div className="flex justify-between text-xs text-slate-400 mt-1">
                   <span>-10%</span>
                   <span>0%</span>
                   <span>+10%</span>
@@ -186,38 +194,41 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             </div>
           </div>
 
-          <Separator />
+          <div className="border-t border-slate-200"></div>
 
-          {/* Modifica PAC */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <PiggyBank className="h-5 w-5 text-primary" />
-              <Label className="text-base font-medium">Versamento PAC</Label>
-              {item.isCustomPAC && (
-                <Badge variant="secondary" className="text-xs">Personalizzato</Badge>
-              )}
+          {/* PAC Section */}
+          <div className="modernize-form-section">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                <PiggyBank className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-800">Versamento PAC</h3>
+                {item.isCustomPAC && (
+                  <span className="modernize-badge modernize-badge-primary text-xs mt-1">Personalizzato</span>
+                )}
+              </div>
             </div>
             
-            <div className="space-y-3">
+            <div className="modernize-form-group">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="pac-input" className="text-sm">Importo ({currency})</Label>
+                  <Label className="modernize-form-label">Importo ({currency})</Label>
                   <Input
-                    id="pac-input"
                     type="number"
                     value={pacAmount.toFixed(2)}
                     onChange={(e) => setPacAmount(Number(e.target.value))}
                     min={0}
                     step={1}
-                    className="font-mono"
+                    className="modernize-input font-mono"
                   />
                 </div>
                 <div className="flex items-end">
-                  <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Differenza da default</Label>
-                    <div className={`text-sm font-medium ${
+                  <div>
+                    <div className="text-xs text-slate-500 mb-1">Differenza da default</div>
+                    <div className={`text-sm font-semibold ${
                       pacDifference > 0 ? 'text-green-600' : 
-                      pacDifference < 0 ? 'text-red-600' : 'text-muted-foreground'
+                      pacDifference < 0 ? 'text-red-600' : 'text-slate-500'
                     }`}>
                       {pacDifference > 0 ? '+' : ''}{formatCurrency(pacDifference, currency)}
                     </div>
@@ -225,50 +236,49 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                 </div>
               </div>
               
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-slate-500 mt-2">
                 PAC predefinito: {formatCurrency(defaultPACAmount, currency)}
               </div>
             </div>
           </div>
 
-          <Separator />
+          <div className="border-t border-slate-200"></div>
 
-          {/* Preview Risultati */}
-          <div className="space-y-3">
-            <Label className="text-base font-medium">Anteprima Risultati</Label>
-            <div className="grid grid-cols-3 gap-4 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-              <div>
-                <Label className="text-sm text-muted-foreground">Capitale Post-PAC</Label>
-                <p className="font-mono text-sm">{formatCurrency(newCapitalAfterPAC, currency)}</p>
+          {/* Preview Results */}
+          <div className="modernize-form-section">
+            <h3 className="font-semibold text-slate-800 mb-4">Anteprima Risultati</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="modernize-stats-card">
+                <div className="text-xs text-slate-500 mb-1">Capitale Post-PAC</div>
+                <div className="font-mono text-sm font-semibold">{formatCurrency(newCapitalAfterPAC, currency)}</div>
               </div>
-              <div>
-                <Label className="text-sm text-muted-foreground">Ricavo Giorno</Label>
-                <p className={`font-mono text-sm ${newDailyGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <div className="modernize-stats-card">
+                <div className="text-xs text-slate-500 mb-1">Ricavo Giorno</div>
+                <div className={`font-mono text-sm font-semibold ${newDailyGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {formatCurrency(newDailyGain, currency)}
-                </p>
+                </div>
               </div>
-              <div>
-                <Label className="text-sm text-muted-foreground">Capitale Finale</Label>
-                <p className="font-mono text-sm font-semibold">{formatCurrency(newFinalCapital, currency)}</p>
+              <div className="modernize-stats-card">
+                <div className="text-xs text-slate-500 mb-1">Capitale Finale</div>
+                <div className="font-mono text-sm font-semibold text-slate-800">{formatCurrency(newFinalCapital, currency)}</div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Azioni */}
-          <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={handleCancel}>
-              <X className="h-4 w-4 mr-2" />
-              Annulla
-            </Button>
-            <Button 
-              onClick={handleSave} 
-              disabled={!hasChanges}
-              className="bg-primary hover:bg-primary/90"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {hasChanges ? 'Salva Modifiche' : 'Nessuna Modifica'}
-            </Button>
-          </div>
+        <div className="modernize-dialog-footer">
+          <Button variant="outline" onClick={handleCancel} className="modernize-btn-secondary">
+            <X className="h-4 w-4 mr-2" />
+            Annulla
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            disabled={!hasChanges}
+            className="modernize-btn-primary"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {hasChanges ? 'Salva Modifiche' : 'Nessuna Modifica'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
