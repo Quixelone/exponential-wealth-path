@@ -53,7 +53,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              €{summary.finalValue.toLocaleString()}
+              €{summary.final.finalCapital.toLocaleString()}
             </div>
           </CardContent>
         </Card>
@@ -67,7 +67,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              {summary.totalReturn.toFixed(2)}%
+              {summary.final.totalReturn.toFixed(2)}%
             </div>
           </CardContent>
         </Card>
@@ -81,7 +81,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              €{summary.totalInvested.toLocaleString()}
+              €{summary.final.totalInvested.toLocaleString()}
             </div>
           </CardContent>
         </Card>
@@ -95,7 +95,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              €{summary.totalProfit.toLocaleString()}
+              €{summary.final.totalInterest.toLocaleString()}
             </div>
           </CardContent>
         </Card>

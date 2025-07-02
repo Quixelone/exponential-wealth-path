@@ -87,10 +87,10 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              €{summary.finalValue.toLocaleString()}
+              €{summary.final.finalCapital.toLocaleString()}
             </div>
             <p className="text-xs text-green-600 mt-1">
-              +{summary.totalReturn.toFixed(1)}%
+              +{summary.final.totalReturn.toFixed(1)}%
             </p>
           </CardContent>
         </Card>

@@ -37,6 +37,24 @@ export default function ConfigurationsPage() {
     loadSavedConfiguration(savedConfig);
   };
 
+  const handleSaveCurrentConfiguration = async () => {
+    if (!currentConfigName) {
+      const name = prompt('Nome della configurazione:');
+      if (name) {
+        await saveCurrentConfiguration(name);
+      }
+    } else {
+      await saveCurrentConfiguration(currentConfigName);
+    }
+  };
+
+  const handleCreateNewConfiguration = () => {
+    const name = prompt('Nome della nuova configurazione:');
+    if (name) {
+      createNewConfiguration(name, false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -98,14 +116,14 @@ export default function ConfigurationsPage() {
           <CardContent>
             <div className="space-y-2">
               <button
-                onClick={() => saveCurrentConfiguration()}
+                onClick={handleSaveCurrentConfiguration}
                 disabled={!hasUnsavedChanges}
                 className="w-full text-left px-3 py-2 text-sm bg-green-50 text-green-700 rounded-md hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Salva Modifiche
               </button>
               <button
-                onClick={() => createNewConfiguration('Nuova Configurazione', false)}
+                onClick={handleCreateNewConfiguration}
                 className="w-full text-left px-3 py-2 text-sm bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100"
               >
                 Nuova Configurazione
@@ -131,7 +149,7 @@ export default function ConfigurationsPage() {
             savedConfigs={savedConfigs}
             onLoadConfiguration={handleLoadConfigWithWarning}
             onDeleteConfiguration={deleteConfiguration}
-            onSaveConfiguration={saveCurrentConfiguration}
+            onSaveConfiguration={handleSaveCurrentConfiguration}
             onUpdateConfiguration={updateCurrentConfiguration}
             currentConfigId={currentConfigId}
             currentConfigName={currentConfigName}
