@@ -49,9 +49,11 @@ export default function ConfigurationsPage() {
   };
 
   const handleCreateNewConfiguration = () => {
-    const name = prompt('Nome della nuova configurazione:');
-    if (name) {
-      createNewConfiguration(name, false);
+    const confirmCreate = window.confirm(
+      'Sei sicuro di voler creare una nuova configurazione? Tutte le modifiche non salvate andranno perse.'
+    );
+    if (confirmCreate) {
+      createNewConfiguration();
     }
   };
 
