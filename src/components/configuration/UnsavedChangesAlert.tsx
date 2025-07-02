@@ -18,7 +18,7 @@ const UnsavedChangesAlert: React.FC<UnsavedChangesAlertProps> = ({
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-amber-500" />
+          <AlertTriangle className="h-5 w-5 text-orange-500" />
           Modifiche non salvate
         </AlertDialogTitle>
         <AlertDialogDescription>

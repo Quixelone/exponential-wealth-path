@@ -76,9 +76,9 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
             </div>
           )}
 
-          <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-            <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-amber-800">
+          <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+            <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-orange-800">
               Le modifiche non salvate della configurazione corrente andranno perse.
             </p>
           </div>
