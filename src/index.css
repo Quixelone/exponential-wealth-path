@@ -11,7 +11,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --primary: 210 100% 50%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
@@ -23,8 +23,10 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 210 100% 50%;
     --radius: 0.5rem;
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
   }
 }
 
@@ -32,7 +34,84 @@
   * {
     @apply border-border;
   }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+  
+  #root {
+    min-height: 100vh;
+    width: 100%;
+  }
+}
+
+@layer components {
+  .app-header {
+    @apply bg-white border-b border-border shadow-sm;
+  }
+  
+  .app-sidebar {
+    @apply bg-white border-r border-border shadow-sm;
+  }
+  
+  .main-content {
+    @apply flex-1 bg-gray-50 min-h-screen;
+  }
+  
+  .page-container {
+    @apply max-w-7xl mx-auto p-4 sm:p-6;
+  }
+  
+  .page-title {
+    @apply text-2xl sm:text-3xl font-bold text-foreground mb-2;
+  }
+  
+  .page-subtitle {
+    @apply text-muted-foreground mb-6;
+  }
+  
+  .stats-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6;
+  }
+  
+  .stat-card {
+    @apply bg-white rounded-lg border border-border p-4 shadow-sm;
+  }
+  
+  .stat-value {
+    @apply text-xl sm:text-2xl font-bold text-foreground;
+  }
+  
+  .stat-label {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+  
+  .nav-button {
+    @apply flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors;
+  }
+  
+  .nav-button-active {
+    @apply bg-primary text-primary-foreground;
+  }
+  
+  .nav-button-inactive {
+    @apply text-muted-foreground hover:text-foreground hover:bg-accent;
+  }
+}
+
+@layer utilities {
+  .text-success {
+    color: hsl(var(--success));
+  }
+  
+  .bg-success {
+    background-color: hsl(var(--success));
+  }
+  
+  .border-success {
+    border-color: hsl(var(--success));
   }
 }

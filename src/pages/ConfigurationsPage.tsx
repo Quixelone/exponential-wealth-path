@@ -58,116 +58,114 @@ export default function ConfigurationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-            <Settings className="h-8 w-8 text-blue-600" />
-            Gestione Configurazioni
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Configura e gestisci le tue strategie di investimento
-          </p>
-        </div>
+    <div className="page-container">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="page-title flex items-center gap-3">
+          <Settings className="h-8 w-8 text-primary" />
+          Gestione Configurazioni
+        </h1>
+        <p className="page-subtitle">
+          Configura e gestisci le tue strategie di investimento
+        </p>
+      </div>
 
-        {/* Status Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-white border border-slate-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Configurazione Attiva
-              </CardTitle>
-              <Settings className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl font-bold text-slate-900">
-                {currentConfigName || 'Nessuna configurazione'}
-              </div>
-              {hasUnsavedChanges && (
-                <div className="mt-2">
-                  <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
-                    Modifiche non salvate
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white border border-slate-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Configurazioni Salvate
-              </CardTitle>
-              <Save className="h-4 w-4 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl font-bold text-slate-900">
-                {savedConfigs.length}
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                Strategie disponibili
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white border border-slate-200">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Azioni Rapide
-              </CardTitle>
-              <Plus className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <button
-                  onClick={handleSaveCurrentConfiguration}
-                  disabled={!hasUnsavedChanges}
-                  className="w-full text-left px-3 py-2 text-sm bg-green-50 text-green-700 rounded-md hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Salva Modifiche
-                </button>
-                <button
-                  onClick={handleCreateNewConfiguration}
-                  className="w-full text-left px-3 py-2 text-sm bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100"
-                >
-                  Nuova Configurazione
-                </button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Configuration Panel */}
-        <Card className="bg-white border border-slate-200">
-          <CardHeader>
-            <CardTitle>Pannello di Configurazione</CardTitle>
+      {/* Status Cards */}
+      <div className="stats-grid">
+        <Card className="stat-card">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="stat-label">
+              Configurazione Attiva
+            </CardTitle>
+            <Settings className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <ConfigurationPanel
-              config={config}
-              onConfigChange={updateConfig}
-              customReturns={dailyReturns}
-              onUpdateDailyReturn={updateDailyReturn}
-              onRemoveDailyReturn={removeDailyReturn}
-              onExportCSV={() => {}}
-              savedConfigs={savedConfigs}
-              onLoadConfiguration={handleLoadConfigWithWarning}
-              onDeleteConfiguration={deleteConfiguration}
-              onSaveConfiguration={handleSaveCurrentConfiguration}
-              onUpdateConfiguration={updateCurrentConfiguration}
-              currentConfigId={currentConfigId}
-              currentConfigName={currentConfigName}
-              supabaseLoading={supabaseLoading}
-              isAdmin={false}
-              dailyPACOverrides={dailyPACOverrides}
-              onUpdatePACForDay={updatePACForDay}
-              onRemovePACOverride={removePACOverride}
-              hasUnsavedChanges={hasUnsavedChanges}
-            />
+            <div className="stat-value text-lg">
+              {currentConfigName || 'Nessuna configurazione'}
+            </div>
+            {hasUnsavedChanges && (
+              <div className="mt-2">
+                <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                  Modifiche non salvate
+                </span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="stat-card">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="stat-label">
+              Configurazioni Salvate
+            </CardTitle>
+            <Save className="h-4 w-4 text-success" />
+          </CardHeader>
+          <CardContent>
+            <div className="stat-value">
+              {savedConfigs.length}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Strategie disponibili
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="stat-card">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="stat-label">
+              Azioni Rapide
+            </CardTitle>
+            <Plus className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <button
+                onClick={handleSaveCurrentConfiguration}
+                disabled={!hasUnsavedChanges}
+                className="w-full text-left px-3 py-2 text-sm bg-green-50 text-green-700 rounded-md hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Salva Modifiche
+              </button>
+              <button
+                onClick={handleCreateNewConfiguration}
+                className="w-full text-left px-3 py-2 text-sm bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100"
+              >
+                Nuova Configurazione
+              </button>
+            </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Configuration Panel */}
+      <Card className="bg-white">
+        <CardHeader>
+          <CardTitle>Pannello di Configurazione</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ConfigurationPanel
+            config={config}
+            onConfigChange={updateConfig}
+            customReturns={dailyReturns}
+            onUpdateDailyReturn={updateDailyReturn}
+            onRemoveDailyReturn={removeDailyReturn}
+            onExportCSV={() => {}}
+            savedConfigs={savedConfigs}
+            onLoadConfiguration={handleLoadConfigWithWarning}
+            onDeleteConfiguration={deleteConfiguration}
+            onSaveConfiguration={handleSaveCurrentConfiguration}
+            onUpdateConfiguration={updateCurrentConfiguration}
+            currentConfigId={currentConfigId}
+            currentConfigName={currentConfigName}
+            supabaseLoading={supabaseLoading}
+            isAdmin={false}
+            dailyPACOverrides={dailyPACOverrides}
+            onUpdatePACForDay={updatePACForDay}
+            onRemovePACOverride={removePACOverride}
+            hasUnsavedChanges={hasUnsavedChanges}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
