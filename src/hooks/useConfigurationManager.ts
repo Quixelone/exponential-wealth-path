@@ -37,12 +37,22 @@ export const useConfigurationManager = () => {
     deleteConfiguration
   } = useSupabaseConfig();
 
+  // Flag per evitare re-load durante il caricamento
+  const [isLoadingConfig, setIsLoadingConfig] = React.useState(false);
+
   // Move loadSavedConfiguration function definition before it's used
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
+    if (isLoadingConfig) {
+      console.log('⚠️ CARICAMENTO GIA IN CORSO - Ignoro richiesta per:', savedConfig.name);
+      return;
+    }
+
     console.log('🔄 LOADING CONFIGURATION:', savedConfig.name);
     console.log('📊 Configurazione da caricare:', savedConfig);
     console.log('💰 Capitale iniziale da caricare:', savedConfig.config.initialCapital);
     console.log('🆔 Config ID corrente PRIMA del caricamento:', configState.currentConfigId);
+    
+    setIsLoadingConfig(true);
     
     // Save current state to history before loading new configuration
     saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
@@ -52,7 +62,7 @@ export const useConfigurationManager = () => {
     setDailyReturns(savedConfig.dailyReturns);
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
     
-    // Update current config info - CRITICO: questo deve essere sincrono
+    // Update current config info
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
     
@@ -60,11 +70,17 @@ export const useConfigurationManager = () => {
     console.log('✅ CONFIGURAZIONE CARICATA - Capitale:', savedConfig.config.initialCapital);
     console.log('✅ CONFIGURAZIONE CARICATA - ID:', savedConfig.id);
     
-    // Verifica che l'ID sia stato aggiornato
+    // Reset loading flag dopo un breve delay
     setTimeout(() => {
-      console.log('🔍 VERIFICA: ID corrente dopo caricamento:', configState.currentConfigId);
+      setIsLoadingConfig(false);
+      console.log('🔍 CARICAMENTO COMPLETATO - ID corrente:', savedConfig.id);
     }, 100);
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory, configState.currentConfigId]);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory, isLoadingConfig]);
+
+  // Effect per monitorare i cambiamenti di currentConfigId
+  React.useEffect(() => {
+    console.log('🔄 currentConfigId cambiato:', configState.currentConfigId);
+  }, [configState.currentConfigId]);
 
   // Determina configurazione "salvata" attuale
   const savedConfig = React.useMemo(() =>
