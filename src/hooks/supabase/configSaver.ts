@@ -34,6 +34,7 @@ export const useConfigSaver = () => {
           initial_capital: config.initialCapital,
           time_horizon: config.timeHorizon,
           daily_return_rate: config.dailyReturnRate,
+          currency: config.currency,
           pac_amount: config.pacConfig.amount,
           pac_frequency: config.pacConfig.frequency,
           pac_custom_days: config.pacConfig.customDays,
