@@ -114,17 +114,17 @@ const Dashboard = () => {
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                Dashboard Investimenti
+              <h1 className="text-4xl font-bold text-foreground mb-2">
+                📈 Dashboard Investimenti
               </h1>
-              <p className="text-slate-600">
+              <p className="text-muted-foreground text-lg">
                 Monitora la crescita del tuo portafoglio e analizza le performance
               </p>
             </div>
             {currentConfigName && (
-              <div className="text-right">
-                <p className="text-sm text-slate-500">Configurazione attiva</p>
-                <p className="text-lg font-semibold text-slate-900">
+              <div className="text-right bg-primary/10 rounded-lg p-3 border border-primary/20">
+                <p className="text-sm text-muted-foreground font-medium">Configurazione attiva</p>
+                <p className="text-xl font-bold text-primary">
                   {currentConfigName}
                 </p>
               </div>
@@ -133,19 +133,16 @@ const Dashboard = () => {
         </div>
 
         {/* Hero Investment Card */}
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-chart-2/5 rounded-2xl blur-xl"></div>
-          <HeroInvestmentCard 
-            summary={summary}
-            currency={config.currency}
-            className="animate-fade-in relative bg-gradient-to-br from-card via-card to-primary/3 border-primary/10"
-          />
-        </div>
+        <HeroInvestmentCard 
+          summary={summary}
+          currency={config.currency}
+          className="animate-fade-in"
+        />
 
         {/* Trend Indicators */}
         <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <h2 className="text-xl font-semibold text-slate-900 mb-4">
-            Andamento Recente
+          <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+            📊 Andamento Recente
           </h2>
           <TrendIndicators 
             trends={trends}
@@ -155,56 +152,54 @@ const Dashboard = () => {
 
         {/* Interactive Chart */}
         <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <h2 className="text-xl font-semibold text-slate-900 mb-4">
-            Grafico Crescita
+          <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+            📈 Grafico Crescita
           </h2>
-          <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
-            <InvestmentChart 
-              data={investmentData} 
-              currency={config.currency} 
-            />
-          </div>
+          <InvestmentChart 
+            data={investmentData} 
+            currency={config.currency} 
+          />
         </div>
 
         {/* Quick Actions */}
         <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
-          <div className="bg-gradient-to-br from-muted/30 via-background to-chart-2/10 rounded-xl p-6 border border-border/50 shadow-sm">
-            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-xl p-6 border border-border shadow-lg">
+            <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
               ⚡ Azioni Rapide
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <button 
                 onClick={() => navigate('/configurations')}
-                className="group p-5 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all duration-300 text-left hover:scale-[1.02]"
+                className="group p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border-2 border-primary/20 hover:border-primary/40 hover:shadow-lg transition-all duration-300 text-left hover:scale-[1.02] hover:from-primary/15 hover:to-primary/10"
               >
-                <div className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                <div className="text-lg font-bold text-primary group-hover:text-primary/90 transition-colors mb-2">
                   🔧 Modifica Configurazione
                 </div>
-                <div className="text-xs text-muted-foreground mt-2">
+                <div className="text-sm text-muted-foreground">
                   Aggiorna parametri di investimento
                 </div>
               </button>
               
               <button 
                 onClick={() => navigate('/history')}
-                className="group p-5 bg-card rounded-xl border border-border hover:border-chart-2/30 hover:shadow-md transition-all duration-300 text-left hover:scale-[1.02]"
+                className="group p-6 bg-gradient-to-br from-chart-2/10 to-chart-2/5 rounded-xl border-2 border-chart-2/20 hover:border-chart-2/40 hover:shadow-lg transition-all duration-300 text-left hover:scale-[1.02] hover:from-chart-2/15 hover:to-chart-2/10"
               >
-                <div className="text-sm font-medium text-foreground group-hover:text-chart-2 transition-colors">
+                <div className="text-lg font-bold text-chart-2 group-hover:text-chart-2/90 transition-colors mb-2">
                   📊 Visualizza Storico
                 </div>
-                <div className="text-xs text-muted-foreground mt-2">
+                <div className="text-sm text-muted-foreground">
                   Analizza rendimenti passati
                 </div>
               </button>
               
               <button 
                 onClick={() => navigate('/reminders')}
-                className="group p-5 bg-card rounded-xl border border-border hover:border-chart-3/30 hover:shadow-md transition-all duration-300 text-left hover:scale-[1.02]"
+                className="group p-6 bg-gradient-to-br from-chart-3/10 to-chart-3/5 rounded-xl border-2 border-chart-3/20 hover:border-chart-3/40 hover:shadow-lg transition-all duration-300 text-left hover:scale-[1.02] hover:from-chart-3/15 hover:to-chart-3/10"
               >
-                <div className="text-sm font-medium text-foreground group-hover:text-chart-3 transition-colors">
+                <div className="text-lg font-bold text-chart-3 group-hover:text-chart-3/90 transition-colors mb-2">
                   🔔 Gestisci Promemoria
                 </div>
-                <div className="text-xs text-muted-foreground mt-2">
+                <div className="text-sm text-muted-foreground">
                   Configura notifiche PAC
                 </div>
               </button>

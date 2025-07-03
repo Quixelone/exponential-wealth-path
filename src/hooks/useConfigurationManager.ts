@@ -39,6 +39,10 @@ export const useConfigurationManager = () => {
 
   // Move loadSavedConfiguration function definition before it's used
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
+    console.log('🔄 LOADING CONFIGURATION:', savedConfig.name);
+    console.log('📊 Configurazione da caricare:', savedConfig);
+    console.log('💰 Capitale iniziale da caricare:', savedConfig.config.initialCapital);
+    
     // Save current state to history before loading new configuration
     saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
     
@@ -47,6 +51,9 @@ export const useConfigurationManager = () => {
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
+    
+    console.log('✅ CONFIGURAZIONE CARICATA - Nome:', savedConfig.name);
+    console.log('✅ CONFIGURAZIONE CARICATA - Capitale:', savedConfig.config.initialCapital);
   }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
   // Determina configurazione "salvata" attuale
