@@ -29,11 +29,17 @@ export const useInvestmentOperations = ({
 }: UseInvestmentOperationsProps) => {
   
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>, reset: boolean = false) => {
+    console.log('🔄 updateConfig called with:', { newConfig, reset });
+    
     // Save to history before making changes
     const description = getConfigUpdateDescription(newConfig);
     saveConfigurationToHistory(description);
     
-    setConfig(prev => ({ ...prev, ...newConfig }));
+    setConfig(prev => {
+      const updated = { ...prev, ...newConfig };
+      console.log('📊 Config updated from:', prev, 'to:', updated);
+      return updated;
+    });
     
     if (
       reset ||
