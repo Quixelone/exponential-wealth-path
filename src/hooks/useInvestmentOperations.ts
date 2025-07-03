@@ -31,6 +31,12 @@ export const useInvestmentOperations = ({
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>, reset: boolean = false) => {
     console.log('🔄 updateConfig called with:', { newConfig, reset });
     
+    // STOP EMPTY CONFIG UPDATES che resettano tutto
+    if (Object.keys(newConfig).length === 0 && reset) {
+      console.log('🚫 BLOCKING EMPTY CONFIG UPDATE with reset=true');
+      return;
+    }
+    
     // Save to history before making changes
     const description = getConfigUpdateDescription(newConfig);
     saveConfigurationToHistory(description);

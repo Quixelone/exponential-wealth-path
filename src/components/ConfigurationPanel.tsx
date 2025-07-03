@@ -73,8 +73,8 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       // Keep current config but reset IDs and name
       onSaveConfiguration(name);
     } else {
-      // Reset to default configuration
-      onConfigChange({}, true);
+      // NON FARE NULLA - la nuova configurazione viene gestita altrove
+      console.log('🚫 BLOCKING createNewConfiguration - non resettare nulla qui');
     }
   };
 
