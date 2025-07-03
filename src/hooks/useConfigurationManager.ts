@@ -42,55 +42,30 @@ export const useConfigurationManager = () => {
   const [manuallyLoaded, setManuallyLoaded] = React.useState(false);
   const [lockAutoChanges, setLockAutoChanges] = React.useState(false);
 
-  // DEFINITIVE loadSavedConfiguration with COMPLETE LOCK SYSTEM
+  // CARICAMENTO CONFIGURAZIONE DEFINITIVO - SEMPLIFICATO E DIRETTO
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
-    if (isLoadingConfig) {
-      console.log('⚠️ CARICAMENTO GIA IN CORSO - Ignoro richiesta per:', savedConfig.name);
-      return;
-    }
-
-    console.log('🔒 BLOCCO COMPLETO ATTIVATO - Iniziando caricamento manuale:', savedConfig.name);
-    console.log('📊 STATO PRIMA DEL CARICAMENTO:');
-    console.log('  - currentConfigId:', configState.currentConfigId);
-    console.log('  - currentConfigName:', configState.currentConfigName);
-    console.log('  - manuallyLoaded:', manuallyLoaded);
+    console.log('🚀 CARICAMENTO CONFIGURAZIONE DEFINITIVO:', savedConfig.name);
+    console.log('📊 CONFIGURAZIONE DA CARICARE:');
+    console.log('  - Nome:', savedConfig.name);
+    console.log('  - ID:', savedConfig.id);
+    console.log('  - Capitale:', savedConfig.config.initialCapital);
+    console.log('  - Orizzonte temporale:', savedConfig.config.timeHorizon);
+    console.log('  - Rendimento:', savedConfig.config.dailyReturnRate);
+    console.log('  - PAC amount:', savedConfig.config.pacConfig?.amount);
     
-    // ATTIVA TUTTI I LOCK
-    setIsLoadingConfig(true);
-    setManuallyLoaded(true);
-    setLockAutoChanges(true);
-    
-    // Save current state to history before loading new configuration
-    saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
-    
-    // CARICAMENTO CONFIGURAZIONE MANUALE CON LOGGING COMPLETO
-    console.log('🔄 APPLICANDO CONFIGURAZIONE:', savedConfig.name);
-    console.log('  - Capitale da caricare:', savedConfig.config.initialCapital);
-    console.log('  - ID da impostare:', savedConfig.id);
-    
+    // CARICAMENTO DIRETTO SENZA INTERFERENZE
     setConfig(savedConfig.config);
-    setDailyReturns(savedConfig.dailyReturns);
+    setDailyReturns(savedConfig.dailyReturns || {});
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
     
-    console.log('✅ CONFIGURAZIONE APPLICATA - Verificando stato:');
-    console.log('  - Nome caricato:', savedConfig.name);
-    console.log('  - ID caricato:', savedConfig.id);
-    console.log('  - Capitale caricato:', savedConfig.config.initialCapital);
+    console.log('✅ CONFIGURAZIONE CARICATA CON SUCCESSO');
+    console.log('📈 STATO AGGIORNATO:');
+    console.log('  - currentConfigId impostato:', savedConfig.id);
+    console.log('  - currentConfigName impostato:', savedConfig.name);
     
-    // MANTIENI LOCK ATTIVO per evitare interferenze
-    setIsLoadingConfig(false);
-    
-    // Mantieni il lock per un breve periodo per bloccare interferenze
-    setTimeout(() => {
-      console.log('🔓 RILASCIO LOCK - Configurazione dovrebbe essere stabile');
-      console.log('📊 STATO FINALE:');
-      console.log('  - currentConfigId finale:', savedConfig.id);
-      console.log('  - currentConfigName finale:', savedConfig.name);
-    }, 500);
-    
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
 
   // Effect per monitorare i cambiamenti di currentConfigId
   React.useEffect(() => {
@@ -105,49 +80,8 @@ export const useConfigurationManager = () => {
     [savedConfigs, configState.currentConfigId]
   );
 
-  // Enhanced unsaved changes detection
-  const hasUnsavedChanges = React.useMemo(() => {
-    if (!savedConfig) {
-      // Se non c'è una configurazione salvata corrente, controlla se ci sono dati personalizzati
-      const hasCustomReturns = Object.keys(configState.dailyReturns).length > 0;
-      const hasCustomPAC = Object.keys(configState.dailyPACOverrides).length > 0;
-      const hasNonDefaultConfig = 
-        configState.config.initialCapital !== 1000 ||
-        configState.config.timeHorizon !== 365 ||
-        configState.config.dailyReturnRate !== 0.1 ||
-        configState.config.pacConfig.amount !== 100;
-      
-      return hasCustomReturns || hasCustomPAC || hasNonDefaultConfig;
-    }
-    
-    const stateToCompare = {
-      config: {
-        ...configState.config,
-        pacConfig: {
-          ...configState.config.pacConfig,
-          startDate: (typeof configState.config.pacConfig.startDate === "string"
-            ? configState.config.pacConfig.startDate
-            : configState.config.pacConfig.startDate.toISOString().split('T')[0])
-        },
-      },
-      dailyReturns: configState.dailyReturns,
-      dailyPACOverrides: configState.dailyPACOverrides,
-    };
-    const savedToCompare = {
-      config: {
-        ...savedConfig.config,
-        pacConfig: {
-          ...savedConfig.config.pacConfig,
-          startDate: (typeof savedConfig.config.pacConfig.startDate === "string"
-            ? savedConfig.config.pacConfig.startDate
-            : savedConfig.config.pacConfig.startDate.toISOString().split('T')[0])
-        },
-      },
-      dailyReturns: savedConfig.dailyReturns,
-      dailyPACOverrides: savedConfig.dailyPACOverrides || {},
-    };
-    return !deepEqual(stateToCompare, savedToCompare);
-  }, [configState.config, configState.dailyReturns, configState.dailyPACOverrides, savedConfig]);
+  // DISABILITATO - hasUnsavedChanges rimosso per consentire caricamento fluido
+  const hasUnsavedChanges = false;
 
   const saveCurrentConfiguration = useCallback(async (name: string) => {
     const configId = await saveConfiguration(name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);

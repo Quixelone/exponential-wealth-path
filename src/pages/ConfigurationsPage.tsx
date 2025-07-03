@@ -68,14 +68,9 @@ const ConfigurationsPage = () => {
     return null;
   }
 
-  // Enhanced configuration loading with unsaved changes check
+  // CARICAMENTO DIRETTO SENZA WARNING - per permettere caricamento fluido
   const handleLoadConfigWithWarning = (savedConfig: any) => {
-    if (hasUnsavedChanges) {
-      const confirmLoad = window.confirm(
-        'Hai modifiche non salvate nella configurazione corrente. Caricando una nuova configurazione perderai queste modifiche. Vuoi continuare?'
-      );
-      if (!confirmLoad) return;
-    }
+    console.log('🚀 CARICAMENTO CONFIGURAZIONE:', savedConfig.name);
     loadSavedConfiguration(savedConfig);
   };
 
@@ -109,7 +104,7 @@ const ConfigurationsPage = () => {
             onRemoveDailyReturn={removeDailyReturn}
             onExportCSV={exportToCSV}
             savedConfigs={savedConfigs}
-            onLoadConfiguration={handleLoadConfigWithWarning}
+            onLoadConfiguration={loadSavedConfiguration}
             onDeleteConfiguration={deleteConfiguration}
             onSaveConfiguration={saveCurrentConfiguration}
             onUpdateConfiguration={updateCurrentConfiguration}

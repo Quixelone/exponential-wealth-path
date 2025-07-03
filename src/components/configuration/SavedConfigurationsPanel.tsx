@@ -78,20 +78,10 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
     }
   };
 
-  // Gestione alert per modifiche non salvate
+  // CARICAMENTO DIRETTO SENZA CONTROLLI - per permettere caricamento fluido
   const handleLoadConfigWithCheck = (config: SavedConfiguration) => {
-    if (hasUnsavedChanges) {
-      setPendingLoadConfig(config);
-      setShowUnsavedAlert(true);
-    } else {
-      // Sempre richiedi conferma per il cambio configurazione
-      const confirmLoad = window.confirm(
-        `Vuoi caricare la configurazione "${config.name}"?\n\nQuesto sostituirà la configurazione attuale.`
-      );
-      if (confirmLoad) {
-        onLoadConfiguration(config);
-      }
-    }
+    console.log('🔄 CARICAMENTO DIRETTO:', config.name);
+    onLoadConfiguration(config);
   };
 
   const continueLoadConfig = () => {
