@@ -39,8 +39,6 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
   const [configName, setConfigName] = useState('');
   const [editingConfigId, setEditingConfigId] = useState<string | null>(null);
   const [editingConfigName, setEditingConfigName] = useState('');
-  const [pendingLoadConfig, setPendingLoadConfig] = useState<SavedConfiguration | null>(null);
-  const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
 
   // Aggiorna il valore predefinito del nome config
   React.useEffect(() => {
@@ -84,18 +82,6 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
     onLoadConfiguration(config);
   };
 
-  const continueLoadConfig = () => {
-    if (pendingLoadConfig) {
-      onLoadConfiguration(pendingLoadConfig);
-      setPendingLoadConfig(null);
-      setShowUnsavedAlert(false);
-    }
-  };
-
-  const cancelLoadConfig = () => {
-    setPendingLoadConfig(null);
-    setShowUnsavedAlert(false);
-  };
 
   return (
     <Card className="animate-fade-in">
@@ -164,12 +150,6 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
             ))
           )}
         </div>
-
-        <UnsavedChangesAlert
-          open={showUnsavedAlert}
-          onContinue={continueLoadConfig}
-          onCancel={cancelLoadConfig}
-        />
 
         <EditConfigDialog
           open={editDialogOpen}
