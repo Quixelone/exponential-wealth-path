@@ -15,6 +15,7 @@ const Dashboard = () => {
     investmentData,
     summary,
     currentDayIndex,
+    currentConfigName,
   } = useInvestmentCalculator();
 
   // Redirect to auth if not logged in
@@ -111,12 +112,24 @@ const Dashboard = () => {
       <div className="space-y-6">
         {/* Welcome Message */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Dashboard Investimenti
-          </h1>
-          <p className="text-slate-600">
-            Monitora la crescita del tuo portafoglio e analizza le performance
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                Dashboard Investimenti
+              </h1>
+              <p className="text-slate-600">
+                Monitora la crescita del tuo portafoglio e analizza le performance
+              </p>
+            </div>
+            {currentConfigName && (
+              <div className="text-right">
+                <p className="text-sm text-slate-500">Configurazione attiva</p>
+                <p className="text-lg font-semibold text-slate-900">
+                  {currentConfigName}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Hero Investment Card */}
