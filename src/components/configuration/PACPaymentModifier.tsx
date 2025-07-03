@@ -99,7 +99,7 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
       case 'active':
         return 'text-green-600 bg-green-50';
       case 'pending':
-        return 'text-orange-600 bg-orange-50';
+        return 'text-yellow-600 bg-yellow-50';
       case 'paused':
         return 'text-red-600 bg-red-50';
       case 'completed':

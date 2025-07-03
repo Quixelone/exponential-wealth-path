@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -78,8 +77,8 @@ const Index = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary/20 border-t-primary mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium">Caricamento dati utente...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Caricamento dati utente...</p>
         </div>
       </div>
     );
@@ -163,47 +162,35 @@ const Index = () => {
 
   return (
     <ModernTooltipProvider>
-      <div className="min-h-screen bg-background">
-        {/* Clean Professional Header */}
-        <div className="modernize-header sticky top-0 z-50">
-          <div className="modernize-container">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                    <TrendingUp className="h-4 w-4 text-white" />
-                  </div>
-                  <h1 className="text-xl font-bold text-slate-900">
-                    Finanza Creativa
-                  </h1>
-                </div>
+      <div className="min-h-screen bg-background text-foreground">
+        {/* Header */}
+        <div className="bg-card border-b shadow-md">
+          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center gap-3">
+                <span className="wealth-gradient-text text-2xl font-bold">Finanza Creativa</span>
                 {isAdmin && (
-                  <span className="modernize-badge modernize-badge-primary">
-                    <User className="h-3 w-3 mr-1" />
+                  <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full font-medium">
                     Admin
                   </span>
                 )}
                 {hasUnsavedChanges && (
-                  <span className="modernize-badge modernize-badge-warning animate-pulse">
-                    <Bell className="h-3 w-3 mr-1" />
+                  <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-xs rounded-full font-medium animate-pulse">
                     Modifiche non salvate
                   </span>
                 )}
               </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-md border border-slate-200">
-                  <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
-                    <User className="h-3 w-3 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700">{displayName}</span>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <User className="h-5 w-5 text-primary" />
+                  {displayName}
                 </div>
                 
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleSettingsClick}
-                  className="modernize-btn-secondary"
+                  className="border-primary text-primary hover:bg-primary/10"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Impostazioni
@@ -212,19 +199,13 @@ const Index = () => {
                 {isAdmin && (
                   <button
                     onClick={handleUserManagementClick}
-                    className="modernize-btn-secondary flex items-center gap-2"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 border-primary text-primary hover:bg-primary/10"
                   >
-                    <Users className="h-4 w-4" />
+                    <Users className="h-4 w-4 mr-2" />
                     Gestione Utenti
                   </button>
                 )}
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleLogout} 
-                  className="modernize-btn-outline"
-                >
+                <Button variant="outline" size="sm" onClick={handleLogout} className="border-primary text-primary hover:bg-primary/10">
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
@@ -233,97 +214,69 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Clean Main Content */}
-        <div className="modernize-container modernize-section">
-          <div className="modernize-card animate-modernize-fade-in">
-            <Tabs defaultValue="investments" className="w-full">
-              <div className="px-6 py-4 border-b border-slate-200">
-                <TabsList className="bg-slate-100 p-1 rounded-md">
-                  <TabsTrigger 
-                    value="investments" 
-                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm px-4 py-2 text-sm font-medium transition-all"
-                  >
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4" />
-                      Dashboard Investimenti
-                    </div>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="reminders" 
-                    className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm px-4 py-2 text-sm font-medium transition-all"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Bell className="h-4 w-4" />
-                      Promemoria Pagamenti
-                    </div>
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-              
-              <div className="p-6">
-                <TabsContent value="investments" className="mt-0">
-                  <div className="modernize-grid modernize-grid-cols-3">
-                    {/* Clean Configuration Panel */}
-                    <div className="lg:col-span-1">
-                      <div className="modernize-card-elevated">
-                        <ConfigurationPanel
-                          config={config}
-                          onConfigChange={updateConfig}
-                          customReturns={dailyReturns}
-                          onUpdateDailyReturn={updateDailyReturn}
-                          onRemoveDailyReturn={removeDailyReturn}
-                          onExportCSV={exportToCSV}
-                          savedConfigs={savedConfigs}
-                          onLoadConfiguration={handleLoadConfigWithWarning}
-                          onDeleteConfiguration={deleteConfiguration}
-                          onSaveConfiguration={saveCurrentConfiguration}
-                          onUpdateConfiguration={updateCurrentConfiguration}
-                          currentConfigId={currentConfigId}
-                          currentConfigName={currentConfigName}
-                          supabaseLoading={supabaseLoading}
-                          isAdmin={isAdmin}
-                          dailyPACOverrides={dailyPACOverrides}
-                          onUpdatePACForDay={updatePACForDay}
-                          onRemovePACOverride={removePACOverride}
-                          hasUnsavedChanges={hasUnsavedChanges}
-                        />
-                      </div>
-                    </div>
+        {/* Main Content Area */}
+        <div className="max-w-full mx-auto p-4 md:p-6">
+          <Tabs defaultValue="investments" className="w-full">
+            <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 mb-6 bg-card p-1 rounded-lg shadow">
+              <TabsTrigger value="investments" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md">
+                <TrendingUp className="h-5 w-5" />
+                Dashboard Investimenti
+              </TabsTrigger>
+              <TabsTrigger value="reminders" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md">
+                <Bell className="h-5 w-5" />
+                Promemoria Pagamenti
+              </TabsTrigger>
+            </TabsList>
 
-                    {/* Clean Charts and Results */}
-                    <div className="lg:col-span-2 space-y-6">
-                      <div className="modernize-card-elevated">
-                        <InvestmentSummary summary={summary} currency={config.currency} />
-                      </div>
-                      
-                      <div className="modernize-card-elevated">
-                        <InvestmentChart data={investmentData} currency={config.currency} />
-                      </div>
-                      
-                      <div className="modernize-card-elevated">
-                        <ReportTable 
-                          data={investmentData} 
-                          currency={config.currency}
-                          onExportCSV={exportToCSV}
-                          onUpdateDailyReturnInReport={handleUpdateDailyReturnInReport}
-                          onUpdatePACInReport={handleUpdatePACInReport}
-                          onRemovePACOverride={handleRemovePACOverride}
-                          defaultPACAmount={config.pacConfig.amount}
-                          investmentStartDate={config.pacConfig.startDate}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
+            <TabsContent value="investments">
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Configuration Panel */}
+                <div className="xl:col-span-1">
+                  <ConfigurationPanel
+                    config={config}
+                    onConfigChange={updateConfig}
+                    customReturns={dailyReturns}
+                    onUpdateDailyReturn={updateDailyReturn}
+                    onRemoveDailyReturn={removeDailyReturn}
+                    onExportCSV={exportToCSV}
+                    savedConfigs={savedConfigs}
+                    onLoadConfiguration={handleLoadConfigWithWarning}
+                    onDeleteConfiguration={deleteConfiguration}
+                    onSaveConfiguration={saveCurrentConfiguration}
+                    onUpdateConfiguration={updateCurrentConfiguration}
+                    currentConfigId={currentConfigId}
+                    currentConfigName={currentConfigName}
+                    supabaseLoading={supabaseLoading}
+                    isAdmin={isAdmin}
+                    dailyPACOverrides={dailyPACOverrides}
+                    onUpdatePACForDay={updatePACForDay}
+                    onRemovePACOverride={removePACOverride}
+                    hasUnsavedChanges={hasUnsavedChanges}
+                  />
+                </div>
 
-                <TabsContent value="reminders" className="mt-0">
-                  <div className="modernize-card-elevated">
-                    <PaymentReminders />
-                  </div>
-                </TabsContent>
+                {/* Charts and Results */}
+                <div className="xl:col-span-2 space-y-6">
+                  <InvestmentSummary summary={summary} currency={config.currency} />
+                  <InvestmentChart data={investmentData} currency={config.currency} />
+                  <ReportTable 
+                    data={investmentData} 
+                    currency={config.currency}
+                    onExportCSV={exportToCSV}
+                    onUpdateDailyReturnInReport={handleUpdateDailyReturnInReport}
+                    onUpdatePACInReport={handleUpdatePACInReport}
+                    onRemovePACOverride={handleRemovePACOverride}
+                    defaultPACAmount={config.pacConfig.amount}
+                    investmentStartDate={config.pacConfig.startDate}
+                  />
+                </div>
               </div>
-            </Tabs>
-          </div>
+            </TabsContent>
+
+            <TabsContent value="reminders">
+              <PaymentReminders />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </ModernTooltipProvider>

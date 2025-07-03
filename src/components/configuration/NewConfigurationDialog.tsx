@@ -34,15 +34,15 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="clean-btn-primary flex items-center gap-2">
+        <Button className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Nuova Configurazione
         </Button>
       </DialogTrigger>
-      <DialogContent className="clean-card sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5 text-blue-600" />
+            <Plus className="h-5 w-5 text-primary" />
             Crea Nuova Configurazione
           </DialogTitle>
         </DialogHeader>
@@ -76,21 +76,20 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
             </div>
           )}
 
-          <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg warning-bg">
-            <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-orange-800">
+          <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-amber-800">
               Le modifiche non salvate della configurazione corrente andranno perse.
             </p>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setOpen(false)} className="clean-btn-secondary">
+            <Button variant="outline" onClick={() => setOpen(false)}>
               Annulla
             </Button>
             <Button
               onClick={handleCreate}
               disabled={!configName.trim()}
-              className="clean-btn-primary"
             >
               Crea Configurazione
             </Button>
