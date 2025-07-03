@@ -35,11 +35,6 @@ export const useInvestmentOperations = ({
     
     setConfig(prev => ({ ...prev, ...newConfig }));
     
-    // Mark as unsaved if we have a current config
-    if (configState.currentConfigId) {
-      setCurrentConfigId(null);
-    }
-    
     if (
       reset ||
       newConfig.initialCapital !== undefined ||
