@@ -43,7 +43,7 @@ export const useInvestmentCalculator = () => {
     }
   }, []);
 
-  // Auto-load first configuration after configurations are loaded
+  // Auto-load first configuration only once when app starts and no config is set
   React.useEffect(() => {
     if (
       !autoLoadAttempted.current && 
@@ -60,11 +60,11 @@ export const useInvestmentCalculator = () => {
       
       if (sortedConfigs.length > 0) {
         const firstConfig = sortedConfigs[0];
-        console.log('🔄 Auto-loading first configuration:', firstConfig.name);
+        console.log('🔄 Auto-loading first configuration on app start:', firstConfig.name);
         loadSavedConfiguration(firstConfig);
       }
     }
-  }, [savedConfigs, supabaseLoading, configState.currentConfigId, loadSavedConfiguration]);
+  }, [savedConfigs, supabaseLoading]); // Rimosse le dipendenze problematiche
 
   const { investmentData, currentDayIndex, nextPACInfo, summary } = useInvestmentData({
     config: configState.config,

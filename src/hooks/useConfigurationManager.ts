@@ -42,19 +42,29 @@ export const useConfigurationManager = () => {
     console.log('🔄 LOADING CONFIGURATION:', savedConfig.name);
     console.log('📊 Configurazione da caricare:', savedConfig);
     console.log('💰 Capitale iniziale da caricare:', savedConfig.config.initialCapital);
+    console.log('🆔 Config ID corrente PRIMA del caricamento:', configState.currentConfigId);
     
     // Save current state to history before loading new configuration
     saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
     
+    // Load configuration data
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
+    
+    // Update current config info - CRITICO: questo deve essere sincrono
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
     
     console.log('✅ CONFIGURAZIONE CARICATA - Nome:', savedConfig.name);
     console.log('✅ CONFIGURAZIONE CARICATA - Capitale:', savedConfig.config.initialCapital);
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
+    console.log('✅ CONFIGURAZIONE CARICATA - ID:', savedConfig.id);
+    
+    // Verifica che l'ID sia stato aggiornato
+    setTimeout(() => {
+      console.log('🔍 VERIFICA: ID corrente dopo caricamento:', configState.currentConfigId);
+    }, 100);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory, configState.currentConfigId]);
 
   // Determina configurazione "salvata" attuale
   const savedConfig = React.useMemo(() =>
