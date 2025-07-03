@@ -40,6 +40,13 @@
     /* Custom gradient colors */
     --wealth-gradient-start: 217 91% 60%;
     --wealth-gradient-end: 212 100% 47%;
+    
+    /* Chart colors */
+    --chart-1: 217 91% 60%; /* Primary blue */
+    --chart-2: 142 76% 36%; /* Emerald green */
+    --chart-3: 38 92% 50%; /* Orange */
+    --chart-4: 268 83% 58%; /* Purple */
+    --chart-5: 10 79% 63%; /* Red */
   }
 
   .dark {
@@ -73,6 +80,13 @@
 
     --wealth-gradient-start: 217 91% 60%;
     --wealth-gradient-end: 212 100% 47%;
+    
+    /* Chart colors - dark mode */
+    --chart-1: 217 91% 60%;
+    --chart-2: 142 86% 28%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 268 83% 58%;
+    --chart-5: 10 79% 63%;
   }
 }
 
@@ -171,6 +185,25 @@
   .text-responsive {
     @apply text-sm md:text-base;
   }
+
+  /* Chart color utilities */
+  .bg-chart-1 { @apply bg-[hsl(var(--chart-1))]; }
+  .bg-chart-2 { @apply bg-[hsl(var(--chart-2))]; }
+  .bg-chart-3 { @apply bg-[hsl(var(--chart-3))]; }
+  .bg-chart-4 { @apply bg-[hsl(var(--chart-4))]; }
+  .bg-chart-5 { @apply bg-[hsl(var(--chart-5))]; }
+  
+  .text-chart-1 { @apply text-[hsl(var(--chart-1))]; }
+  .text-chart-2 { @apply text-[hsl(var(--chart-2))]; }
+  .text-chart-3 { @apply text-[hsl(var(--chart-3))]; }
+  .text-chart-4 { @apply text-[hsl(var(--chart-4))]; }
+  .text-chart-5 { @apply text-[hsl(var(--chart-5))]; }
+  
+  .border-chart-1 { @apply border-[hsl(var(--chart-1))]; }
+  .border-chart-2 { @apply border-[hsl(var(--chart-2))]; }
+  .border-chart-3 { @apply border-[hsl(var(--chart-3))]; }
+  .border-chart-4 { @apply border-[hsl(var(--chart-4))]; }
+  .border-chart-5 { @apply border-[hsl(var(--chart-5))]; }
 }
 
 /* Enhanced animations */

@@ -84,7 +84,13 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
       setPendingLoadConfig(config);
       setShowUnsavedAlert(true);
     } else {
-      onLoadConfiguration(config);
+      // Sempre richiedi conferma per il cambio configurazione
+      const confirmLoad = window.confirm(
+        `Vuoi caricare la configurazione "${config.name}"?\n\nQuesto sostituirà la configurazione attuale.`
+      );
+      if (confirmLoad) {
+        onLoadConfiguration(config);
+      }
     }
   };
 

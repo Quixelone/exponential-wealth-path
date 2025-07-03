@@ -133,11 +133,14 @@ const Dashboard = () => {
         </div>
 
         {/* Hero Investment Card */}
-        <HeroInvestmentCard 
-          summary={summary}
-          currency={config.currency}
-          className="animate-fade-in"
-        />
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-chart-2/5 rounded-2xl blur-xl"></div>
+          <HeroInvestmentCard 
+            summary={summary}
+            currency={config.currency}
+            className="animate-fade-in relative bg-gradient-to-br from-card via-card to-primary/3 border-primary/10"
+          />
+        </div>
 
         {/* Trend Indicators */}
         <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
@@ -165,37 +168,43 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
-          <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg p-6 border border-slate-200">
-            <h3 className="text-lg font-semibold text-slate-900 mb-3">
-              Azioni Rapide
+          <div className="bg-gradient-to-br from-muted/30 via-background to-chart-2/10 rounded-xl p-6 border border-border/50 shadow-sm">
+            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+              ⚡ Azioni Rapide
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button 
                 onClick={() => navigate('/configurations')}
-                className="p-4 bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 text-left"
+                className="group p-5 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all duration-300 text-left hover:scale-[1.02]"
               >
-                <div className="text-sm font-medium text-slate-900">Modifica Configurazione</div>
-                <div className="text-xs text-slate-600 mt-1">
+                <div className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                  🔧 Modifica Configurazione
+                </div>
+                <div className="text-xs text-muted-foreground mt-2">
                   Aggiorna parametri di investimento
                 </div>
               </button>
               
               <button 
                 onClick={() => navigate('/history')}
-                className="p-4 bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 text-left"
+                className="group p-5 bg-card rounded-xl border border-border hover:border-chart-2/30 hover:shadow-md transition-all duration-300 text-left hover:scale-[1.02]"
               >
-                <div className="text-sm font-medium text-slate-900">Visualizza Storico</div>
-                <div className="text-xs text-slate-600 mt-1">
+                <div className="text-sm font-medium text-foreground group-hover:text-chart-2 transition-colors">
+                  📊 Visualizza Storico
+                </div>
+                <div className="text-xs text-muted-foreground mt-2">
                   Analizza rendimenti passati
                 </div>
               </button>
               
               <button 
                 onClick={() => navigate('/reminders')}
-                className="p-4 bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 text-left"
+                className="group p-5 bg-card rounded-xl border border-border hover:border-chart-3/30 hover:shadow-md transition-all duration-300 text-left hover:scale-[1.02]"
               >
-                <div className="text-sm font-medium text-slate-900">Gestisci Promemoria</div>
-                <div className="text-xs text-slate-600 mt-1">
+                <div className="text-sm font-medium text-foreground group-hover:text-chart-3 transition-colors">
+                  🔔 Gestisci Promemoria
+                </div>
+                <div className="text-xs text-muted-foreground mt-2">
                   Configura notifiche PAC
                 </div>
               </button>
