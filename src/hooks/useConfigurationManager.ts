@@ -75,7 +75,7 @@ export const useConfigurationManager = () => {
       setIsLoadingConfig(false);
       console.log('🔍 CARICAMENTO COMPLETATO - ID corrente:', savedConfig.id);
     }, 100);
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory, isLoadingConfig]);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]); // RIMOSSA isLoadingConfig per stabilità
 
   // Effect per monitorare i cambiamenti di currentConfigId
   React.useEffect(() => {

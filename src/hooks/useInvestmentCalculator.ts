@@ -64,7 +64,7 @@ export const useInvestmentCalculator = () => {
         loadSavedConfiguration(firstConfig);
       }
     }
-  }, [savedConfigs, supabaseLoading, loadSavedConfiguration]);
+  }, [savedConfigs, supabaseLoading]); // RIMOSSA loadSavedConfiguration per evitare loop
 
   // Logging per debugging: monitora cambiamenti di currentConfigId
   React.useEffect(() => {
