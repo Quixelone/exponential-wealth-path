@@ -37,45 +37,34 @@ export const useConfigurationManager = () => {
     deleteConfiguration
   } = useSupabaseConfig();
 
-  // Flag per evitare re-load durante il caricamento
+  // Flags per gestire il caricamento
   const [isLoadingConfig, setIsLoadingConfig] = React.useState(false);
+  const [manuallyLoaded, setManuallyLoaded] = React.useState(false);
 
-  // Move loadSavedConfiguration function definition before it's used
+  // Simplified loadSavedConfiguration function
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
     if (isLoadingConfig) {
       console.log('⚠️ CARICAMENTO GIA IN CORSO - Ignoro richiesta per:', savedConfig.name);
       return;
     }
 
-    console.log('🔄 LOADING CONFIGURATION:', savedConfig.name);
-    console.log('📊 Configurazione da caricare:', savedConfig);
-    console.log('💰 Capitale iniziale da caricare:', savedConfig.config.initialCapital);
-    console.log('🆔 Config ID corrente PRIMA del caricamento:', configState.currentConfigId);
-    
+    console.log('🔄 MANUAL LOADING CONFIGURATION:', savedConfig.name);
     setIsLoadingConfig(true);
+    setManuallyLoaded(true); // Flag che indica caricamento manuale
     
     // Save current state to history before loading new configuration
     saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
     
-    // Load configuration data
+    // Load configuration data SYNCHRONOUSLY
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
-    
-    // Update current config info
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
     
-    console.log('✅ CONFIGURAZIONE CARICATA - Nome:', savedConfig.name);
-    console.log('✅ CONFIGURAZIONE CARICATA - Capitale:', savedConfig.config.initialCapital);
-    console.log('✅ CONFIGURAZIONE CARICATA - ID:', savedConfig.id);
-    
-    // Reset loading flag dopo un breve delay
-    setTimeout(() => {
-      setIsLoadingConfig(false);
-      console.log('🔍 CARICAMENTO COMPLETATO - ID corrente:', savedConfig.id);
-    }, 100);
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]); // RIMOSSA isLoadingConfig per stabilità
+    console.log('✅ MANUAL LOAD COMPLETED - ID:', savedConfig.id, 'Name:', savedConfig.name);
+    setIsLoadingConfig(false);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
   // Effect per monitorare i cambiamenti di currentConfigId
   React.useEffect(() => {
