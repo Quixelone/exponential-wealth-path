@@ -42,10 +42,24 @@ export const useInvestmentCalculator = () => {
     }
   }, []);
 
-  // Logging per debugging: monitora cambiamenti di currentConfigId
+  // LOGGING DETTAGLIATO per tracciare tutti i cambiamenti
   React.useEffect(() => {
-    console.log('📱 INVESTMENT CALCULATOR - currentConfigId changed to:', configState.currentConfigId);
-  }, [configState.currentConfigId]);
+    console.log('🚨 INVESTMENT CALCULATOR - currentConfigId CAMBIO DETECTATO:', configState.currentConfigId);
+    console.log('📱 STATO COMPLETO CONFIG:');
+    console.log('  - currentConfigId:', configState.currentConfigId);
+    console.log('  - currentConfigName:', configState.currentConfigName);
+    console.log('  - initialCapital:', configState.config.initialCapital);
+    console.log('  - timeHorizon:', configState.config.timeHorizon);
+    console.log('🔍 STACK TRACE:', new Error().stack);
+  }, [configState.currentConfigId, configState.currentConfigName, configState.config]);
+
+  // MONITORING completo dello stato per detectare interferenze
+  React.useEffect(() => {
+    console.log('📊 CONFIG STATE MONITORING:');
+    console.log('  - Capital:', configState.config.initialCapital);
+    console.log('  - Name:', configState.currentConfigName);
+    console.log('  - ID:', configState.currentConfigId);
+  }, [configState.config.initialCapital, configState.currentConfigName, configState.currentConfigId]);
 
   const { investmentData, currentDayIndex, nextPACInfo, summary } = useInvestmentData({
     config: configState.config,

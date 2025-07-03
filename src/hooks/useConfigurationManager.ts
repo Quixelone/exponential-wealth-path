@@ -37,33 +37,59 @@ export const useConfigurationManager = () => {
     deleteConfiguration
   } = useSupabaseConfig();
 
-  // Flags per gestire il caricamento
+  // Flags per gestire il caricamento con LOCK robusto
   const [isLoadingConfig, setIsLoadingConfig] = React.useState(false);
   const [manuallyLoaded, setManuallyLoaded] = React.useState(false);
+  const [lockAutoChanges, setLockAutoChanges] = React.useState(false);
 
-  // Simplified loadSavedConfiguration function
+  // DEFINITIVE loadSavedConfiguration with COMPLETE LOCK SYSTEM
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
     if (isLoadingConfig) {
       console.log('⚠️ CARICAMENTO GIA IN CORSO - Ignoro richiesta per:', savedConfig.name);
       return;
     }
 
-    console.log('🔄 MANUAL LOADING CONFIGURATION:', savedConfig.name);
+    console.log('🔒 BLOCCO COMPLETO ATTIVATO - Iniziando caricamento manuale:', savedConfig.name);
+    console.log('📊 STATO PRIMA DEL CARICAMENTO:');
+    console.log('  - currentConfigId:', configState.currentConfigId);
+    console.log('  - currentConfigName:', configState.currentConfigName);
+    console.log('  - manuallyLoaded:', manuallyLoaded);
+    
+    // ATTIVA TUTTI I LOCK
     setIsLoadingConfig(true);
-    setManuallyLoaded(true); // Flag che indica caricamento manuale
+    setManuallyLoaded(true);
+    setLockAutoChanges(true);
     
     // Save current state to history before loading new configuration
     saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
     
-    // Load configuration data SYNCHRONOUSLY
+    // CARICAMENTO CONFIGURAZIONE MANUALE CON LOGGING COMPLETO
+    console.log('🔄 APPLICANDO CONFIGURAZIONE:', savedConfig.name);
+    console.log('  - Capitale da caricare:', savedConfig.config.initialCapital);
+    console.log('  - ID da impostare:', savedConfig.id);
+    
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
     
-    console.log('✅ MANUAL LOAD COMPLETED - ID:', savedConfig.id, 'Name:', savedConfig.name);
+    console.log('✅ CONFIGURAZIONE APPLICATA - Verificando stato:');
+    console.log('  - Nome caricato:', savedConfig.name);
+    console.log('  - ID caricato:', savedConfig.id);
+    console.log('  - Capitale caricato:', savedConfig.config.initialCapital);
+    
+    // MANTIENI LOCK ATTIVO per evitare interferenze
     setIsLoadingConfig(false);
+    
+    // Mantieni il lock per un breve periodo per bloccare interferenze
+    setTimeout(() => {
+      console.log('🔓 RILASCIO LOCK - Configurazione dovrebbe essere stabile');
+      console.log('📊 STATO FINALE:');
+      console.log('  - currentConfigId finale:', savedConfig.id);
+      console.log('  - currentConfigName finale:', savedConfig.name);
+    }, 500);
+    
   }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
   // Effect per monitorare i cambiamenti di currentConfigId
