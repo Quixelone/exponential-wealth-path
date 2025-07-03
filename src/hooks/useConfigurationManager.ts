@@ -37,10 +37,6 @@ export const useConfigurationManager = () => {
     deleteConfiguration
   } = useSupabaseConfig();
 
-  // Flags per gestire il caricamento con LOCK robusto
-  const [isLoadingConfig, setIsLoadingConfig] = React.useState(false);
-  const [manuallyLoaded, setManuallyLoaded] = React.useState(false);
-  const [lockAutoChanges, setLockAutoChanges] = React.useState(false);
 
   // CARICAMENTO CONFIGURAZIONE DEFINITIVO - SEMPLIFICATO E DIRETTO
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
@@ -67,12 +63,6 @@ export const useConfigurationManager = () => {
     
   }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
 
-  // Effect per monitorare i cambiamenti di currentConfigId
-  React.useEffect(() => {
-    console.log('🔄 currentConfigId cambiato:', configState.currentConfigId);
-  }, [configState.currentConfigId]);
-
-  // Determina configurazione "salvata" attuale
   const savedConfig = React.useMemo(() =>
     configState.currentConfigId
       ? savedConfigs.find(c => c.id === configState.currentConfigId)
