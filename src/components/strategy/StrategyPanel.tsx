@@ -17,7 +17,7 @@ const StrategyPanel: React.FC<StrategyPanelProps> = ({ strategiesManager }) => {
     loading,
     summary,
     strategyConfig,
-    strategyConfig,
+    currentStrategy,
   } = strategiesManager;
 
   const displayName = currentStrategy?.name || 'Nuova Strategia';
