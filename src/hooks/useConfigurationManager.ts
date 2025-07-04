@@ -64,7 +64,7 @@ export const useConfigurationManager = () => {
       console.error('❌ Errore nel caricamento della configurazione:', error);
       return false;
     }
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName]);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
   const savedConfig = React.useMemo(() =>
     configState.currentConfigId

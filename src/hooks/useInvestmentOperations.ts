@@ -53,8 +53,11 @@ export const useInvestmentOperations = ({
       newConfig.timeHorizon !== undefined ||
       newConfig.pacConfig?.frequency !== undefined
     ) {
-      setDailyReturns({});
-      setDailyPACOverrides({});
+     // Only reset if explicitly requested
+     if (reset) {
+       setDailyReturns({});
+       setDailyPACOverrides({});
+     }
     }
   }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 

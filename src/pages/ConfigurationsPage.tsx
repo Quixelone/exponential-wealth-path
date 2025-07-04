@@ -73,23 +73,10 @@ const ConfigurationsPage = () => {
     console.log('🚀 CARICAMENTO CONFIGURAZIONE:', savedConfig.name);
     try {
       // Assicuriamoci che la configurazione abbia tutti i campi necessari
-      const configToLoad = {
-        ...savedConfig,
-        config: {
-          ...savedConfig.config,
-          pacConfig: {
-            ...savedConfig.config.pacConfig,
-            // Assicuriamoci che startDate sia un oggetto Date
-            startDate: savedConfig.config.pacConfig.startDate instanceof Date 
-              ? savedConfig.config.pacConfig.startDate 
-              : new Date(savedConfig.config.pacConfig.startDate)
-          }
-        }
-      };
-      
-      loadSavedConfiguration(configToLoad);
+     loadSavedConfiguration(savedConfig);
     } catch (error) {
       console.error('❌ Errore nel caricamento della configurazione:', error);
+     const { toast } = useToast();
       toast({
         title: "Errore",
         description: "Impossibile caricare la configurazione",

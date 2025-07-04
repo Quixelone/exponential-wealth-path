@@ -55,12 +55,10 @@ export const useSupabaseConfig = () => {
         console.log('✅ Configurazione aggiornata con successo');
         await loadConfigurations();
         console.log('✅ Configurazioni ricaricate dopo l\'aggiornamento');
-        )
       }
       return result;
     } catch (error) {
       console.error('❌ Errore durante l\'aggiornamento della configurazione:', error);
-      )
       return false;
     } finally {
       setLoading(false);

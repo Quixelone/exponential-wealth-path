@@ -50,7 +50,7 @@ export const useInvestmentCalculator = () => {
     console.log('  - currentConfigName:', configState.currentConfigName);
     console.log('  - initialCapital:', configState.config.initialCapital);
     console.log('  - timeHorizon:', configState.config.timeHorizon);
-    console.log('🔍 STACK TRACE:', new Error().stack);
+   // console.log('🔍 STACK TRACE:', new Error().stack);
   }, [configState.currentConfigId, configState.currentConfigName, configState.config]);
 
   // MONITORING completo dello stato per detectare interferenze
