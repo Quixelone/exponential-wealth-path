@@ -128,10 +128,13 @@ export const useStrategiesManager = () => {
         setHasUnsavedChanges(false);
         console.log('✅ Strategia aggiornata con successo:', name);
       } catch (error) {
-        console.error('❌ Errore dopo l'aggiornamento della strategia:', error);
+        console.error('❌ Errore dopo l\'aggiornamento della strategia:', error);
+        )
       }
     }
     return success;
+  }
+  )
 
   const updateStrategyConfig = useCallback((newConfig: Partial<StrategyConfig>) => {
     setStrategyConfig(prev => ({ ...prev, ...newConfig }));
