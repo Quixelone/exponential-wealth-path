@@ -13,11 +13,11 @@ interface StrategyPanelProps {
 
 const StrategyPanel: React.FC<StrategyPanelProps> = ({ strategiesManager }) => {
   const {
+    currentStrategy,
+    strategyConfig,
     hasUnsavedChanges,
     loading,
-    summary,
-    strategyConfig,
-    currentStrategy,
+    summary
   } = strategiesManager;
 
   const displayName = currentStrategy?.name || 'Nuova Strategia';
