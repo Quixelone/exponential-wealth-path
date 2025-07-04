@@ -60,10 +60,26 @@ export const useStrategiesManager = () => {
 
   const loadStrategy = useCallback((strategy: Strategy) => {
     setCurrentStrategy(strategy);
-    setStrategyConfig(strategy.config);
-    setDailyReturns(strategy.dailyReturns);
-    setDailyPACOverrides(strategy.dailyPACOverrides);
+    
+    // Assicuriamoci che la configurazione abbia tutti i campi necessari
+    const configToLoad = {
+      ...strategy.config,
+      pacConfig: {
+        ...strategy.config.pacConfig,
+        // Assicuriamoci che startDate sia un oggetto Date
+        startDate: strategy.config.pacConfig.startDate instanceof Date 
+          ? strategy.config.pacConfig.startDate 
+          : new Date(strategy.config.pacConfig.startDate)
+      }
+    };
+    
+    // Caricamento in sequenza per evitare problemi di stato
+    setStrategyConfig(configToLoad);
+    setDailyReturns(strategy.dailyReturns || {});
+    setDailyPACOverrides(strategy.dailyPACOverrides || {});
     setHasUnsavedChanges(false);
+    
+    console.log('✅ Strategia caricata con successo:', strategy.name);
   }, []);
 
   const createNewStrategy = useCallback(() => {
@@ -77,13 +93,20 @@ export const useStrategiesManager = () => {
   const saveCurrentStrategy = useCallback(async (name: string) => {
     const strategyId = await saveStrategy(name, strategyConfig, dailyReturns, dailyPACOverrides);
     if (strategyId) {
-      // Trova la strategia appena salvata
-      await loadStrategies();
-      const savedStrategy = strategies.find(s => s.id === strategyId);
-      if (savedStrategy) {
-        setCurrentStrategy(savedStrategy);
+      try {
+        // Ricarica le strategie per aggiornare la lista
+        await loadStrategies();
+        
+        // Cerca la strategia appena salvata
+        const savedStrategy = strategies.find(s => s.id === strategyId);
+        if (savedStrategy) {
+          setCurrentStrategy(savedStrategy);
+        }
+        setHasUnsavedChanges(false);
+        console.log('✅ Strategia salvata con successo:', name);
+      } catch (error) {
+        console.error('❌ Errore dopo il salvataggio della strategia:', error);
       }
-      setHasUnsavedChanges(false);
     }
     return strategyId;
   }, [saveStrategy, strategyConfig, dailyReturns, dailyPACOverrides, loadStrategies, strategies]);
@@ -91,21 +114,24 @@ export const useStrategiesManager = () => {
   const updateCurrentStrategy = useCallback(async (strategyId: string, name: string) => {
     const success = await updateStrategy(strategyId, name, strategyConfig, dailyReturns, dailyPACOverrides);
     if (success) {
-      // Aggiorna la strategia corrente
-      if (currentStrategy) {
-        const updatedStrategy = {
-          ...currentStrategy,
-          name,
-          config: strategyConfig,
-          dailyReturns,
-          dailyPACOverrides,
-        };
-        setCurrentStrategy(updatedStrategy);
+      try {
+        // Ricarica le strategie per aggiornare la lista
+        await loadStrategies();
+        
+        // Aggiorna la strategia corrente
+        if (currentStrategy) {
+          const updatedStrategy = strategies.find(s => s.id === strategyId);
+          if (updatedStrategy) {
+            setCurrentStrategy(updatedStrategy);
+          }
+        }
+        setHasUnsavedChanges(false);
+        console.log('✅ Strategia aggiornata con successo:', name);
+      } catch (error) {
+        console.error('❌ Errore dopo l'aggiornamento della strategia:', error);
       }
-      setHasUnsavedChanges(false);
     }
     return success;
-  }, [updateStrategy, strategyConfig, dailyReturns, dailyPACOverrides, currentStrategy]);
 
   const updateStrategyConfig = useCallback((newConfig: Partial<StrategyConfig>) => {
     setStrategyConfig(prev => ({ ...prev, ...newConfig }));

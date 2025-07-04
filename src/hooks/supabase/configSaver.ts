@@ -15,7 +15,7 @@ export const useConfigSaver = () => {
     dailyPACOverrides: { [day: number]: number } = {}
   ): Promise<string | null> => {
     try {
-      console.log('🔄 Inizio salvataggio configurazione:', { name, dailyPACOverrides });
+      console.log('🔄 Inizio salvataggio configurazione:', name);
       
       const user = await validateUser();
       if (!user) {
@@ -34,11 +34,13 @@ export const useConfigSaver = () => {
           initial_capital: config.initialCapital,
           time_horizon: config.timeHorizon,
           daily_return_rate: config.dailyReturnRate,
-          currency: config.currency,
+          currency: config.currency || 'EUR',
           pac_amount: config.pacConfig.amount,
           pac_frequency: config.pacConfig.frequency,
           pac_custom_days: config.pacConfig.customDays,
-          pac_start_date: config.pacConfig.startDate.toISOString().split('T')[0]
+          pac_start_date: (config.pacConfig.startDate instanceof Date 
+            ? config.pacConfig.startDate 
+            : new Date(config.pacConfig.startDate)).toISOString().split('T')[0]
         })
         .select()
         .single();

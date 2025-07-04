@@ -11,10 +11,14 @@ export const useStrategyDatabase = () => {
   const loadStrategies = useCallback(async (): Promise<void> => {
     if (loading) return;
     
+    console.log('🔄 Caricamento strategie...');
     setLoading(true);
     try {
       const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
+      if (!user.user) {
+        console.log('❌ Utente non autenticato');
+        return;
+      }
 
       const { data: configs, error } = await supabase
         .from('investment_configs')
@@ -25,6 +29,7 @@ export const useStrategyDatabase = () => {
       if (error) throw error;
 
       const strategiesData: Strategy[] = [];
+      console.log(`📊 Trovate ${configs?.length || 0} configurazioni`);
 
       for (const config of configs || []) {
         // Carica daily returns
@@ -59,9 +64,9 @@ export const useStrategyDatabase = () => {
             currency: config.currency as 'EUR' | 'USD' | 'USDT',
             pacConfig: {
               amount: config.pac_amount,
-              frequency: config.pac_frequency as 'daily' | 'weekly' | 'monthly' | 'custom',
+              frequency: (config.pac_frequency || 'monthly') as 'daily' | 'weekly' | 'monthly' | 'custom',
               customDays: config.pac_custom_days,
-              startDate: new Date(config.pac_start_date)
+              startDate: new Date(config.pac_start_date || new Date())
             }
           },
           dailyReturns: dailyReturnsMap,
@@ -71,6 +76,7 @@ export const useStrategyDatabase = () => {
         });
       }
 
+      console.log(`✅ Caricate ${strategiesData.length} strategie`);
       setStrategies(strategiesData);
     } catch (error) {
       console.error('Errore caricamento strategie:', error);
@@ -93,7 +99,14 @@ export const useStrategyDatabase = () => {
     setLoading(true);
     try {
       const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error('Utente non autenticato');
+      if (!user.user) {
+        toast({
+          title: "Errore",
+          description: "Devi essere autenticato per salvare una strategia",
+          variant: "destructive",
+        });
+        return null;
+      }
 
       const { data: savedConfig, error: configError } = await supabase
         .from('investment_configs')
@@ -103,7 +116,7 @@ export const useStrategyDatabase = () => {
           initial_capital: config.initialCapital,
           time_horizon: config.timeHorizon,
           daily_return_rate: config.dailyReturnRate,
-          currency: config.currency,
+          currency: config.currency || 'EUR',
           pac_amount: config.pacConfig.amount,
           pac_frequency: config.pacConfig.frequency,
           pac_custom_days: config.pacConfig.customDays,
@@ -182,7 +195,7 @@ export const useStrategyDatabase = () => {
           initial_capital: config.initialCapital,
           time_horizon: config.timeHorizon,
           daily_return_rate: config.dailyReturnRate,
-          currency: config.currency,
+          currency: config.currency || 'EUR',
           pac_amount: config.pacConfig.amount,
           pac_frequency: config.pacConfig.frequency,
           pac_custom_days: config.pacConfig.customDays,

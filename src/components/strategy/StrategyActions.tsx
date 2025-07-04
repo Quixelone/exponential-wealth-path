@@ -26,10 +26,10 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
   const handleSaveClick = () => {
     if (currentStrategy) {
       // Se è una strategia esistente, aggiorna direttamente
-      setStrategyName(currentStrategy.name);
+      setStrategyName(currentStrategy.name || 'Strategia senza nome');
     } else {
       // Se è una nuova strategia, apri il dialog
-      setStrategyName('');
+      setStrategyName('Nuova strategia');
     }
     setSaveDialogOpen(true);
   };
@@ -52,7 +52,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
   };
 
   const handleCopyStrategy = () => {
-    const copyName = `${currentStrategy?.name || 'Strategia'} - Copia`;
+    const copyName = `${currentStrategy?.name || 'Strategia'} (copia)`;
     setStrategyName(copyName);
     setSaveDialogOpen(true);
   };

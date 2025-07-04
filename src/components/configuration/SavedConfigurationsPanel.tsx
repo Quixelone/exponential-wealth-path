@@ -40,14 +40,15 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
   const [editingConfigId, setEditingConfigId] = useState<string | null>(null);
   const [editingConfigName, setEditingConfigName] = useState('');
 
-  // Aggiorna il valore predefinito del nome config
-  React.useEffect(() => {
-    if (currentConfigId && currentConfigName) {
+  // Aggiorna il valore predefinito del nome config quando si apre il dialog
+  const handleOpenSaveDialog = (open: boolean) => {
+    if (open && currentConfigId && currentConfigName) {
       setConfigName(currentConfigName);
-    } else {
-      setConfigName('');
+    } else if (open) {
+      setConfigName('Nuova configurazione');
     }
-  }, [currentConfigId, currentConfigName, saveDialogOpen]);
+    setSaveDialogOpen(open);
+  };
 
   const handleSaveConfiguration = () => {
     if (configName.trim()) {
@@ -103,7 +104,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
             )}
             <SaveConfigDialog
               open={saveDialogOpen}
-              onOpenChange={setSaveDialogOpen}
+              onOpenChange={handleOpenSaveDialog}
               configName={configName}
               setConfigName={setConfigName}
               onSave={handleSaveConfiguration}

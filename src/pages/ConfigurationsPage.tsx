@@ -71,7 +71,31 @@ const ConfigurationsPage = () => {
   // CARICAMENTO DIRETTO SENZA WARNING - per permettere caricamento fluido
   const handleLoadConfigWithWarning = (savedConfig: any) => {
     console.log('🚀 CARICAMENTO CONFIGURAZIONE:', savedConfig.name);
-    loadSavedConfiguration(savedConfig);
+    try {
+      // Assicuriamoci che la configurazione abbia tutti i campi necessari
+      const configToLoad = {
+        ...savedConfig,
+        config: {
+          ...savedConfig.config,
+          pacConfig: {
+            ...savedConfig.config.pacConfig,
+            // Assicuriamoci che startDate sia un oggetto Date
+            startDate: savedConfig.config.pacConfig.startDate instanceof Date 
+              ? savedConfig.config.pacConfig.startDate 
+              : new Date(savedConfig.config.pacConfig.startDate)
+          }
+        }
+      };
+      
+      loadSavedConfiguration(configToLoad);
+    } catch (error) {
+      console.error('❌ Errore nel caricamento della configurazione:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare la configurazione",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
