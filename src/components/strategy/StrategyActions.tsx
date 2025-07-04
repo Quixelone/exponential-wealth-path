@@ -14,6 +14,10 @@ interface StrategyActionsProps {
   strategiesManager: ReturnType<typeof useStrategiesManager>;
 }
 
+interface StrategyActionsProps {
+  strategiesManager: ReturnType<typeof useStrategiesManager>;
+}
+
 const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) => {
   const {
     currentStrategy,
@@ -26,6 +30,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [strategyName, setStrategyName] = useState(''); 
+  const [isCopyMode, setIsCopyMode] = useState(false);
   const [isCopyMode, setIsCopyMode] = useState(false);
 
   const handleSaveClick = () => {
@@ -41,9 +46,9 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
 
   const handleSave = async () => {
     if (!strategyName.trim()) return;
-
+    
     let success = false;
-    if (currentStrategy) {
+    if (currentStrategy && !isCopyMode) {
       success = await updateCurrentStrategy(currentStrategy.id, strategyName.trim());
     } else {
       const strategyId = await saveCurrentStrategy(strategyName.trim());
@@ -51,13 +56,13 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     }
 
     if (success) {
-      setSaveDialogOpen(false);
     }
   };
 
   const handleCopyStrategy = () => {
     const copyName = `${currentStrategy?.name || 'Strategia'} (copia)`;
     setStrategyName(copyName); 
+    setIsCopyMode(true);
     setIsCopyMode(true);
     setSaveDialogOpen(true); 
   };
@@ -102,7 +107,16 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
       </Button>
 
       {/* Dialog Salvataggio */}
-      <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+      <Dialog 
+        open={saveDialogOpen} 
+        onOpenChange={(open) => {
+          setSaveDialogOpen(open);
+          if (!open) {
+            setStrategyName('');
+            setIsCopyMode(false);
+          }
+        }}
+      >
       <Dialog 
         open={saveDialogOpen} 
         onOpenChange={(open) => {
@@ -162,7 +176,6 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
             </div>
           </div>
         </DialogContent>
-      </Dialog>
       </Dialog>
     </div>
   );

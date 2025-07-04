@@ -3,14 +3,13 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
-  BarChart3,
-  TrendingUp,
-  History,
-  Settings,
-  Bell,
-  X,
-  PieChart,
-  Calculator,
+  BarChart3, 
+  TrendingUp, 
+  History, 
+  Settings, 
+  Bell, 
+  X, 
+  Calculator, 
   Target
 } from 'lucide-react';
 
@@ -50,13 +49,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       title: 'Configurazioni',
       href: '/configurations',
       icon: Calculator,
-      description: 'Gestione parametri'
-    },
-    {
-      title: 'Strategie',
-      href: '/strategies',
-      icon: Target,
-      description: 'Gestione strategie'
+      description: 'Gestione parametri e strategie'
     },
     {
       title: 'Promemoria',
