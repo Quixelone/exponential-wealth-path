@@ -8,7 +8,7 @@ import StrategyPanel from '@/components/strategy/StrategyPanel';
 const StrategiesPage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const strategiesManager = useStrategiesManager();
+  const strategiesManager = useStrategiesManager(user, authLoading);
 
   useEffect(() => {
     if (!authLoading && !user) {

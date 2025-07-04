@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { User } from '@supabase/supabase-js';
 import { Strategy, StrategyConfig } from '@/types/strategy';
 import { useStrategyDatabase } from './useStrategyDatabase';
 import { useStrategyCalculations } from './useStrategyCalculations';
@@ -16,7 +17,7 @@ const getDefaultStrategyConfig = (): StrategyConfig => ({
   }
 });
 
-export const useStrategiesManager = () => {
+export const useStrategiesManager = (user: User | null, authLoading: boolean) => {
   const [currentStrategy, setCurrentStrategy] = useState<Strategy | null>(null);
   const [strategyConfig, setStrategyConfig] = useState<StrategyConfig>(getDefaultStrategyConfig());
   const [dailyReturns, setDailyReturns] = useState<{ [day: number]: number }>({});
@@ -30,14 +31,16 @@ export const useStrategiesManager = () => {
     saveStrategy,
     updateStrategy,
     deleteStrategy,
-  } = useStrategyDatabase();
+  } = useStrategyDatabase(user);
 
   const calculations = useStrategyCalculations(strategyConfig, dailyReturns, dailyPACOverrides);
 
-  // Carica strategie all'avvio
+  // Carica strategie solo quando l'autenticazione è stabile
   useEffect(() => {
-    loadStrategies();
-  }, [loadStrategies]);
+    if (!authLoading && user) {
+      loadStrategies();
+    }
+  }, [loadStrategies, user, authLoading]);
 
   // Monitora i cambiamenti per unsaved changes
   useEffect(() => {

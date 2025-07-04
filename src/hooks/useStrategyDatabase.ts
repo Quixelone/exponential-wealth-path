@@ -1,29 +1,25 @@
 import { useState, useCallback } from 'react';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Strategy, StrategyConfig } from '@/types/strategy';
 import { useToast } from '@/hooks/use-toast';
 
-export const useStrategyDatabase = () => {
+export const useStrategyDatabase = (user: User | null) => {
   const [loading, setLoading] = useState(false);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const { toast } = useToast();
 
   const loadStrategies = useCallback(async (): Promise<void> => {
-    if (loading) return;
+    if (loading || !user) return;
     
     console.log('🔄 Caricamento strategie...');
     setLoading(true);
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) {
-        console.log('❌ Utente non autenticato');
-        return;
-      }
 
       const { data: configs, error } = await supabase
         .from('investment_configs')
         .select('*')
-        .eq('user_id', user.user.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -88,7 +84,7 @@ export const useStrategyDatabase = () => {
     } finally {
       setLoading(false);
     }
-  }, [loading, toast]);
+  }, [loading, toast, user]);
 
   const saveStrategy = useCallback(async (
     name: string,
@@ -96,22 +92,22 @@ export const useStrategyDatabase = () => {
     dailyReturns: { [day: number]: number },
     dailyPACOverrides: { [day: number]: number }
   ): Promise<string | null> => {
+    if (!user) {
+      toast({
+        title: "Errore",
+        description: "Devi essere autenticato per salvare una strategia",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     setLoading(true);
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) {
-        toast({
-          title: "Errore",
-          description: "Devi essere autenticato per salvare una strategia",
-          variant: "destructive",
-        });
-        return null;
-      }
 
       const { data: savedConfig, error: configError } = await supabase
         .from('investment_configs')
         .insert({
-          user_id: user.user.id,
+          user_id: user.id,
           name,
           initial_capital: config.initialCapital,
           time_horizon: config.timeHorizon,
@@ -176,7 +172,7 @@ export const useStrategyDatabase = () => {
     } finally {
       setLoading(false);
     }
-  }, [loadStrategies, toast]);
+  }, [loadStrategies, toast, user]);
 
   const updateStrategy = useCallback(async (
     strategyId: string,
@@ -185,6 +181,15 @@ export const useStrategyDatabase = () => {
     dailyReturns: { [day: number]: number },
     dailyPACOverrides: { [day: number]: number }
   ): Promise<boolean> => {
+    if (!user) {
+      toast({
+        title: "Errore",
+        description: "Devi essere autenticato per aggiornare una strategia",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     setLoading(true);
     try {
       // Aggiorna config principale
@@ -247,9 +252,18 @@ export const useStrategyDatabase = () => {
     } finally {
       setLoading(false);
     }
-  }, [loadStrategies, toast]);
+  }, [loadStrategies, toast, user]);
 
   const deleteStrategy = useCallback(async (strategyId: string): Promise<void> => {
+    if (!user) {
+      toast({
+        title: "Errore",
+        description: "Devi essere autenticato per eliminare una strategia",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       // Elimina in cascata: prima daily returns e PAC overrides, poi config
@@ -279,7 +293,7 @@ export const useStrategyDatabase = () => {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, user]);
 
   return {
     loading,
