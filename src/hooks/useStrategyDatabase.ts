@@ -20,7 +20,7 @@ export const useStrategyDatabase = () => {
       }
 
       const { data: configs, error } = await supabase
-        .from('configs')
+        .from('investment_configs')
         .select('*')
         .eq('user_id', user.user.id)
         .order('created_at', { ascending: false });
@@ -99,7 +99,7 @@ export const useStrategyDatabase = () => {
       if (!user.user) return null;
 
       const { data: config, error } = await supabase
-        .from('configs')
+        .from('investment_configs')
         .insert({
           user_id: user.user.id,
           name: strategy.name,
@@ -150,7 +150,7 @@ export const useStrategyDatabase = () => {
   const updateStrategy = useCallback(async (id: string, updates: Partial<Strategy>): Promise<boolean> => {
     try {
       const { error } = await supabase
-        .from('configs')
+        .from('investment_configs')
         .update({
           name: updates.name,
           initial_capital: updates.config?.initialCapital,
@@ -209,7 +209,7 @@ export const useStrategyDatabase = () => {
       await supabase.from('daily_pac_overrides').delete().eq('config_id', id);
       
       // Delete the config
-      const { error } = await supabase.from('configs').delete().eq('id', id);
+      const { error } = await supabase.from('investment_configs').delete().eq('id', id);
       
       if (error) throw error;
 
