@@ -10,14 +10,6 @@ interface StrategyActionsProps {
   strategiesManager: ReturnType<typeof useStrategiesManager>;
 }
 
-interface StrategyActionsProps {
-  strategiesManager: ReturnType<typeof useStrategiesManager>;
-}
-
-interface StrategyActionsProps {
-  strategiesManager: ReturnType<typeof useStrategiesManager>;
-}
-
 const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) => {
   const {
     currentStrategy,
@@ -30,7 +22,6 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [strategyName, setStrategyName] = useState(''); 
-  const [isCopyMode, setIsCopyMode] = useState(false);
   const [isCopyMode, setIsCopyMode] = useState(false);
 
   const handleSaveClick = () => {
@@ -63,7 +54,6 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
   const handleCopyStrategy = () => {
     const copyName = `${currentStrategy?.name || 'Strategia'} (copia)`;
     setStrategyName(copyName); 
-    setIsCopyMode(true);
     setIsCopyMode(true);
     setSaveDialogOpen(true); 
   };
