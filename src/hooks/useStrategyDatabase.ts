@@ -1,5 +1,4 @@
-@@ .. @@
-  const loadStrategies = useCallback(async (): Promise<void> => {
+const loadStrategies = useCallback(async (): Promise<void> => {
     if (loading) return;
     
     console.log('🔄 Caricamento strategie...');
@@ -8,16 +7,28 @@
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) {
         console.log('❌ Utente non autenticato');
-+       setLoading(false);
+        setLoading(false);
         return;
       }
 
       const { data: configs, error } = await supabase
-@@ .. @@
+        .from('configs')
+        .select('*')
+        .eq('user_id', user.user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching configs:', error);
+        setLoading(false);
+        return;
+      }
+
+      const strategiesData: Strategy[] = [];
+
       console.log(`📊 Trovate ${configs?.length || 0} configurazioni`);
 
       for (const config of configs || []) {
-+       try {
+        try {
           // Carica daily returns
           const { data: dailyReturns } = await supabase
             .from('daily_returns')
@@ -60,9 +71,15 @@
             created_at: config.created_at,
             updated_at: config.updated_at
           });
-+       } catch (configError) {
-+         console.error(`Error processing config ${config.id}:`, configError);
-+       }
+        } catch (configError) {
+          console.error(`Error processing config ${config.id}:`, configError);
+        }
       }
 
       console.log(`✅ Caricate ${strategiesData.length} strategie`);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, supabase]);
