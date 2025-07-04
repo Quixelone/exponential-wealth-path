@@ -49,8 +49,8 @@ export const useInvestmentCalculator = () => {
     console.log('  - currentConfigId:', configState.currentConfigId);
     console.log('  - currentConfigName:', configState.currentConfigName);
     console.log('  - initialCapital:', configState.config.initialCapital);
-    console.log('  - timeHorizon:', configState.config.timeHorizon); 
-    console.log('  - pacAmount:', configState.config.pacConfig.amount);
+    console.log('  - timeHorizon:', configState.config.timeHorizon);
+   // console.log('🔍 STACK TRACE:', new Error().stack);
   }, [configState.currentConfigId, configState.currentConfigName, configState.config]);
 
   // MONITORING completo dello stato per detectare interferenze
@@ -59,7 +59,6 @@ export const useInvestmentCalculator = () => {
     console.log('  - Capital:', configState.config.initialCapital);
     console.log('  - Name:', configState.currentConfigName);
     console.log('  - ID:', configState.currentConfigId);
-    console.log('  - PAC Amount:', configState.config.pacConfig.amount);
   }, [configState.config.initialCapital, configState.currentConfigName, configState.currentConfigId]);
 
   const { investmentData, currentDayIndex, nextPACInfo, summary } = useInvestmentData({
@@ -81,7 +80,6 @@ export const useInvestmentCalculator = () => {
     setDailyReturns,
     setDailyPACOverrides,
     setCurrentConfigId,
-    setCurrentConfigName,
     investmentData,
     saveConfigurationToHistory
   });
@@ -89,14 +87,6 @@ export const useInvestmentCalculator = () => {
   return {
     config: configState.config,
     updateConfig,
-    setConfig,
-    setDailyReturns,
-    setDailyPACOverrides,
-    setCurrentConfigName,
-    setConfig,
-    setDailyReturns,
-    setDailyPACOverrides,
-    setCurrentConfigName,
     createNewConfiguration,
     investmentData,
     dailyReturns: configState.dailyReturns,

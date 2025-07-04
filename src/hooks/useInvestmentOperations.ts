@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { InvestmentConfig } from '@/types/investment';
 
@@ -13,7 +14,6 @@ interface UseInvestmentOperationsProps {
   setDailyReturns: (returns: { [day: number]: number } | ((prev: { [day: number]: number }) => { [day: number]: number })) => void;
   setDailyPACOverrides: (overrides: { [day: number]: number } | ((prev: { [day: number]: number }) => { [day: number]: number })) => void;
   setCurrentConfigId: (id: string | null) => void;
-  setCurrentConfigName: (name: string) => void;
   investmentData: any[];
   saveConfigurationToHistory: (description: string) => void;
 }
@@ -24,7 +24,6 @@ export const useInvestmentOperations = ({
   setDailyReturns,
   setDailyPACOverrides,
   setCurrentConfigId,
-  setCurrentConfigName,
   investmentData,
   saveConfigurationToHistory
 }: UseInvestmentOperationsProps) => {
@@ -72,10 +71,9 @@ export const useInvestmentOperations = ({
     
     // Mark as unsaved
     if (configState.currentConfigId) {
-      // Don't reset the ID, just mark as having unsaved changes
-      // We keep the ID to maintain the connection to the original config
+      setCurrentConfigId(null);
     }
-  }, [setDailyReturns, configState.currentConfigId, saveConfigurationToHistory]);
+  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const removeDailyReturn = useCallback((day: number) => {
     saveConfigurationToHistory(`Rimozione rendimento personalizzato giorno ${day}`);
@@ -88,10 +86,9 @@ export const useInvestmentOperations = ({
     
     // Mark as unsaved
     if (configState.currentConfigId) {
-      // Don't reset the ID, just mark as having unsaved changes
-      // We keep the ID to maintain the connection to the original config
+      setCurrentConfigId(null);
     }
-  }, [setDailyReturns, configState.currentConfigId, saveConfigurationToHistory]);
+  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const updatePACForDay = useCallback((day: number, pacAmount: number) => {
     saveConfigurationToHistory(`Modifica PAC giorno ${day}: €${pacAmount}`);
@@ -106,10 +103,9 @@ export const useInvestmentOperations = ({
     
     // Mark as unsaved
     if (configState.currentConfigId) {
-      // Don't reset the ID, just mark as having unsaved changes
-      // We keep the ID to maintain the connection to the original config
+      setCurrentConfigId(null);
     }
-  }, [setDailyPACOverrides, configState.currentConfigId, saveConfigurationToHistory]);
+  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const removePACOverride = useCallback((day: number) => {
     saveConfigurationToHistory(`Rimozione PAC personalizzato giorno ${day}`);
@@ -122,10 +118,9 @@ export const useInvestmentOperations = ({
     
     // Mark as unsaved
     if (configState.currentConfigId) {
-      // Don't reset the ID, just mark as having unsaved changes
-      // We keep the ID to maintain the connection to the original config
+      setCurrentConfigId(null);
     }
-  }, [setDailyPACOverrides, configState.currentConfigId, saveConfigurationToHistory]);
+  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const exportToCSV = useCallback(() => {
     const csvContent = [

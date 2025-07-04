@@ -16,7 +16,6 @@ const Dashboard = () => {
     summary,
     currentDayIndex,
     currentConfigName,
-    currentConfigName,
   } = useInvestmentCalculator();
 
   // Redirect to auth if not logged in
@@ -116,12 +115,10 @@ const Dashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-foreground mb-2">
-                📈 Dashboard {currentConfigName ? currentConfigName : "Investimenti"}
+                📈 Dashboard Investimenti
               </h1>
               <p className="text-muted-foreground text-lg">
-                {currentConfigName 
-                  ? `Monitora la crescita della strategia "${currentConfigName}"`
-                  : "Monitora la crescita del tuo portafoglio e analizza le performance"}
+                Monitora la crescita del tuo portafoglio e analizza le performance
               </p>
             </div>
             {currentConfigName && (

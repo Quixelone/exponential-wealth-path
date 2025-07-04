@@ -2,13 +2,14 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Calendar, TrendingUp, Play, Edit, Trash2, Plus, Check } from 'lucide-react';
+import { FileText, Calendar, TrendingUp, Play, Edit, Trash2, Plus } from 'lucide-react';
 import { Strategy } from '@/types/strategy';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 interface StrategiesListProps {
   strategiesManager: ReturnType<typeof useStrategiesManager>;
+  loading: boolean;
 }
 
 const formatDate = (dateString: string) => {
@@ -33,11 +34,9 @@ const StrategyCard: React.FC<{
   strategy: Strategy;
   isCurrent: boolean;
   onLoad: () => void;
-  onActivate: () => void;
   onDelete: () => void;
   loading: boolean;
-  isActive: boolean;
-}> = ({ strategy, isCurrent, onLoad, onActivate, onDelete, loading, isActive }) => {
+}> = ({ strategy, isCurrent, onLoad, onDelete, loading }) => {
   return (
     <Card className={`border transition-all duration-200 hover:shadow-md ${
       isCurrent ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
@@ -59,9 +58,8 @@ const StrategyCard: React.FC<{
                 </div>
               </div>
             </div>
-            {isActive && (
-              <Badge variant="secondary" className="text-xs">
-                <Check className="h-3 w-3 mr-1" />
+            {isCurrent && (
+              <Badge variant="default" className="text-xs">
                 Attiva
               </Badge>
             )}
@@ -99,24 +97,10 @@ const StrategyCard: React.FC<{
               variant="outline"
               onClick={onLoad}
               disabled={loading}
-              className="h-8 text-xs"
+              className="flex-1 h-8 text-xs"
             >
-              <Edit className="h-3 w-3 mr-1" />
-              Modifica
-            </Button>
-            
-            <Button
-              size="sm"
-              variant={isActive ? "outline" : "default"}
-              onClick={onActivate}
-              disabled={loading || isActive}
-              className={`h-8 text-xs flex-1 ${isActive ? 'border-green-500 text-green-600' : ''}`}
-            >
-              {isActive ? (
-                <><Check className="h-3 w-3 mr-1" />Attiva</>
-              ) : (
-                <><Play className="h-3 w-3 mr-1" />Attiva</>
-              )}
+              <Play className="h-3 w-3 mr-1" />
+              Carica
             </Button>
             
             <AlertDialog>
@@ -156,17 +140,8 @@ const StrategyCard: React.FC<{
   );
 };
 
-const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager }) => {
-  const { 
-    strategies, 
-    currentStrategy, 
-    createNewStrategy, 
-    loadStrategy, 
-    deleteStrategy, 
-    activateStrategy,
-    activeInCalculator,
-    loading
-  } = strategiesManager;
+const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, loading }) => {
+  const { strategies, currentStrategy, createNewStrategy, loadStrategy, deleteStrategy } = strategiesManager;
 
   return (
     <Card>
@@ -202,10 +177,8 @@ const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager }) =>
                 strategy={strategy}
                 isCurrent={currentStrategy?.id === strategy.id}
                 onLoad={() => loadStrategy(strategy)}
-                onActivate={() => activateStrategy(strategy)}
                 onDelete={() => deleteStrategy(strategy.id)}
                 loading={loading}
-                isActive={activeInCalculator && currentStrategy?.id === strategy.id}
               />
             ))
           )}

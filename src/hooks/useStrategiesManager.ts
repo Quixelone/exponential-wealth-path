@@ -1,10 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
-import { User } from '@supabase/supabase-js';
 import { Strategy, StrategyConfig } from '@/types/strategy';
 import { useStrategyDatabase } from './useStrategyDatabase';
 import { useStrategyCalculations } from './useStrategyCalculations';
-import { useToast } from '@/hooks/use-toast';
-import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 
 // Configurazione di default per una nuova strategia
 const getDefaultStrategyConfig = (): StrategyConfig => ({
@@ -19,15 +16,12 @@ const getDefaultStrategyConfig = (): StrategyConfig => ({
   }
 });
 
-export const useStrategiesManager = (user: User | null, authLoading: boolean) => {
-  const { toast } = useToast();
-  const calculator = useInvestmentCalculator();
+export const useStrategiesManager = () => {
   const [currentStrategy, setCurrentStrategy] = useState<Strategy | null>(null);
   const [strategyConfig, setStrategyConfig] = useState<StrategyConfig>(getDefaultStrategyConfig());
   const [dailyReturns, setDailyReturns] = useState<{ [day: number]: number }>({});
   const [dailyPACOverrides, setDailyPACOverrides] = useState<{ [day: number]: number }>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [activeInCalculator, setActiveInCalculator] = useState(false);
 
   const {
     loading,
@@ -36,16 +30,14 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
     saveStrategy,
     updateStrategy,
     deleteStrategy,
-  } = useStrategyDatabase(user);
+  } = useStrategyDatabase();
 
   const calculations = useStrategyCalculations(strategyConfig, dailyReturns, dailyPACOverrides);
 
-  // Carica strategie solo quando l'autenticazione è stabile
+  // Carica strategie all'avvio
   useEffect(() => {
-    if (!authLoading && user) {
-      loadStrategies();
-    }
-  }, [loadStrategies, user, authLoading]);
+    loadStrategies();
+  }, [loadStrategies]);
 
   // Monitora i cambiamenti per unsaved changes
   useEffect(() => {
@@ -65,15 +57,6 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
       setHasUnsavedChanges(hasConfigChanges || hasReturnsChanges || hasPACChanges);
     }
   }, [strategyConfig, dailyReturns, dailyPACOverrides, currentStrategy]);
-
-  // Verifica se la strategia è attiva nel calcolatore
-  useEffect(() => {
-    if (currentStrategy && calculator.currentConfigName === currentStrategy.name) {
-      setActiveInCalculator(true);
-    } else {
-      setActiveInCalculator(false);
-    }
-  }, [currentStrategy, calculator.currentConfigName]);
 
   const loadStrategy = useCallback((strategy: Strategy) => {
     setCurrentStrategy(strategy);
@@ -97,66 +80,7 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
     setHasUnsavedChanges(false);
     
     console.log('✅ Strategia caricata con successo:', strategy.name);
-    return strategy;
   }, []);
-
-  // Funzione per sincronizzare con il calcolatore principale
-  const syncWithCalculator = useCallback((strategy: Strategy) => {
-    try {
-      // Prepara la configurazione con date valide
-      const config = {
-        initialCapital: strategy.config.initialCapital,
-        timeHorizon: strategy.config.timeHorizon,
-        dailyReturnRate: strategy.config.dailyReturnRate,
-        currency: strategy.config.currency,
-        pacConfig: {
-          ...strategy.config.pacConfig,
-          startDate: strategy.config.pacConfig.startDate instanceof Date 
-            ? strategy.config.pacConfig.startDate 
-            : new Date(strategy.config.pacConfig.startDate)
-        }
-      };
-      
-      // Aggiorna il calcolatore con i dati della strategia
-      calculator.setConfig(config);
-      calculator.setDailyReturns(strategy.dailyReturns || {});
-      calculator.setDailyPACOverrides(strategy.dailyPACOverrides || {});
-      calculator.setCurrentConfigId(null); // Resetta l'ID della configurazione
-      calculator.setCurrentConfigName(strategy.name);
-      
-      console.log('✅ Strategia sincronizzata con il calcolatore:', strategy.name);
-      return true;
-    } catch (error) {
-      console.error('❌ Errore sincronizzando con il calcolatore:', error);
-      return false;
-    }
-  }, [calculator]);
-
-  // Funzione separata per attivare una strategia nel calcolatore principale
-  const activateStrategy = useCallback((strategy: Strategy) => {
-    try {
-      // Carica prima la strategia nell'interfaccia
-      loadStrategy(strategy);
-      
-      // Sincronizza con il calcolatore
-      const success = syncWithCalculator(strategy);
-      
-      if (success) {
-        setActiveInCalculator(true);
-        
-        // Notifica l'attivazione
-        toast({
-          title: "Strategia attivata",
-          description: `La strategia "${strategy.name}" è stata attivata nel calcolatore`
-        });
-      }
-      
-      return success;
-    } catch (error) {
-      console.error('❌ Errore attivando la strategia:', error);
-      return false;
-    }
-  }, [loadStrategy, syncWithCalculator, toast]);
 
   const createNewStrategy = useCallback(() => {
     setCurrentStrategy(null);
@@ -164,7 +88,6 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
     setDailyReturns({});
     setDailyPACOverrides({});
     setHasUnsavedChanges(false);
-    setActiveInCalculator(false);
   }, []);
 
   const saveCurrentStrategy = useCallback(async (name: string) => {
@@ -204,7 +127,7 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
         }
         setHasUnsavedChanges(false);
         console.log('✅ Strategia aggiornata con successo:', name);
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Errore dopo l\'aggiornamento della strategia:', error);
       }
     }
@@ -275,7 +198,6 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
     dailyReturns,
     dailyPACOverrides,
     hasUnsavedChanges,
-    activeInCalculator,
     
     // Calcoli
     ...calculations,
@@ -286,7 +208,6 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
     saveCurrentStrategy,
     updateCurrentStrategy,
     deleteStrategy,
-    activateStrategy,
     
     // Operazioni configurazione
     updateStrategyConfig,
@@ -297,6 +218,6 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
     
     // Utilità
     exportToCSV,
-    refreshStrategies: loadStrategies
+    refreshStrategies: loadStrategies,
   };
 };
