@@ -7,6 +7,7 @@ import { Strategy } from '@/types/strategy';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 
 interface StrategiesListProps {
   strategiesManager: ReturnType<typeof useStrategiesManager>;
@@ -38,8 +39,6 @@ const StrategyCard: React.FC<{
   onDelete: () => void;
   loading: boolean;
 }> = ({ strategy, isCurrent, onLoad, onActivate, onDelete, loading }) => {
-  const { toast } = useToast();
-  
   return (
     <Card className={`border transition-all duration-200 hover:shadow-md ${
       isCurrent ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
@@ -97,14 +96,8 @@ const StrategyCard: React.FC<{
           <div className="flex gap-2 pt-2 justify-between">
             <Button
               size="sm"
-              variant="outline"
-              onClick={() => {
-                onActivate();
-                toast({
-                  title: "Strategia attivata",
-                  description: `La strategia "${strategy.name}" è stata attivata nel calcolatore`
-                });
-              }}
+              variant="default"
+              onClick={onActivate}
               disabled={loading}
               className="h-8 text-xs"
             >
@@ -161,9 +154,31 @@ const StrategyCard: React.FC<{
 
 const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, loading }) => {
   const { strategies, currentStrategy, createNewStrategy, loadStrategy, deleteStrategy } = strategiesManager;
+  const calculator = useInvestmentCalculator();
   
   const handleActivateStrategy = (strategy: Strategy) => {
-    loadStrategy(strategy, true);
+    // Carica la strategia nel manager
+    strategiesManager.activateStrategy(strategy);
+    
+    // Sincronizza con il calcolatore di investimento
+    const config = {
+      initialCapital: strategy.config.initialCapital,
+      timeHorizon: strategy.config.timeHorizon,
+      dailyReturnRate: strategy.config.dailyReturnRate,
+      currency: strategy.config.currency,
+      pacConfig: {
+        ...strategy.config.pacConfig,
+        startDate: strategy.config.pacConfig.startDate instanceof Date 
+          ? strategy.config.pacConfig.startDate 
+          : new Date(strategy.config.pacConfig.startDate)
+      }
+    };
+    
+    // Aggiorna il calcolatore con i dati della strategia
+    calculator.setConfig(config);
+    calculator.setDailyReturns(strategy.dailyReturns || {});
+    calculator.setDailyPACOverrides(strategy.dailyPACOverrides || {});
+    calculator.setCurrentConfigName(strategy.name);
   };
 
   return (
@@ -199,7 +214,7 @@ const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, load
                 key={strategy.id}
                 strategy={strategy}
                 isCurrent={currentStrategy?.id === strategy.id}
-                onLoad={() => loadStrategy(strategy, false)}
+                onLoad={() => loadStrategy(strategy)}
                 onActivate={() => handleActivateStrategy(strategy)}
                 onDelete={() => deleteStrategy(strategy.id)}
                 loading={strategiesManager.loading}

@@ -3,7 +3,7 @@ import { User } from '@supabase/supabase-js';
 import { Strategy, StrategyConfig } from '@/types/strategy';
 import { useStrategyDatabase } from './useStrategyDatabase';
 import { useStrategyCalculations } from './useStrategyCalculations';
-import { useInvestmentCalculator } from './useInvestmentCalculator';
+import { useToast } from '@/hooks/use-toast';
 
 // Configurazione di default per una nuova strategia
 const getDefaultStrategyConfig = (): StrategyConfig => ({
@@ -19,14 +19,12 @@ const getDefaultStrategyConfig = (): StrategyConfig => ({
 });
 
 export const useStrategiesManager = (user: User | null, authLoading: boolean) => {
+  const { toast } = useToast();
   const [currentStrategy, setCurrentStrategy] = useState<Strategy | null>(null);
   const [strategyConfig, setStrategyConfig] = useState<StrategyConfig>(getDefaultStrategyConfig());
   const [dailyReturns, setDailyReturns] = useState<{ [day: number]: number }>({});
   const [dailyPACOverrides, setDailyPACOverrides] = useState<{ [day: number]: number }>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  
-  // Get access to the investment calculator to sync strategies
-  const investmentCalculator = useInvestmentCalculator();
 
   const {
     loading,
@@ -65,7 +63,7 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
     }
   }, [strategyConfig, dailyReturns, dailyPACOverrides, currentStrategy]);
 
-  const loadStrategy = useCallback((strategy: Strategy, activateInCalculator = true) => {
+  const loadStrategy = useCallback((strategy: Strategy, activateInCalculator = false) => {
     setCurrentStrategy(strategy);
     
     // Assicuriamoci che la configurazione abbia tutti i campi necessari
@@ -87,34 +85,24 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
     setHasUnsavedChanges(false);
     
     // Sync with investment calculator if requested
-    if (activateInCalculator) {
-      console.log('🔄 Sincronizzando strategia con il calcolatore di investimenti');
-      
-      // Convert strategy to investment config format
-      const investmentConfig = {
-        initialCapital: strategy.config.initialCapital,
-        timeHorizon: strategy.config.timeHorizon,
-        dailyReturnRate: strategy.config.dailyReturnRate,
-        currency: strategy.config.currency,
-        pacConfig: {
-          ...strategy.config.pacConfig,
-          startDate: strategy.config.pacConfig.startDate instanceof Date 
-            ? strategy.config.pacConfig.startDate 
-            : new Date(strategy.config.pacConfig.startDate)
-        }
-      };
-      
-      // Update investment calculator with this strategy
-      investmentCalculator.setConfig(investmentConfig);
-      investmentCalculator.setDailyReturns(strategy.dailyReturns || {});
-      investmentCalculator.setDailyPACOverrides(strategy.dailyPACOverrides || {});
-      investmentCalculator.setCurrentConfigName(strategy.name);
-      
-      console.log('✅ Strategia sincronizzata con il calcolatore di investimenti');
-    }
-    
     console.log('✅ Strategia caricata con successo:', strategy.name);
-  }, [investmentCalculator]);
+    return strategy;
+  }, []);
+
+  // Funzione separata per attivare una strategia nel calcolatore principale
+  const activateStrategy = useCallback((strategy: Strategy) => {
+    // Carica prima la strategia nell'interfaccia
+    loadStrategy(strategy, false);
+    
+    // Notifica l'attivazione
+    toast({
+      title: "Strategia attivata",
+      description: `La strategia "${strategy.name}" è stata attivata nel calcolatore`
+    });
+    
+    // Restituisci la strategia per l'uso esterno
+    return strategy;
+  }, [loadStrategy, toast]);
 
   const createNewStrategy = useCallback(() => {
     setCurrentStrategy(null);
@@ -253,5 +241,6 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
     // Utilità
     exportToCSV,
     refreshStrategies: loadStrategies,
+    activateStrategy
   };
 };

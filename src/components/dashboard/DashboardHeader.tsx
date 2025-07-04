@@ -131,6 +131,14 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           {/* Unsaved Changes Indicator */}
           {hasUnsavedChanges && (
             <Badge variant="destructive" className="animate-pulse text-xs">
+          {configState.currentConfigName && (
+            <div className="hidden md:flex items-center gap-2">
+              <div className="h-4 w-px bg-slate-200"></div>
+              <span className="text-sm font-medium text-primary">
+                {configState.currentConfigName}
+              </span>
+            </div>
+          )}
               Non salvato
             </Badge>
           )}

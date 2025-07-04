@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Save, Download, Copy, Play } from 'lucide-react';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 import { useToast } from '@/hooks/use-toast';
+import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 
 interface StrategyActionsProps {
   strategiesManager: ReturnType<typeof useStrategiesManager>;
@@ -21,6 +22,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     loading,
   } = strategiesManager;
   const { toast } = useToast();
+  const calculator = useInvestmentCalculator();
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [strategyName, setStrategyName] = useState('');
@@ -61,10 +63,27 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
 
   const handleActivateStrategy = () => {
     if (!currentStrategy) return;
-    
-    // Activate the current strategy in the investment calculator
-    strategiesManager.loadStrategy(currentStrategy, true);
-    
+
+    // Sincronizza con il calcolatore di investimento
+    const config = {
+      initialCapital: currentStrategy.config.initialCapital,
+      timeHorizon: currentStrategy.config.timeHorizon,
+      dailyReturnRate: currentStrategy.config.dailyReturnRate,
+      currency: currentStrategy.config.currency,
+      pacConfig: {
+        ...currentStrategy.config.pacConfig,
+        startDate: currentStrategy.config.pacConfig.startDate instanceof Date 
+          ? currentStrategy.config.pacConfig.startDate 
+          : new Date(currentStrategy.config.pacConfig.startDate)
+      }
+    };
+
+    // Aggiorna il calcolatore con i dati della strategia
+    calculator.setConfig(config);
+    calculator.setDailyReturns(currentStrategy.dailyReturns || {});
+    calculator.setDailyPACOverrides(currentStrategy.dailyPACOverrides || {});
+    calculator.setCurrentConfigName(currentStrategy.name);
+
     toast({
       title: "Strategia attivata",
       description: `La strategia "${currentStrategy.name}" è stata attivata nel calcolatore`
@@ -76,10 +95,10 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
       {/* Attiva Strategia */}
       {currentStrategy && (
         <Button
-          size="sm"
+          size="sm" 
+          variant="default"
           onClick={handleActivateStrategy}
           disabled={loading}
-          variant="outline"
           className="h-8"
         >
           <Play className="h-4 w-4 mr-1" />

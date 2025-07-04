@@ -115,7 +115,7 @@ const Dashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-foreground mb-2">
-                📈 Dashboard Investimenti
+                📈 Dashboard {currentConfigName ? currentConfigName : "Investimenti"}
               </h1>
               <p className="text-muted-foreground text-lg">
                 Monitora la crescita del tuo portafoglio e analizza le performance
