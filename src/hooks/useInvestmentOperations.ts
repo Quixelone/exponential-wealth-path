@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { InvestmentConfig } from '@/types/investment';
 
@@ -74,8 +73,7 @@ export const useInvestmentOperations = ({
     // Mark as unsaved
     if (configState.currentConfigId) {
       // Don't reset the ID, just mark as having unsaved changes
-      // This allows the UI to still show which configuration is being edited
-      // setCurrentConfigId(null);
+      // We keep the ID to maintain the connection to the original config
     }
   }, [setDailyReturns, configState.currentConfigId, saveConfigurationToHistory]);
 
@@ -91,7 +89,7 @@ export const useInvestmentOperations = ({
     // Mark as unsaved
     if (configState.currentConfigId) {
       // Don't reset the ID, just mark as having unsaved changes
-      // setCurrentConfigId(null);
+      // We keep the ID to maintain the connection to the original config
     }
   }, [setDailyReturns, configState.currentConfigId, saveConfigurationToHistory]);
 
@@ -109,7 +107,7 @@ export const useInvestmentOperations = ({
     // Mark as unsaved
     if (configState.currentConfigId) {
       // Don't reset the ID, just mark as having unsaved changes
-      // setCurrentConfigId(null);
+      // We keep the ID to maintain the connection to the original config
     }
   }, [setDailyPACOverrides, configState.currentConfigId, saveConfigurationToHistory]);
 
@@ -125,7 +123,7 @@ export const useInvestmentOperations = ({
     // Mark as unsaved
     if (configState.currentConfigId) {
       // Don't reset the ID, just mark as having unsaved changes
-      // setCurrentConfigId(null);
+      // We keep the ID to maintain the connection to the original config
     }
   }, [setDailyPACOverrides, configState.currentConfigId, saveConfigurationToHistory]);
 
