@@ -34,7 +34,7 @@ export const useInvestmentOperations = ({
     // STOP EMPTY CONFIG UPDATES che resettano tutto
     if (Object.keys(newConfig).length === 0 && reset) {
       console.log('🚫 BLOCKING EMPTY CONFIG UPDATE with reset=true');
-      return;
+      return; 
     }
     
     // Save to history before making changes
@@ -47,17 +47,10 @@ export const useInvestmentOperations = ({
       return updated;
     });
     
-    if (
-      reset ||
-      newConfig.initialCapital !== undefined ||
-      newConfig.timeHorizon !== undefined ||
-      newConfig.pacConfig?.frequency !== undefined
-    ) {
-     // Only reset if explicitly requested
-     if (reset) {
-       setDailyReturns({});
-       setDailyPACOverrides({});
-     }
+    // Only reset if explicitly requested
+    if (reset) {
+      setDailyReturns({});
+      setDailyPACOverrides({});
     }
   }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 

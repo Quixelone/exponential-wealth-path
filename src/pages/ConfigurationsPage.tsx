@@ -71,18 +71,15 @@ const ConfigurationsPage = () => {
   // CARICAMENTO DIRETTO SENZA WARNING - per permettere caricamento fluido
   const handleLoadConfigWithWarning = (savedConfig: any) => {
     console.log('🚀 CARICAMENTO CONFIGURAZIONE:', savedConfig.name);
-    try {
-      // Assicuriamoci che la configurazione abbia tutti i campi necessari
-     loadSavedConfiguration(savedConfig);
-    } catch (error) {
-      console.error('❌ Errore nel caricamento della configurazione:', error);
-     const { toast } = useToast();
-      toast({
-        title: "Errore",
-        description: "Impossibile caricare la configurazione",
-        variant: "destructive",
-      });
+    
+    if (hasUnsavedChanges) {
+      const confirmLoad = window.confirm(
+        'Hai modifiche non salvate nella configurazione corrente. Caricando una nuova configurazione perderai queste modifiche. Vuoi continuare?'
+      );
+      if (!confirmLoad) return;
     }
+    
+    loadSavedConfiguration(savedConfig);
   };
 
   return (

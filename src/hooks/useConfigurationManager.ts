@@ -35,29 +35,29 @@ export const useConfigurationManager = () => {
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
     try {
       console.log('🚀 CARICAMENTO CONFIGURAZIONE:', savedConfig.name);
-      
+
       // Assicuriamoci che la configurazione abbia tutti i campi necessari
       const configToLoad = {
         ...savedConfig.config,
         pacConfig: {
           ...savedConfig.config.pacConfig,
           // Assicuriamoci che startDate sia un oggetto Date
-          startDate: savedConfig.config.pacConfig.startDate instanceof Date 
-            ? savedConfig.config.pacConfig.startDate 
+          startDate: savedConfig.config.pacConfig.startDate instanceof Date
+            ? savedConfig.config.pacConfig.startDate
             : new Date(savedConfig.config.pacConfig.startDate)
         }
       };
-      
+
       // Caricamento in sequenza per evitare problemi di stato
       setConfig(configToLoad);
       setDailyReturns(savedConfig.dailyReturns || {});
       setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
       setCurrentConfigId(savedConfig.id);
       setCurrentConfigName(savedConfig.name);
-      
+
       // Salva nella cronologia
       saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
-      
+
       console.log('✅ Configurazione caricata con successo:', savedConfig.name);
       return true;
     } catch (error) {
