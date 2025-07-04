@@ -66,7 +66,6 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     <div className="flex items-center gap-2">
       {/* Salva/Aggiorna */}
       <Button
-    if (currentStrategy && !isCopyMode) {
         onClick={handleSaveClick}
         disabled={loading}
         variant={hasUnsavedChanges ? "default" : "outline"}
