@@ -10,6 +10,14 @@ import Auth from "./pages/Auth";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import StrategiesPage from "./pages/StrategiesPage";
+import ChartsPage from "./pages/ChartsPage";
+import HistoryPage from "./pages/HistoryPage";
+import RemindersPage from "./pages/RemindersPage";
+import Auth from "./pages/Auth";
+import UserManagement from "./pages/UserManagement";
+import Settings from "./pages/Settings";
+import NotFound from "./pages/NotFound";
 import ConfigurationsPage from "./pages/ConfigurationsPage";
 import StrategiesPage from "./pages/StrategiesPage";
 import ChartsPage from "./pages/ChartsPage";
@@ -29,6 +37,16 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<DashboardLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="charts" element={<ChartsPage />} />
+              <Route path="history" element={<HistoryPage />} />
+              <Route path="strategies" element={<StrategiesPage />} />
+              <Route path="reminders" element={<RemindersPage />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="user-management" element={<UserManagement />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="charts" element={<ChartsPage />} />

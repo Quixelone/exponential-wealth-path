@@ -49,14 +49,9 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     {
       title: 'Configurazioni',
       href: '/configurations',
-      icon: Calculator,
-      description: 'Gestione parametri'
-    },
-    {
-      title: 'Strategie',
       href: '/strategies',
       icon: Target,
-      description: 'Gestione strategie'
+      description: 'Gestione parametri'
     },
     {
       title: 'Promemoria',

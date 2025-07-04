@@ -37,7 +37,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
   const handleSave = async () => {
     if (!strategyName.trim()) return;
 
-    let success: boolean | string | null = false;
+    let success = false;
     if (currentStrategy) {
       success = await updateCurrentStrategy(currentStrategy.id, strategyName.trim());
     } else {
@@ -45,7 +45,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
       success = !!strategyId;
     }
 
-    if (success !== false) {
+    if (success) {
       setSaveDialogOpen(false);
       setStrategyName('');
     }

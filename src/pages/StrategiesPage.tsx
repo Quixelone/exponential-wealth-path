@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
+import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
 import StrategyPanel from '@/components/strategy/StrategyPanel';
 
 const StrategiesPage = () => {
@@ -47,6 +48,7 @@ const StrategiesPage = () => {
   const currentStrategyName = strategiesManager.currentStrategy?.name || 'Nuova Strategia';
 
   return (
+    <ModernTooltipProvider>
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-6">
@@ -70,6 +72,7 @@ const StrategiesPage = () => {
         <StrategyPanel strategiesManager={strategiesManager} />
       </div>
     </div>
+    </ModernTooltipProvider>
   );
 };
 

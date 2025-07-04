@@ -16,7 +16,7 @@ const StrategyPanel: React.FC<StrategyPanelProps> = ({ strategiesManager }) => {
     currentStrategy,
     strategyConfig,
     hasUnsavedChanges,
-    loading,
+    hasUnsavedChanges,
     summary
   } = strategiesManager;
 
