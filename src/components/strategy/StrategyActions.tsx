@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Save, Download, Copy, Play, Check } from 'lucide-react';
+import { Save, Download, Copy, Play, Check, Plus } from 'lucide-react';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 
 interface StrategyActionsProps {
@@ -24,6 +24,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [strategyName, setStrategyName] = useState('');
+  const [isCopyMode, setIsCopyMode] = useState(false);
 
   const handleSaveClick = () => {
     if (currentStrategy) {
@@ -40,7 +41,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     if (!strategyName.trim()) return;
 
     let success = false;
-    if (currentStrategy) {
+    if (currentStrategy && !isCopyMode) {
       success = await updateCurrentStrategy(currentStrategy.id, strategyName.trim());
     } else {
       const strategyId = await saveCurrentStrategy(strategyName.trim());
@@ -56,6 +57,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
   const handleCopyStrategy = () => {
     const copyName = `${currentStrategy?.name || 'Strategia'} (copia)`;
     setStrategyName(copyName);
+    setIsCopyMode(true);
     setSaveDialogOpen(true);
   };
 
@@ -117,11 +119,22 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
       </Button>
 
       {/* Dialog Salvataggio */}
-      <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+      <Dialog 
+        open={saveDialogOpen} 
+        onOpenChange={(open) => {
+          setSaveDialogOpen(open);
+          if (!open) {
+            setStrategyName('');
+            setIsCopyMode(false);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {currentStrategy ? 'Aggiorna Strategia' : 'Salva Nuova Strategia'}
+              {isCopyMode 
+                ? 'Copia Strategia' 
+                : (currentStrategy ? 'Aggiorna Strategia' : 'Salva Nuova Strategia')}
             </DialogTitle>
           </DialogHeader>
           
@@ -133,6 +146,11 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
                 placeholder="Inserisci il nome della strategia"
                 value={strategyName}
                 onChange={(e) => setStrategyName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && strategyName.trim()) {
+                    handleSave();
+                  }
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && strategyName.trim()) {
                     handleSave();
@@ -162,7 +180,9 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
                 disabled={!strategyName.trim() || loading}
               >
                 <Save className="h-4 w-4 mr-1" />
-                {currentStrategy ? 'Aggiorna' : 'Salva'}
+                {isCopyMode 
+                  ? 'Salva Copia' 
+                  : (currentStrategy ? 'Aggiorna' : 'Salva')}
               </Button>
             </div>
           </div>
