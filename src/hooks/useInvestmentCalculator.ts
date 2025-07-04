@@ -80,6 +80,7 @@ export const useInvestmentCalculator = () => {
     setDailyReturns,
     setDailyPACOverrides,
     setCurrentConfigId,
+    setCurrentConfigName,
     investmentData,
     saveConfigurationToHistory
   });
@@ -87,6 +88,10 @@ export const useInvestmentCalculator = () => {
   return {
     config: configState.config,
     updateConfig,
+    setConfig,
+    setDailyReturns,
+    setDailyPACOverrides,
+    setCurrentConfigName,
     createNewConfiguration,
     investmentData,
     dailyReturns: configState.dailyReturns,

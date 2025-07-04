@@ -14,6 +14,7 @@ interface UseInvestmentOperationsProps {
   setDailyReturns: (returns: { [day: number]: number } | ((prev: { [day: number]: number }) => { [day: number]: number })) => void;
   setDailyPACOverrides: (overrides: { [day: number]: number } | ((prev: { [day: number]: number }) => { [day: number]: number })) => void;
   setCurrentConfigId: (id: string | null) => void;
+  setCurrentConfigName: (name: string) => void;
   investmentData: any[];
   saveConfigurationToHistory: (description: string) => void;
 }
@@ -24,6 +25,7 @@ export const useInvestmentOperations = ({
   setDailyReturns,
   setDailyPACOverrides,
   setCurrentConfigId,
+  setCurrentConfigName,
   investmentData,
   saveConfigurationToHistory
 }: UseInvestmentOperationsProps) => {
@@ -71,9 +73,11 @@ export const useInvestmentOperations = ({
     
     // Mark as unsaved
     if (configState.currentConfigId) {
-      setCurrentConfigId(null);
+      // Don't reset the ID, just mark as having unsaved changes
+      // This allows the UI to still show which configuration is being edited
+      // setCurrentConfigId(null);
     }
-  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
+  }, [setDailyReturns, configState.currentConfigId, saveConfigurationToHistory]);
 
   const removeDailyReturn = useCallback((day: number) => {
     saveConfigurationToHistory(`Rimozione rendimento personalizzato giorno ${day}`);
@@ -86,9 +90,10 @@ export const useInvestmentOperations = ({
     
     // Mark as unsaved
     if (configState.currentConfigId) {
-      setCurrentConfigId(null);
+      // Don't reset the ID, just mark as having unsaved changes
+      // setCurrentConfigId(null);
     }
-  }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
+  }, [setDailyReturns, configState.currentConfigId, saveConfigurationToHistory]);
 
   const updatePACForDay = useCallback((day: number, pacAmount: number) => {
     saveConfigurationToHistory(`Modifica PAC giorno ${day}: €${pacAmount}`);
@@ -103,9 +108,10 @@ export const useInvestmentOperations = ({
     
     // Mark as unsaved
     if (configState.currentConfigId) {
-      setCurrentConfigId(null);
+      // Don't reset the ID, just mark as having unsaved changes
+      // setCurrentConfigId(null);
     }
-  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
+  }, [setDailyPACOverrides, configState.currentConfigId, saveConfigurationToHistory]);
 
   const removePACOverride = useCallback((day: number) => {
     saveConfigurationToHistory(`Rimozione PAC personalizzato giorno ${day}`);
@@ -118,9 +124,10 @@ export const useInvestmentOperations = ({
     
     // Mark as unsaved
     if (configState.currentConfigId) {
-      setCurrentConfigId(null);
+      // Don't reset the ID, just mark as having unsaved changes
+      // setCurrentConfigId(null);
     }
-  }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
+  }, [setDailyPACOverrides, configState.currentConfigId, saveConfigurationToHistory]);
 
   const exportToCSV = useCallback(() => {
     const csvContent = [

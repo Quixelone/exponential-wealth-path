@@ -6,6 +6,7 @@ import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 import StrategyConfiguration from './StrategyConfiguration';
 import StrategiesList from './StrategiesList';
 import StrategyActions from './StrategyActions';
+import { useToast } from '@/hooks/use-toast';
 
 interface StrategyPanelProps {
   strategiesManager: ReturnType<typeof useStrategiesManager>;
@@ -16,8 +17,10 @@ const StrategyPanel: React.FC<StrategyPanelProps> = ({ strategiesManager }) => {
     currentStrategy,
     strategyConfig,
     hasUnsavedChanges,
-    summary
+    summary,
+    loading
   } = strategiesManager;
+  const { toast } = useToast();
 
   const displayName = currentStrategy?.name || 'Nuova Strategia';
 
@@ -116,7 +119,7 @@ const StrategyPanel: React.FC<StrategyPanelProps> = ({ strategiesManager }) => {
       {/* Pannello Strategie Salvate */}
       <div className="space-y-6">
         <StrategiesList 
-          strategiesManager={strategiesManager}
+          strategiesManager={strategiesManager} 
         />
       </div>
     </div>

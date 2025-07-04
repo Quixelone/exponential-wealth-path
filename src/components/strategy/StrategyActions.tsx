@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Save, Download, Copy, Plus } from 'lucide-react';
+import { Save, Download, Copy, Play } from 'lucide-react';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
+import { useToast } from '@/hooks/use-toast';
 
 interface StrategyActionsProps {
   strategiesManager: ReturnType<typeof useStrategiesManager>;
@@ -19,6 +20,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     exportToCSV,
     loading,
   } = strategiesManager;
+  const { toast } = useToast();
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [strategyName, setStrategyName] = useState('');
@@ -57,8 +59,34 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     setSaveDialogOpen(true);
   };
 
+  const handleActivateStrategy = () => {
+    if (!currentStrategy) return;
+    
+    // Activate the current strategy in the investment calculator
+    strategiesManager.loadStrategy(currentStrategy, true);
+    
+    toast({
+      title: "Strategia attivata",
+      description: `La strategia "${currentStrategy.name}" è stata attivata nel calcolatore`
+    });
+  };
+
   return (
     <div className="flex items-center gap-2">
+      {/* Attiva Strategia */}
+      {currentStrategy && (
+        <Button
+          size="sm"
+          onClick={handleActivateStrategy}
+          disabled={loading}
+          variant="outline"
+          className="h-8"
+        >
+          <Play className="h-4 w-4 mr-1" />
+          Attiva
+        </Button>
+      )}
+    
       {/* Salva/Aggiorna */}
       <Button
         size="sm"
