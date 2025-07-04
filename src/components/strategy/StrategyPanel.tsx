@@ -16,7 +16,6 @@ const StrategyPanel: React.FC<StrategyPanelProps> = ({ strategiesManager }) => {
     currentStrategy,
     strategyConfig,
     hasUnsavedChanges,
-    hasUnsavedChanges,
     summary
   } = strategiesManager;
 
@@ -118,7 +117,6 @@ const StrategyPanel: React.FC<StrategyPanelProps> = ({ strategiesManager }) => {
       <div className="space-y-6">
         <StrategiesList 
           strategiesManager={strategiesManager}
-          loading={loading}
         />
       </div>
     </div>
