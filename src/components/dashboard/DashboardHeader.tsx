@@ -117,8 +117,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <div className="text-sm text-slate-600">
               {currentConfigName ? `${currentConfigName} - ` : ''}Capitale Attuale
             </div>
-              {currentConfigName ? `${currentConfigName} - ` : ''}Capitale Attuale
-            </div>
             <div className="text-lg font-bold text-slate-900">
               {formatCurrencyWhole(currentBalance, config?.currency || 'EUR')}
             </div>
