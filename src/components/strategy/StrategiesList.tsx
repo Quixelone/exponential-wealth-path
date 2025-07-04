@@ -33,7 +33,6 @@ const StrategyCard: React.FC<{
   isCurrent: boolean;
   onLoad: () => void;
   onActivate: () => void;
-  onActivate: () => void;
   onDelete: () => void;
   loading: boolean;
   isActive: boolean;
@@ -118,6 +117,7 @@ const StrategyCard: React.FC<{
               onClick={onLoad}
               disabled={loading}
               className="h-8 text-xs"
+            >
               Modifica
             </Button>
             
@@ -211,17 +211,9 @@ const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, load
                   loadStrategy(strategy);
                 }}
                 onActivate={() => activateStrategy(strategy)}
-                  console.log('🔄 Caricando strategia per modifica:', strategy.name);
-                  loadStrategy(strategy);
-                }}
-                onActivate={() => {
-                  console.log('🚀 Attivando strategia:', strategy.name);
-                  strategiesManager.activateStrategy(strategy);
-                }}
                 onDelete={() => deleteStrategy(strategy.id)}
                 isActive={activeInCalculator && currentStrategy?.id === strategy.id}
-                loading={strategiesManager.loading}
-                loading={strategiesManager.loading}
+                loading={loading}
               />
             ))
           )}
