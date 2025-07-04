@@ -56,6 +56,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     }
 
     if (success) {
+      setSaveDialogOpen(false);
     }
   };
 
@@ -107,16 +108,6 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
       </Button>
 
       {/* Dialog Salvataggio */}
-      <Dialog 
-        open={saveDialogOpen} 
-        onOpenChange={(open) => {
-          setSaveDialogOpen(open);
-          if (!open) {
-            setStrategyName('');
-            setIsCopyMode(false);
-          }
-        }}
-      >
       <Dialog 
         open={saveDialogOpen} 
         onOpenChange={(open) => {
