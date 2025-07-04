@@ -15,15 +15,6 @@ import StrategiesPage from "./pages/StrategiesPage";
 import ChartsPage from "./pages/ChartsPage";
 import HistoryPage from "./pages/HistoryPage";
 import RemindersPage from "./pages/RemindersPage";
-import Auth from "./pages/Auth";
-import UserManagement from "./pages/UserManagement";
-import Settings from "./pages/Settings";
-import NotFound from "./pages/NotFound";
-import ConfigurationsPage from "./pages/ConfigurationsPage";
-import StrategiesPage from "./pages/StrategiesPage";
-import ChartsPage from "./pages/ChartsPage";
-import HistoryPage from "./pages/HistoryPage";
-import RemindersPage from "./pages/RemindersPage";
 
 const queryClient = new QueryClient();
 
