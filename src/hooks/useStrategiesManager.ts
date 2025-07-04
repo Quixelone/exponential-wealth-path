@@ -48,6 +48,7 @@ export const useStrategiesManager = (user: User | null, authLoading: boolean) =>
   useEffect(() => {
     if (!authLoading && user) {
       loadStrategies();
+    }
     if (!authLoading && user) {
       loadStrategies();
     }
