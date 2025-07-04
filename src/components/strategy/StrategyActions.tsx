@@ -3,10 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Save, Download, Copy, Play } from 'lucide-react';
+import { Save, Download, Copy, Play, Check } from 'lucide-react';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
-import { useToast } from '@/hooks/use-toast';
-import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 
 interface StrategyActionsProps {
   strategiesManager: ReturnType<typeof useStrategiesManager>;
@@ -20,9 +18,9 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     updateCurrentStrategy,
     exportToCSV,
     loading,
+    activeInCalculator,
+    activateStrategy
   } = strategiesManager;
-  const { toast } = useToast();
-  const calculator = useInvestmentCalculator();
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [strategyName, setStrategyName] = useState('');
@@ -61,48 +59,22 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     setSaveDialogOpen(true);
   };
 
-  const handleActivateStrategy = () => {
-    if (!currentStrategy) return;
-
-    // Sincronizza con il calcolatore di investimento
-    const config = {
-      initialCapital: currentStrategy.config.initialCapital,
-      timeHorizon: currentStrategy.config.timeHorizon,
-      dailyReturnRate: currentStrategy.config.dailyReturnRate,
-      currency: currentStrategy.config.currency,
-      pacConfig: {
-        ...currentStrategy.config.pacConfig,
-        startDate: currentStrategy.config.pacConfig.startDate instanceof Date 
-          ? currentStrategy.config.pacConfig.startDate 
-          : new Date(currentStrategy.config.pacConfig.startDate)
-      }
-    };
-
-    // Aggiorna il calcolatore con i dati della strategia
-    calculator.setConfig(config);
-    calculator.setDailyReturns(currentStrategy.dailyReturns || {});
-    calculator.setDailyPACOverrides(currentStrategy.dailyPACOverrides || {});
-    calculator.setCurrentConfigName(currentStrategy.name);
-
-    toast({
-      title: "Strategia attivata",
-      description: `La strategia "${currentStrategy.name}" è stata attivata nel calcolatore`
-    });
-  };
-
   return (
     <div className="flex items-center gap-2">
       {/* Attiva Strategia */}
       {currentStrategy && (
         <Button
           size="sm" 
-          variant="default"
-          onClick={handleActivateStrategy}
+          variant={activeInCalculator ? "outline" : "default"}
+          onClick={() => activateStrategy(currentStrategy)}
           disabled={loading}
-          className="h-8"
+          className={`h-8 ${activeInCalculator ? 'border-green-500 text-green-600' : ''}`}
         >
-          <Play className="h-4 w-4 mr-1" />
-          Attiva
+          {activeInCalculator ? (
+            <><Check className="h-4 w-4 mr-1" />Attivata</>
+          ) : (
+            <><Play className="h-4 w-4 mr-1" />Attiva</>
+          )}
         </Button>
       )}
     

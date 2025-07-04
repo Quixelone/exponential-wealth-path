@@ -50,7 +50,7 @@ export const useInvestmentCalculator = () => {
     console.log('  - currentConfigName:', configState.currentConfigName);
     console.log('  - initialCapital:', configState.config.initialCapital);
     console.log('  - timeHorizon:', configState.config.timeHorizon); 
-    console.log('  - currentConfigName:', configState.currentConfigName);
+    console.log('  - pacAmount:', configState.config.pacConfig.amount);
   }, [configState.currentConfigId, configState.currentConfigName, configState.config]);
 
   // MONITORING completo dello stato per detectare interferenze
@@ -58,8 +58,8 @@ export const useInvestmentCalculator = () => {
     console.log('📊 CONFIG STATE MONITORING:');
     console.log('  - Capital:', configState.config.initialCapital);
     console.log('  - Name:', configState.currentConfigName);
-    console.log('  - ID:', configState.currentConfigId); 
-    console.log('  - Current Name:', configState.currentConfigName);
+    console.log('  - ID:', configState.currentConfigId);
+    console.log('  - PAC Amount:', configState.config.pacConfig.amount);
   }, [configState.config.initialCapital, configState.currentConfigName, configState.currentConfigId]);
 
   const { investmentData, currentDayIndex, nextPACInfo, summary } = useInvestmentData({

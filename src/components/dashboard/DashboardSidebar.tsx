@@ -9,9 +9,9 @@ import {
   Settings,
   Bell,
   X,
-  PieChart,
+  Target,
   Calculator,
-  Target
+  Briefcase
 } from 'lucide-react';
 
 interface DashboardSidebarProps {
@@ -50,13 +50,13 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       title: 'Configurazioni',
       href: '/configurations',
       icon: Calculator,
-      description: 'Gestione parametri'
+      description: 'Parametri investimento'
     },
     {
       title: 'Strategie',
       href: '/strategies',
-      icon: Target,
-      description: 'Gestione strategie'
+      icon: Briefcase,
+      description: 'Strategie investimento'
     },
     {
       title: 'Promemoria',

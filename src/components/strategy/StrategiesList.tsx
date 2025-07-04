@@ -6,8 +6,6 @@ import { FileText, Calendar, TrendingUp, Play, Trash2, Plus } from 'lucide-react
 import { Strategy } from '@/types/strategy';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
-import { useToast } from '@/hooks/use-toast';
-import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 
 interface StrategiesListProps {
   strategiesManager: ReturnType<typeof useStrategiesManager>;
@@ -41,7 +39,7 @@ const StrategyCard: React.FC<{
 }> = ({ strategy, isCurrent, onLoad, onActivate, onDelete, loading }) => {
   return (
     <Card className={`border transition-all duration-200 hover:shadow-md ${
-      isCurrent ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
+      isCurrent ? 'border-primary bg-primary/5 shadow-md' : 'border-border hover:border-primary/30'
     }`}>
       <CardContent className="p-4">
         <div className="space-y-3">
@@ -96,13 +94,13 @@ const StrategyCard: React.FC<{
           <div className="flex gap-2 pt-2 justify-between">
             <Button
               size="sm"
-              variant="default"
+              variant={isCurrent ? "outline" : "default"}
               onClick={onActivate}
               disabled={loading}
-              className="h-8 text-xs"
+              className={`h-8 text-xs ${isCurrent ? 'border-green-500 text-green-600' : ''}`}
             >
               <Play className="h-3 w-3 mr-1" />
-              Attiva
+              {isCurrent ? 'Attivata' : 'Attiva'}
             </Button>
             
             <Button
@@ -154,32 +152,6 @@ const StrategyCard: React.FC<{
 
 const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, loading }) => {
   const { strategies, currentStrategy, createNewStrategy, loadStrategy, deleteStrategy } = strategiesManager;
-  const calculator = useInvestmentCalculator();
-  
-  const handleActivateStrategy = (strategy: Strategy) => {
-    // Carica la strategia nel manager
-    strategiesManager.activateStrategy(strategy);
-    
-    // Sincronizza con il calcolatore di investimento
-    const config = {
-      initialCapital: strategy.config.initialCapital,
-      timeHorizon: strategy.config.timeHorizon,
-      dailyReturnRate: strategy.config.dailyReturnRate,
-      currency: strategy.config.currency,
-      pacConfig: {
-        ...strategy.config.pacConfig,
-        startDate: strategy.config.pacConfig.startDate instanceof Date 
-          ? strategy.config.pacConfig.startDate 
-          : new Date(strategy.config.pacConfig.startDate)
-      }
-    };
-    
-    // Aggiorna il calcolatore con i dati della strategia
-    calculator.setConfig(config);
-    calculator.setDailyReturns(strategy.dailyReturns || {});
-    calculator.setDailyPACOverrides(strategy.dailyPACOverrides || {});
-    calculator.setCurrentConfigName(strategy.name);
-  };
 
   return (
     <Card>
@@ -214,8 +186,14 @@ const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, load
                 key={strategy.id}
                 strategy={strategy}
                 isCurrent={currentStrategy?.id === strategy.id}
-                onLoad={() => loadStrategy(strategy)}
-                onActivate={() => handleActivateStrategy(strategy)}
+                onLoad={() => {
+                  console.log('🔄 Caricando strategia per modifica:', strategy.name);
+                  loadStrategy(strategy);
+                }}
+                onActivate={() => {
+                  console.log('🚀 Attivando strategia:', strategy.name);
+                  strategiesManager.activateStrategy(strategy);
+                }}
                 onDelete={() => deleteStrategy(strategy.id)}
                 loading={strategiesManager.loading}
               />
