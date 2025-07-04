@@ -2,8 +2,12 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
+import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 import ConfigurationPanel from '@/components/ConfigurationPanel';
+import StrategyPanel from '@/components/strategy/StrategyPanel';
 import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calculator, Target } from 'lucide-react';
 
 const ConfigurationsPage = () => {
   const navigate = useNavigate();
@@ -32,6 +36,9 @@ const ConfigurationsPage = () => {
     canUndo,
     canRedo
   } = useInvestmentCalculator();
+  
+  // Strategies manager
+  const strategiesManager = useStrategiesManager();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -90,8 +97,8 @@ const ConfigurationsPage = () => {
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
             Gestione Configurazioni
           </h1>
-          <p className="text-slate-600">
-            Configura i parametri del tuo investimento e gestisci le impostazioni salvate
+          <p className="text-slate-600 mb-4">
+            Configura i parametri del tuo investimento e gestisci le tue strategie
           </p>
           {hasUnsavedChanges && (
             <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
@@ -103,33 +110,50 @@ const ConfigurationsPage = () => {
         </div>
 
         {/* Configuration Panel */}
-        <div className="animate-fade-in">
-          <ConfigurationPanel
-            config={config}
-            onConfigChange={updateConfig}
-            customReturns={dailyReturns}
-            onUpdateDailyReturn={updateDailyReturn}
-            onRemoveDailyReturn={removeDailyReturn}
-            onExportCSV={exportToCSV}
-            savedConfigs={savedConfigs}
-            onLoadConfiguration={loadSavedConfiguration}
-            onDeleteConfiguration={deleteConfiguration}
-            onSaveConfiguration={saveCurrentConfiguration}
-            onUpdateConfiguration={updateCurrentConfiguration}
-            currentConfigId={currentConfigId}
-            currentConfigName={currentConfigName}
-            supabaseLoading={supabaseLoading}
-            isAdmin={isAdmin}
-            dailyPACOverrides={dailyPACOverrides}
-            onUpdatePACForDay={updatePACForDay}
-            onRemovePACOverride={removePACOverride}
-            hasUnsavedChanges={hasUnsavedChanges}
-            onUndo={undoConfiguration}
-            onRedo={redoConfiguration}
-            canUndo={canUndo}
-            canRedo={canRedo}
-          />
-        </div>
+        <Tabs defaultValue="configurations" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="configurations" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Configurazioni
+            </TabsTrigger>
+            <TabsTrigger value="strategies" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Strategie
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="configurations" className="animate-fade-in">
+            <ConfigurationPanel
+              config={config}
+              onConfigChange={updateConfig}
+              customReturns={dailyReturns}
+              onUpdateDailyReturn={updateDailyReturn}
+              onRemoveDailyReturn={removeDailyReturn}
+              onExportCSV={exportToCSV}
+              savedConfigs={savedConfigs}
+              onLoadConfiguration={loadSavedConfiguration}
+              onDeleteConfiguration={deleteConfiguration}
+              onSaveConfiguration={saveCurrentConfiguration}
+              onUpdateConfiguration={updateCurrentConfiguration}
+              currentConfigId={currentConfigId}
+              currentConfigName={currentConfigName}
+              supabaseLoading={supabaseLoading}
+              isAdmin={isAdmin}
+              dailyPACOverrides={dailyPACOverrides}
+              onUpdatePACForDay={updatePACForDay}
+              onRemovePACOverride={removePACOverride}
+              hasUnsavedChanges={hasUnsavedChanges}
+              onUndo={undoConfiguration}
+              onRedo={redoConfiguration}
+              canUndo={canUndo}
+              canRedo={canRedo}
+            />
+          </TabsContent>
+          
+          <TabsContent value="strategies" className="animate-fade-in">
+            <StrategyPanel strategiesManager={strategiesManager} />
+          </TabsContent>
+        </Tabs>
       </div>
     </ModernTooltipProvider>
   );

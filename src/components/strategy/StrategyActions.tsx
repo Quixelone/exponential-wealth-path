@@ -39,7 +39,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     if (!strategyName.trim()) return;
     
     let success = false;
-    if (currentStrategy && !isCopyMode) {
+    if (currentStrategy && !isCopyMode) { 
       success = await updateCurrentStrategy(currentStrategy.id, strategyName.trim());
     } else {
       const strategyId = await saveCurrentStrategy(strategyName.trim());
@@ -48,6 +48,7 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
 
     if (success) {
       setSaveDialogOpen(false);
+      // No need to reset here as we'll do it in onOpenChange
     }
   };
 

@@ -132,7 +132,7 @@ export const useStrategiesManager = () => {
       }
     }
     return success;
-  }, [updateStrategy, strategyConfig, dailyReturns, dailyPACOverrides, loadStrategies, strategies, currentStrategy, setHasUnsavedChanges]);
+  }, [updateStrategy, strategyConfig, dailyReturns, dailyPACOverrides, loadStrategies, strategies, currentStrategy, setHasUnsavedChanges, setCurrentStrategy]);
 
   const updateStrategyConfig = useCallback((newConfig: Partial<StrategyConfig>) => {
     setStrategyConfig(prev => ({ ...prev, ...newConfig }));
