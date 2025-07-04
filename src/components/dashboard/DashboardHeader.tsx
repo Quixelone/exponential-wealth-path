@@ -36,9 +36,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onToggleSidebar
 }) => {
   const { user, userProfile, signOut, isAdmin } = useAuth();
-  const { summary, config, hasUnsavedChanges } = useInvestmentCalculator();
-  const { currentConfigName } = useInvestmentCalculator();
-  const { currentConfigName } = useInvestmentCalculator();
+  const { summary, config, hasUnsavedChanges, currentConfigName } = useInvestmentCalculator();
   const navigate = useNavigate();
 
   const displayName = userProfile?.first_name && userProfile?.last_name 
@@ -140,13 +138,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               {currentConfigName}
             </Badge>
           )}
-          
-          {currentConfigName && (
-            <Badge variant="outline" className="text-xs text-primary border-primary">
-              {currentConfigName}
-            </Badge>
-          )}
-          
           {hasUnsavedChanges && (
             <Badge variant="destructive" className="animate-pulse text-xs">
               Non salvato

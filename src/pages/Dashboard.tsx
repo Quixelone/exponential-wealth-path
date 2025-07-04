@@ -122,8 +122,6 @@ const Dashboard = () => {
                 {currentConfigName 
                   ? `Monitora la crescita della strategia "${currentConfigName}"`
                   : "Monitora la crescita del tuo portafoglio e analizza le performance"}
-                  ? `Monitora la crescita della strategia "${currentConfigName}"`
-                  : "Monitora la crescita del tuo portafoglio e analizza le performance"}
               </p>
             </div>
             {currentConfigName && (
