@@ -2,12 +2,13 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Calendar, TrendingUp, Play, Trash2, Plus, Check } from 'lucide-react';
+import { FileText, Calendar, TrendingUp, Play, Edit, Trash2, Plus, Check } from 'lucide-react';
 import { Strategy } from '@/types/strategy';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 interface StrategiesListProps {
+  strategiesManager: ReturnType<typeof useStrategiesManager>;
 }
 
 const formatDate = (dateString: string) => {
@@ -39,22 +40,14 @@ const StrategyCard: React.FC<{
 }> = ({ strategy, isCurrent, onLoad, onActivate, onDelete, loading, isActive }) => {
   return (
     <Card className={`border transition-all duration-200 hover:shadow-md ${
-      isCurrent ? 'border-primary bg-primary/5 shadow-md' : 'border-border hover:border-primary/30'
+      isCurrent ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
     }`}>
       <CardContent className="p-4">
         <div className="space-y-3">
           {/* Header */}
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h4 className="font-semibold text-sm">{strategy.name}</h4>
-                {isActive && (
-                  <Badge variant="outline" className="text-xs text-green-600 border-green-500">
-                    <Check className="h-3 w-3 mr-1" />
-                    Attiva
-                  </Badge>
-                )}
-              </div>
+              <h4 className="font-semibold text-sm mb-1">{strategy.name}</h4>
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
@@ -66,8 +59,9 @@ const StrategyCard: React.FC<{
                 </div>
               </div>
             </div>
-            {isCurrent && (
-              <Badge variant="default" className="text-xs">
+            {isActive && (
+              <Badge variant="secondary" className="text-xs">
+                <Check className="h-3 w-3 mr-1" />
                 Attiva
               </Badge>
             )}
@@ -99,18 +93,7 @@ const StrategyCard: React.FC<{
           </div>
 
           {/* Azioni */}
-          <div className="flex gap-2 pt-2 justify-between">
-            <Button
-              size="sm"
-              variant={isCurrent ? "outline" : "default"}
-              onClick={onActivate}
-              disabled={loading}
-              className={`h-8 text-xs ${isCurrent ? 'border-green-500 text-green-600' : ''}`}
-            >
-              <Play className="h-3 w-3 mr-1" />
-              {isCurrent ? 'Attivata' : 'Attiva'}
-            </Button>
-            
+          <div className="flex gap-2 pt-2">
             <Button
               size="sm"
               variant="outline"
@@ -118,6 +101,7 @@ const StrategyCard: React.FC<{
               disabled={loading}
               className="h-8 text-xs"
             >
+              <Edit className="h-3 w-3 mr-1" />
               Modifica
             </Button>
             
@@ -125,12 +109,14 @@ const StrategyCard: React.FC<{
               size="sm"
               variant={isActive ? "outline" : "default"}
               onClick={onActivate}
-              disabled={loading}
-              className={`h-8 text-xs ${isActive ? 'border-green-500 text-green-600' : ''}`}
+              disabled={loading || isActive}
+              className={`h-8 text-xs flex-1 ${isActive ? 'border-green-500 text-green-600' : ''}`}
             >
               {isActive ? (
                 <><Check className="h-3 w-3 mr-1" />Attiva</>
-              ) : (<><Play className="h-3 w-3 mr-1" />Attiva</>)}
+              ) : (
+                <><Play className="h-3 w-3 mr-1" />Attiva</>
+              )}
             </Button>
             
             <AlertDialog>
@@ -170,8 +156,17 @@ const StrategyCard: React.FC<{
   );
 };
 
-const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, loading }) => {
-  const { strategies, currentStrategy, createNewStrategy, loadStrategy, activateStrategy, deleteStrategy, activeInCalculator } = strategiesManager;
+const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager }) => {
+  const { 
+    strategies, 
+    currentStrategy, 
+    createNewStrategy, 
+    loadStrategy, 
+    deleteStrategy, 
+    activateStrategy,
+    activeInCalculator,
+    loading
+  } = strategiesManager;
 
   return (
     <Card>
@@ -206,14 +201,11 @@ const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, load
                 key={strategy.id}
                 strategy={strategy}
                 isCurrent={currentStrategy?.id === strategy.id}
-                onLoad={() => {
-                  console.log('🔄 Caricando strategia per modifica:', strategy.name);
-                  loadStrategy(strategy);
-                }}
+                onLoad={() => loadStrategy(strategy)}
                 onActivate={() => activateStrategy(strategy)}
                 onDelete={() => deleteStrategy(strategy.id)}
-                isActive={activeInCalculator && currentStrategy?.id === strategy.id}
                 loading={loading}
+                isActive={activeInCalculator && currentStrategy?.id === strategy.id}
               />
             ))
           )}

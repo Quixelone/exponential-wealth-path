@@ -20,8 +20,6 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
     loading,
     activeInCalculator,
     activateStrategy
-    activeInCalculator,
-    activateStrategy
   } = strategiesManager;
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -63,23 +61,6 @@ const StrategyActions: React.FC<StrategyActionsProps> = ({ strategiesManager }) 
 
   return (
     <div className="flex items-center gap-2">
-      {/* Attiva Strategia */}
-      {currentStrategy && (
-        <Button
-          size="sm" 
-          variant={activeInCalculator ? "outline" : "default"}
-          onClick={() => activateStrategy(currentStrategy)}
-          disabled={loading}
-          className={`h-8 ${activeInCalculator ? 'border-green-500 text-green-600' : ''}`}
-        >
-          {activeInCalculator ? (
-            <><Check className="h-4 w-4 mr-1" />Attivata</>
-          ) : (
-            <><Play className="h-4 w-4 mr-1" />Attiva</>
-          )}
-        </Button>
-      )}
-    
       {/* Attiva Strategia */}
       {currentStrategy && (
         <Button
