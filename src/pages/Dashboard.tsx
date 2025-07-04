@@ -16,6 +16,7 @@ const Dashboard = () => {
     summary,
     currentDayIndex,
     currentConfigName,
+    currentConfigName,
   } = useInvestmentCalculator();
 
   // Redirect to auth if not logged in
@@ -119,6 +120,8 @@ const Dashboard = () => {
               </h1>
               <p className="text-muted-foreground text-lg">
                 {currentConfigName 
+                  ? `Monitora la crescita della strategia "${currentConfigName}"`
+                  : "Monitora la crescita del tuo portafoglio e analizza le performance"}
                   ? `Monitora la crescita della strategia "${currentConfigName}"`
                   : "Monitora la crescita del tuo portafoglio e analizza le performance"}
               </p>

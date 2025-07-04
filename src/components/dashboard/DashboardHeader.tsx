@@ -38,6 +38,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const { user, userProfile, signOut, isAdmin } = useAuth();
   const { summary, config, hasUnsavedChanges } = useInvestmentCalculator();
   const { currentConfigName } = useInvestmentCalculator();
+  const { currentConfigName } = useInvestmentCalculator();
   const navigate = useNavigate();
 
   const displayName = userProfile?.first_name && userProfile?.last_name 
@@ -118,6 +119,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <div className="text-sm text-slate-600">
               {currentConfigName ? `${currentConfigName} - ` : ''}Capitale Attuale
             </div>
+              {currentConfigName ? `${currentConfigName} - ` : ''}Capitale Attuale
+            </div>
             <div className="text-lg font-bold text-slate-900">
               {formatCurrencyWhole(currentBalance, config?.currency || 'EUR')}
             </div>
@@ -132,6 +135,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         {/* Right Section */}
         <div className="flex items-center gap-3">
           {/* Unsaved Changes Indicator */}
+          {currentConfigName && (
+            <Badge variant="outline" className="text-xs text-primary border-primary">
+              {currentConfigName}
+            </Badge>
+          )}
+          
           {currentConfigName && (
             <Badge variant="outline" className="text-xs text-primary border-primary">
               {currentConfigName}

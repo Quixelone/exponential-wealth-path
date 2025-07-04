@@ -2,13 +2,12 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Calendar, TrendingUp, Play, Trash2, Plus } from 'lucide-react';
+import { FileText, Calendar, TrendingUp, Play, Trash2, Plus, Check } from 'lucide-react';
 import { Strategy } from '@/types/strategy';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 interface StrategiesListProps {
-  strategiesManager: ReturnType<typeof useStrategiesManager>;
 }
 
 const formatDate = (dateString: string) => {
@@ -34,9 +33,11 @@ const StrategyCard: React.FC<{
   isCurrent: boolean;
   onLoad: () => void;
   onActivate: () => void;
+  onActivate: () => void;
   onDelete: () => void;
   loading: boolean;
-}> = ({ strategy, isCurrent, onLoad, onActivate, onDelete, loading }) => {
+  isActive: boolean;
+}> = ({ strategy, isCurrent, onLoad, onActivate, onDelete, loading, isActive }) => {
   return (
     <Card className={`border transition-all duration-200 hover:shadow-md ${
       isCurrent ? 'border-primary bg-primary/5 shadow-md' : 'border-border hover:border-primary/30'
@@ -46,7 +47,15 @@ const StrategyCard: React.FC<{
           {/* Header */}
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <h4 className="font-semibold text-sm mb-1">{strategy.name}</h4>
+              <div className="flex items-center gap-2">
+                <h4 className="font-semibold text-sm">{strategy.name}</h4>
+                {isActive && (
+                  <Badge variant="outline" className="text-xs text-green-600 border-green-500">
+                    <Check className="h-3 w-3 mr-1" />
+                    Attiva
+                  </Badge>
+                )}
+              </div>
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
@@ -109,8 +118,19 @@ const StrategyCard: React.FC<{
               onClick={onLoad}
               disabled={loading}
               className="h-8 text-xs"
-            >
               Modifica
+            </Button>
+            
+            <Button
+              size="sm"
+              variant={isActive ? "outline" : "default"}
+              onClick={onActivate}
+              disabled={loading}
+              className={`h-8 text-xs ${isActive ? 'border-green-500 text-green-600' : ''}`}
+            >
+              {isActive ? (
+                <><Check className="h-3 w-3 mr-1" />Attiva</>
+              ) : (<><Play className="h-3 w-3 mr-1" />Attiva</>)}
             </Button>
             
             <AlertDialog>
@@ -151,7 +171,7 @@ const StrategyCard: React.FC<{
 };
 
 const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, loading }) => {
-  const { strategies, currentStrategy, createNewStrategy, loadStrategy, deleteStrategy } = strategiesManager;
+  const { strategies, currentStrategy, createNewStrategy, loadStrategy, activateStrategy, deleteStrategy, activeInCalculator } = strategiesManager;
 
   return (
     <Card>
@@ -190,11 +210,17 @@ const StrategiesList: React.FC<StrategiesListProps> = ({ strategiesManager, load
                   console.log('🔄 Caricando strategia per modifica:', strategy.name);
                   loadStrategy(strategy);
                 }}
+                onActivate={() => activateStrategy(strategy)}
+                  console.log('🔄 Caricando strategia per modifica:', strategy.name);
+                  loadStrategy(strategy);
+                }}
                 onActivate={() => {
                   console.log('🚀 Attivando strategia:', strategy.name);
                   strategiesManager.activateStrategy(strategy);
                 }}
                 onDelete={() => deleteStrategy(strategy.id)}
+                isActive={activeInCalculator && currentStrategy?.id === strategy.id}
+                loading={strategiesManager.loading}
                 loading={strategiesManager.loading}
               />
             ))
