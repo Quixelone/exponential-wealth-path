@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Save, TrendingUp } from 'lucide-react';
+import { Settings, Save, TrendingUp, Play } from 'lucide-react';
 import { useStrategiesManager } from '@/hooks/useStrategiesManager';
 import StrategyConfiguration from './StrategyConfiguration';
 import StrategiesList from './StrategiesList';
@@ -49,6 +49,12 @@ const StrategyPanel: React.FC<StrategyPanelProps> = ({ strategiesManager }) => {
                       <Badge variant="destructive" className="animate-pulse text-xs">
                         <Save className="h-3 w-3 mr-1" />
                         Non salvata
+                      </Badge>
+                    )}
+                    {currentStrategy && (
+                      <Badge variant="outline" className="text-xs ml-2">
+                        <Play className="h-3 w-3 mr-1" />
+                        Strategia attiva
                       </Badge>
                     )}
                     {summary && (
