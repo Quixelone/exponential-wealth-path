@@ -126,9 +126,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                   <Input
                     id="return-input"
                     type="number"
-                    value={returnRate.toFixed(3)}
-                    onChange={(e) => setReturnRate(Number(e.target.value))}
+                    value={returnRate}
+                    onChange={(e) => setReturnRate(Number(e.target.value) || 0)}
                     step={0.001}
+                    placeholder="Es: 0.500"
                     className="font-mono"
                   />
                 </div>

@@ -7,72 +7,103 @@
 
 @layer base {
   :root {
-    --background: 240 67% 99%; /* #F8F7FA */
-    --foreground: 249 11% 40%; /* #5E5873 */
+    /* Modern MatDash inspired palette */
+    --background: 220 20% 97%; /* #F5F6FA - Light gray background */
+    --foreground: 210 11% 15%; /* #212529 - Dark text */
 
-    --card: 0 0% 100%; /* #FFFFFF */
-    --card-foreground: 249 11% 40%; /* #5E5873 */
+    --card: 0 0% 100%; /* #FFFFFF - Pure white cards */
+    --card-foreground: 210 11% 15%; /* #212529 */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 249 11% 40%;
+    --popover-foreground: 210 11% 15%;
 
-    --primary: 245 84% 70%; /* #7367F0 */
-    --primary-foreground: 210 40% 98%; /* #FAFAFE */
+    --primary: 235 85% 60%; /* #5D87FF - Modern blue */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 250 100% 77%; /* #9C88FF */
-    --secondary-foreground: 0 0% 98%; /* #F9F9FC */
+    --secondary: 280 83% 57%; /* #8763FF - Purple accent */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 20% 95%; /* #F1F1F3 */
-    --muted-foreground: 251 5% 48%; /* #6E6B7B */
+    --success: 134 61% 41%; /* #39B069 - Green */
+    --success-foreground: 0 0% 100%;
 
-    --accent: 250 100% 80%; /* Lighter shade of secondary for accents */
-    --accent-foreground: 249 11% 25%; /* Darker for contrast on accent */
+    --warning: 45 93% 58%; /* #FFAE1F - Orange */
+    --warning-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%; /* Slightly adjusted red for Vuexy feel: #EA5455 */
-    --destructive-foreground: 0 0% 98%;
+    --danger: 0 72% 51%; /* #FA896B - Red */
+    --danger-foreground: 0 0% 100%;
 
-    --border: 240 10% 90%; /* #E0E0E6 */
-    --input: 240 10% 90%; /* #E0E0E6 */
-    --ring: 245 84% 70%; /* #7367F0 */
+    --info: 195 85% 55%; /* #39B8E5 - Cyan */
+    --info-foreground: 0 0% 100%;
 
-    --radius: 0.5rem; /* Vuexy uses ~6px radius */
+    --muted: 220 13% 91%; /* #E6EBF1 - Light muted */
+    --muted-foreground: 215 16% 47%; /* #64748B - Dark muted */
 
-    /* Custom gradient colors based on new palette */
-    --wealth-gradient-start: 245 84% 70%; /* primary */
-    --wealth-gradient-end: 250 100% 77%; /* secondary */
+    --accent: 220 20% 96%; /* #F1F5F9 - Very light accent */
+    --accent-foreground: 210 11% 15%;
+
+    --destructive: 0 72% 51%; /* #FA896B */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%; /* #E6EBF1 */
+    --input: 220 13% 91%; /* #E6EBF1 */
+    --ring: 235 85% 60%; /* #5D87FF */
+
+    --radius: 0.75rem; /* Larger radius for modern look */
+
+    /* Gradient colors for various elements */
+    --gradient-primary: linear-gradient(135deg, #5D87FF 0%, #8763FF 100%);
+    --gradient-success: linear-gradient(135deg, #39B069 0%, #49DA6C 100%);
+    --gradient-warning: linear-gradient(135deg, #FFAE1F 0%, #FFC107 100%);
+    --gradient-danger: linear-gradient(135deg, #FA896B 0%, #FF5722 100%);
+    --gradient-info: linear-gradient(135deg, #39B8E5 0%, #03A9F4 100%);
   }
 
   .dark {
-    --background: 249 11% 15%; /* Darker background for dark mode */
-    --foreground: 240 67% 95%;
+    --background: 210 11% 4%; /* #0A0E1A - Very dark background */
+    --foreground: 220 20% 95%; /* #F5F6FA */
 
-    --card: 249 11% 20%; /* Darker card */
-    --card-foreground: 240 67% 95%;
+    --card: 210 11% 8%; /* #1A1E2E - Dark card */
+    --card-foreground: 220 20% 95%;
 
-    --popover: 249 11% 15%;
-    --popover-foreground: 240 67% 95%;
+    --popover: 210 11% 8%;
+    --popover-foreground: 220 20% 95%;
 
-    --primary: 245 84% 75%; /* Slightly lighter primary for dark mode */
-    --primary-foreground: 249 11% 10%;
+    --primary: 235 85% 65%; /* Brighter primary for dark mode */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 250 100% 80%; /* Slightly lighter secondary */
-    --secondary-foreground: 249 11% 10%;
+    --secondary: 280 83% 62%; /* Brighter secondary */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 249 11% 25%;
-    --muted-foreground: 240 20% 75%;
+    --success: 134 61% 46%;
+    --success-foreground: 0 0% 100%;
 
-    --accent: 250 100% 82%;
-    --accent-foreground: 249 11% 10%;
+    --warning: 45 93% 63%;
+    --warning-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --danger: 0 72% 56%;
+    --danger-foreground: 0 0% 100%;
 
-    --border: 249 11% 30%;
-    --input: 249 11% 30%;
-    --ring: 245 84% 75%;
+    --info: 195 85% 60%;
+    --info-foreground: 0 0% 100%;
 
-    --wealth-gradient-start: 245 84% 75%;
-    --wealth-gradient-end: 250 100% 80%;
+    --muted: 210 11% 15%; /* #2A2F42 */
+    --muted-foreground: 215 16% 70%; /* #9CA3AF */
+
+    --accent: 210 11% 12%; /* #1E2332 */
+    --accent-foreground: 220 20% 95%;
+
+    --destructive: 0 72% 56%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 11% 15%; /* #2A2F42 */
+    --input: 210 11% 15%;
+    --ring: 235 85% 65%;
+
+    --gradient-primary: linear-gradient(135deg, #5D87FF 0%, #8763FF 100%);
+    --gradient-success: linear-gradient(135deg, #39B069 0%, #49DA6C 100%);
+    --gradient-warning: linear-gradient(135deg, #FFAE1F 0%, #FFC107 100%);
+    --gradient-danger: linear-gradient(135deg, #FA896B 0%, #FF5722 100%);
+    --gradient-info: linear-gradient(135deg, #39B8E5 0%, #03A9F4 100%);
   }
 }
 
@@ -93,46 +124,117 @@
 }
 
 @layer components {
-  /* Custom card styling for Vuexy feel */
-  .card {
-    @apply rounded-lg border bg-card text-card-foreground shadow-lg; /* Default to a more prominent shadow */
-  }
-   /* Custom button styling for Vuexy feel */
-  .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary;
-  }
-  .btn-outline-primary {
-     @apply border-primary text-primary bg-transparent hover:bg-primary/10;
+  /* Modern card styling */
+  .modern-card {
+    @apply rounded-xl bg-card border border-border shadow-sm hover:shadow-lg transition-all duration-300;
   }
 
-  /* Input styling */
-  .input {
-    @apply h-10 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
-    @apply transition-colors duration-200 ease-in-out; /* Smooth transition for focus */
+  /* Statistic cards with gradients */
+  .stat-card-primary {
+    @apply rounded-xl p-6 text-white relative overflow-hidden;
+    background: var(--gradient-primary);
   }
-  .input:focus-visible {
-    @apply border-primary; /* Use primary color for border on focus */
+
+  .stat-card-success {
+    @apply rounded-xl p-6 text-white relative overflow-hidden;
+    background: var(--gradient-success);
+  }
+
+  .stat-card-warning {
+    @apply rounded-xl p-6 text-white relative overflow-hidden;
+    background: var(--gradient-warning);
+  }
+
+  .stat-card-danger {
+    @apply rounded-xl p-6 text-white relative overflow-hidden;
+    background: var(--gradient-danger);
+  }
+
+  .stat-card-info {
+    @apply rounded-xl p-6 text-white relative overflow-hidden;
+    background: var(--gradient-info);
+  }
+
+  /* Modern sidebar */
+  .modern-sidebar {
+    @apply bg-card border-r border-border h-screen w-64 fixed left-0 top-0 z-40 transition-all duration-300;
+  }
+
+  .sidebar-collapsed {
+    @apply w-16;
+  }
+
+  /* Modern button styles */
+  .btn-modern-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary/20 rounded-lg transition-all duration-200;
+  }
+
+  .btn-modern-outline {
+    @apply border border-border text-foreground hover:bg-accent hover:text-accent-foreground rounded-lg transition-all duration-200;
+  }
+
+  /* Modern input styling */
+  .modern-input {
+    @apply h-11 rounded-lg border border-input bg-background px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .modern-input:focus-visible {
+    @apply border-primary shadow-sm;
   }
 }
 
 @layer utilities {
-  .wealth-gradient {
-    background: linear-gradient(135deg, hsl(var(--wealth-gradient-start)), hsl(var(--wealth-gradient-end)));
+  /* Gradient backgrounds */
+  .gradient-primary {
+    background: var(--gradient-primary);
   }
-  
-  .wealth-gradient-text {
-    background: linear-gradient(135deg, hsl(var(--wealth-gradient-start)), hsl(var(--wealth-gradient-end)));
+
+  .gradient-success {
+    background: var(--gradient-success);
+  }
+
+  .gradient-warning {
+    background: var(--gradient-warning);
+  }
+
+  .gradient-danger {
+    background: var(--gradient-danger);
+  }
+
+  .gradient-info {
+    background: var(--gradient-info);
+  }
+
+  /* Gradient text */
+  .gradient-text-primary {
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* Added subtle shadow for hover effects on interactive elements */
-  .hover-shadow-sm {
-    @apply transition-shadow duration-200 hover:shadow-sm;
+  /* Glass effect */
+  .glass-effect {
+    @apply backdrop-blur-lg bg-white/10 border border-white/20;
   }
-  .hover-shadow-md {
-    @apply transition-shadow duration-200 hover:shadow-md;
+
+  /* Modern shadows */
+  .shadow-modern {
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 4px 12px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-modern-lg {
+    box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.1), 0 8px 24px -6px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-lg;
   }
 }
 

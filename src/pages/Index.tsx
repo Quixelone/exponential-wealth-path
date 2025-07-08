@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { LogOut, User, Users, Bell, Settings, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { TrendingUp, Bell } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ConfigurationPanel from '@/components/ConfigurationPanel';
 import InvestmentChart from '@/components/InvestmentChart';
-import InvestmentSummary from '@/components/InvestmentSummary';
 import ReportTable from '@/components/ReportTable';
 import PaymentReminders from '@/components/PaymentReminders';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import { useAuth } from '@/hooks/useAuth';
 import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
+import ModernSidebar from '@/components/dashboard/ModernSidebar';
+import ModernHeader from '@/components/dashboard/ModernHeader';
+import StatisticsCards from '@/components/dashboard/StatisticsCards';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -162,121 +163,107 @@ const Index = () => {
 
   return (
     <ModernTooltipProvider>
-      <div className="min-h-screen bg-background text-foreground">
-        {/* Header */}
-        <div className="bg-card border-b shadow-md">
-          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center gap-3">
-                <span className="wealth-gradient-text text-2xl font-bold">Finanza Creativa</span>
-                {isAdmin && (
-                  <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full font-medium">
-                    Admin
-                  </span>
-                )}
-                {hasUnsavedChanges && (
-                  <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-xs rounded-full font-medium animate-pulse">
-                    Modifiche non salvate
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <User className="h-5 w-5 text-primary" />
-                  {displayName}
-                </div>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSettingsClick}
-                  className="border-primary text-primary hover:bg-primary/10"
+      <div className="min-h-screen bg-background flex">
+        {/* Sidebar */}
+        <ModernSidebar 
+          isAdmin={isAdmin}
+          onNavigate={(path) => console.log('Navigation to:', path)}
+        />
+
+        {/* Main Content */}
+        <div className="flex-1 ml-64 flex flex-col">
+          {/* Header */}
+          <ModernHeader
+            userProfile={userProfile}
+            isAdmin={isAdmin}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onLogout={handleLogout}
+            onSettings={handleSettingsClick}
+            onUserManagement={handleUserManagementClick}
+          />
+
+          {/* Page Content */}
+          <main className="flex-1 p-6 bg-background">
+            {/* Statistics Cards */}
+            <StatisticsCards summary={summary} currency={config.currency} />
+
+            {/* Tabs */}
+            <Tabs defaultValue="investments" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-card rounded-xl p-1">
+                <TabsTrigger 
+                  value="investments" 
+                  className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
                 >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Impostazioni
-                </Button>
+                  <TrendingUp className="h-4 w-4" />
+                  Dashboard Investimenti
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="reminders" 
+                  className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                >
+                  <Bell className="h-4 w-4" />
+                  Promemoria Pagamenti
+                </TabsTrigger>
+              </TabsList>
 
-                {isAdmin && (
-                  <button
-                    onClick={handleUserManagementClick}
-                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 border-primary text-primary hover:bg-primary/10"
-                  >
-                    <Users className="h-4 w-4 mr-2" />
-                    Gestione Utenti
-                  </button>
-                )}
-                <Button variant="outline" size="sm" onClick={handleLogout} className="border-primary text-primary hover:bg-primary/10">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+              <TabsContent value="investments" className="space-y-6">
+                <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                  {/* Configuration Panel */}
+                  <div className="xl:col-span-1">
+                    <div className="modern-card p-6">
+                      <ConfigurationPanel
+                        config={config}
+                        onConfigChange={updateConfig}
+                        customReturns={dailyReturns}
+                        onUpdateDailyReturn={updateDailyReturn}
+                        onRemoveDailyReturn={removeDailyReturn}
+                        onExportCSV={exportToCSV}
+                        savedConfigs={savedConfigs}
+                        onLoadConfiguration={handleLoadConfigWithWarning}
+                        onDeleteConfiguration={deleteConfiguration}
+                        onSaveConfiguration={saveCurrentConfiguration}
+                        onUpdateConfiguration={updateCurrentConfiguration}
+                        currentConfigId={currentConfigId}
+                        currentConfigName={currentConfigName}
+                        supabaseLoading={supabaseLoading}
+                        isAdmin={isAdmin}
+                        dailyPACOverrides={dailyPACOverrides}
+                        onUpdatePACForDay={updatePACForDay}
+                        onRemovePACOverride={removePACOverride}
+                        hasUnsavedChanges={hasUnsavedChanges}
+                      />
+                    </div>
+                  </div>
 
-        {/* Main Content Area */}
-        <div className="max-w-full mx-auto p-4 md:p-6">
-          <Tabs defaultValue="investments" className="w-full">
-            <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 mb-6 bg-card p-1 rounded-lg shadow">
-              <TabsTrigger value="investments" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md">
-                <TrendingUp className="h-5 w-5" />
-                Dashboard Investimenti
-              </TabsTrigger>
-              <TabsTrigger value="reminders" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md">
-                <Bell className="h-5 w-5" />
-                Promemoria Pagamenti
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="investments">
-              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                {/* Configuration Panel */}
-                <div className="xl:col-span-1">
-                  <ConfigurationPanel
-                    config={config}
-                    onConfigChange={updateConfig}
-                    customReturns={dailyReturns}
-                    onUpdateDailyReturn={updateDailyReturn}
-                    onRemoveDailyReturn={removeDailyReturn}
-                    onExportCSV={exportToCSV}
-                    savedConfigs={savedConfigs}
-                    onLoadConfiguration={handleLoadConfigWithWarning}
-                    onDeleteConfiguration={deleteConfiguration}
-                    onSaveConfiguration={saveCurrentConfiguration}
-                    onUpdateConfiguration={updateCurrentConfiguration}
-                    currentConfigId={currentConfigId}
-                    currentConfigName={currentConfigName}
-                    supabaseLoading={supabaseLoading}
-                    isAdmin={isAdmin}
-                    dailyPACOverrides={dailyPACOverrides}
-                    onUpdatePACForDay={updatePACForDay}
-                    onRemovePACOverride={removePACOverride}
-                    hasUnsavedChanges={hasUnsavedChanges}
-                  />
+                  {/* Charts and Results */}
+                  <div className="xl:col-span-3 space-y-6">
+                    <div className="modern-card p-6">
+                      <InvestmentChart data={investmentData} currency={config.currency} />
+                    </div>
+                    
+                    <div className="modern-card">
+                      <ReportTable 
+                        data={investmentData} 
+                        currency={config.currency}
+                        onExportCSV={exportToCSV}
+                        onUpdateDailyReturnInReport={handleUpdateDailyReturnInReport}
+                        onUpdatePACInReport={handleUpdatePACInReport}
+                        onRemovePACOverride={handleRemovePACOverride}
+                        defaultPACAmount={config.pacConfig.amount}
+                        investmentStartDate={config.pacConfig.startDate}
+                      />
+                    </div>
+                  </div>
                 </div>
+              </TabsContent>
 
-                {/* Charts and Results */}
-                <div className="xl:col-span-2 space-y-6">
-                  <InvestmentSummary summary={summary} currency={config.currency} />
-                  <InvestmentChart data={investmentData} currency={config.currency} />
-                  <ReportTable 
-                    data={investmentData} 
-                    currency={config.currency}
-                    onExportCSV={exportToCSV}
-                    onUpdateDailyReturnInReport={handleUpdateDailyReturnInReport}
-                    onUpdatePACInReport={handleUpdatePACInReport}
-                    onRemovePACOverride={handleRemovePACOverride}
-                    defaultPACAmount={config.pacConfig.amount}
-                    investmentStartDate={config.pacConfig.startDate}
-                  />
+              <TabsContent value="reminders">
+                <div className="modern-card p-6">
+                  <PaymentReminders />
                 </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="reminders">
-              <PaymentReminders />
-            </TabsContent>
-          </Tabs>
+              </TabsContent>
+            </Tabs>
+          </main>
         </div>
       </div>
     </ModernTooltipProvider>
