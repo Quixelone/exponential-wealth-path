@@ -12,7 +12,7 @@ import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import { useAuth } from '@/hooks/useAuth';
 import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
 
-const Index = () => { 
+const Index = () => {
   const navigate = useNavigate();
   const { user, userProfile, loading: authLoading, signOut, isAdmin } = useAuth();
   
@@ -73,6 +73,7 @@ const Index = () => {
   }, [hasUnsavedChanges]);
 
   if (authLoading) {
+    console.log('⏳ Showing loading screen - auth still loading');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -84,6 +85,7 @@ const Index = () => {
   }
 
   if (!user) {
+    console.log('❌ No user found, component will redirect via useEffect');
     return null; // Will redirect to auth via useEffect
   }
 
@@ -96,8 +98,8 @@ const Index = () => {
     }
     
     console.log('🚪 Logout initiated');
-    await signOut(); 
-    navigate('/auth'); 
+    await signOut();
+    navigate('/auth');
   };
 
   const handleUserManagementClick = (e: React.MouseEvent) => {
@@ -105,17 +107,27 @@ const Index = () => {
     console.log('🔧 USER MANAGEMENT BUTTON CLICKED');
     console.log('Current admin status:', isAdmin);
     console.log('User role:', userProfile?.role);
+    console.log('Auth loading:', authLoading);
+    console.log('User exists:', !!user);
+    console.log('User profile exists:', !!userProfile);
     
     try {
       console.log('🚀 Attempting navigation to /user-management');
-      navigate('/user-management'); 
+      console.log('Current location:', window.location.pathname);
+      navigate('/user-management');
+      console.log('✅ Navigation call completed');
+      
+      // Aggiungiamo un timeout per verificare se la navigazione è avvenuta
+      setTimeout(() => {
+        console.log('🔍 Post-navigation check - Current location:', window.location.pathname);
+      }, 100);
     } catch (error) {
       console.error('💥 Error during navigation:', error);
     }
   };
 
   const handleSettingsClick = () => {
-    navigate('/settings'); 
+    navigate('/settings');
   };
 
   const displayName = userProfile?.first_name && userProfile?.last_name 
@@ -136,15 +148,17 @@ const Index = () => {
   };
 
   // Enhanced configuration loading with unsaved changes check
-  const handleLoadConfigWithWarning = (savedConfig: any) => { 
+  const handleLoadConfigWithWarning = (savedConfig: any) => {
     if (hasUnsavedChanges) {
       const confirmLoad = window.confirm(
         'Hai modifiche non salvate nella configurazione corrente. Caricando una nuova configurazione perderai queste modifiche. Vuoi continuare?'
       );
       if (!confirmLoad) return;
     }
-    loadSavedConfiguration(savedConfig); 
+    loadSavedConfiguration(savedConfig);
   };
+
+  console.log('🎯 Admin button should show:', isAdmin);
 
   return (
     <ModernTooltipProvider>

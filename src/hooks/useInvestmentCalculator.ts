@@ -33,8 +33,9 @@ export const useInvestmentCalculator = () => {
   } = useConfigurationManager();
 
   const loadInitialized = useRef(false);
+  const autoLoadAttempted = useRef(false);
 
-  // Load configurations only once on mount - NO AUTO-LOADING
+  // Load configurations only once on mount
   React.useEffect(() => {
     if (!loadInitialized.current) {
       loadInitialized.current = true;
@@ -42,24 +43,28 @@ export const useInvestmentCalculator = () => {
     }
   }, []);
 
-  // LOGGING DETTAGLIATO per tracciare tutti i cambiamenti
+  // Auto-load first configuration after configurations are loaded
   React.useEffect(() => {
-    console.log('🚨 INVESTMENT CALCULATOR - currentConfigId CAMBIO DETECTATO:', configState.currentConfigId);
-    console.log('📱 STATO COMPLETO CONFIG:');
-    console.log('  - currentConfigId:', configState.currentConfigId);
-    console.log('  - currentConfigName:', configState.currentConfigName);
-    console.log('  - initialCapital:', configState.config.initialCapital);
-    console.log('  - timeHorizon:', configState.config.timeHorizon);
-   // console.log('🔍 STACK TRACE:', new Error().stack);
-  }, [configState.currentConfigId, configState.currentConfigName, configState.config]);
-
-  // MONITORING completo dello stato per detectare interferenze
-  React.useEffect(() => {
-    console.log('📊 CONFIG STATE MONITORING:');
-    console.log('  - Capital:', configState.config.initialCapital);
-    console.log('  - Name:', configState.currentConfigName);
-    console.log('  - ID:', configState.currentConfigId);
-  }, [configState.config.initialCapital, configState.currentConfigName, configState.currentConfigId]);
+    if (
+      !autoLoadAttempted.current && 
+      !supabaseLoading && 
+      savedConfigs.length > 0 && 
+      !configState.currentConfigId
+    ) {
+      autoLoadAttempted.current = true;
+      
+      // Sort configurations by creation date (oldest first) and load the first one
+      const sortedConfigs = [...savedConfigs].sort((a, b) => 
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+      
+      if (sortedConfigs.length > 0) {
+        const firstConfig = sortedConfigs[0];
+        console.log('🔄 Auto-loading first configuration:', firstConfig.name);
+        loadSavedConfiguration(firstConfig);
+      }
+    }
+  }, [savedConfigs, supabaseLoading, configState.currentConfigId, loadSavedConfiguration]);
 
   const { investmentData, currentDayIndex, nextPACInfo, summary } = useInvestmentData({
     config: configState.config,

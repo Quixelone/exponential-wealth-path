@@ -29,26 +29,23 @@ export const useInvestmentOperations = ({
 }: UseInvestmentOperationsProps) => {
   
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>, reset: boolean = false) => {
-    console.log('🔄 updateConfig called with:', { newConfig, reset });
-    
-    // STOP EMPTY CONFIG UPDATES che resettano tutto
-    if (Object.keys(newConfig).length === 0 && reset) {
-      console.log('🚫 BLOCKING EMPTY CONFIG UPDATE with reset=true');
-      return; 
-    }
-    
     // Save to history before making changes
     const description = getConfigUpdateDescription(newConfig);
     saveConfigurationToHistory(description);
     
-    setConfig(prev => {
-      const updated = { ...prev, ...newConfig };
-      console.log('📊 Config updated from:', prev, 'to:', updated);
-      return updated;
-    });
+    setConfig(prev => ({ ...prev, ...newConfig }));
     
-    // Only reset if explicitly requested
-    if (reset) {
+    // Mark as unsaved if we have a current config
+    if (configState.currentConfigId) {
+      setCurrentConfigId(null);
+    }
+    
+    if (
+      reset ||
+      newConfig.initialCapital !== undefined ||
+      newConfig.timeHorizon !== undefined ||
+      newConfig.pacConfig?.frequency !== undefined
+    ) {
       setDailyReturns({});
       setDailyPACOverrides({});
     }

@@ -39,16 +39,17 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
   const [configName, setConfigName] = useState('');
   const [editingConfigId, setEditingConfigId] = useState<string | null>(null);
   const [editingConfigName, setEditingConfigName] = useState('');
+  const [pendingLoadConfig, setPendingLoadConfig] = useState<SavedConfiguration | null>(null);
+  const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
 
-  // Aggiorna il valore predefinito del nome config quando si apre il dialog
-  const handleOpenSaveDialog = (open: boolean) => {
-    if (open && currentConfigId && currentConfigName) {
+  // Aggiorna il valore predefinito del nome config
+  React.useEffect(() => {
+    if (currentConfigId && currentConfigName) {
       setConfigName(currentConfigName);
-    } else if (open) {
-      setConfigName('Nuova configurazione');
+    } else {
+      setConfigName('');
     }
-    setSaveDialogOpen(open);
-  };
+  }, [currentConfigId, currentConfigName, saveDialogOpen]);
 
   const handleSaveConfiguration = () => {
     if (configName.trim()) {
@@ -77,12 +78,28 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
     }
   };
 
-  // CARICAMENTO DIRETTO SENZA CONTROLLI - per permettere caricamento fluido
+  // Gestione alert per modifiche non salvate
   const handleLoadConfigWithCheck = (config: SavedConfiguration) => {
-    console.log('🔄 CARICAMENTO DIRETTO:', config.name);
-    onLoadConfiguration(config);
+    if (hasUnsavedChanges) {
+      setPendingLoadConfig(config);
+      setShowUnsavedAlert(true);
+    } else {
+      onLoadConfiguration(config);
+    }
   };
 
+  const continueLoadConfig = () => {
+    if (pendingLoadConfig) {
+      onLoadConfiguration(pendingLoadConfig);
+      setPendingLoadConfig(null);
+      setShowUnsavedAlert(false);
+    }
+  };
+
+  const cancelLoadConfig = () => {
+    setPendingLoadConfig(null);
+    setShowUnsavedAlert(false);
+  };
 
   return (
     <Card className="animate-fade-in">
@@ -104,7 +121,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
             )}
             <SaveConfigDialog
               open={saveDialogOpen}
-              onOpenChange={handleOpenSaveDialog}
+              onOpenChange={setSaveDialogOpen}
               configName={configName}
               setConfigName={setConfigName}
               onSave={handleSaveConfiguration}
@@ -151,6 +168,12 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
             ))
           )}
         </div>
+
+        <UnsavedChangesAlert
+          open={showUnsavedAlert}
+          onContinue={continueLoadConfig}
+          onCancel={cancelLoadConfig}
+        />
 
         <EditConfigDialog
           open={editDialogOpen}

@@ -57,7 +57,6 @@ export const useConfigLoader = () => {
           initialCapital: dbConfig.initial_capital,
           timeHorizon: dbConfig.time_horizon,
           dailyReturnRate: dbConfig.daily_return_rate,
-          currency: (dbConfig.currency || 'EUR') as 'EUR' | 'USD' | 'USDT',
           pacConfig: {
             amount: dbConfig.pac_amount,
             frequency: dbConfig.pac_frequency as 'daily' | 'weekly' | 'monthly' | 'custom',

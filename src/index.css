@@ -3,90 +3,76 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Modern Design System - Modernize inspired */
+/* Design system inspired by Vuexy */
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Clean white background */
-    --foreground: 215 25% 27%; /* Dark blue-gray text */
+    --background: 240 67% 99%; /* #F8F7FA */
+    --foreground: 249 11% 40%; /* #5E5873 */
 
-    --card: 0 0% 100%; /* Pure white cards */
-    --card-foreground: 215 25% 27%;
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 249 11% 40%; /* #5E5873 */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover-foreground: 249 11% 40%;
 
-    --primary: 217 91% 60%; /* Modern blue #3B82F6 */
-    --primary-foreground: 0 0% 100%;
+    --primary: 245 84% 70%; /* #7367F0 */
+    --primary-foreground: 210 40% 98%; /* #FAFAFE */
 
-    --secondary: 214 32% 91%; /* Light blue-gray */
-    --secondary-foreground: 215 25% 27%;
+    --secondary: 250 100% 77%; /* #9C88FF */
+    --secondary-foreground: 0 0% 98%; /* #F9F9FC */
 
-    --muted: 210 40% 96%; /* Very light gray */
-    --muted-foreground: 215 16% 47%;
+    --muted: 240 20% 95%; /* #F1F1F3 */
+    --muted-foreground: 251 5% 48%; /* #6E6B7B */
 
-    --accent: 210 40% 94%;
-    --accent-foreground: 215 25% 27%;
+    --accent: 250 100% 80%; /* Lighter shade of secondary for accents */
+    --accent-foreground: 249 11% 25%; /* Darker for contrast on accent */
 
-    --destructive: 0 84% 60%; /* Modern red */
+    --destructive: 0 72% 51%; /* Slightly adjusted red for Vuexy feel: #EA5455 */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --border: 240 10% 90%; /* #E0E0E6 */
+    --input: 240 10% 90%; /* #E0E0E6 */
+    --ring: 245 84% 70%; /* #7367F0 */
 
-    --radius: 0.5rem;
+    --radius: 0.5rem; /* Vuexy uses ~6px radius */
 
-    /* Custom gradient colors */
-    --wealth-gradient-start: 217 91% 60%;
-    --wealth-gradient-end: 212 100% 47%;
-    
-    /* Chart colors */
-    --chart-1: 217 91% 60%; /* Primary blue */
-    --chart-2: 142 76% 36%; /* Emerald green */
-    --chart-3: 38 92% 50%; /* Orange */
-    --chart-4: 268 83% 58%; /* Purple */
-    --chart-5: 10 79% 63%; /* Red */
+    /* Custom gradient colors based on new palette */
+    --wealth-gradient-start: 245 84% 70%; /* primary */
+    --wealth-gradient-end: 250 100% 77%; /* secondary */
   }
 
   .dark {
-    --background: 222 84% 5%;
-    --foreground: 210 40% 98%;
+    --background: 249 11% 15%; /* Darker background for dark mode */
+    --foreground: 240 67% 95%;
 
-    --card: 222 84% 5%;
-    --card-foreground: 210 40% 98%;
+    --card: 249 11% 20%; /* Darker card */
+    --card-foreground: 240 67% 95%;
 
-    --popover: 222 84% 5%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 249 11% 15%;
+    --popover-foreground: 240 67% 95%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 84% 5%;
+    --primary: 245 84% 75%; /* Slightly lighter primary for dark mode */
+    --primary-foreground: 249 11% 10%;
 
-    --secondary: 217 32% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 250 100% 80%; /* Slightly lighter secondary */
+    --secondary-foreground: 249 11% 10%;
 
-    --muted: 217 32% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 249 11% 25%;
+    --muted-foreground: 240 20% 75%;
 
-    --accent: 217 32% 17%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 250 100% 82%;
+    --accent-foreground: 249 11% 10%;
 
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 217 32% 17%;
-    --input: 217 32% 17%;
-    --ring: 217 91% 60%;
+    --border: 249 11% 30%;
+    --input: 249 11% 30%;
+    --ring: 245 84% 75%;
 
-    --wealth-gradient-start: 217 91% 60%;
-    --wealth-gradient-end: 212 100% 47%;
-    
-    /* Chart colors - dark mode */
-    --chart-1: 217 91% 60%;
-    --chart-2: 142 86% 28%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 268 83% 58%;
-    --chart-5: 10 79% 63%;
+    --wealth-gradient-start: 245 84% 75%;
+    --wealth-gradient-end: 250 100% 80%;
   }
 }
 
@@ -98,64 +84,38 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Inter', sans-serif; /* Common font in Vuexy-like themes */
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold text-foreground;
-    line-height: 1.2;
-  }
-
-  /* Smooth scroll behavior */
-  html {
-    scroll-behavior: smooth;
   }
 }
 
 @layer components {
-  /* Modern card styling */
+  /* Custom card styling for Vuexy feel */
   .card {
-    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
-    transition: all 0.2s ease-in-out;
+    @apply rounded-lg border bg-card text-card-foreground shadow-lg; /* Default to a more prominent shadow */
   }
-  
-  .card:hover {
-    @apply shadow-md;
-  }
-
-  /* Button variants */
+   /* Custom button styling for Vuexy feel */
   .btn-primary {
     @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary;
   }
-  
   .btn-outline-primary {
-    @apply border-primary text-primary bg-transparent hover:bg-primary/10;
+     @apply border-primary text-primary bg-transparent hover:bg-primary/10;
   }
 
   /* Input styling */
   .input {
-    @apply h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background;
-    @apply file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground;
-    @apply placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2;
-    @apply focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
-    @apply transition-colors duration-200 ease-in-out;
+    @apply h-10 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
+    @apply transition-colors duration-200 ease-in-out; /* Smooth transition for focus */
   }
-  
   .input:focus-visible {
-    @apply border-primary;
-  }
-
-  /* Loading states */
-  .loading-skeleton {
-    @apply animate-pulse bg-muted rounded;
+    @apply border-primary; /* Use primary color for border on focus */
   }
 }
 
 @layer utilities {
-  /* Gradient utilities */
   .wealth-gradient {
     background: linear-gradient(135deg, hsl(var(--wealth-gradient-start)), hsl(var(--wealth-gradient-end)));
   }
@@ -167,87 +127,30 @@
     background-clip: text;
   }
 
-  /* Interactive effects */
+  /* Added subtle shadow for hover effects on interactive elements */
   .hover-shadow-sm {
     @apply transition-shadow duration-200 hover:shadow-sm;
   }
-  
   .hover-shadow-md {
     @apply transition-shadow duration-200 hover:shadow-md;
   }
-
-  /* Focus ring utilities */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
-  }
-
-  /* Responsive text utilities */
-  .text-responsive {
-    @apply text-sm md:text-base;
-  }
-
-  /* Chart color utilities */
-  .bg-chart-1 { @apply bg-[hsl(var(--chart-1))]; }
-  .bg-chart-2 { @apply bg-[hsl(var(--chart-2))]; }
-  .bg-chart-3 { @apply bg-[hsl(var(--chart-3))]; }
-  .bg-chart-4 { @apply bg-[hsl(var(--chart-4))]; }
-  .bg-chart-5 { @apply bg-[hsl(var(--chart-5))]; }
-  
-  .text-chart-1 { @apply text-[hsl(var(--chart-1))]; }
-  .text-chart-2 { @apply text-[hsl(var(--chart-2))]; }
-  .text-chart-3 { @apply text-[hsl(var(--chart-3))]; }
-  .text-chart-4 { @apply text-[hsl(var(--chart-4))]; }
-  .text-chart-5 { @apply text-[hsl(var(--chart-5))]; }
-  
-  .border-chart-1 { @apply border-[hsl(var(--chart-1))]; }
-  .border-chart-2 { @apply border-[hsl(var(--chart-2))]; }
-  .border-chart-3 { @apply border-[hsl(var(--chart-3))]; }
-  .border-chart-4 { @apply border-[hsl(var(--chart-4))]; }
-  .border-chart-5 { @apply border-[hsl(var(--chart-5))]; }
 }
 
-/* Enhanced animations */
+/* Animations */
 @keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(10px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
+  from { opacity: 0; transform: translateY(10px); } /* Adjusted Y transform */
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scaleIn {
-  from { 
-    opacity: 0; 
-    transform: scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: scale(1); 
-  }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: scale(0.95); } /* Adjusted scale */
+  to { opacity: 1; transform: scale(1); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.5s ease-out; /* Slightly adjusted duration */
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.3s ease-out;
-}
-
-.animate-slide-in {
-  animation: slideIn 0.4s ease-out;
+  animation: scaleIn 0.3s ease-out; /* Slightly adjusted duration */
 }

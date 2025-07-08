@@ -76,7 +76,6 @@ export type Database = {
       investment_configs: {
         Row: {
           created_at: string
-          currency: string
           daily_return_rate: number
           id: string
           initial_capital: number
@@ -91,7 +90,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          currency?: string
           daily_return_rate: number
           id?: string
           initial_capital: number
@@ -106,7 +104,6 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          currency?: string
           daily_return_rate?: number
           id?: string
           initial_capital?: number

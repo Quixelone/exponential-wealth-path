@@ -48,10 +48,7 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
         <Input
           type="number"
           value={initialCapital}
-          onChange={(e) => {
-            console.log('🔧 Capital change:', e.target.value);
-            onCapitalChange(Number(e.target.value));
-          }}
+          onChange={(e) => onCapitalChange(Number(e.target.value))}
           min={50}
           max={5000}
           step={50}
