@@ -16,48 +16,54 @@ interface StatisticsCardsProps {
 }
 
 const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) => {
+  // Calcola valori derivati dal summary
+  const totalInvested = summary?.totalInvested || 0;
+  const finalCapital = summary?.finalCapital || 0;
+  const totalProfit = finalCapital - totalInvested;
+  const roiPercentage = totalInvested > 0 ? ((totalProfit / totalInvested) * 100) : 0;
+  
   const stats = [
     {
       title: 'Capitale Finale',
-      value: formatCurrency(summary?.finalCapital || 0, currency),
+      value: formatCurrency(finalCapital, currency),
       change: '+12.5%',
-      changeType: 'positive',
+      changeType: 'positive' as const,
       icon: DollarSign,
       gradient: 'gradient-primary',
-      description: 'Rispetto al mese scorso'
+      description: 'Valore totale portfolio'
     },
     {
       title: 'Profitto Totale',
-      value: formatCurrency(summary?.totalProfit || 0, currency),
-      change: '+8.2%',
-      changeType: 'positive',
+      value: formatCurrency(totalProfit, currency),
+      change: totalProfit >= 0 ? '+8.2%' : '-3.1%',
+      changeType: totalProfit >= 0 ? 'positive' as const : 'negative' as const,
       icon: TrendingUp,
       gradient: 'gradient-success',
-      description: 'Crescita mensile'
+      description: 'Guadagno/Perdita totale'
     },
     {
       title: 'Investimento Totale',
-      value: formatCurrency(summary?.totalInvested || 0, currency),
+      value: formatCurrency(totalInvested, currency),
       change: '+5.4%',
-      changeType: 'positive',
+      changeType: 'positive' as const,
       icon: PiggyBank,
       gradient: 'gradient-info',
       description: 'PAC accumulato'
     },
     {
-      title: 'ROI Medio',
-      value: summary?.averageROI ? `${summary.averageROI.toFixed(2)}%` : '0.00%',
-      change: '-2.1%',
-      changeType: 'negative',
+      title: 'ROI Percentuale',
+      value: `${roiPercentage.toFixed(2)}%`,
+      change: roiPercentage >= 0 ? '+2.1%' : '-2.1%',
+      changeType: roiPercentage >= 0 ? 'positive' as const : 'negative' as const,
       icon: Target,
       gradient: 'gradient-warning',
       description: 'Rendimento percentuale'
     },
     {
       title: 'Giorni Investimento',
-      value: summary?.totalDays || '0',
+      value: summary?.totalDays?.toString() || '0',
       change: '+30',
-      changeType: 'positive',
+      changeType: 'positive' as const,
       icon: Calendar,
       gradient: 'gradient-danger',
       description: 'Giorni totali'

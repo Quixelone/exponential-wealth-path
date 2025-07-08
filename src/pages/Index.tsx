@@ -167,7 +167,6 @@ const Index = () => {
         {/* Sidebar */}
         <ModernSidebar 
           isAdmin={isAdmin}
-          onNavigate={(path) => console.log('Navigation to:', path)}
         />
 
         {/* Main Content */}

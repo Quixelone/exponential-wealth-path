@@ -31,18 +31,6 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate }) =>
       description: 'Dashboard principale'
     },
     {
-      icon: TrendingUp,
-      label: 'Investimenti',
-      path: '/#investments',
-      description: 'Gestione investimenti'
-    },
-    {
-      icon: Bell,
-      label: 'Promemoria',
-      path: '/#reminders',
-      description: 'Promemoria pagamenti'
-    },
-    {
       icon: Settings,
       label: 'Impostazioni',
       path: '/settings',
@@ -60,21 +48,7 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate }) =>
   }
 
   const handleNavigation = (path: string) => {
-    if (path.includes('#')) {
-      const [route, hash] = path.split('#');
-      navigate(route);
-      if (hash) {
-        // Simulate tab selection for hash navigation
-        setTimeout(() => {
-          const tabTrigger = document.querySelector(`[value="${hash}"]`) as HTMLElement;
-          if (tabTrigger) {
-            tabTrigger.click();
-          }
-        }, 100);
-      }
-    } else {
-      navigate(path);
-    }
+    navigate(path);
     onNavigate?.(path);
   };
 
