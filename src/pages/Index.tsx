@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Bell } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,15 +8,21 @@ import ReportTable from '@/components/ReportTable';
 import PaymentReminders from '@/components/PaymentReminders';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import { useAuth } from '@/hooks/useAuth';
+import { useDeviceInfo } from '@/hooks/use-mobile';
 import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
 import ModernSidebar from '@/components/dashboard/ModernSidebar';
 import ModernHeader from '@/components/dashboard/ModernHeader';
+import MobileHeader from '@/components/mobile/MobileHeader';
+import MobileDrawer from '@/components/mobile/MobileDrawer';
+import BottomNavigation from '@/components/mobile/BottomNavigation';
 import StatisticsCards from '@/components/dashboard/StatisticsCards';
 import CurrentStrategyProgress from '@/components/dashboard/CurrentStrategyProgress';
 
 const Index = () => {
   const navigate = useNavigate();
   const { user, userProfile, loading: authLoading, signOut, isAdmin } = useAuth();
+  const { isMobile, isTablet } = useDeviceInfo();
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   
   console.log('🏠 Index component render state:', {
     authLoading,
@@ -104,8 +110,8 @@ const Index = () => {
     navigate('/auth');
   };
 
-  const handleUserManagementClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleUserManagementClick = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     console.log('🔧 USER MANAGEMENT BUTTON CLICKED');
     console.log('Current admin status:', isAdmin);
     console.log('User role:', userProfile?.role);
@@ -119,6 +125,11 @@ const Index = () => {
       navigate('/user-management');
       console.log('✅ Navigation call completed');
       
+      // Chiudi il drawer mobile se aperto
+      if (isMobileDrawerOpen) {
+        setIsMobileDrawerOpen(false);
+      }
+      
       // Aggiungiamo un timeout per verificare se la navigazione è avvenuta
       setTimeout(() => {
         console.log('🔍 Post-navigation check - Current location:', window.location.pathname);
@@ -128,8 +139,16 @@ const Index = () => {
     }
   };
 
+  const handleMobileMenuClick = () => {
+    setIsMobileDrawerOpen(true);
+  };
+
   const handleSettingsClick = () => {
     navigate('/settings');
+    // Chiudi il drawer mobile se aperto
+    if (isMobileDrawerOpen) {
+      setIsMobileDrawerOpen(false);
+    }
   };
 
   const displayName = userProfile?.first_name && userProfile?.last_name 
@@ -164,26 +183,47 @@ const Index = () => {
 
   return (
     <ModernTooltipProvider>
-      <div className="min-h-screen bg-background flex">
-        {/* Sidebar */}
-        <ModernSidebar 
-          isAdmin={isAdmin}
-        />
+      <div className="min-h-screen bg-background flex relative">
+        {/* Desktop Sidebar - Hidden on mobile */}
+        {!isMobile && (
+          <ModernSidebar 
+            isAdmin={isAdmin}
+          />
+        )}
+
+        {/* Mobile Drawer */}
+        {isMobile && (
+          <MobileDrawer
+            isOpen={isMobileDrawerOpen}
+            onClose={() => setIsMobileDrawerOpen(false)}
+            isAdmin={isAdmin}
+          />
+        )}
 
         {/* Main Content */}
-        <div className="flex-1 ml-64 flex flex-col">
+        <div className={`flex-1 ${!isMobile ? 'ml-64' : ''} flex flex-col ${isMobile ? 'pb-20' : ''}`}>
           {/* Header */}
-          <ModernHeader
-            userProfile={userProfile}
-            isAdmin={isAdmin}
-            hasUnsavedChanges={hasUnsavedChanges}
-            onLogout={handleLogout}
-            onSettings={handleSettingsClick}
-            onUserManagement={handleUserManagementClick}
-          />
+          {isMobile ? (
+            <MobileHeader
+              userProfile={userProfile}
+              isAdmin={isAdmin}
+              hasUnsavedChanges={hasUnsavedChanges}
+              onLogout={handleLogout}
+              onMenuClick={handleMobileMenuClick}
+            />
+          ) : (
+            <ModernHeader
+              userProfile={userProfile}
+              isAdmin={isAdmin}
+              hasUnsavedChanges={hasUnsavedChanges}
+              onLogout={handleLogout}
+              onSettings={handleSettingsClick}
+              onUserManagement={handleUserManagementClick}
+            />
+          )}
 
           {/* Page Content */}
-          <main className="flex-1 p-6 bg-background">
+          <main className={`flex-1 ${isMobile ? 'p-4' : 'p-6'} bg-background`}>
             {/* Statistics Cards */}
             <StatisticsCards summary={summary} currency={config.currency} />
             
@@ -198,28 +238,28 @@ const Index = () => {
 
             {/* Tabs */}
             <Tabs defaultValue="investments" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6 bg-card rounded-xl p-1">
+              <TabsList className={`grid w-full grid-cols-2 ${isMobile ? 'mb-4' : 'mb-6'} bg-card rounded-xl p-1`}>
                 <TabsTrigger 
                   value="investments" 
                   className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
                 >
                   <TrendingUp className="h-4 w-4" />
-                  Dashboard Investimenti
+                  <span className={isMobile ? 'text-sm' : ''}>Dashboard</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="reminders" 
                   className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
                 >
                   <Bell className="h-4 w-4" />
-                  Promemoria Pagamenti
+                  <span className={isMobile ? 'text-sm' : ''}>Promemoria</span>
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="investments" className="space-y-6">
-                <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+              <TabsContent value="investments" className={`space-y-${isMobile ? '4' : '6'}`}>
+                <div className={`${isMobile ? 'space-y-4' : 'grid grid-cols-1 xl:grid-cols-4 gap-6'}`}>
                   {/* Configuration Panel */}
-                  <div className="xl:col-span-1">
-                    <div className="modern-card p-6">
+                  <div className={`${!isMobile ? 'xl:col-span-1' : ''}`}>
+                    <div className={`modern-card ${isMobile ? 'p-4' : 'p-6'}`}>
                       <ConfigurationPanel
                         config={config}
                         onConfigChange={updateConfig}
@@ -245,8 +285,8 @@ const Index = () => {
                   </div>
 
                   {/* Charts and Results */}
-                  <div className="xl:col-span-3 space-y-6">
-                    <div className="modern-card p-6">
+                  <div className={`${!isMobile ? 'xl:col-span-3' : ''} space-y-${isMobile ? '4' : '6'}`}>
+                    <div className={`modern-card ${isMobile ? 'p-4' : 'p-6'}`}>
                       <InvestmentChart data={investmentData} currency={config.currency} />
                     </div>
                     
@@ -267,13 +307,18 @@ const Index = () => {
               </TabsContent>
 
               <TabsContent value="reminders">
-                <div className="modern-card p-6">
+                <div className={`modern-card ${isMobile ? 'p-4' : 'p-6'}`}>
                   <PaymentReminders />
                 </div>
               </TabsContent>
             </Tabs>
           </main>
         </div>
+
+        {/* Mobile Bottom Navigation */}
+        {isMobile && (
+          <BottomNavigation isAdmin={isAdmin} />
+        )}
       </div>
     </ModernTooltipProvider>
   );
