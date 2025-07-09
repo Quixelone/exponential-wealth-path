@@ -12,6 +12,7 @@ import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
 import ModernSidebar from '@/components/dashboard/ModernSidebar';
 import ModernHeader from '@/components/dashboard/ModernHeader';
 import StatisticsCards from '@/components/dashboard/StatisticsCards';
+import CurrentStrategyProgress from '@/components/dashboard/CurrentStrategyProgress';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -185,6 +186,15 @@ const Index = () => {
           <main className="flex-1 p-6 bg-background">
             {/* Statistics Cards */}
             <StatisticsCards summary={summary} currency={config.currency} />
+            
+            {/* Current Strategy Progress */}
+            <div className="mb-6">
+              <CurrentStrategyProgress 
+                summary={summary} 
+                currency={config.currency} 
+                currentDayIndex={currentDayIndex}
+              />
+            </div>
 
             {/* Tabs */}
             <Tabs defaultValue="investments" className="w-full">
