@@ -16,11 +16,15 @@ interface StatisticsCardsProps {
 }
 
 const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) => {
-  // Calcola valori derivati dal summary
-  const totalInvested = summary?.totalInvested || 0;
-  const finalCapital = summary?.finalCapital || 0;
+  // Calcola valori derivati dal summary (usando la struttura corretta con current/final)
+  const finalData = summary?.final || summary?.current || {};
+  const currentData = summary?.current || {};
+  
+  const totalInvested = finalData.totalInvested || 0;
+  const finalCapital = finalData.finalCapital || 0;
   const totalProfit = finalCapital - totalInvested;
   const roiPercentage = totalInvested > 0 ? ((totalProfit / totalInvested) * 100) : 0;
+  const totalDays = finalData.day || 0;
   
   const stats = [
     {
@@ -61,7 +65,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
     },
     {
       title: 'Giorni Investimento',
-      value: summary?.totalDays?.toString() || '0',
+      value: totalDays.toString(),
       change: '+30',
       changeType: 'positive' as const,
       icon: Calendar,
