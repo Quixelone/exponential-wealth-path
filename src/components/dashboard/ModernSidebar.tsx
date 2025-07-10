@@ -16,12 +16,19 @@ import { cn } from '@/lib/utils';
 interface ModernSidebarProps {
   isAdmin?: boolean;
   onNavigate?: (path: string) => void;
+  onCollapseChange?: (collapsed: boolean) => void;
 }
 
-const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate }) => {
+const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCollapseChange }) => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleCollapseToggle = () => {
+    const newCollapsed = !collapsed;
+    setCollapsed(newCollapsed);
+    onCollapseChange?.(newCollapsed);
+  };
 
   const menuItems = [
     {
@@ -87,7 +94,7 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate }) =>
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={handleCollapseToggle}
           className={cn(
             "hover:bg-accent transition-all duration-200",
             collapsed ? "absolute -right-3 top-4 bg-card border border-border shadow-md rounded-full w-6 h-6 p-0 z-10" : ""

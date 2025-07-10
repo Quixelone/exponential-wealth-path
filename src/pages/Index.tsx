@@ -23,6 +23,7 @@ const Index = () => {
   const { user, userProfile, loading: authLoading, signOut, isAdmin } = useAuth();
   const { isMobile, isTablet } = useDeviceInfo();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   console.log('🏠 Index component render state:', {
     authLoading,
@@ -188,6 +189,7 @@ const Index = () => {
         {!isMobile && (
           <ModernSidebar 
             isAdmin={isAdmin}
+            onCollapseChange={setIsSidebarCollapsed}
           />
         )}
 
@@ -201,7 +203,13 @@ const Index = () => {
         )}
 
         {/* Main Content */}
-        <div className={`flex-1 ${!isMobile ? 'ml-64' : ''} flex flex-col ${isMobile ? 'pb-20' : ''}`}>
+        <div className={`flex-1 transition-all duration-300 flex flex-col ${
+          !isMobile 
+            ? isSidebarCollapsed 
+              ? 'ml-16' 
+              : 'ml-64' 
+            : 'pb-20'
+        }`}>
           {/* Header */}
           {isMobile ? (
             <MobileHeader
