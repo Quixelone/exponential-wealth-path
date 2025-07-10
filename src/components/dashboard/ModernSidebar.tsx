@@ -61,58 +61,85 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate }) =>
 
   return (
     <div className={cn(
-      "modern-sidebar flex flex-col bg-card border-r border-border transition-all duration-300",
+      "modern-sidebar flex flex-col bg-card border-r border-border transition-all duration-300 relative",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
+      <div className={cn(
+        "flex items-center border-b border-border transition-all duration-300",
+        collapsed ? "justify-center p-2" : "justify-between p-4"
+      )}>
         {!collapsed && (
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
               <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg gradient-text-primary">
+            <span className="font-bold text-lg gradient-text-primary truncate">
               Finanza Creativa
             </span>
+          </div>
+        )}
+        {collapsed && (
+          <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+            <TrendingUp className="h-5 w-5 text-white" />
           </div>
         )}
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setCollapsed(!collapsed)}
-          className="hover:bg-accent"
+          className={cn(
+            "hover:bg-accent transition-all duration-200",
+            collapsed ? "absolute -right-3 top-4 bg-card border border-border shadow-md rounded-full w-6 h-6 p-0 z-10" : ""
+          )}
         >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className={cn(
+        "flex-1 space-y-2 transition-all duration-300",
+        collapsed ? "p-2" : "p-4"
+      )}>
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActivePath(item.path);
           
           return (
-            <button
-              key={item.path}
-              onClick={() => handleNavigation(item.path)}
-              className={cn(
-                "w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-200 group",
-                isActive 
-                  ? "bg-primary text-primary-foreground shadow-sm" 
-                  : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
-              )}
-            >
-              <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-accent-foreground")} />
-              {!collapsed && (
-                <div className="flex flex-col items-start">
-                  <span className="font-medium text-sm">{item.label}</span>
-                  {!isActive && (
-                    <span className="text-xs opacity-70">{item.description}</span>
-                  )}
+            <div key={item.path} className="relative group">
+              <button
+                onClick={() => handleNavigation(item.path)}
+                className={cn(
+                  "w-full flex items-center rounded-lg transition-all duration-200 group relative",
+                  collapsed ? "p-3 justify-center" : "gap-3 p-3",
+                  isActive 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
+                    : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
+                )}
+              >
+                <Icon className={cn(
+                  "transition-colors flex-shrink-0",
+                  collapsed ? "h-5 w-5" : "h-5 w-5",
+                  isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-accent-foreground"
+                )} />
+                {!collapsed && (
+                  <div className="flex flex-col items-start min-w-0">
+                    <span className="font-medium text-sm truncate">{item.label}</span>
+                    {!isActive && (
+                      <span className="text-xs opacity-70 truncate">{item.description}</span>
+                    )}
+                  </div>
+                )}
+              </button>
+              
+              {/* Tooltip per collapsed state */}
+              {collapsed && (
+                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-popover text-popover-foreground px-2 py-1 rounded-md text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap shadow-md border">
+                  {item.label}
                 </div>
               )}
-            </button>
+            </div>
           );
         })}
       </nav>

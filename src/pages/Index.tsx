@@ -233,6 +233,8 @@ const Index = () => {
                 summary={summary} 
                 currency={config.currency} 
                 currentDayIndex={currentDayIndex}
+                dailyReturns={dailyReturns}
+                originalDailyReturnRate={config.dailyReturnRate}
               />
             </div>
 

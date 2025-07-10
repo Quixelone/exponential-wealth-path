@@ -9,12 +9,16 @@ interface CurrentStrategyProgressProps {
   summary: any;
   currency: Currency;
   currentDayIndex: number;
+  dailyReturns?: { [day: number]: number };
+  originalDailyReturnRate?: number;
 }
 
 const CurrentStrategyProgress: React.FC<CurrentStrategyProgressProps> = ({ 
   summary, 
   currency, 
-  currentDayIndex 
+  currentDayIndex,
+  dailyReturns = {},
+  originalDailyReturnRate = 0
 }) => {
   if (!summary?.current || !summary?.final) {
     return null;
@@ -28,7 +32,12 @@ const CurrentStrategyProgress: React.FC<CurrentStrategyProgressProps> = ({
   const capitalProgress = final.finalCapital > 0 ? (current.finalCapital / final.finalCapital) * 100 : 0;
   const investmentProgress = final.totalInvested > 0 ? (current.totalInvested / final.totalInvested) * 100 : 0;
   
-  // Calcola performance vs aspettativa
+  // Calcola performance reale vs aspettativa del piano originale
+  const actualReturnToday = dailyReturns[currentDayIndex] || originalDailyReturnRate;
+  const expectedReturnToday = originalDailyReturnRate;
+  const returnDeviation = actualReturnToday - expectedReturnToday;
+  
+  // Calcola performance complessiva vs aspettativa
   const expectedCurrentCapital = (final.finalCapital / final.day) * current.day;
   const performanceVsExpected = expectedCurrentCapital > 0 ? 
     ((current.finalCapital - expectedCurrentCapital) / expectedCurrentCapital) * 100 : 0;
@@ -111,6 +120,37 @@ const CurrentStrategyProgress: React.FC<CurrentStrategyProgressProps> = ({
             {performanceVsExpected >= 0 
               ? "La strategia sta performando meglio del previsto"
               : "La strategia è sotto le aspettative"
+            }
+          </p>
+        </div>
+
+        {/* Confronto Rendimento Giornaliero */}
+        <div className="pt-4 border-t">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium">Giorno {currentDayIndex} - Rendimento vs Piano</span>
+            <Badge 
+              variant={returnDeviation >= 0 ? "default" : "destructive"}
+              className={returnDeviation >= 0 ? "bg-green-500 hover:bg-green-600" : ""}
+            >
+              {returnDeviation >= 0 ? '+' : ''}{returnDeviation.toFixed(3)}%
+            </Badge>
+          </div>
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <span className="text-muted-foreground">Rendimento Reale:</span>
+              <div className="font-medium">{actualReturnToday.toFixed(3)}%</div>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Piano Originale:</span>
+              <div className="font-medium">{expectedReturnToday.toFixed(3)}%</div>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            {returnDeviation === 0 
+              ? "In linea con il piano originale"
+              : returnDeviation > 0 
+                ? "Sopra il piano originale"
+                : "Sotto il piano originale"
             }
           </p>
         </div>
