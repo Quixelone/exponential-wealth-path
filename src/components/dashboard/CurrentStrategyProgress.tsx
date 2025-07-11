@@ -124,36 +124,6 @@ const CurrentStrategyProgress: React.FC<CurrentStrategyProgressProps> = ({
           </p>
         </div>
 
-        {/* Confronto Rendimento Giornaliero */}
-        <div className="pt-4 border-t">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">Giorno {currentDayIndex} - Rendimento vs Piano</span>
-            <Badge 
-              variant={returnDeviation >= 0 ? "default" : "destructive"}
-              className={returnDeviation >= 0 ? "bg-green-500 hover:bg-green-600" : ""}
-            >
-              {returnDeviation >= 0 ? '+' : ''}{returnDeviation.toFixed(3)}%
-            </Badge>
-          </div>
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            <div>
-              <span className="text-muted-foreground">Rendimento Reale:</span>
-              <div className="font-medium">{actualReturnToday.toFixed(3)}%</div>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Piano Originale:</span>
-              <div className="font-medium">{expectedReturnToday.toFixed(3)}%</div>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {returnDeviation === 0 
-              ? "In linea con il piano originale"
-              : returnDeviation > 0 
-                ? "Sopra il piano originale"
-                : "Sotto il piano originale"
-            }
-          </p>
-        </div>
 
         {/* Rendimento Attuale */}
         <div className="grid grid-cols-2 gap-4 pt-4 border-t">

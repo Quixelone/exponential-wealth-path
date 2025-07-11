@@ -21,9 +21,10 @@ interface MobileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   isAdmin?: boolean;
+  onStrategiesClick?: () => void;
 }
 
-const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin }) => {
+const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin, onStrategiesClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,7 +39,8 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin })
       icon: TrendingUp,
       label: 'Strategie',
       path: '/strategies',
-      description: 'Gestione strategie'
+      description: 'Gestione strategie',
+      isButton: true
     },
     {
       icon: Settings,
@@ -57,9 +59,14 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin })
     });
   }
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-    onClose();
+  const handleNavigation = (path: string, isButton?: boolean) => {
+    if (isButton && path === '/strategies') {
+      onClose();
+      onStrategiesClick?.();
+    } else {
+      navigate(path);
+      onClose();
+    }
   };
 
   const isActivePath = (path: string) => {
@@ -96,10 +103,10 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin })
             return (
               <button
                 key={item.path}
-                onClick={() => handleNavigation(item.path)}
+                onClick={() => handleNavigation(item.path, item.isButton)}
                 className={cn(
                   "w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200 text-left",
-                  isActive 
+                  isActive && !item.isButton
                     ? "bg-primary text-primary-foreground shadow-sm" 
                     : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
                 )}

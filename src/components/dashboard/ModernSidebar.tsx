@@ -17,9 +17,10 @@ interface ModernSidebarProps {
   isAdmin?: boolean;
   onNavigate?: (path: string) => void;
   onCollapseChange?: (collapsed: boolean) => void;
+  onStrategiesClick?: () => void;
 }
 
-const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCollapseChange }) => {
+const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCollapseChange, onStrategiesClick }) => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,7 +42,8 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       icon: TrendingUp,
       label: 'Strategie',
       path: '/strategies',
-      description: 'Gestione strategie'
+      description: 'Gestione strategie',
+      isButton: true
     },
     {
       icon: Settings,
@@ -60,9 +62,13 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
     });
   }
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-    onNavigate?.(path);
+  const handleNavigation = (path: string, isButton?: boolean) => {
+    if (isButton && path === '/strategies') {
+      onStrategiesClick?.();
+    } else {
+      navigate(path);
+      onNavigate?.(path);
+    }
   };
 
   const isActivePath = (path: string) => {
@@ -122,11 +128,11 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
           return (
             <div key={item.path} className="relative group">
               <button
-                onClick={() => handleNavigation(item.path)}
+                onClick={() => handleNavigation(item.path, item.isButton)}
                 className={cn(
                   "w-full flex items-center rounded-lg transition-all duration-200 group relative",
                   collapsed ? "p-3 justify-center" : "gap-3 p-3",
-                  isActive 
+                  isActive && !item.isButton
                     ? "bg-primary text-primary-foreground shadow-sm" 
                     : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
                 )}
