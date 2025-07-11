@@ -268,6 +268,7 @@ const Index = () => {
               onMenuClick={() => setIsMobileDrawerOpen(true)}
               onLogout={handleLogout}
               isAdmin={isAdmin}
+              hasUnsavedChanges={hasUnsavedChanges}
             />
             <MobileDrawer 
               isOpen={isMobileDrawerOpen}

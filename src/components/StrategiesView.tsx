@@ -9,6 +9,7 @@ import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import { useToast } from '@/hooks/use-toast';
 import NewConfigurationDialog from '@/components/configuration/NewConfigurationDialog';
 import { formatCurrency, Currency } from '@/lib/utils';
+import { SavedConfiguration } from '@/types/database';
 
 interface StrategiesViewProps {
   onBackToDashboard: () => void;
@@ -87,7 +88,7 @@ const StrategiesView: React.FC<StrategiesViewProps> = ({ onBackToDashboard }) =>
     return `${(value * 100).toFixed(2)}%`;
   };
 
-  const getStrategyMetrics = (strategy: any) => {
+  const getStrategyMetrics = (strategy: SavedConfiguration) => {
     const config = strategy.config;
     const totalDays = config.timeHorizon;
     const pacFrequency = config.pacConfig.frequency;
@@ -97,8 +98,6 @@ const StrategiesView: React.FC<StrategiesViewProps> = ({ onBackToDashboard }) =>
       case 'daily': paymentsPerYear = 365; break;
       case 'weekly': paymentsPerYear = 52; break;
       case 'monthly': paymentsPerYear = 12; break;
-      case 'quarterly': paymentsPerYear = 4; break;
-      case 'yearly': paymentsPerYear = 1; break;
       case 'custom': paymentsPerYear = config.pacConfig.customDays ? Math.floor(365 / config.pacConfig.customDays) : 0; break;
       default: paymentsPerYear = 0;
     }
@@ -241,11 +240,11 @@ const StrategiesView: React.FC<StrategiesViewProps> = ({ onBackToDashboard }) =>
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div className="space-y-1">
                         <p className="text-muted-foreground">Capitale iniziale</p>
-                        <p className="font-medium">{formatCurrency(strategy.config.initialCapital, strategy.config.currency as Currency)}</p>
+                        <p className="font-medium">{formatCurrency(strategy.config.initialCapital, 'EUR')}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-muted-foreground">PAC</p>
-                        <p className="font-medium">{formatCurrency(strategy.config.pacConfig.amount, strategy.config.currency as Currency)}</p>
+                        <p className="font-medium">{formatCurrency(strategy.config.pacConfig.amount, 'EUR')}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-muted-foreground">Rendimento</p>
@@ -262,7 +261,7 @@ const StrategiesView: React.FC<StrategiesViewProps> = ({ onBackToDashboard }) =>
                     
                     <div className="space-y-1">
                       <p className="text-muted-foreground text-sm">Investimento totale stimato</p>
-                      <p className="font-semibold text-primary">{formatCurrency(metrics.totalInvestment, strategy.config.currency as Currency)}</p>
+                      <p className="font-semibold text-primary">{formatCurrency(metrics.totalInvestment, 'EUR')}</p>
                     </div>
                     
                     <div className="flex gap-2 pt-2">
