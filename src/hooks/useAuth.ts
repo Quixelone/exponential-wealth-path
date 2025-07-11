@@ -183,15 +183,10 @@ export const useAuth = () => {
     try {
       console.log('🚀 Starting registration process for:', email);
       
-      const redirectUrl = `${window.location.origin}/`;
-      console.log('📍 Redirect URL:', redirectUrl);
-      
       const userData: any = {
         email,
         password,
-        options: {
-          emailRedirectTo: redirectUrl
-        }
+       options: {}
       };
 
       if (firstName || lastName || phone) {
@@ -236,18 +231,18 @@ export const useAuth = () => {
 
       console.log('✅ Signup successful:', data);
       
-      if (data.user && !data.session) {
-        console.log('📧 User created, confirmation email sent');
-        toast({
-          title: "Registrazione completata",
-          description: "Controlla la tua email per confermare l'account",
-        });
-      } else if (data.session) {
+     if (data.session) {
         console.log('🔐 User automatically signed in');
         toast({
           title: "Registrazione completata",
           description: "Benvenuto! Il tuo account è stato creato con successo.",
         });
+     } else {
+       console.log('👤 User created but not signed in');
+       toast({
+         title: "Registrazione completata",
+         description: "Account creato. Puoi effettuare il login.",
+       });
       }
 
       return { error: null };

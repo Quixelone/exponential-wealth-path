@@ -84,16 +84,7 @@ const AuthForm: React.FC = () => {
     e.preventDefault();
     console.log('📝 Form submitted - validating input...');
     
-    // Test Supabase connection first
-    const connectionOk = await testSupabaseConnection();
-    if (!connectionOk) {
-      toast({
-        title: "Errore di connessione",
-        description: "Impossibile connettersi al server. Riprova tra qualche momento.",
-        variant: "destructive"
-      });
-      return;
-    }
+   setLoading(true);
     
     // Log registration attempt for debugging
     logRegistrationAttempt(email, {
@@ -119,17 +110,21 @@ const AuthForm: React.FC = () => {
         description: validation.errors.join(', '),
         variant: "destructive"
       });
+     setLoading(false);
       return;
     }
     
     console.log('✅ Validation passed, attempting registration...');
-    setLoading(true);
     
     try {
       const result = await signUp(email, password, firstName, lastName, phone);
       
       if (!result.error) {
         console.log('🎉 Registration successful');
+       toast({
+         title: "Registrazione completata",
+         description: "Account creato con successo! Puoi accedere ora.",
+       });
         // Reset form on success
         setEmail('');
         setPassword('');
@@ -137,8 +132,17 @@ const AuthForm: React.FC = () => {
         setFirstName('');
         setLastName('');
         setPhone('');
+       // Passa automaticamente alla tab di login
+       document.querySelector('[value="signin"]')?.dispatchEvent(
+         new MouseEvent('click', { bubbles: true })
+       );
       } else {
         console.error('🚫 Registration failed:', result.error);
+       toast({
+         title: "Errore nella registrazione",
+         description: result.error.message || "Si è verificato un errore durante la registrazione",
+         variant: "destructive"
+       });
       }
     } catch (error) {
       console.error('💥 Unexpected error during signup:', error);

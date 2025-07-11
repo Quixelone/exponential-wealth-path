@@ -44,6 +44,10 @@ enable_anonymous_sign_ins = false
 enable_signup = true
 double_confirm_changes = false
 enable_confirmations = false
+# Aggiunta esplicita per disabilitare la conferma email
+enable_email_confirmations = false
+email_confirm_required = false
+email_autoconfirm = true
 
 [auth.sms]
 enable_signup = false
@@ -72,4 +76,9 @@ verify_jwt = true
 [[edge_runtime.function]]
 name = "test-whatsapp"
 source = "./supabase/functions/test-whatsapp"
+verify_jwt = true
+
+[[edge_runtime.function]]
+name = "check-auth-config"
+source = "./supabase/functions/check-auth-config"
 verify_jwt = true
