@@ -41,11 +41,31 @@ const Strategies: React.FC = () => {
     try {
       if (copyFromCurrent) {
         // Salva la configurazione corrente con il nuovo nome
-        await saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
-        toast({
-          title: "Strategia creata",
-          description: `La strategia "${name}" è stata creata copiando la configurazione corrente.`,
+        console.log('🔄 Strategies: Attempting to save configuration with data:', {
+          name,
+          configKeys: Object.keys(config),
+          dailyReturnsCount: Object.keys(dailyReturns).length,
+          dailyPACOverridesCount: Object.keys(dailyPACOverrides).length
         });
+        
+        const result = await saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
+        
+        if (result) {
+          console.log('✅ Strategies: Configuration saved successfully, ID:', result);
+          toast({
+            title: "Strategia creata",
+            description: `La strategia "${name}" è stata creata copiando la configurazione corrente.`,
+          });
+          // Ricarica le configurazioni dopo il salvataggio
+          await loadConfigurations();
+        } else {
+          console.error('❌ Strategies: Save returned null/false');
+          toast({
+            title: "Errore",
+            description: "Non è stato possibile salvare la strategia.",
+            variant: "destructive"
+          });
+        }
       } else {
         // Crea una nuova strategia e naviga al dashboard
         toast({
@@ -104,11 +124,23 @@ const Strategies: React.FC = () => {
   const handleSaveConfiguration = async (name: string) => {
     console.log('🔄 Strategies: Saving configuration', { name });
     try {
-      await saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
-      toast({
-        title: "Strategia salvata",
-        description: `La strategia "${name}" è stata salvata.`,
-      });
+      const result = await saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
+      if (result) {
+        console.log('✅ Strategies: Configuration saved successfully, ID:', result);
+        toast({
+          title: "Strategia salvata",
+          description: `La strategia "${name}" è stata salvata.`,
+        });
+        // Ricarica le configurazioni dopo il salvataggio
+        await loadConfigurations();
+      } else {
+        console.error('❌ Strategies: Save returned null/false');
+        toast({
+          title: "Errore",
+          description: "Non è stato possibile salvare la strategia.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       console.error('❌ Strategies: Error saving configuration', error);
       toast({
@@ -137,13 +169,13 @@ const Strategies: React.FC = () => {
     }
   };
 
-  // Load configurations on mount
+  // Load configurations on mount - only once
   useEffect(() => {
-    if (user) {
-      console.log('🔄 Strategies: Loading configurations for user');
+    if (user && savedConfigs.length === 0 && !supabaseLoading) {
+      console.log('🔄 Strategies: Loading configurations for user (first time)');
       loadConfigurations();
     }
-  }, [user, loadConfigurations]);
+  }, [user, savedConfigs.length, supabaseLoading]);
 
   const handleRetryLoad = () => {
     console.log('🔄 Strategies: Manual retry triggered');
