@@ -83,6 +83,8 @@ export const useSupabaseConfig = () => {
       console.error('❌ Error loading configurations:', error);
       setSavedConfigs([]);
     } finally {
+      // Always reset loading state
+      console.log('🏁 Setting loading to false and resetting loadingRef');
       setLoading(false);
       loadingRef.current = false;
       console.log('🏁 Configuration loading completed');
