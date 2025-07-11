@@ -37,12 +37,12 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
     hasUnsavedChanges
   } = useInvestmentCalculator();
 
-  // Load configurations when drawer opens
+  // Load configurations when drawer opens (only if not already loaded)
   React.useEffect(() => {
-    if (isOpen && user) {
+    if (isOpen && user && savedConfigs.length === 0 && !supabaseLoading) {
       loadConfigurations();
     }
-  }, [isOpen, user, loadConfigurations]);
+  }, [isOpen, user, savedConfigs.length, supabaseLoading]);
 
   const handleCreateNewConfiguration = (name: string, copyFromCurrent: boolean) => {
     if (copyFromCurrent) {

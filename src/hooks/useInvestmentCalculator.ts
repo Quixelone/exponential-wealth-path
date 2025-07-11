@@ -41,7 +41,7 @@ export const useInvestmentCalculator = () => {
       loadInitialized.current = true;
       loadConfigurations();
     }
-  }, []);
+  }, [loadConfigurations]);
 
   // Auto-load first configuration after configurations are loaded
   React.useEffect(() => {
