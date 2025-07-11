@@ -56,38 +56,18 @@ export const useSupabaseConfig = () => {
   const loadConfigurations = useCallback(async (): Promise<void> => {
     // Prevent multiple simultaneous calls with a more robust check
     if (loadingRef.current) {
-      console.log('🔄 Config loading already in progress, skipping...');
       return;
     }
     
-    console.log('🔄 Starting configuration load...');
     loadingRef.current = true;
     setLoading(true);
     
     try {
       const configs = await loadConfigs();
-      console.log('✅ Loaded configurations:', configs.length, configs);
       setSavedConfigs(configs);
-      
-      // Log each config structure for debugging
-      configs.forEach((config, index) => {
-        console.log(`📋 Config ${index + 1}:`, {
-          id: config.id,
-          name: config.name,
-          hasConfig: !!config.config,
-          configKeys: config.config ? Object.keys(config.config) : [],
-          configStructure: config.config
-        });
-      });
-    } catch (error) {
-      console.error('❌ Error loading configurations:', error);
-      setSavedConfigs([]);
     } finally {
-      // Always reset loading state
-      console.log('🏁 Setting loading to false and resetting loadingRef');
       setLoading(false);
       loadingRef.current = false;
-      console.log('🏁 Configuration loading completed');
     }
   }, [loadConfigs]);
 

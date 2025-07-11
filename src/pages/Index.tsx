@@ -18,7 +18,7 @@ import MobileDrawer from '@/components/mobile/MobileDrawer';
 import BottomNavigation from '@/components/mobile/BottomNavigation';
 import StatisticsCards from '@/components/dashboard/StatisticsCards';
 import CurrentStrategyProgress from '@/components/dashboard/CurrentStrategyProgress';
-import StrategiesView from '@/components/StrategiesView';
+import StrategiesDrawer from '@/components/StrategiesDrawer';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const Index = () => {
   const { isMobile, isTablet } = useDeviceInfo();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'strategies'>('dashboard');
+  const [isStrategiesDrawerOpen, setIsStrategiesDrawerOpen] = useState(false);
   
   console.log('🏠 Index component render state:', {
     authLoading,
@@ -242,7 +242,7 @@ const Index = () => {
             <ModernSidebar 
               isAdmin={isAdmin}
               onCollapseChange={setIsSidebarCollapsed}
-              onStrategiesClick={() => setCurrentView('strategies')}
+              onStrategiesClick={() => setIsStrategiesDrawerOpen(true)}
             />
             <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
               <ModernHeader 
@@ -252,9 +252,7 @@ const Index = () => {
                 isAdmin={isAdmin}
               />
               <main className="flex-1 p-6">
-                {currentView === 'dashboard' ? renderMainContent() : (
-                  <StrategiesView onBackToDashboard={() => setCurrentView('dashboard')} />
-                )}
+                {renderMainContent()}
               </main>
             </div>
           </div>
@@ -268,26 +266,28 @@ const Index = () => {
               onMenuClick={() => setIsMobileDrawerOpen(true)}
               onLogout={handleLogout}
               isAdmin={isAdmin}
-              hasUnsavedChanges={hasUnsavedChanges}
             />
             <MobileDrawer 
               isOpen={isMobileDrawerOpen}
               onClose={() => setIsMobileDrawerOpen(false)}
               isAdmin={isAdmin}
-              onStrategiesClick={() => setCurrentView('strategies')}
+              onStrategiesClick={() => setIsStrategiesDrawerOpen(true)}
             />
             <div className="pt-14 pb-20 px-4">
-              {currentView === 'dashboard' ? renderMainContent() : (
-                <StrategiesView onBackToDashboard={() => setCurrentView('dashboard')} />
-              )}
+              {renderMainContent()}
             </div>
             <BottomNavigation 
               isAdmin={isAdmin} 
-              onStrategiesClick={() => setCurrentView('strategies')} 
+              onStrategiesClick={() => setIsStrategiesDrawerOpen(true)} 
             />
           </>
         )}
 
+        {/* Strategies Drawer */}
+        <StrategiesDrawer 
+          isOpen={isStrategiesDrawerOpen}
+          onClose={() => setIsStrategiesDrawerOpen(false)}
+        />
       </div>
     </ModernTooltipProvider>
   );
