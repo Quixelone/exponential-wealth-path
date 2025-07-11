@@ -82,3 +82,8 @@ verify_jwt = true
 name = "check-auth-config"
 source = "./supabase/functions/check-auth-config"
 verify_jwt = true
+
+[[edge_runtime.function]]
+name = "custom-smtp-auth"
+source = "./supabase/functions/custom-smtp-auth"
+verify_jwt = false

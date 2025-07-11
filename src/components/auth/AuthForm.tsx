@@ -117,32 +117,75 @@ const AuthForm: React.FC = () => {
     console.log('✅ Validation passed, attempting registration...');
     
     try {
-      const result = await signUp(email, password, firstName, lastName, phone);
+      // Try custom SMTP auth first for better reliability
+      console.log('🌐 Attempting registration via custom SMTP...');
+      const customAuthResponse = await fetch(`${window.location.origin}/functions/v1/custom-smtp-auth`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzbXZqc29rcW9seGdjemNscWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDI5MTUsImV4cCI6MjA2NTExODkxNX0.8ruQsbU1HlK_CPsgrIv7JhJgDJsM-XD8daBa1Z2gEmo'}`
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          type: 'signup',
+          redirectTo: `${window.location.origin}/`
+        })
+      });
       
-      if (!result.error) {
-        console.log('🎉 Registration successful');
-       toast({
-         title: "Registrazione completata",
-         description: "Account creato con successo! Puoi accedere ora.",
-       });
-        // Reset form on success
+      const customResult = await customAuthResponse.json();
+      
+      if (customResult.success) {
+        console.log('🎉 Registration successful via custom SMTP');
+        toast({
+          title: "Registrazione completata",
+          description: "Account creato con successo! Puoi effettuare il login.",
+        });
+        
+        // Clear form
         setEmail('');
         setPassword('');
         setConfirmPassword('');
         setFirstName('');
         setLastName('');
         setPhone('');
-       // Passa automaticamente alla tab di login
-       document.querySelector('[value="signin"]')?.dispatchEvent(
-         new MouseEvent('click', { bubbles: true })
-       );
+        
+        // Switch to login tab
+        document.querySelector('[value="signin"]')?.dispatchEvent(
+          new MouseEvent('click', { bubbles: true })
+        );
       } else {
-        console.error('🚫 Registration failed:', result.error);
-       toast({
-         title: "Errore nella registrazione",
-         description: result.error.message || "Si è verificato un errore durante la registrazione",
-         variant: "destructive"
-       });
+        console.log('⚠️ Custom SMTP failed, trying fallback auth...');
+        
+        // Fallback to standard Supabase auth
+        const result = await signUp(email, password, firstName, lastName, phone);
+        
+        if (!result.error) {
+          console.log('🎉 Registration successful via fallback');
+          toast({
+            title: "Registrazione completata",
+            description: "Account creato con successo! Puoi effettuare il login.",
+          });
+          
+          // Clear form and switch to login
+          setEmail('');
+          setPassword('');
+          setConfirmPassword('');
+          setFirstName('');
+          setLastName('');
+          setPhone('');
+          
+          document.querySelector('[value="signin"]')?.dispatchEvent(
+            new MouseEvent('click', { bubbles: true })
+          );
+        } else {
+          console.error('❌ Registration failed:', result.error);
+          toast({
+            title: "Errore nella registrazione",
+            description: result.error.message || "Si è verificato un errore durante la registrazione",
+            variant: "destructive"
+          });
+        }
       }
     } catch (error) {
       console.error('💥 Unexpected error during signup:', error);
