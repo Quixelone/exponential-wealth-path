@@ -49,20 +49,50 @@ const AuthForm: React.FC = () => {
   }, [user, session, navigate]);
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔐 Login attempt for:', email);
+    
+    if (!email || !password) {
+      toast({
+        title: "Errore",
+        description: "Inserisci email e password",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setLoading(true);
     try {
       const result = await signIn(email, password);
       if (!result.error) {
-        console.log('Login successful, waiting for redirect...');
+        console.log('✅ Login successful, waiting for redirect...');
+      } else {
+        console.error('❌ Login failed:', result.error);
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('💥 Unexpected login error:', error);
+      toast({
+        title: "Errore di connessione",
+        description: "Problema di rete. Riprova tra qualche momento.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('📝 Form submitted - validating input...');
+    
+    // Validation checks
+    if (!email || !email.includes('@')) {
+      toast({
+        title: "Errore",
+        description: "Inserisci un indirizzo email valido",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     if (password !== confirmPassword) {
       toast({
         title: "Errore",
@@ -71,6 +101,7 @@ const AuthForm: React.FC = () => {
       });
       return;
     }
+    
     if (password.length < 6) {
       toast({
         title: "Errore",
@@ -79,11 +110,41 @@ const AuthForm: React.FC = () => {
       });
       return;
     }
+    
+    if (!firstName.trim() || !lastName.trim()) {
+      toast({
+        title: "Errore",
+        description: "Nome e cognome sono obbligatori",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    console.log('✅ Validation passed, attempting registration...');
     setLoading(true);
+    
     try {
-      await signUp(email, password, firstName, lastName, phone);
+      const result = await signUp(email, password, firstName, lastName, phone);
+      
+      if (!result.error) {
+        console.log('🎉 Registration successful');
+        // Reset form on success
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setFirstName('');
+        setLastName('');
+        setPhone('');
+      } else {
+        console.error('🚫 Registration failed:', result.error);
+      }
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error('💥 Unexpected error during signup:', error);
+      toast({
+        title: "Errore imprevisto",
+        description: "Si è verificato un errore. Riprova tra qualche momento.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }

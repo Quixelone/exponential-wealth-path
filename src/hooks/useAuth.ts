@@ -181,7 +181,10 @@ export const useAuth = () => {
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => {
     try {
+      console.log('🚀 Starting registration process for:', email);
+      
       const redirectUrl = `${window.location.origin}/`;
+      console.log('📍 Redirect URL:', redirectUrl);
       
       const userData: any = {
         email,
@@ -197,37 +200,62 @@ export const useAuth = () => {
           last_name: lastName,
           phone: phone
         };
+        console.log('👤 User metadata:', userData.options.data);
       }
 
-      const { error } = await supabase.auth.signUp(userData);
+      console.log('📤 Sending signup request to Supabase...');
+      const { data, error } = await supabase.auth.signUp(userData);
 
       if (error) {
+        console.error('❌ Signup error:', error);
+        
+        let errorMessage = error.message;
+        let errorTitle = "Errore nella registrazione";
+        
         if (error.message.includes('User already registered')) {
-          toast({
-            title: "Utente già registrato",
-            description: "Prova ad effettuare il login invece",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Errore nella registrazione",
-            description: error.message,
-            variant: "destructive",
-          });
+          errorTitle = "Utente già registrato";
+          errorMessage = "Questo email è già registrato. Prova ad effettuare il login invece.";
+        } else if (error.message.includes('Invalid email')) {
+          errorTitle = "Email non valida";
+          errorMessage = "Inserisci un indirizzo email valido.";
+        } else if (error.message.includes('Password')) {
+          errorTitle = "Password non valida";
+          errorMessage = "La password deve essere di almeno 6 caratteri.";
+        } else if (error.message.includes('signup is disabled')) {
+          errorTitle = "Registrazione disabilitata";
+          errorMessage = "La registrazione è temporaneamente disabilitata. Riprova più tardi.";
         }
+        
+        toast({
+          title: errorTitle,
+          description: errorMessage,
+          variant: "destructive",
+        });
         return { error };
       }
 
-      toast({
-        title: "Registrazione completata",
-        description: "Controlla la tua email per confermare l'account",
-      });
+      console.log('✅ Signup successful:', data);
+      
+      if (data.user && !data.session) {
+        console.log('📧 User created, confirmation email sent');
+        toast({
+          title: "Registrazione completata",
+          description: "Controlla la tua email per confermare l'account",
+        });
+      } else if (data.session) {
+        console.log('🔐 User automatically signed in');
+        toast({
+          title: "Registrazione completata",
+          description: "Benvenuto! Il tuo account è stato creato con successo.",
+        });
+      }
 
       return { error: null };
     } catch (error: any) {
+      console.error('💥 Unexpected signup error:', error);
       toast({
-        title: "Errore",
-        description: error.message,
+        title: "Errore di rete",
+        description: "Problema di connessione. Riprova tra qualche momento.",
         variant: "destructive",
       });
       return { error };
