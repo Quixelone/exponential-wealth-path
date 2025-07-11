@@ -59,14 +59,9 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin, o
     });
   }
 
-  const handleNavigation = (path: string, isButton?: boolean) => {
-    if (isButton && path === '/strategies') {
-      onClose();
-      onStrategiesClick?.();
-    } else {
-      navigate(path);
-      onClose();
-    }
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    onClose();
   };
 
   const isActivePath = (path: string) => {
@@ -103,7 +98,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin, o
             return (
               <button
                 key={item.path}
-                onClick={() => handleNavigation(item.path, item.isButton)}
+                onClick={() => handleNavigation(item.path)}
                 className={cn(
                   "w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200 text-left",
                   isActive && !item.isButton

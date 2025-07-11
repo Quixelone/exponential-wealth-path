@@ -28,8 +28,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
       icon: TrendingUp,
       label: 'Strategie',
       path: '/strategies',
-      isButton: true,
-      onClick: () => onStrategiesClick?.()
     },
     {
       icon: Bell,

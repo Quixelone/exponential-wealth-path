@@ -266,19 +266,18 @@ const Index = () => {
               onMenuClick={() => setIsMobileDrawerOpen(true)}
               onLogout={handleLogout}
               isAdmin={isAdmin}
+              hasUnsavedChanges={hasUnsavedChanges}
             />
             <MobileDrawer 
               isOpen={isMobileDrawerOpen}
               onClose={() => setIsMobileDrawerOpen(false)}
               isAdmin={isAdmin}
-              onStrategiesClick={() => setIsStrategiesDrawerOpen(true)}
             />
             <div className="pt-14 pb-20 px-4">
               {renderMainContent()}
             </div>
             <BottomNavigation 
               isAdmin={isAdmin} 
-              onStrategiesClick={() => setIsStrategiesDrawerOpen(true)} 
             />
           </>
         )}

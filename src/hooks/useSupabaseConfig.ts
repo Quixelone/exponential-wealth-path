@@ -9,6 +9,7 @@ import { useConfigDeleter } from './supabase/configDeleter';
 export const useSupabaseConfig = () => {
   const [loading, setLoading] = useState(false);
   const [savedConfigs, setSavedConfigs] = useState<SavedConfiguration[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const loadingRef = useRef(false);
 
   const { saveConfiguration: saveConfig } = useConfigSaver();
@@ -22,13 +23,21 @@ export const useSupabaseConfig = () => {
     dailyReturns: { [day: number]: number },
     dailyPACOverrides: { [day: number]: number } = {}
   ): Promise<string | null> => {
+    console.log('🔄 useSupabaseConfig: Starting saveConfiguration', { name, configKeys: Object.keys(config) });
     setLoading(true);
+    setError(null);
     try {
       const result = await saveConfig(name, config, dailyReturns, dailyPACOverrides);
+      console.log('✅ useSupabaseConfig: Save successful', { result });
       if (result) {
+        console.log('🔄 useSupabaseConfig: Reloading configurations after save');
         await loadConfigurations();
       }
       return result;
+    } catch (err) {
+      console.error('❌ useSupabaseConfig: Save failed', err);
+      setError(err instanceof Error ? err.message : 'Errore durante il salvataggio');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -41,13 +50,21 @@ export const useSupabaseConfig = () => {
     dailyReturns: { [day: number]: number },
     dailyPACOverrides: { [day: number]: number } = {}
   ): Promise<boolean> => {
+    console.log('🔄 useSupabaseConfig: Starting updateConfiguration', { configId, name });
     setLoading(true);
+    setError(null);
     try {
       const result = await updateConfig(configId, name, config, dailyReturns, dailyPACOverrides);
+      console.log('✅ useSupabaseConfig: Update successful', { result });
       if (result) {
+        console.log('🔄 useSupabaseConfig: Reloading configurations after update');
         await loadConfigurations();
       }
       return result;
+    } catch (err) {
+      console.error('❌ useSupabaseConfig: Update failed', err);
+      setError(err instanceof Error ? err.message : 'Errore durante l\'aggiornamento');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -56,26 +73,45 @@ export const useSupabaseConfig = () => {
   const loadConfigurations = useCallback(async (): Promise<void> => {
     // Prevent multiple simultaneous calls with a more robust check
     if (loadingRef.current) {
+      console.log('⚠️ useSupabaseConfig: Load already in progress, skipping');
       return;
     }
     
+    console.log('🔄 useSupabaseConfig: Starting loadConfigurations');
     loadingRef.current = true;
     setLoading(true);
+    setError(null);
     
     try {
       const configs = await loadConfigs();
+      console.log('✅ useSupabaseConfig: Configurations loaded', { 
+        count: configs.length, 
+        configIds: configs.map(c => c.id) 
+      });
       setSavedConfigs(configs);
+    } catch (err) {
+      console.error('❌ useSupabaseConfig: Load failed', err);
+      setError(err instanceof Error ? err.message : 'Errore durante il caricamento');
+      setSavedConfigs([]); // Reset to empty array on error
     } finally {
+      console.log('🏁 useSupabaseConfig: Load completed, resetting flags');
       setLoading(false);
       loadingRef.current = false;
     }
   }, [loadConfigs]);
 
   const deleteConfiguration = useCallback(async (configId: string): Promise<void> => {
+    console.log('🔄 useSupabaseConfig: Starting deleteConfiguration', { configId });
     setLoading(true);
+    setError(null);
     try {
       await deleteConfig(configId);
+      console.log('✅ useSupabaseConfig: Delete successful, updating local state');
       setSavedConfigs(prev => prev.filter(config => config.id !== configId));
+    } catch (err) {
+      console.error('❌ useSupabaseConfig: Delete failed', err);
+      setError(err instanceof Error ? err.message : 'Errore durante l\'eliminazione');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -83,6 +119,7 @@ export const useSupabaseConfig = () => {
 
   return {
     loading,
+    error,
     savedConfigs,
     saveConfiguration,
     updateConfiguration,
