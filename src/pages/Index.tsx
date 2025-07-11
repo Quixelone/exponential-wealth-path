@@ -120,6 +120,10 @@ const Index = () => {
                   onUpdatePACForDay={updatePACForDay}
                   onRemovePACOverride={removePACOverride}
                   hasUnsavedChanges={hasUnsavedChanges}
+                  currentConfigId={currentConfigId}
+                  currentConfigName={currentConfigName}
+                  onSaveStrategy={saveCurrentConfiguration}
+                  onUpdateStrategy={updateCurrentConfiguration}
                   onUndo={undoConfiguration}
                   onRedo={redoConfiguration}
                   canUndo={canUndo}

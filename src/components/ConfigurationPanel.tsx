@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings, Save } from 'lucide-react';
+import { Settings, Save, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import CapitalConfiguration from './configuration/CapitalConfiguration';
 import TimeHorizonConfiguration from './configuration/TimeHorizonConfiguration';
 import ReturnConfiguration from './configuration/ReturnConfiguration';
@@ -11,6 +12,7 @@ import PACConfiguration from './configuration/PACConfiguration';
 import CurrencyConfiguration from './configuration/CurrencyConfiguration';
 import ExportSection from './configuration/ExportSection';
 import UndoRedoControls from './configuration/UndoRedoControls';
+import SaveConfigDialog from './configuration/SaveConfigDialog';
 import { Badge } from '@/components/ui/badge';
 
 interface ConfigurationPanelProps {
@@ -25,6 +27,11 @@ interface ConfigurationPanelProps {
   onUpdatePACForDay: (day: number, pacAmount: number) => void;
   onRemovePACOverride: (day: number) => void;
   hasUnsavedChanges?: boolean;
+  // Strategy management
+  currentConfigId?: string | null;
+  currentConfigName?: string;
+  onSaveStrategy?: (name: string) => void;
+  onUpdateStrategy?: (configId: string, name: string) => void;
   // History operations
   onUndo?: () => any;
   onRedo?: () => any;
@@ -44,12 +51,31 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   onUpdatePACForDay,
   onRemovePACOverride,
   hasUnsavedChanges = false,
+  // Strategy management
+  currentConfigId,
+  currentConfigName,
+  onSaveStrategy,
+  onUpdateStrategy,
   // History operations
   onUndo,
   onRedo,
   canUndo = false,
   canRedo = false,
 }) => {
+
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [configName, setConfigName] = useState(currentConfigName || '');
+
+  const handleSaveStrategy = () => {
+    if (configName.trim() && onSaveStrategy) {
+      if (currentConfigId && onUpdateStrategy) {
+        onUpdateStrategy(currentConfigId, configName.trim());
+      } else {
+        onSaveStrategy(configName.trim());
+      }
+      setSaveDialogOpen(false);
+    }
+  };
 
   return (
     <div className="space-y-6 h-fit">
@@ -63,6 +89,39 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 <h2 className="text-xl font-bold text-primary">
                   Configurazione Attiva
                 </h2>
+                {hasUnsavedChanges && (
+                  <Badge variant="destructive" className="animate-pulse text-xs">
+                    Modificato
+                  </Badge>
+                )}
+              </div>
+              
+              {/* Save Strategy Button */}
+              {onSaveStrategy && (
+                <Button
+                  onClick={() => setSaveDialogOpen(true)}
+                  size="sm"
+                  className="flex items-center gap-2"
+                  variant={hasUnsavedChanges ? "default" : "outline"}
+                >
+                  <Save className="h-4 w-4" />
+                  {currentConfigId ? 'Aggiorna Strategia' : 'Salva Strategia'}
+                </Button>
+              )}
+            </div>
+
+            {/* Strategy Name */}
+            {currentConfigName && (
+              <div className="text-sm text-muted-foreground">
+                Strategia: <span className="font-medium">{currentConfigName}</span>
+              </div>
+            )}
+            
+            {/* Sottotitolo configurazione */}
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-primary" />
+                <span>Parametri di Configurazione</span>
               </div>
               
               {/* Undo/Redo Controls */}
@@ -74,14 +133,6 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                   onRedo={onRedo}
                 />
               )}
-            </div>
-            
-            {/* Sottotitolo configurazione */}
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-primary" />
-                <span>Parametri di Configurazione</span>
-              </div>
             </CardTitle>
           </div>
         </CardHeader>
@@ -116,6 +167,22 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
 
       {/* Export */}
       <ExportSection onExportCSV={onExportCSV} />
+
+      {/* Save Strategy Dialog */}
+      {onSaveStrategy && (
+        <SaveConfigDialog
+          open={saveDialogOpen}
+          onOpenChange={setSaveDialogOpen}
+          configName={configName}
+          setConfigName={setConfigName}
+          onSave={handleSaveStrategy}
+          loading={false}
+          isUpdate={!!currentConfigId}
+          hasUnsavedChanges={hasUnsavedChanges}
+          currentConfigName={currentConfigName || ''}
+          currentConfigId={currentConfigId || null}
+        />
+      )}
     </div>
   );
 };
