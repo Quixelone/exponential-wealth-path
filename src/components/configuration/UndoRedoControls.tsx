@@ -71,7 +71,7 @@ const UndoRedoControls: React.FC<UndoRedoControlsProps> = ({
             size="sm"
             onClick={handleUndo}
             disabled={!canUndo}
-            className="h-8 px-2 text-muted-foreground hover:text-primary disabled:opacity-50"
+            className="h-8 w-8 sm:h-8 sm:w-auto sm:px-2 p-0 sm:p-2 text-muted-foreground hover:text-primary disabled:opacity-50 min-h-[44px] sm:min-h-[32px]"
           >
             <Undo className="h-4 w-4" />
           </Button>
@@ -88,7 +88,7 @@ const UndoRedoControls: React.FC<UndoRedoControlsProps> = ({
             size="sm"
             onClick={handleRedo}
             disabled={!canRedo}
-            className="h-8 px-2 text-muted-foreground hover:text-primary disabled:opacity-50"
+            className="h-8 w-8 sm:h-8 sm:w-auto sm:px-2 p-0 sm:p-2 text-muted-foreground hover:text-primary disabled:opacity-50 min-h-[44px] sm:min-h-[32px]"
           >
             <Redo className="h-4 w-4" />
           </Button>

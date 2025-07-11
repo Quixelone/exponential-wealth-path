@@ -84,9 +84,9 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         <CardHeader className="pb-3">
           <div className="space-y-3">
             {/* Titolo configurazione attiva */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-primary">
+                <h2 className="text-lg sm:text-xl font-bold text-primary">
                   Configurazione Attiva
                 </h2>
                 {hasUnsavedChanges && (
@@ -96,16 +96,19 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 )}
               </div>
               
-              {/* Save Strategy Button */}
+              {/* Save Strategy Button - Mobile optimized */}
               {onSaveStrategy && (
                 <Button
                   onClick={() => setSaveDialogOpen(true)}
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px] text-sm"
                   variant={hasUnsavedChanges ? "default" : "outline"}
                 >
                   <Save className="h-4 w-4" />
-                  {currentConfigId ? 'Aggiorna Strategia' : 'Salva Strategia'}
+                  <span className="sm:hidden">Salva</span>
+                  <span className="hidden sm:inline">
+                    {currentConfigId ? 'Aggiorna Strategia' : 'Salva Strategia'}
+                  </span>
                 </Button>
               )}
             </div>
@@ -118,10 +121,10 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
             )}
             
             {/* Sottotitolo configurazione */}
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
               <div className="flex items-center gap-2">
                 <Settings className="h-5 w-5 text-primary" />
-                <span>Parametri di Configurazione</span>
+                <span className="text-base sm:text-lg">Parametri di Configurazione</span>
               </div>
               
               {/* Undo/Redo Controls */}

@@ -371,3 +371,41 @@
 .animate-scale-in {
   animation: scaleIn 0.3s ease-out; /* Slightly adjusted duration */
 }
+
+/* Mobile Touch Target Optimization */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.touch-target-lg {
+  min-height: 56px;
+  min-width: 56px;
+}
+
+/* Mobile-first responsive spacing */
+.mobile-spacing {
+  @apply p-3 sm:p-4 lg:p-6;
+}
+
+.mobile-gap {
+  @apply gap-2 sm:gap-3 lg:gap-4;
+}
+
+/* Mobile typography utilities */
+.text-mobile-responsive {
+  @apply text-sm sm:text-base lg:text-lg;
+}
+
+.text-mobile-title {
+  @apply text-lg sm:text-xl lg:text-2xl;
+}
+
+/* Mobile-optimized buttons */
+.btn-mobile {
+  @apply min-h-[44px] px-4 py-2 text-sm font-medium;
+}
+
+.btn-mobile-icon {
+  @apply min-h-[44px] min-w-[44px] p-2;
+}

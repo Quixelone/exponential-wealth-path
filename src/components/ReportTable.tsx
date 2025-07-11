@@ -259,32 +259,43 @@ const ReportTable: React.FC<ReportTableProps> = ({
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6">
-              <div className="text-sm text-muted-foreground">
-                Visualizzando {paginatedData.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + itemsPerPage, filteredData.length)} di {filteredData.length} giorni
+            <div className="mt-6 space-y-4">
+              {/* Mobile-first pagination info */}
+              <div className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
+                {paginatedData.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + itemsPerPage, filteredData.length)} di {filteredData.length} giorni
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Precedente
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  Pagina {currentPage} di {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                >
-                  Successiva
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
+              
+              {/* Responsive pagination controls */}
+              <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3">
+                <div className="flex items-center justify-center gap-2 w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    className="flex-1 sm:flex-none min-h-[44px] min-w-[100px]"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    <span className="sm:hidden">Prec</span>
+                    <span className="hidden sm:inline">Precedente</span>
+                  </Button>
+                  
+                  <div className="px-3 py-2 text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                    {currentPage} / {totalPages}
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className="flex-1 sm:flex-none min-h-[44px] min-w-[100px]"
+                  >
+                    <span className="sm:hidden">Succ</span>
+                    <span className="hidden sm:inline">Successiva</span>
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
               </div>
             </div>
           )}
