@@ -10,6 +10,7 @@ import { Lock, Mail, User, Phone, Eye, EyeOff, ArrowLeft, KeyRound } from 'lucid
 import { useToast } from '@/hooks/use-toast';
 import Logo from '@/components/brand/Logo';
 import Claim from '@/components/brand/Claim';
+import { logRegistrationAttempt, validateRegistrationForm, testSupabaseConnection } from '@/utils/registrationTestUtils';
 
 const AuthForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -83,38 +84,39 @@ const AuthForm: React.FC = () => {
     e.preventDefault();
     console.log('📝 Form submitted - validating input...');
     
-    // Validation checks
-    if (!email || !email.includes('@')) {
+    // Test Supabase connection first
+    const connectionOk = await testSupabaseConnection();
+    if (!connectionOk) {
       toast({
-        title: "Errore",
-        description: "Inserisci un indirizzo email valido",
+        title: "Errore di connessione",
+        description: "Impossibile connettersi al server. Riprova tra qualche momento.",
         variant: "destructive"
       });
       return;
     }
     
-    if (password !== confirmPassword) {
-      toast({
-        title: "Errore",
-        description: "Le password non coincidono",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Log registration attempt for debugging
+    logRegistrationAttempt(email, {
+      firstName,
+      lastName,
+      phone,
+      hasPassword: !!password,
+      passwordLength: password.length
+    });
     
-    if (password.length < 6) {
-      toast({
-        title: "Errore",
-        description: "La password deve essere di almeno 6 caratteri",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Validate form data
+    const validation = validateRegistrationForm({
+      email,
+      password,
+      confirmPassword,
+      firstName,
+      lastName
+    });
     
-    if (!firstName.trim() || !lastName.trim()) {
+    if (!validation.isValid) {
       toast({
-        title: "Errore",
-        description: "Nome e cognome sono obbligatori",
+        title: "Errore di validazione",
+        description: validation.errors.join(', '),
         variant: "destructive"
       });
       return;
@@ -150,31 +152,66 @@ const AuthForm: React.FC = () => {
     }
   };
   const handleGoogleSignIn = async () => {
+    console.log('🔍 Google sign in attempt...');
     setLoading(true);
     try {
-      await signInWithGoogle();
+      const result = await signInWithGoogle();
+      if (!result.error) {
+        console.log('✅ Google sign in initiated');
+      } else {
+        console.error('❌ Google sign in failed:', result.error);
+      }
     } catch (error) {
-      console.error('Google login error:', error);
+      console.error('💥 Google sign in error:', error);
+      toast({
+        title: "Errore login Google",
+        description: "Problema di connessione con Google. Riprova tra qualche momento.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
+  
   const handleFacebookSignIn = async () => {
+    console.log('📘 Facebook sign in attempt...');
     setLoading(true);
     try {
-      await signInWithFacebook!();
+      const result = await signInWithFacebook!();
+      if (!result.error) {
+        console.log('✅ Facebook sign in initiated');
+      } else {
+        console.error('❌ Facebook sign in failed:', result.error);
+      }
     } catch (error) {
-      console.error('Facebook login error:', error);
+      console.error('💥 Facebook sign in error:', error);
+      toast({
+        title: "Errore login Facebook",
+        description: "Problema di connessione con Facebook. Riprova tra qualche momento.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
+  
   const handleTwitterSignIn = async () => {
+    console.log('🐦 Twitter sign in attempt...');
     setLoading(true);
     try {
-      await signInWithTwitter!();
+      const result = await signInWithTwitter!();
+      if (!result.error) {
+        console.log('✅ Twitter sign in initiated');
+      } else {
+        console.error('❌ Twitter sign in failed:', result.error);
+      }
     } catch (error) {
-      console.error('Twitter login error:', error);
+      console.error('💥 Twitter sign in error:', error);
+      toast({
+        title: "Errore login Twitter",
+        description: "Problema di connessione con Twitter. Riprova tra qualche momento.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
