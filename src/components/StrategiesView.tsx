@@ -89,11 +89,33 @@ const StrategiesView: React.FC<StrategiesViewProps> = ({ onBackToDashboard }) =>
   };
 
   const getStrategyMetrics = (strategy: SavedConfiguration) => {
-    const config = strategy.config;
-    const totalDays = config.timeHorizon;
-    const pacFrequency = config.pacConfig.frequency;
-    let paymentsPerYear = 0;
+    console.log('📊 Getting metrics for strategy:', strategy.name, strategy);
     
+    if (!strategy.config) {
+      console.error('❌ Strategy config is missing for:', strategy.name);
+      return {
+        totalInvestment: 0,
+        annualReturn: 0,
+        timeHorizon: 0
+      };
+    }
+
+    const config = strategy.config;
+    console.log('📈 Config structure:', config);
+    
+    const totalDays = config.timeHorizon;
+    const pacFrequency = config.pacConfig?.frequency;
+    
+    if (!pacFrequency) {
+      console.error('❌ PAC frequency is missing for:', strategy.name);
+      return {
+        totalInvestment: config.initialCapital || 0,
+        annualReturn: 0,
+        timeHorizon: totalDays || 0
+      };
+    }
+    
+    let paymentsPerYear = 0;
     switch (pacFrequency) {
       case 'daily': paymentsPerYear = 365; break;
       case 'weekly': paymentsPerYear = 52; break;
@@ -102,13 +124,17 @@ const StrategiesView: React.FC<StrategiesViewProps> = ({ onBackToDashboard }) =>
       default: paymentsPerYear = 0;
     }
     
-    const totalInvestment = config.initialCapital + (config.pacConfig.amount * paymentsPerYear * (totalDays / 365));
+    const totalInvestment = (config.initialCapital || 0) + ((config.pacConfig?.amount || 0) * paymentsPerYear * ((totalDays || 0) / 365));
+    const annualReturn = (config.dailyReturnRate || 0) * 365;
     
-    return {
+    const metrics = {
       totalInvestment,
-      annualReturn: config.dailyReturnRate * 365,
-      timeHorizon: totalDays
+      annualReturn,
+      timeHorizon: totalDays || 0
     };
+    
+    console.log('📊 Calculated metrics:', metrics);
+    return metrics;
   };
 
   if (!user) {
@@ -186,6 +212,10 @@ const StrategiesView: React.FC<StrategiesViewProps> = ({ onBackToDashboard }) =>
                       <div className="h-3 bg-muted rounded"></div>
                       <div className="h-3 bg-muted rounded"></div>
                     </div>
+                    <div className="flex gap-2 pt-4">
+                      <div className="h-8 bg-muted rounded flex-1"></div>
+                      <div className="h-8 bg-muted rounded w-16"></div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -238,14 +268,14 @@ const StrategiesView: React.FC<StrategiesViewProps> = ({ onBackToDashboard }) =>
                   
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="space-y-1">
-                        <p className="text-muted-foreground">Capitale iniziale</p>
-                        <p className="font-medium">{formatCurrency(strategy.config.initialCapital, 'EUR')}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-muted-foreground">PAC</p>
-                        <p className="font-medium">{formatCurrency(strategy.config.pacConfig.amount, 'EUR')}</p>
-                      </div>
+                       <div className="space-y-1">
+                         <p className="text-muted-foreground">Capitale iniziale</p>
+                         <p className="font-medium">{formatCurrency(strategy.config?.initialCapital || 0, 'EUR')}</p>
+                       </div>
+                       <div className="space-y-1">
+                         <p className="text-muted-foreground">PAC</p>
+                         <p className="font-medium">{formatCurrency(strategy.config?.pacConfig?.amount || 0, 'EUR')}</p>
+                       </div>
                       <div className="space-y-1">
                         <p className="text-muted-foreground">Rendimento</p>
                         <p className="font-medium flex items-center gap-1">
