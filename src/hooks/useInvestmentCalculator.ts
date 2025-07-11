@@ -43,13 +43,14 @@ export const useInvestmentCalculator = () => {
     }
   }, [loadConfigurations]);
 
-  // Auto-load first configuration after configurations are loaded
+  // Auto-load first configuration only on initial load when no config is set
   React.useEffect(() => {
     if (
       !autoLoadAttempted.current && 
       !supabaseLoading && 
       savedConfigs.length > 0 && 
-      !configState.currentConfigId
+      !configState.currentConfigId &&
+      loadInitialized.current // Only auto-load after initial configurations load
     ) {
       autoLoadAttempted.current = true;
       
@@ -60,7 +61,7 @@ export const useInvestmentCalculator = () => {
       
       if (sortedConfigs.length > 0) {
         const firstConfig = sortedConfigs[0];
-        console.log('🔄 Auto-loading first configuration:', firstConfig.name);
+        console.log('🔄 Auto-loading first configuration (initial load only):', firstConfig.name);
         loadSavedConfiguration(firstConfig);
       }
     }
