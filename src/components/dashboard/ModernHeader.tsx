@@ -1,15 +1,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { 
   User, 
   LogOut, 
   Settings, 
   Users, 
   Bell,
-  Search,
-  Sun,
-  Moon
+  Search
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
@@ -55,9 +54,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
         </Button>
 
         {/* Theme toggle */}
-        <Button variant="ghost" size="sm" className="hover:bg-accent">
-          <Sun className="h-4 w-4" />
-        </Button>
+        <ThemeToggle />
 
         {/* Status badges */}
         <div className="flex gap-2">
