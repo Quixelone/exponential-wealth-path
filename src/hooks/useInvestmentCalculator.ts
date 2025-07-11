@@ -43,27 +43,22 @@ export const useInvestmentCalculator = () => {
     }
   }, [loadConfigurations]);
 
-  // Auto-load first configuration only on initial load when no config is set
+  // Auto-load only when no configurations exist and user has no current config
   React.useEffect(() => {
     if (
       !autoLoadAttempted.current && 
       !supabaseLoading && 
       savedConfigs.length > 0 && 
       !configState.currentConfigId &&
-      loadInitialized.current // Only auto-load after initial configurations load
+      loadInitialized.current &&
+      // Only auto-load if this is truly the first time the user opens the app
+      savedConfigs.every(config => !config.name || config.name === 'Configurazione senza nome')
     ) {
       autoLoadAttempted.current = true;
       
-      // Sort configurations by creation date (oldest first) and load the first one
-      const sortedConfigs = [...savedConfigs].sort((a, b) => 
-        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-      );
-      
-      if (sortedConfigs.length > 0) {
-        const firstConfig = sortedConfigs[0];
-        console.log('🔄 Auto-loading first configuration (initial load only):', firstConfig.name);
-        loadSavedConfiguration(firstConfig);
-      }
+      console.log('🔄 Auto-loading first configuration (first time user only)');
+      const firstConfig = savedConfigs[0];
+      loadSavedConfiguration(firstConfig);
     }
   }, [savedConfigs, supabaseLoading, configState.currentConfigId, loadSavedConfiguration]);
 

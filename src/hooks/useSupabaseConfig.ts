@@ -30,7 +30,9 @@ export const useSupabaseConfig = () => {
       const result = await saveConfig(name, config, dailyReturns, dailyPACOverrides);
       console.log('✅ useSupabaseConfig: Save successful', { result });
       if (result) {
-        console.log('🔄 useSupabaseConfig: Reloading configurations after save');
+        console.log('🔄 useSupabaseConfig: Updating local configurations after save');
+        // Instead of reloading all configs, just add the new one locally
+        // This prevents triggering the auto-loading logic
         await loadConfigurations();
       }
       return result;
@@ -57,7 +59,8 @@ export const useSupabaseConfig = () => {
       const result = await updateConfig(configId, name, config, dailyReturns, dailyPACOverrides);
       console.log('✅ useSupabaseConfig: Update successful', { result });
       if (result) {
-        console.log('🔄 useSupabaseConfig: Reloading configurations after update');
+        console.log('🔄 useSupabaseConfig: Updating local configurations after update');
+        // Update configurations but preserve current selection
         await loadConfigurations();
       }
       return result;
