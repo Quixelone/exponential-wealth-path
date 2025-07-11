@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceInfo } from '@/hooks/use-mobile';
 import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
 import ModernSidebar from '@/components/dashboard/ModernSidebar';

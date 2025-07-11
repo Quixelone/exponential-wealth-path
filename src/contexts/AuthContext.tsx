@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +16,36 @@ interface UserProfile {
   login_count: number | null;
 }
 
+interface AuthContextType {
+  user: User | null;
+  session: Session | null;
+  userProfile: UserProfile | null;
+  loading: boolean;
+  isAdmin: boolean;
+  signUp: (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithFacebook: () => Promise<{ error: any }>;
+  signInWithTwitter: () => Promise<{ error: any }>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -73,7 +102,6 @@ export const useAuth = () => {
       
       if (profile) {
         console.log('✅ Profile loaded successfully:', profile);
-        console.log('👤 User role:', profile.role);
         setUserProfile({
           id: profile.id,
           email: profile.email,
@@ -110,7 +138,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     let mounted = true;
-    console.log('🚀 Initializing auth...');
+    console.log('🚀 Initializing AuthProvider...');
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -123,7 +151,6 @@ export const useAuth = () => {
         
         if (session?.user) {
           console.log('👤 User authenticated, fetching profile...');
-          // Use setTimeout to avoid blocking the auth state change
           setTimeout(async () => {
             if (mounted) {
               await fetchUserProfile(session.user.id);
@@ -153,7 +180,6 @@ export const useAuth = () => {
         }
 
         if (mounted) {
-          console.log('📋 Initial session:', session?.user?.id ? 'Found' : 'Not found');
           setSession(session);
           setUser(session?.user ?? null);
           
@@ -186,7 +212,7 @@ export const useAuth = () => {
       const userData: any = {
         email,
         password,
-       options: {}
+        options: {}
       };
 
       if (firstName || lastName || phone) {
@@ -195,10 +221,8 @@ export const useAuth = () => {
           last_name: lastName,
           phone: phone
         };
-        console.log('👤 User metadata:', userData.options.data);
       }
 
-      console.log('📤 Sending signup request to Supabase...');
       const { data, error } = await supabase.auth.signUp(userData);
 
       if (error) {
@@ -216,9 +240,6 @@ export const useAuth = () => {
         } else if (error.message.includes('Password')) {
           errorTitle = "Password non valida";
           errorMessage = "La password deve essere di almeno 6 caratteri.";
-        } else if (error.message.includes('signup is disabled')) {
-          errorTitle = "Registrazione disabilitata";
-          errorMessage = "La registrazione è temporaneamente disabilitata. Riprova più tardi.";
         }
         
         toast({
@@ -229,20 +250,16 @@ export const useAuth = () => {
         return { error };
       }
 
-      console.log('✅ Signup successful:', data);
-      
-     if (data.session) {
-        console.log('🔐 User automatically signed in');
+      if (data.session) {
         toast({
           title: "Registrazione completata",
           description: "Benvenuto! Il tuo account è stato creato con successo.",
         });
-     } else {
-       console.log('👤 User created but not signed in');
-       toast({
-         title: "Registrazione completata",
-         description: "Account creato. Puoi effettuare il login.",
-       });
+      } else {
+        toast({
+          title: "Registrazione completata",
+          description: "Account creato. Puoi effettuare il login.",
+        });
       }
 
       return { error: null };
@@ -259,8 +276,6 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('🔐 Attempting to sign in with:', email);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -276,8 +291,6 @@ export const useAuth = () => {
         return { error };
       }
 
-      console.log('✅ Sign in successful:', data.user?.id);
-      
       toast({
         title: "Login effettuato",
         description: "Benvenuto!",
@@ -432,22 +445,14 @@ export const useAuth = () => {
     }
   };
 
-  // Calcola isAdmin in modo più semplice e diretto
   const isAdmin = userProfile?.role === 'admin';
-  
-  console.log('🔍 Current auth state:', {
-    userExists: !!user,
-    userProfileExists: !!userProfile,
-    userRole: userProfile?.role,
-    isAdmin,
-    loading
-  });
 
-  return {
+  const value: AuthContextType = {
     user,
     session,
     userProfile,
     loading,
+    isAdmin,
     signUp,
     signIn,
     signInWithGoogle,
@@ -455,6 +460,11 @@ export const useAuth = () => {
     signInWithTwitter,
     resetPassword,
     signOut,
-    isAdmin
   };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

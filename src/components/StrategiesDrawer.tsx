@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Target, Plus, X } from 'lucide-react';
 import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
 import NewConfigurationButton from '@/components/configuration/NewConfigurationButton';

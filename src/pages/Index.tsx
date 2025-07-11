@@ -8,7 +8,7 @@ import ReportTable from '@/components/ReportTable';
 import PaymentReminders from '@/components/PaymentReminders';
 import PerformanceVsPlan from '@/components/PerformanceVsPlan';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceInfo } from '@/hooks/use-mobile';
 import StatisticsCards from '@/components/dashboard/StatisticsCards';
 import CurrentStrategyProgress from '@/components/dashboard/CurrentStrategyProgress';
