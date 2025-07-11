@@ -56,8 +56,7 @@ const Strategies: React.FC = () => {
             title: "Strategia creata",
             description: `La strategia "${name}" è stata creata copiando la configurazione corrente.`,
           });
-          // Ricarica le configurazioni dopo il salvataggio
-          await loadConfigurations();
+          // Non ricaricare le configurazioni per evitare di sovrascrivere la selezione corrente
         } else {
           console.error('❌ Strategies: Save returned null/false');
           toast({
@@ -88,6 +87,7 @@ const Strategies: React.FC = () => {
     console.log('🔄 Strategies: Loading configuration', { configId: config.id, name: config.name });
     try {
       loadSavedConfiguration(config);
+      console.log('✅ Strategies: Configuration loaded successfully, navigating to dashboard');
       toast({
         title: "Strategia caricata",
         description: `La strategia "${config.name}" è stata caricata.`,
@@ -131,8 +131,7 @@ const Strategies: React.FC = () => {
           title: "Strategia salvata",
           description: `La strategia "${name}" è stata salvata.`,
         });
-        // Ricarica le configurazioni dopo il salvataggio
-        await loadConfigurations();
+        // Non ricaricare le configurazioni per evitare di sovrascrivere la selezione corrente
       } else {
         console.error('❌ Strategies: Save returned null/false');
         toast({
@@ -155,6 +154,7 @@ const Strategies: React.FC = () => {
     console.log('🔄 Strategies: Updating configuration', { configId, name });
     try {
       await updateConfiguration(configId, name, config, dailyReturns, dailyPACOverrides);
+      console.log('✅ Strategies: Configuration updated successfully');
       toast({
         title: "Strategia aggiornata",
         description: `La strategia "${name}" è stata aggiornata.`,

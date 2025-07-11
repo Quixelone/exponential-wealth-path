@@ -37,26 +37,29 @@ export const useConfigurationManager = () => {
     deleteConfiguration
   } = useSupabaseConfig();
 
-  // Move loadSavedConfiguration function definition before it's used
+  // Load saved configuration with enhanced persistence tracking
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
     console.log('🔄 ConfigurationManager: Loading saved configuration', { 
       configId: savedConfig.id, 
       name: savedConfig.name,
-      currentConfigId: configState.currentConfigId 
+      currentConfigId: configState.currentConfigId,
+      source: 'user_selection'
     });
     
     // Save current state to history before loading new configuration
     saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
     
+    // Set all configuration data atomically
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
     setCurrentConfigId(savedConfig.id);
     setCurrentConfigName(savedConfig.name);
     
-    console.log('✅ ConfigurationManager: Configuration loaded successfully', { 
+    console.log('✅ ConfigurationManager: Configuration loaded and persisted', { 
       newConfigId: savedConfig.id, 
-      newName: savedConfig.name 
+      newName: savedConfig.name,
+      source: 'user_selection'
     });
   }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory, configState.currentConfigId]);
 

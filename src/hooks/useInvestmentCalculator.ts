@@ -43,7 +43,7 @@ export const useInvestmentCalculator = () => {
     }
   }, [loadConfigurations]);
 
-  // Auto-load only when no configurations exist and user has no current config
+  // Auto-load ONLY on first app usage when user has no configurations and no current config
   React.useEffect(() => {
     if (
       !autoLoadAttempted.current && 
@@ -51,16 +51,24 @@ export const useInvestmentCalculator = () => {
       savedConfigs.length > 0 && 
       !configState.currentConfigId &&
       loadInitialized.current &&
-      // Only auto-load if this is truly the first time the user opens the app
+      // VERY restrictive auto-load: only if ALL configs are unnamed/default
       savedConfigs.every(config => !config.name || config.name === 'Configurazione senza nome')
     ) {
       autoLoadAttempted.current = true;
       
-      console.log('🔄 Auto-loading first configuration (first time user only)');
+      console.log('🔄 InvestmentCalculator: Auto-loading first configuration (first time user only)', {
+        configCount: savedConfigs.length,
+        hasCurrentConfig: !!configState.currentConfigId
+      });
       const firstConfig = savedConfigs[0];
       loadSavedConfiguration(firstConfig);
+    } else if (configState.currentConfigId) {
+      console.log('🔄 InvestmentCalculator: Skipping auto-load - user has current config', {
+        currentConfigId: configState.currentConfigId,
+        currentConfigName: configState.currentConfigName
+      });
     }
-  }, [savedConfigs, supabaseLoading, configState.currentConfigId, loadSavedConfiguration]);
+  }, [savedConfigs, supabaseLoading, configState.currentConfigId, configState.currentConfigName, loadSavedConfiguration]);
 
   const { investmentData, currentDayIndex, nextPACInfo, summary } = useInvestmentData({
     config: configState.config,
