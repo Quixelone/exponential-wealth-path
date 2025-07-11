@@ -9,8 +9,6 @@ import TimeHorizonConfiguration from './configuration/TimeHorizonConfiguration';
 import ReturnConfiguration from './configuration/ReturnConfiguration';
 import PACConfiguration from './configuration/PACConfiguration';
 import CurrencyConfiguration from './configuration/CurrencyConfiguration';
-import SavedConfigurationsPanel from './configuration/SavedConfigurationsPanel';
-import NewConfigurationButton from './configuration/NewConfigurationButton';
 import ExportSection from './configuration/ExportSection';
 import UndoRedoControls from './configuration/UndoRedoControls';
 import { Badge } from '@/components/ui/badge';
@@ -22,14 +20,6 @@ interface ConfigurationPanelProps {
   onUpdateDailyReturn: (day: number, returnRate: number) => void;
   onRemoveDailyReturn: (day: number) => void;
   onExportCSV: () => void;
-  savedConfigs: SavedConfiguration[];
-  onLoadConfiguration: (config: SavedConfiguration) => void;
-  onDeleteConfiguration: (configId: string) => void;
-  onSaveConfiguration: (name: string) => void;
-  onUpdateConfiguration: (configId: string, name: string) => void;
-  currentConfigId: string | null;
-  currentConfigName: string;
-  supabaseLoading: boolean;
   isAdmin?: boolean;
   dailyPACOverrides: { [day: number]: number };
   onUpdatePACForDay: (day: number, pacAmount: number) => void;
@@ -49,14 +39,6 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   onUpdateDailyReturn,
   onRemoveDailyReturn,
   onExportCSV,
-  savedConfigs,
-  onLoadConfiguration,
-  onDeleteConfiguration,
-  onSaveConfiguration,
-  onUpdateConfiguration,
-  currentConfigId,
-  currentConfigName,
-  supabaseLoading,
   isAdmin = false,
   dailyPACOverrides,
   onUpdatePACForDay,
@@ -68,18 +50,6 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   canUndo = false,
   canRedo = false,
 }) => {
-  const handleCreateNewConfiguration = (name: string, copyFromCurrent: boolean) => {
-    if (copyFromCurrent) {
-      // Keep current config but reset IDs and name
-      onSaveConfiguration(name);
-    } else {
-      // Reset to default configuration
-      onConfigChange({}, true);
-    }
-  };
-
-  const displayConfigTitle = currentConfigName || "Nuova Configurazione";
-  const hasCurrentConfig = !!currentConfigId;
 
   return (
     <div className="space-y-6 h-fit">
@@ -91,20 +61,8 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-primary">
-                  {displayConfigTitle}
+                  Configurazione Attiva
                 </h2>
-                {hasCurrentConfig && !hasUnsavedChanges && (
-                  <Badge variant="secondary" className="text-xs">
-                    <Save className="h-3 w-3 mr-1" />
-                    Salvato
-                  </Badge>
-                )}
-                {hasUnsavedChanges && (
-                  <Badge variant="destructive" className="animate-pulse text-xs">
-                    <Save className="h-3 w-3 mr-1" />
-                    Non salvato
-                  </Badge>
-                )}
               </div>
               
               {/* Undo/Redo Controls */}
@@ -154,27 +112,6 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       <PACConfiguration
         pacConfig={config.pacConfig}
         onPACConfigChange={(pacConfigUpdate) => onConfigChange({ pacConfig: { ...config.pacConfig, ...pacConfigUpdate } }, true)}
-      />
-
-      {/* Nuova Configurazione */}
-      <NewConfigurationButton 
-        onCreateNew={handleCreateNewConfiguration}
-        hasCurrentConfig={hasCurrentConfig}
-        currentConfigName={displayConfigTitle}
-      />
-
-      {/* Configurazioni Salvate */}
-      <SavedConfigurationsPanel
-        savedConfigs={savedConfigs}
-        onLoadConfiguration={onLoadConfiguration}
-        onDeleteConfiguration={onDeleteConfiguration}
-        onSaveConfiguration={onSaveConfiguration}
-        onUpdateConfiguration={onUpdateConfiguration}
-        currentConfigId={currentConfigId}
-        currentConfigName={currentConfigName}
-        loading={supabaseLoading}
-        isAdmin={isAdmin}
-        hasUnsavedChanges={hasUnsavedChanges}
       />
 
       {/* Export */}

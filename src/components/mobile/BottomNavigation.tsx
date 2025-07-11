@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
+  TrendingUp,
   Bell, 
   Settings, 
   Users
@@ -21,6 +22,11 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin }) => {
       icon: LayoutDashboard,
       label: 'Dashboard',
       path: '/',
+    },
+    {
+      icon: TrendingUp,
+      label: 'Strategie',
+      path: '/strategies',
     },
     {
       icon: Bell,

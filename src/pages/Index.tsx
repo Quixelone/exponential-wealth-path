@@ -56,7 +56,11 @@ const Index = () => {
     updatePACForDay,
     removePACOverride,
     hasUnsavedChanges,
-    currentDayIndex
+    currentDayIndex,
+    undoConfiguration,
+    redoConfiguration,
+    canUndo,
+    canRedo
   } = useInvestmentCalculator();
 
   // Redirect to auth if not logged in
@@ -181,19 +185,15 @@ const Index = () => {
                   onUpdateDailyReturn={updateDailyReturn}
                   onRemoveDailyReturn={removeDailyReturn}
                   onExportCSV={exportToCSV}
-                  savedConfigs={savedConfigs}
-                  onLoadConfiguration={handleLoadConfigWithWarning}
-                  onDeleteConfiguration={deleteConfiguration}
-                  onSaveConfiguration={saveCurrentConfiguration}
-                  onUpdateConfiguration={updateCurrentConfiguration}
-                  currentConfigId={currentConfigId}
-                  currentConfigName={currentConfigName}
-                  supabaseLoading={supabaseLoading}
                   isAdmin={isAdmin}
                   dailyPACOverrides={dailyPACOverrides}
                   onUpdatePACForDay={updatePACForDay}
                   onRemovePACOverride={removePACOverride}
                   hasUnsavedChanges={hasUnsavedChanges}
+                  onUndo={undoConfiguration}
+                  onRedo={redoConfiguration}
+                  canUndo={canUndo}
+                  canRedo={canRedo}
                 />
               </div>
 

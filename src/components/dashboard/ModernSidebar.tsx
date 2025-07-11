@@ -38,6 +38,12 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       description: 'Dashboard principale'
     },
     {
+      icon: TrendingUp,
+      label: 'Strategie',
+      path: '/strategies',
+      description: 'Gestione strategie'
+    },
+    {
       icon: Settings,
       label: 'Impostazioni',
       path: '/settings',

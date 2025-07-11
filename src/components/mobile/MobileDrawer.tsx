@@ -35,6 +35,12 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin })
       description: 'Dashboard principale'
     },
     {
+      icon: TrendingUp,
+      label: 'Strategie',
+      path: '/strategies',
+      description: 'Gestione strategie'
+    },
+    {
       icon: Settings,
       label: 'Impostazioni',
       path: '/settings',
