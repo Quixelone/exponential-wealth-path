@@ -13,14 +13,46 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: '2rem',
+			padding: {
+				DEFAULT: '1rem',
+				sm: '2rem',
+				lg: '4rem',
+				xl: '5rem',
+				'2xl': '6rem',
+			},
 			screens: {
 				'2xl': '1400px'
 			}
 		},
+		screens: {
+			'xs': '475px',
+			'sm': '640px',
+			'md': '768px',
+			'lg': '1024px',
+			'xl': '1280px',
+			'2xl': '1400px',
+		},
 		extend: {
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
+			},
+			fontSize: {
+				'xs': ['clamp(0.75rem, 0.17vw + 0.76rem, 0.8rem)', { lineHeight: '1rem' }],
+				'sm': ['clamp(0.875rem, 0.25vw + 0.87rem, 0.94rem)', { lineHeight: '1.25rem' }],
+				'base': ['clamp(1rem, 0.34vw + 0.91rem, 1.13rem)', { lineHeight: '1.5rem' }],
+				'lg': ['clamp(1.125rem, 0.34vw + 1.03rem, 1.31rem)', { lineHeight: '1.75rem' }],
+				'xl': ['clamp(1.25rem, 0.61vw + 1.1rem, 1.56rem)', { lineHeight: '1.75rem' }],
+				'2xl': ['clamp(1.5rem, 0.87vw + 1.27rem, 1.88rem)', { lineHeight: '2rem' }],
+				'3xl': ['clamp(1.875rem, 1.26vw + 1.52rem, 2.25rem)', { lineHeight: '2.25rem' }],
+				'4xl': ['clamp(2.25rem, 1.83vw + 1.8rem, 2.81rem)', { lineHeight: '2.5rem' }],
+				'5xl': ['clamp(3rem, 2.46vw + 2.39rem, 3.75rem)', { lineHeight: '1' }],
+				'6xl': ['clamp(3.75rem, 3.54vw + 2.77rem, 4.69rem)', { lineHeight: '1' }],
+			},
+			spacing: {
+				'safe-top': 'env(safe-area-inset-top)',
+				'safe-bottom': 'env(safe-area-inset-bottom)',
+				'safe-left': 'env(safe-area-inset-left)',
+				'safe-right': 'env(safe-area-inset-right)',
 			},
 			colors: {
 				border: 'hsl(var(--border))',

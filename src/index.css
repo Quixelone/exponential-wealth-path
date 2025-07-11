@@ -115,11 +115,36 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: 'Inter', sans-serif; /* Common font in Vuexy-like themes */
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1rem, 0.34vw + 0.91rem, 1.13rem);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold text-foreground;
+    line-height: 1.2;
+  }
+
+  /* Ensure consistent sizing across devices */
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Improved focus styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Better touch targets on mobile */
+  @media (max-width: 768px) {
+    button, [role="button"], input, select, textarea {
+      min-height: 44px;
+    }
   }
 }
 
@@ -260,40 +285,70 @@
     min-width: 44px;
   }
 
-  /* Mobile typography */
-  @media (max-width: 768px) {
-    .text-mobile-sm {
-      font-size: 0.875rem;
-      line-height: 1.25rem;
-    }
-    
-    .text-mobile-base {
-      font-size: 1rem;
-      line-height: 1.5rem;
-    }
-    
-    .text-mobile-lg {
-      font-size: 1.125rem;
-      line-height: 1.75rem;
-    }
+  /* Fluid typography utilities */
+  .text-fluid-xs { font-size: clamp(0.75rem, 0.17vw + 0.76rem, 0.8rem); }
+  .text-fluid-sm { font-size: clamp(0.875rem, 0.25vw + 0.87rem, 0.94rem); }
+  .text-fluid-base { font-size: clamp(1rem, 0.34vw + 0.91rem, 1.13rem); }
+  .text-fluid-lg { font-size: clamp(1.125rem, 0.34vw + 1.03rem, 1.31rem); }
+  .text-fluid-xl { font-size: clamp(1.25rem, 0.61vw + 1.1rem, 1.56rem); }
+  .text-fluid-2xl { font-size: clamp(1.5rem, 0.87vw + 1.27rem, 1.88rem); }
+  .text-fluid-3xl { font-size: clamp(1.875rem, 1.26vw + 1.52rem, 2.25rem); }
+
+  /* Mobile optimized spacing */
+  .space-mobile-xs { @apply space-y-2 sm:space-y-3; }
+  .space-mobile-sm { @apply space-y-3 sm:space-y-4; }
+  .space-mobile-md { @apply space-y-4 sm:space-y-6; }
+  .space-mobile-lg { @apply space-y-6 sm:space-y-8; }
+
+  /* Responsive container */
+  .container-fluid {
+    @apply w-full px-4 sm:px-6 lg:px-8;
+    max-width: 100%;
   }
 
-  /* Mobile layout utilities */
-  .mobile-container {
-    @apply px-4 py-2;
-  }
-
-  .mobile-card {
-    @apply p-4 rounded-lg;
-  }
-
-  .mobile-grid {
+  /* Mobile-first grid system */
+  .grid-mobile {
     @apply grid grid-cols-1 gap-4;
   }
+  
+  .grid-mobile-2 {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6;
+  }
+  
+  .grid-mobile-3 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6;
+  }
 
-  @media (min-width: 640px) {
-    .mobile-grid {
-      @apply grid-cols-2 gap-6;
+  /* Enhanced touch targets */
+  .touch-target-sm { min-height: 40px; min-width: 40px; }
+  .touch-target { min-height: 44px; min-width: 44px; }
+  .touch-target-lg { min-height: 48px; min-width: 48px; }
+
+  /* Swipe gesture support */
+  .swipe-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Better focus states for mobile */
+  .focus-mobile:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2;
+  }
+
+  /* Scroll snap utilities */
+  .scroll-snap-x {
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+  }
+  
+  .scroll-snap-item {
+    scroll-snap-align: start;
+  }
+
+  /* iOS specific fixes */
+  @supports (-webkit-appearance: none) {
+    .ios-scroll-fix {
+      -webkit-overflow-scrolling: touch;
     }
   }
 }
