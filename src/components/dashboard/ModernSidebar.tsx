@@ -62,13 +62,9 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
     });
   }
 
-  const handleNavigation = (path: string, isButton?: boolean) => {
-    if (isButton && path === '/strategies') {
-      onStrategiesClick?.();
-    } else {
-      navigate(path);
-      onNavigate?.(path);
-    }
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    onNavigate?.(path);
   };
 
   const isActivePath = (path: string) => {
@@ -128,14 +124,12 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
           return (
             <div key={item.path} className="relative group">
               <button
-                onClick={() => handleNavigation(item.path, item.isButton)}
+                onClick={() => handleNavigation(item.path)}
                 className={cn(
                   "w-full flex items-center rounded-lg transition-all duration-200 group relative",
                   collapsed ? "p-3 justify-center" : "gap-3 p-3",
-                  isActive && !item.isButton
+                  isActive
                     ? "bg-primary text-primary-foreground shadow-sm" 
-                    : item.isButton
-                    ? "hover:bg-primary hover:text-primary-foreground text-primary border border-primary/20 hover:border-primary"
                     : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
                 )}
               >
@@ -144,8 +138,6 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
                   collapsed ? "h-5 w-5" : "h-5 w-5",
                   isActive 
                     ? "text-primary-foreground" 
-                    : item.isButton 
-                    ? "text-primary group-hover:text-primary-foreground" 
                     : "text-muted-foreground group-hover:text-accent-foreground"
                 )} />
                 {!collapsed && (
