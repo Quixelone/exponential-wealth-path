@@ -1,8 +1,53 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { Currency } from '@/lib/utils';
 import { useConfigurationHistory } from './useConfigurationHistory';
+
+// Keys for localStorage persistence
+const CURRENT_CONFIG_ID_KEY = 'investment_current_config_id';
+const CURRENT_CONFIG_NAME_KEY = 'investment_current_config_name';
+
+// Helper functions for localStorage
+const getPersistedConfigId = (): string | null => {
+  try {
+    return localStorage.getItem(CURRENT_CONFIG_ID_KEY);
+  } catch {
+    return null;
+  }
+};
+
+const getPersistedConfigName = (): string => {
+  try {
+    return localStorage.getItem(CURRENT_CONFIG_NAME_KEY) || '';
+  } catch {
+    return '';
+  }
+};
+
+const persistConfigId = (configId: string | null) => {
+  try {
+    if (configId) {
+      localStorage.setItem(CURRENT_CONFIG_ID_KEY, configId);
+    } else {
+      localStorage.removeItem(CURRENT_CONFIG_ID_KEY);
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+};
+
+const persistConfigName = (configName: string) => {
+  try {
+    if (configName) {
+      localStorage.setItem(CURRENT_CONFIG_NAME_KEY, configName);
+    } else {
+      localStorage.removeItem(CURRENT_CONFIG_NAME_KEY);
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+};
 
 // Stato di default configurazione investimento
 export const getDefaultConfig = (): InvestmentConfig & { currency: Currency } => ({
@@ -18,11 +63,27 @@ export const getDefaultConfig = (): InvestmentConfig & { currency: Currency } =>
 });
 
 export const useInvestmentConfigState = () => {
+  // Initialize with empty state first, will be populated based on persistence logic
   const [config, setConfig] = useState<InvestmentConfig & { currency: Currency }>(getDefaultConfig());
   const [dailyReturns, setDailyReturns] = useState<{ [day: number]: number }>({});
   const [dailyPACOverrides, setDailyPACOverrides] = useState<{ [day: number]: number }>({});
-  const [currentConfigId, setCurrentConfigId] = useState<string | null>(null);
-  const [currentConfigName, setCurrentConfigName] = useState<string>('');
+  
+  // Initialize with persisted values
+  const [currentConfigId, setCurrentConfigIdState] = useState<string | null>(() => getPersistedConfigId());
+  const [currentConfigName, setCurrentConfigNameState] = useState<string>(() => getPersistedConfigName());
+
+  // Enhanced setters that persist to localStorage
+  const setCurrentConfigId = useCallback((configId: string | null) => {
+    console.log('🔄 investmentConfigState: Setting currentConfigId', { configId, persist: true });
+    setCurrentConfigIdState(configId);
+    persistConfigId(configId);
+  }, []);
+
+  const setCurrentConfigName = useCallback((configName: string) => {
+    console.log('🔄 investmentConfigState: Setting currentConfigName', { configName, persist: true });
+    setCurrentConfigNameState(configName);
+    persistConfigName(configName);
+  }, []);
 
   const {
     saveToHistory,
@@ -82,6 +143,7 @@ export const useInvestmentConfigState = () => {
 
   // Quando vuoi azzerare tutto e ripartire da 0
   const createNewConfiguration = useCallback(() => {
+    console.log('🔄 investmentConfigState: Creating new configuration - clearing persistence');
     saveConfigurationToHistory('Creazione nuova configurazione');
     resetCustomData();
     setCurrentConfigId(null);
@@ -91,7 +153,7 @@ export const useInvestmentConfigState = () => {
       pacConfig: { ...getDefaultConfig().pacConfig, startDate: new Date() }, // startDate sempre oggi
     });
     clearHistory(); // Reset history when creating new configuration
-  }, [resetCustomData, saveConfigurationToHistory, clearHistory]);
+  }, [resetCustomData, saveConfigurationToHistory, clearHistory, setCurrentConfigId, setCurrentConfigName]);
 
   return {
     configState: { config, dailyReturns, dailyPACOverrides, currentConfigId, currentConfigName },

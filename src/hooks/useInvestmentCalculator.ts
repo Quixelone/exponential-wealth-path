@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import { useConfigurationManager } from './useConfigurationManager';
 import { useInvestmentData } from './useInvestmentData';
 import { useInvestmentOperations } from './useInvestmentOperations';
+import { usePersistedConfigLoader } from './usePersistedConfigLoader';
 
 // Custom hook principale per usare il calcolatore d'investimento e tutte le sue API
 export const useInvestmentCalculator = () => {
@@ -33,42 +34,38 @@ export const useInvestmentCalculator = () => {
   } = useConfigurationManager();
 
   const loadInitialized = useRef(false);
-  const autoLoadAttempted = useRef(false);
 
   // Load configurations only once on mount
   React.useEffect(() => {
     if (!loadInitialized.current) {
       loadInitialized.current = true;
+      console.log('🔄 InvestmentCalculator: Initial configuration load');
       loadConfigurations();
     }
   }, [loadConfigurations]);
 
-  // Auto-load ONLY on first app usage when user has no configurations and no current config
+  // Use the persisted config loader to restore user's last selected strategy
+  const { persistedConfigLoadAttempted } = usePersistedConfigLoader({
+    savedConfigs,
+    currentConfigId: configState.currentConfigId,
+    supabaseLoading,
+    loadSavedConfiguration,
+    setCurrentConfigId,
+    setCurrentConfigName
+  });
+
+  // Log current state for debugging
   React.useEffect(() => {
-    if (
-      !autoLoadAttempted.current && 
-      !supabaseLoading && 
-      savedConfigs.length > 0 && 
-      !configState.currentConfigId &&
-      loadInitialized.current &&
-      // VERY restrictive auto-load: only if ALL configs are unnamed/default
-      savedConfigs.every(config => !config.name || config.name === 'Configurazione senza nome')
-    ) {
-      autoLoadAttempted.current = true;
-      
-      console.log('🔄 InvestmentCalculator: Auto-loading first configuration (first time user only)', {
-        configCount: savedConfigs.length,
-        hasCurrentConfig: !!configState.currentConfigId
-      });
-      const firstConfig = savedConfigs[0];
-      loadSavedConfiguration(firstConfig);
-    } else if (configState.currentConfigId) {
-      console.log('🔄 InvestmentCalculator: Skipping auto-load - user has current config', {
+    if (!supabaseLoading && savedConfigs.length > 0) {
+      console.log('📊 InvestmentCalculator: Current state', {
         currentConfigId: configState.currentConfigId,
-        currentConfigName: configState.currentConfigName
+        currentConfigName: configState.currentConfigName,
+        savedConfigsCount: savedConfigs.length,
+        persistedConfigLoadAttempted,
+        loadInitialized: loadInitialized.current
       });
     }
-  }, [savedConfigs, supabaseLoading, configState.currentConfigId, configState.currentConfigName, loadSavedConfiguration]);
+  }, [configState.currentConfigId, configState.currentConfigName, savedConfigs.length, supabaseLoading, persistedConfigLoadAttempted]);
 
   const { investmentData, currentDayIndex, nextPACInfo, summary } = useInvestmentData({
     config: configState.config,

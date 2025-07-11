@@ -43,25 +43,26 @@ export const useConfigurationManager = () => {
       configId: savedConfig.id, 
       name: savedConfig.name,
       currentConfigId: configState.currentConfigId,
-      source: 'user_selection'
+      source: 'user_selection',
+      willPersist: true
     });
     
     // Save current state to history before loading new configuration
     saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
     
-    // Set all configuration data atomically
+    // Set all configuration data atomically - persistence is handled automatically
     setConfig(savedConfig.config);
     setDailyReturns(savedConfig.dailyReturns);
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
-    setCurrentConfigId(savedConfig.id);
-    setCurrentConfigName(savedConfig.name);
+    setCurrentConfigId(savedConfig.id); // This will persist to localStorage
+    setCurrentConfigName(savedConfig.name); // This will persist to localStorage
     
-    console.log('✅ ConfigurationManager: Configuration loaded and persisted', { 
+    console.log('✅ ConfigurationManager: Configuration loaded and persisted to localStorage', { 
       newConfigId: savedConfig.id, 
       newName: savedConfig.name,
       source: 'user_selection'
     });
-  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory, configState.currentConfigId]);
+  }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
   // Determina configurazione "salvata" attuale
   const savedConfig = React.useMemo(() =>
@@ -119,9 +120,9 @@ export const useConfigurationManager = () => {
     console.log('🔄 ConfigurationManager: Saving configuration', { name, hasCurrentId: !!configState.currentConfigId });
     const configId = await saveConfiguration(name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
     if (configId) {
-      console.log('✅ ConfigurationManager: Configuration saved, setting current ID', { configId, name });
-      setCurrentConfigId(configId);
-      setCurrentConfigName(name);
+      console.log('✅ ConfigurationManager: Configuration saved, persisting to localStorage', { configId, name });
+      setCurrentConfigId(configId); // This will persist to localStorage
+      setCurrentConfigName(name); // This will persist to localStorage
       saveConfigurationToHistory(`Salvataggio configurazione: ${name}`);
     } else {
       console.error('❌ ConfigurationManager: Save failed - no ID returned');
@@ -132,10 +133,10 @@ export const useConfigurationManager = () => {
     console.log('🔄 ConfigurationManager: Updating configuration', { configId, name });
     const success = await updateConfiguration(configId, name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
     if (success) {
-      console.log('✅ ConfigurationManager: Configuration updated, preserving current ID', { configId, name });
-      // Ensure we maintain the current config context
-      setCurrentConfigId(configId);
-      setCurrentConfigName(name);
+      console.log('✅ ConfigurationManager: Configuration updated, persisting to localStorage', { configId, name });
+      // Ensure we maintain the current config context and persist it
+      setCurrentConfigId(configId); // This will persist to localStorage
+      setCurrentConfigName(name); // This will persist to localStorage
       saveConfigurationToHistory(`Aggiornamento configurazione: ${name}`);
     } else {
       console.error('❌ ConfigurationManager: Update failed');
