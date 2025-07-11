@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Save, FileText, Crown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import SavedConfigCard from './SavedConfigCard';
+import ResponsiveConfigCards from './ResponsiveConfigCards';
 import SaveConfigDialog from './SaveConfigDialog';
 import EditConfigDialog from './EditConfigDialog';
 import UnsavedChangesAlert from './UnsavedChangesAlert';
@@ -155,17 +155,14 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
               <p className="text-sm">Salva la tua prima configurazione per iniziare</p>
             </div>
           ) : (
-            savedConfigs.map((savedConfig) => (
-              <SavedConfigCard
-                key={savedConfig.id}
-                savedConfig={savedConfig}
-                onLoad={() => handleLoadConfigWithCheck(savedConfig)}
-                onEdit={() => handleEditConfiguration(savedConfig)}
-                onDelete={() => onDeleteConfiguration(savedConfig.id)}
-                isCurrent={currentConfigId === savedConfig.id}
-                loading={loading}
-              />
-            ))
+            <ResponsiveConfigCards
+              savedConfigs={savedConfigs}
+              onLoad={handleLoadConfigWithCheck}
+              onEdit={handleEditConfiguration}
+              onDelete={onDeleteConfiguration}
+              currentConfigId={currentConfigId}
+              loading={loading}
+            />
           )}
         </div>
 

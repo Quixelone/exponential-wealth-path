@@ -110,7 +110,7 @@ const PerformanceVsPlan: React.FC<PerformanceVsPlanProps> = ({
             variant={Math.abs(performance.difference) <= 0.1 ? "default" : performance.isOutperforming ? "secondary" : "destructive"}
             className="px-3 py-1"
           >
-            {Math.abs(performance.difference) <= 0.1 ? "In linea" : performance.isOutperforming ? "+96.25%" : performance.difference.toFixed(2) + "%"}
+            {Math.abs(performance.difference) <= 0.1 ? "In linea" : (performance.isOutperforming ? "+" : "") + performance.difference.toFixed(2) + "%"}
           </Badge>
         </div>
         <p className="text-sm text-muted-foreground">

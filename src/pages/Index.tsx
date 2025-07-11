@@ -112,51 +112,6 @@ const Index = () => {
     navigate('/auth');
   };
 
-  const handleUserManagementClick = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
-    console.log('🔧 USER MANAGEMENT BUTTON CLICKED');
-    console.log('Current admin status:', isAdmin);
-    console.log('User role:', userProfile?.role);
-    console.log('Auth loading:', authLoading);
-    console.log('User exists:', !!user);
-    console.log('User profile exists:', !!userProfile);
-    
-    try {
-      console.log('🚀 Attempting navigation to /user-management');
-      console.log('Current location:', window.location.pathname);
-      navigate('/user-management');
-      console.log('✅ Navigation call completed');
-      
-      // Chiudi il drawer mobile se aperto
-      if (isMobileDrawerOpen) {
-        setIsMobileDrawerOpen(false);
-      }
-      
-      // Aggiungiamo un timeout per verificare se la navigazione è avvenuta
-      setTimeout(() => {
-        console.log('🔍 Post-navigation check - Current location:', window.location.pathname);
-      }, 100);
-    } catch (error) {
-      console.error('💥 Error during navigation:', error);
-    }
-  };
-
-  const handleMobileMenuClick = () => {
-    setIsMobileDrawerOpen(true);
-  };
-
-  const handleSettingsClick = () => {
-    navigate('/settings');
-    // Chiudi il drawer mobile se aperto
-    if (isMobileDrawerOpen) {
-      setIsMobileDrawerOpen(false);
-    }
-  };
-
-  const displayName = userProfile?.first_name && userProfile?.last_name 
-    ? `${userProfile.first_name} ${userProfile.last_name}`
-    : userProfile?.email || 'Utente';
-
   // Callback for ReportTable inline editing
   const handleUpdateDailyReturnInReport = (day: number, newReturn: number) => {
     updateDailyReturn(day, newReturn); 
@@ -181,162 +136,144 @@ const Index = () => {
     loadSavedConfiguration(savedConfig);
   };
 
+  const renderMainContent = () => {
+    return (
+      <div className="space-y-6">
+        {/* Statistics Cards */}
+        <StatisticsCards summary={summary} currency={config.currency} />
+        
+        {/* Current Strategy Progress */}
+        <CurrentStrategyProgress 
+          summary={summary} 
+          currency={config.currency} 
+          currentDayIndex={currentDayIndex}
+          dailyReturns={dailyReturns}
+          originalDailyReturnRate={config.dailyReturnRate}
+        />
+
+        {/* Tabs */}
+        <Tabs defaultValue="investments" className="w-full">
+          <TabsList className={`grid w-full grid-cols-2 ${isMobile ? 'mb-4' : 'mb-6'} bg-card rounded-xl p-1`}>
+            <TabsTrigger 
+              value="investments" 
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+            >
+              <TrendingUp className="h-4 w-4" />
+              <span className={isMobile ? 'text-sm' : ''}>Dashboard</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="reminders" 
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+            >
+              <Bell className="h-4 w-4" />
+              <span className={isMobile ? 'text-sm' : ''}>Promemoria</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="investments" className={`space-y-${isMobile ? '4' : '6'}`}>
+            <div className={`${isMobile ? 'space-y-4' : 'grid grid-cols-1 xl:grid-cols-4 gap-6'}`}>
+              {/* Configuration Panel */}
+              <div className={`${!isMobile ? 'xl:col-span-1' : ''}`}>
+                <ConfigurationPanel
+                  config={config}
+                  onConfigChange={updateConfig}
+                  customReturns={dailyReturns}
+                  onUpdateDailyReturn={updateDailyReturn}
+                  onRemoveDailyReturn={removeDailyReturn}
+                  onExportCSV={exportToCSV}
+                  savedConfigs={savedConfigs}
+                  onLoadConfiguration={handleLoadConfigWithWarning}
+                  onDeleteConfiguration={deleteConfiguration}
+                  onSaveConfiguration={saveCurrentConfiguration}
+                  onUpdateConfiguration={updateCurrentConfiguration}
+                  currentConfigId={currentConfigId}
+                  currentConfigName={currentConfigName}
+                  supabaseLoading={supabaseLoading}
+                  isAdmin={isAdmin}
+                  dailyPACOverrides={dailyPACOverrides}
+                  onUpdatePACForDay={updatePACForDay}
+                  onRemovePACOverride={removePACOverride}
+                  hasUnsavedChanges={hasUnsavedChanges}
+                />
+              </div>
+
+              {/* Charts and Results */}
+              <div className={`${!isMobile ? 'xl:col-span-3' : ''} space-y-${isMobile ? '4' : '6'}`}>
+                <InvestmentChart data={investmentData} currency={config.currency} />
+
+                <PerformanceVsPlan 
+                  data={investmentData}
+                  currency={config.currency}
+                  currentDay={Math.min(Math.floor((new Date().getTime() - new Date(config.pacConfig.startDate).getTime()) / (1000 * 60 * 60 * 24)), config.timeHorizon)}
+                />
+                
+                <ReportTable 
+                  data={investmentData} 
+                  currency={config.currency}
+                  onExportCSV={exportToCSV}
+                  onUpdateDailyReturnInReport={handleUpdateDailyReturnInReport}
+                  onUpdatePACInReport={handleUpdatePACInReport}
+                  onRemovePACOverride={handleRemovePACOverride}
+                  defaultPACAmount={config.pacConfig.amount}
+                  investmentStartDate={config.pacConfig.startDate}
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reminders">
+            <PaymentReminders />
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
+  };
+
   console.log('🎯 Admin button should show:', isAdmin);
 
   return (
     <ModernTooltipProvider>
-      <div className="min-h-screen bg-background flex relative">
-        {/* Desktop Sidebar - Hidden on mobile */}
-        {!isMobile && (
-          <ModernSidebar 
-            isAdmin={isAdmin}
-            onCollapseChange={setIsSidebarCollapsed}
-          />
-        )}
-
-        {/* Mobile Drawer */}
-        {isMobile && (
-          <MobileDrawer
-            isOpen={isMobileDrawerOpen}
-            onClose={() => setIsMobileDrawerOpen(false)}
-            isAdmin={isAdmin}
-          />
-        )}
-
-        {/* Main Content */}
-        <div className={`flex-1 transition-all duration-300 flex flex-col ${
-          !isMobile 
-            ? isSidebarCollapsed 
-              ? 'ml-16' 
-              : 'ml-64' 
-            : 'pb-20'
-        }`}>
-          {/* Header */}
-          {isMobile ? (
-            <MobileHeader
-              userProfile={userProfile}
+      <div className="min-h-screen bg-background">
+        {/* Desktop Layout */}
+        {!isMobile && !isTablet && (
+          <div className="flex min-h-screen w-full">
+            <ModernSidebar 
               isAdmin={isAdmin}
-              hasUnsavedChanges={hasUnsavedChanges}
-              onLogout={handleLogout}
-              onMenuClick={handleMobileMenuClick}
+              onCollapseChange={setIsSidebarCollapsed}
             />
-          ) : (
-            <ModernHeader
-              userProfile={userProfile}
-              isAdmin={isAdmin}
-              hasUnsavedChanges={hasUnsavedChanges}
-              onLogout={handleLogout}
-              onSettings={handleSettingsClick}
-              onUserManagement={handleUserManagementClick}
-            />
-          )}
-
-          {/* Page Content */}
-          <main className={`flex-1 ${isMobile ? 'p-4' : 'p-6'} bg-background`}>
-            {/* Statistics Cards */}
-            <StatisticsCards summary={summary} currency={config.currency} />
-            
-            {/* Current Strategy Progress */}
-            <div className="mb-6">
-              <CurrentStrategyProgress 
-                summary={summary} 
-                currency={config.currency} 
-                currentDayIndex={currentDayIndex}
-                dailyReturns={dailyReturns}
-                originalDailyReturnRate={config.dailyReturnRate}
+            <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+              <ModernHeader 
+                userProfile={userProfile}
+                onLogout={handleLogout}
+                onSettings={() => navigate('/settings')}
+                isAdmin={isAdmin}
               />
+              <main className="flex-1 p-6">
+                {renderMainContent()}
+              </main>
             </div>
+          </div>
+        )}
 
-            {/* Tabs */}
-            <Tabs defaultValue="investments" className="w-full">
-              <TabsList className={`grid w-full grid-cols-2 ${isMobile ? 'mb-4' : 'mb-6'} bg-card rounded-xl p-1`}>
-                <TabsTrigger 
-                  value="investments" 
-                  className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-                >
-                  <TrendingUp className="h-4 w-4" />
-                  <span className={isMobile ? 'text-sm' : ''}>Dashboard</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="reminders" 
-                  className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-                >
-                  <Bell className="h-4 w-4" />
-                  <span className={isMobile ? 'text-sm' : ''}>Promemoria</span>
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="investments" className={`space-y-${isMobile ? '4' : '6'}`}>
-                <div className={`${isMobile ? 'space-y-4' : 'grid grid-cols-1 xl:grid-cols-4 gap-6'}`}>
-                  {/* Configuration Panel */}
-                  <div className={`${!isMobile ? 'xl:col-span-1' : ''}`}>
-                    <div className={`modern-card ${isMobile ? 'p-4' : 'p-6'}`}>
-                      <ConfigurationPanel
-                        config={config}
-                        onConfigChange={updateConfig}
-                        customReturns={dailyReturns}
-                        onUpdateDailyReturn={updateDailyReturn}
-                        onRemoveDailyReturn={removeDailyReturn}
-                        onExportCSV={exportToCSV}
-                        savedConfigs={savedConfigs}
-                        onLoadConfiguration={handleLoadConfigWithWarning}
-                        onDeleteConfiguration={deleteConfiguration}
-                        onSaveConfiguration={saveCurrentConfiguration}
-                        onUpdateConfiguration={updateCurrentConfiguration}
-                        currentConfigId={currentConfigId}
-                        currentConfigName={currentConfigName}
-                        supabaseLoading={supabaseLoading}
-                        isAdmin={isAdmin}
-                        dailyPACOverrides={dailyPACOverrides}
-                        onUpdatePACForDay={updatePACForDay}
-                        onRemovePACOverride={removePACOverride}
-                        hasUnsavedChanges={hasUnsavedChanges}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Charts and Results */}
-                  <div className={`${!isMobile ? 'xl:col-span-3' : ''} space-y-${isMobile ? '4' : '6'}`}>
-                    <div className={`modern-card ${isMobile ? 'p-4' : 'p-6'}`}>
-                      <InvestmentChart data={investmentData} currency={config.currency} />
-                    </div>
-
-                    <div className={`modern-card ${isMobile ? 'p-4' : 'p-6'}`}>
-                      <PerformanceVsPlan 
-                        data={investmentData}
-                        currency={config.currency}
-                        currentDay={Math.min(Math.floor((new Date().getTime() - new Date(config.pacConfig.startDate).getTime()) / (1000 * 60 * 60 * 24)), config.timeHorizon)}
-                      />
-                    </div>
-                    
-                    <div className="modern-card">
-                      <ReportTable 
-                        data={investmentData} 
-                        currency={config.currency}
-                        onExportCSV={exportToCSV}
-                        onUpdateDailyReturnInReport={handleUpdateDailyReturnInReport}
-                        onUpdatePACInReport={handleUpdatePACInReport}
-                        onRemovePACOverride={handleRemovePACOverride}
-                        defaultPACAmount={config.pacConfig.amount}
-                        investmentStartDate={config.pacConfig.startDate}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="reminders">
-                <div className={`modern-card ${isMobile ? 'p-4' : 'p-6'}`}>
-                  <PaymentReminders />
-                </div>
-              </TabsContent>
-            </Tabs>
-          </main>
-        </div>
-
-        {/* Mobile Bottom Navigation */}
-        {isMobile && (
-          <BottomNavigation isAdmin={isAdmin} />
+        {/* Mobile Layout */}
+        {(isMobile || isTablet) && (
+          <>
+            <MobileHeader 
+              userProfile={userProfile}
+              onMenuClick={() => setIsMobileDrawerOpen(true)}
+              onLogout={handleLogout}
+              isAdmin={isAdmin}
+            />
+            <MobileDrawer 
+              isOpen={isMobileDrawerOpen}
+              onClose={() => setIsMobileDrawerOpen(false)}
+              isAdmin={isAdmin}
+            />
+            <div className="pt-14 pb-20 px-4">
+              {renderMainContent()}
+            </div>
+            <BottomNavigation isAdmin={isAdmin} />
+          </>
         )}
       </div>
     </ModernTooltipProvider>

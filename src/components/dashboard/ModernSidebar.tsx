@@ -68,7 +68,7 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
 
   return (
     <div className={cn(
-      "modern-sidebar flex flex-col bg-card border-r border-border transition-all duration-300 relative",
+      "modern-sidebar flex flex-col bg-card border-r border-border transition-all duration-300 fixed left-0 top-0 h-full z-20",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
@@ -78,16 +78,16 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       )}>
         {!collapsed && (
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
               <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg gradient-text-primary truncate">
+            <span className="font-bold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent truncate">
               Finanza Creativa
             </span>
           </div>
         )}
         {collapsed && (
-          <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
             <TrendingUp className="h-5 w-5 text-white" />
           </div>
         )}

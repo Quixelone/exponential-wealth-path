@@ -37,9 +37,15 @@ export const useConfigSaver = () => {
           pac_amount: config.pacConfig.amount,
           pac_frequency: config.pacConfig.frequency,
           pac_custom_days: config.pacConfig.customDays,
-          pac_start_date: typeof config.pacConfig.startDate === 'string' 
-            ? config.pacConfig.startDate 
-            : config.pacConfig.startDate.toISOString().split('T')[0],
+          pac_start_date: (() => {
+            if (typeof config.pacConfig.startDate === 'string') {
+              return config.pacConfig.startDate;
+            }
+            if (config.pacConfig.startDate instanceof Date) {
+              return config.pacConfig.startDate.toISOString().split('T')[0];
+            }
+            return new Date().toISOString().split('T')[0];
+          })(),
           currency: config.currency || 'EUR'
         })
         .select()
