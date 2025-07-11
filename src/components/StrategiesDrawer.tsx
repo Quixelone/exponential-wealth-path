@@ -44,14 +44,34 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
     }
   }, [isOpen, user, savedConfigs.length, supabaseLoading]);
 
-  const handleCreateNewConfiguration = (name: string, copyFromCurrent: boolean) => {
+  const handleCreateNewConfiguration = async (name: string, copyFromCurrent: boolean) => {
     if (copyFromCurrent) {
-      // Salva la configurazione corrente con il nuovo nome
-      saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
-      toast({
-        title: "Strategia creata",
-        description: `La strategia "${name}" è stata creata copiando la configurazione corrente.`,
-      });
+      try {
+        // Salva la configurazione corrente con il nuovo nome
+        console.log('🔄 Tentativo di salvare nuova strategia:', name);
+        const configId = await saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
+        if (configId) {
+          console.log('✅ Strategia salvata con successo, ID:', configId);
+          toast({
+            title: "Strategia creata",
+            description: `La strategia "${name}" è stata creata copiando la configurazione corrente.`,
+          });
+        } else {
+          console.error('❌ Salvataggio fallito - nessun ID restituito');
+          toast({
+            title: "Errore",
+            description: "Non è stato possibile salvare la strategia",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('❌ Errore durante il salvataggio:', error);
+        toast({
+          title: "Errore",
+          description: "Non è stato possibile salvare la strategia",
+          variant: "destructive",
+        });
+      }
     } else {
       // Chiudi il drawer e torna al dashboard per configurare una nuova strategia
       onClose();
@@ -79,20 +99,60 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
     });
   };
 
-  const handleSaveConfiguration = (name: string) => {
-    saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
-    toast({
-      title: "Strategia salvata",
-      description: `La strategia "${name}" è stata salvata.`,
-    });
+  const handleSaveConfiguration = async (name: string) => {
+    try {
+      console.log('🔄 Tentativo di salvare strategia esistente:', name);
+      const configId = await saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
+      if (configId) {
+        console.log('✅ Strategia salvata con successo, ID:', configId);
+        toast({
+          title: "Strategia salvata",
+          description: `La strategia "${name}" è stata salvata.`,
+        });
+      } else {
+        console.error('❌ Salvataggio fallito - nessun ID restituito');
+        toast({
+          title: "Errore",
+          description: "Non è stato possibile salvare la strategia",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('❌ Errore durante il salvataggio:', error);
+      toast({
+        title: "Errore",
+        description: "Non è stato possibile salvare la strategia",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpdateConfiguration = (configId: string, name: string) => {
-    updateConfiguration(configId, name, config, dailyReturns, dailyPACOverrides);
-    toast({
-      title: "Strategia aggiornata",
-      description: `La strategia "${name}" è stata aggiornata.`,
-    });
+  const handleUpdateConfiguration = async (configId: string, name: string) => {
+    try {
+      console.log('🔄 Tentativo di aggiornare strategia:', name, configId);
+      const success = await updateConfiguration(configId, name, config, dailyReturns, dailyPACOverrides);
+      if (success) {
+        console.log('✅ Strategia aggiornata con successo');
+        toast({
+          title: "Strategia aggiornata",
+          description: `La strategia "${name}" è stata aggiornata.`,
+        });
+      } else {
+        console.error('❌ Aggiornamento fallito');
+        toast({
+          title: "Errore",
+          description: "Non è stato possibile aggiornare la strategia",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('❌ Errore durante l\'aggiornamento:', error);
+      toast({
+        title: "Errore",
+        description: "Non è stato possibile aggiornare la strategia",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!user) {
