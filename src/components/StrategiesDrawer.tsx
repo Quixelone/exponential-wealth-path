@@ -104,12 +104,19 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
+            <Target className="h-5 w-5 text-primary" />
             Gestione Strategie
           </SheetTitle>
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
+          {/* Stato di caricamento */}
+          {supabaseLoading && (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+              <p className="text-sm text-muted-foreground">Caricamento strategie...</p>
+            </div>
+          )}
           {/* Nuova Strategia */}
           <Card className="border-primary/20">
             <CardHeader>
@@ -136,18 +143,32 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <SavedConfigurationsPanel
-                savedConfigs={savedConfigs}
-                onLoadConfiguration={handleLoadConfiguration}
-                onDeleteConfiguration={handleDeleteConfiguration}
-                onSaveConfiguration={handleSaveConfiguration}
-                onUpdateConfiguration={handleUpdateConfiguration}
-                currentConfigId={currentConfigId}
-                currentConfigName={currentConfigName}
-                loading={supabaseLoading}
-                isAdmin={isAdmin}
-                hasUnsavedChanges={hasUnsavedChanges}
-              />
+              {savedConfigs.length === 0 && !supabaseLoading ? (
+                <div className="text-center py-8">
+                  <Target className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <h3 className="font-semibold text-lg mb-2">Nessuna strategia salvata</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Crea la tua prima strategia personalizzata configurando i parametri di investimento
+                  </p>
+                  <div className="bg-muted/50 p-4 rounded-lg text-sm text-muted-foreground">
+                    <strong>Suggerimento:</strong> Configura i tuoi parametri di investimento nel dashboard principale, 
+                    poi torna qui per salvare la strategia con un nome personalizzato.
+                  </div>
+                </div>
+              ) : (
+                <SavedConfigurationsPanel
+                  savedConfigs={savedConfigs}
+                  onLoadConfiguration={handleLoadConfiguration}
+                  onDeleteConfiguration={handleDeleteConfiguration}
+                  onSaveConfiguration={handleSaveConfiguration}
+                  onUpdateConfiguration={handleUpdateConfiguration}
+                  currentConfigId={currentConfigId}
+                  currentConfigName={currentConfigName}
+                  loading={supabaseLoading}
+                  isAdmin={isAdmin}
+                  hasUnsavedChanges={hasUnsavedChanges}
+                />
+              )}
             </CardContent>
           </Card>
         </div>

@@ -134,13 +134,19 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
                   collapsed ? "p-3 justify-center" : "gap-3 p-3",
                   isActive && !item.isButton
                     ? "bg-primary text-primary-foreground shadow-sm" 
+                    : item.isButton
+                    ? "hover:bg-primary hover:text-primary-foreground text-primary border border-primary/20 hover:border-primary"
                     : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
                 )}
               >
                 <Icon className={cn(
                   "transition-colors flex-shrink-0",
                   collapsed ? "h-5 w-5" : "h-5 w-5",
-                  isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-accent-foreground"
+                  isActive 
+                    ? "text-primary-foreground" 
+                    : item.isButton 
+                    ? "text-primary group-hover:text-primary-foreground" 
+                    : "text-muted-foreground group-hover:text-accent-foreground"
                 )} />
                 {!collapsed && (
                   <div className="flex flex-col items-start min-w-0">
