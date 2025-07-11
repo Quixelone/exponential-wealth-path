@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Target, Plus, AlertCircle, RefreshCw } from 'lucide-react';
 import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
@@ -9,21 +9,12 @@ import NewConfigurationButton from '@/components/configuration/NewConfigurationB
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useDeviceInfo } from '@/hooks/use-mobile';
-import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
-import ModernSidebar from '@/components/dashboard/ModernSidebar';
-import ModernHeader from '@/components/dashboard/ModernHeader';
-import MobileHeader from '@/components/mobile/MobileHeader';
-import MobileDrawer from '@/components/mobile/MobileDrawer';
-import BottomNavigation from '@/components/mobile/BottomNavigation';
+import AppLayout from '@/components/layout/AppLayout';
 
 const Strategies: React.FC = () => {
-  const { user, userProfile, loading: authLoading, signOut, isAdmin } = useAuth();
-  const { isMobile, isTablet } = useDeviceInfo();
+  const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   const {
     savedConfigs,
@@ -161,26 +152,10 @@ const Strategies: React.FC = () => {
 
   // Redirect to auth if not logged in
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!user) {
       navigate('/auth');
     }
-  }, [user, authLoading, navigate]);
-
-  const handleLogout = async () => {
-    await signOut();
-    navigate('/auth');
-  };
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Caricamento dati utente...</p>
-        </div>
-      </div>
-    );
-  }
+  }, [user, navigate]);
 
   if (!user) {
     return null; // Will redirect to auth via useEffect
@@ -268,53 +243,9 @@ const Strategies: React.FC = () => {
   };
 
   return (
-    <ModernTooltipProvider>
-      <div className="min-h-screen bg-background">
-        {/* Desktop Layout */}
-        {!isMobile && !isTablet && (
-          <div className="flex min-h-screen w-full">
-            <ModernSidebar 
-              isAdmin={isAdmin}
-              onCollapseChange={setIsSidebarCollapsed}
-            />
-            <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
-              <ModernHeader 
-                userProfile={userProfile}
-                onLogout={handleLogout}
-                onSettings={() => navigate('/settings')}
-                isAdmin={isAdmin}
-              />
-              <main className="flex-1 p-6">
-                {renderStrategiesContent()}
-              </main>
-            </div>
-          </div>
-        )}
-
-        {/* Mobile Layout */}
-        {(isMobile || isTablet) && (
-          <>
-            <MobileHeader 
-              userProfile={userProfile}
-              onMenuClick={() => setIsMobileDrawerOpen(true)}
-              onLogout={handleLogout}
-              isAdmin={isAdmin}
-            />
-            <MobileDrawer 
-              isOpen={isMobileDrawerOpen}
-              onClose={() => setIsMobileDrawerOpen(false)}
-              isAdmin={isAdmin}
-            />
-            <div className="pt-14 pb-20 px-4">
-              {renderStrategiesContent()}
-            </div>
-            <BottomNavigation 
-              isAdmin={isAdmin} 
-            />
-          </>
-        )}
-      </div>
-    </ModernTooltipProvider>
+    <AppLayout hasUnsavedChanges={hasUnsavedChanges}>
+      {renderStrategiesContent()}
+    </AppLayout>
   );
 };
 
