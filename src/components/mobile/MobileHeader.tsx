@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { 
   User, 
   LogOut, 
@@ -76,6 +77,8 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
         >
           <Bell className="h-4 w-4" />
         </Button>
+
+        <ThemeToggle className="h-10 w-10 p-0" />
 
         <Button
           variant="ghost"
