@@ -13,11 +13,14 @@ import { useDeviceInfo } from '@/hooks/use-mobile';
 import StatisticsCards from '@/components/dashboard/StatisticsCards';
 import CurrentStrategyProgress from '@/components/dashboard/CurrentStrategyProgress';
 import AppLayout from '@/components/layout/AppLayout';
+import FloatingActionButton from '@/components/mobile/FloatingActionButton';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const { isMobile } = useDeviceInfo();
+  const { toast } = useToast();
 
   const {
     config,
@@ -68,6 +71,30 @@ const Index = () => {
 
   const handleRemovePACOverride = (day: number) => {
     removePACOverride(day);
+  };
+
+  const handleQuickSave = async () => {
+    try {
+      if (currentConfigId && currentConfigName) {
+        await updateCurrentConfiguration(currentConfigId, currentConfigName);
+        toast({
+          title: "Configurazione salvata",
+          description: "Le modifiche sono state salvate con successo.",
+        });
+      } else {
+        await saveCurrentConfiguration(`Strategia ${new Date().toLocaleDateString('it-IT')}`);
+        toast({
+          title: "Nuova strategia salvata",
+          description: "La strategia è stata salvata con successo.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Errore nel salvataggio",
+        description: "Si è verificato un errore durante il salvataggio.",
+        variant: "destructive",
+      });
+    }
   };
 
   const renderMainContent = () => {
@@ -166,6 +193,16 @@ const Index = () => {
   return (
     <AppLayout hasUnsavedChanges={hasUnsavedChanges}>
       {renderMainContent()}
+      
+      {/* Mobile Quick Save FAB */}
+      {isMobile && (
+        <FloatingActionButton
+          variant="save"
+          onClick={handleQuickSave}
+          disabled={!hasUnsavedChanges}
+          show={hasUnsavedChanges}
+        />
+      )}
     </AppLayout>
   );
 };

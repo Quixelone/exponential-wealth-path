@@ -85,8 +85,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] sm:max-h-[85vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Calendar className="h-6 w-6 text-primary" />
             Modifica Giorno {item.day}
@@ -94,7 +94,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
           <p className="text-muted-foreground">{formatDate(item.date)}</p>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 overflow-y-auto flex-1 px-1">
           {/* Informazioni attuali */}
           <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
             <div>
@@ -230,19 +230,31 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             </div>
           </div>
 
-          {/* Azioni */}
-          <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={handleCancel}>
+        </div>
+        
+        {/* Sticky footer with actions */}
+        <div className="flex-shrink-0 border-t border-border pt-4 mt-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+            <Button 
+              variant="outline" 
+              onClick={handleCancel}
+              className="w-full sm:w-auto touch-target"
+            >
               <X className="h-4 w-4 mr-2" />
               Annulla
             </Button>
             <Button 
               onClick={handleSave} 
               disabled={!hasChanges}
-              className="bg-primary hover:bg-primary/90"
+              className="w-full sm:w-auto bg-primary hover:bg-primary/90 touch-target"
             >
               <Save className="h-4 w-4 mr-2" />
-              {hasChanges ? 'Salva Modifiche' : 'Nessuna Modifica'}
+              <span className="sm:hidden">
+                {hasChanges ? 'Salva' : 'Nessuna Modifica'}
+              </span>
+              <span className="hidden sm:inline">
+                {hasChanges ? 'Salva Modifiche' : 'Nessuna Modifica'}
+              </span>
             </Button>
           </div>
         </div>

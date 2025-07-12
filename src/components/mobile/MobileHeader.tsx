@@ -30,14 +30,14 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
   const firstName = userProfile?.first_name || userProfile?.email?.charAt(0) || 'U';
 
   return (
-    <header className="h-16 bg-card border-b border-border px-4 flex items-center justify-between sticky top-0 z-40">
+    <header className="h-16 bg-card/95 backdrop-blur-md border-b border-border px-4 flex items-center justify-between sticky top-0 z-40 safe-area-top">
       {/* Left section */}
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="sm"
           onClick={onMenuClick}
-          className="h-10 w-10 p-0"
+          className="h-10 w-10 p-0 touch-target"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -72,7 +72,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          className="h-10 w-10 p-0"
+          className="h-10 w-10 p-0 touch-target"
         >
           <Bell className="h-4 w-4" />
         </Button>
@@ -81,7 +81,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
           variant="ghost"
           size="sm"
           onClick={onLogout}
-          className="h-10 w-10 p-0 hover:bg-destructive/10 hover:text-destructive"
+          className="h-10 w-10 p-0 hover:bg-destructive/10 hover:text-destructive touch-target"
         >
           <LogOut className="h-4 w-4" />
         </Button>

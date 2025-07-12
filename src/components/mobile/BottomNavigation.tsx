@@ -76,7 +76,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 safe-area-bottom">
+    <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50 safe-area-bottom">
       <div className="flex items-center justify-around px-2 py-2">
         {mainItems.map((item) => {
           const Icon = item.icon;
@@ -87,10 +87,10 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
               key={item.path}
               onClick={() => handleNavigation(item)}
               className={cn(
-                "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 min-w-0 flex-1",
+                "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 min-w-0 flex-1 touch-target-lg",
                 isActive 
-                  ? "text-primary" 
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-primary bg-primary/10" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
             >
               <Icon className={cn("h-5 w-5 mb-1", isActive && "text-primary")} />
@@ -98,7 +98,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
                 {item.label}
               </span>
               {isActive && (
-                <div className="w-1 h-1 bg-primary rounded-full mt-1" />
+                <div className="w-2 h-0.5 bg-primary rounded-full mt-1" />
               )}
             </button>
           );

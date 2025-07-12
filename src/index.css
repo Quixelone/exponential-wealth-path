@@ -69,33 +69,33 @@
     --popover-foreground: 220 20% 95%;
 
     --primary: 235 85% 65%; /* Brighter primary for dark mode */
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 210 11% 4%;
 
     --secondary: 280 83% 62%; /* Brighter secondary */
-    --secondary-foreground: 0 0% 100%;
+    --secondary-foreground: 210 11% 4%;
 
     --success: 134 61% 46%;
-    --success-foreground: 0 0% 100%;
+    --success-foreground: 210 11% 4%;
 
     --warning: 45 93% 63%;
-    --warning-foreground: 0 0% 100%;
+    --warning-foreground: 210 11% 4%;
 
     --danger: 0 72% 56%;
-    --danger-foreground: 0 0% 100%;
+    --danger-foreground: 220 20% 95%;
 
     --info: 195 85% 60%;
-    --info-foreground: 0 0% 100%;
+    --info-foreground: 210 11% 4%;
 
     --muted: 210 11% 15%; /* #2A2F42 */
-    --muted-foreground: 215 16% 70%; /* #9CA3AF */
+    --muted-foreground: 215 16% 65%; /* Better contrast */
 
     --accent: 210 11% 12%; /* #1E2332 */
     --accent-foreground: 220 20% 95%;
 
     --destructive: 0 72% 56%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 220 20% 95%;
 
-    --border: 210 11% 15%; /* #2A2F42 */
+    --border: 210 11% 20%; /* Lighter border for better visibility */
     --input: 210 11% 15%;
     --ring: 235 85% 65%;
 
@@ -401,11 +401,47 @@
   @apply text-lg sm:text-xl lg:text-2xl;
 }
 
-/* Mobile-optimized buttons */
-.btn-mobile {
-  @apply min-h-[44px] px-4 py-2 text-sm font-medium;
-}
+  /* Mobile-optimized buttons */
+  .btn-mobile {
+    @apply min-h-[44px] px-4 py-2 text-sm font-medium;
+  }
 
-.btn-mobile-icon {
-  @apply min-h-[44px] min-w-[44px] p-2;
-}
+  .btn-mobile-icon {
+    @apply min-h-[44px] min-w-[44px] p-2;
+  }
+
+  /* Mobile dialogs and modals */
+  .mobile-dialog {
+    @apply h-[90vh] sm:h-auto max-h-[90vh] overflow-hidden;
+  }
+
+  .mobile-dialog-content {
+    @apply flex flex-col h-full;
+  }
+
+  .mobile-dialog-body {
+    @apply flex-1 overflow-y-auto px-1;
+  }
+
+  .mobile-dialog-footer {
+    @apply flex-shrink-0 border-t border-border pt-4 mt-4;
+  }
+
+  /* Dark mode specific improvements */
+  .dark .glass-effect {
+    @apply backdrop-blur-lg bg-black/10 border border-white/10;
+  }
+
+  .dark .mobile-card {
+    @apply bg-card border-border/50;
+  }
+
+  /* Enhanced touch feedback */
+  .touch-feedback {
+    @apply transition-all duration-150 active:scale-95 active:bg-muted/50;
+  }
+
+  /* Pull to refresh indicator */
+  .pull-refresh {
+    @apply transform transition-transform duration-300;
+  }
