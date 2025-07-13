@@ -51,26 +51,22 @@ const PerformanceVsPlan: React.FC<PerformanceVsPlanProps> = ({
     const actualCapital = currentDayData.finalCapital;
     const actualReturn = totalInvested > 0 ? ((actualCapital - totalInvested) / totalInvested) * 100 : 0;
 
-    // Calcola il rendimento pianificato cumulativo
-    // Questo dovrebbe essere basato solo sui rendimenti giornalieri standard (non personalizzati)
+    // Calcola il rendimento pianificato usando sempre il tasso standard originale
+    // Il piano originale deve essere basato sul tasso di rendimento configurato inizialmente
+    const standardDailyRate = data[0]?.dailyReturn || 0;
     let plannedCapital = initialCapital;
     let plannedTotalInvested = initialCapital;
     
     for (let day = 1; day <= currentDay; day++) {
       const dayData = data.find(d => d.day === day);
       if (dayData) {
-        // Aggiungi PAC
+        // Aggiungi PAC per il giorno corrente
         plannedCapital += dayData.pacAmount;
         plannedTotalInvested += dayData.pacAmount;
         
-        // Applica il rendimento standard (non personalizzato)
-        if (!dayData.isCustomReturn) {
-          plannedCapital += plannedCapital * (dayData.dailyReturn / 100);
-        } else {
-          // Se c'è un rendimento personalizzato, usa il rendimento standard per il piano
-          const standardReturn = data[0].dailyReturn || 0; // Usa il primo rendimento standard disponibile
-          plannedCapital += plannedCapital * (standardReturn / 100);
-        }
+        // Applica SEMPRE il rendimento standard originale (ignorando i rendimenti personalizzati)
+        // Questo rappresenta il piano originale senza modifiche
+        plannedCapital += plannedCapital * (standardDailyRate / 100);
       }
     }
 
