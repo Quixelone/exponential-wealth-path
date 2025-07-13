@@ -45,45 +45,73 @@ const PerformanceVsPlan: React.FC<PerformanceVsPlanProps> = ({
       };
     }
 
-    // Calcola il rendimento attuale cumulativo dall'inizio
+    // CAPITALE REALE (con tutti i rendimenti modificati dal giorno 1 ad oggi)
     const initialCapital = data[0].capitalBeforePAC;
-    const totalInvested = currentDayData.totalPACInvested + initialCapital;
     const actualCapital = currentDayData.finalCapital;
-    const actualReturn = totalInvested > 0 ? ((actualCapital - totalInvested) / totalInvested) * 100 : 0;
+    
+    // CAPITALE PIANIFICATO (usando SOLO il tasso standard originale per tutti i giorni)
+    // Trova il primo giorno per ottenere il tasso di rendimento standard originale
+    const firstDay = data.find(d => d.day === 1);
+    if (!firstDay) {
+      return {
+        actualReturn: 0,
+        plannedReturn: 0,
+        difference: 0,
+        isOutperforming: false,
+        actualCapital: 0,
+        plannedCapital: 0,
+        message: "Dati del primo giorno non disponibili"
+      };
+    }
 
-    // Calcola il rendimento pianificato usando sempre il tasso standard originale
-    // Il piano originale deve essere basato sul tasso di rendimento configurato inizialmente
-    const standardDailyRate = data[0]?.dailyReturn || 0;
+    // Ottieni il tasso di rendimento standard (quello che era configurato inizialmente)
+    // Se il primo giorno ha un rendimento personalizzato, dovremmo avere il tasso originale
+    // Per ora usiamo il tasso dal primo giorno disponibile non personalizzato
+    let standardDailyRate = firstDay.dailyReturn;
+    
+    // Cerca il primo giorno senza rendimento personalizzato per ottenere il tasso standard
+    for (const dayData of data) {
+      if (!dayData.isCustomReturn) {
+        standardDailyRate = dayData.dailyReturn;
+        break;
+      }
+    }
+
+    // Simula il piano originale usando sempre il tasso standard
     let plannedCapital = initialCapital;
-    let plannedTotalInvested = initialCapital;
     
     for (let day = 1; day <= currentDay; day++) {
       const dayData = data.find(d => d.day === day);
       if (dayData) {
-        // Aggiungi PAC per il giorno corrente
+        // Aggiungi il PAC del giorno (usando i PAC effettivamente investiti)
         plannedCapital += dayData.pacAmount;
-        plannedTotalInvested += dayData.pacAmount;
         
-        // Applica SEMPRE il rendimento standard originale (ignorando i rendimenti personalizzati)
-        // Questo rappresenta il piano originale senza modifiche
-        plannedCapital += plannedCapital * (standardDailyRate / 100);
+        // Applica SEMPRE il tasso di rendimento standard originale
+        plannedCapital = plannedCapital * (1 + standardDailyRate / 100);
       }
     }
 
-    const plannedReturn = plannedTotalInvested > 0 ? ((plannedCapital - plannedTotalInvested) / plannedTotalInvested) * 100 : 0;
-    const difference = actualReturn - plannedReturn;
+    // Calcola i tassi di crescita complessivi dal giorno 1 ad oggi
+    const totalInvested = currentDayData.totalPACInvested + initialCapital;
+    const actualGrowthRate = totalInvested > 0 ? ((actualCapital - totalInvested) / totalInvested) * 100 : 0;
+    
+    const plannedTotalInvested = totalInvested; // Stesso investimento totale
+    const plannedGrowthRate = plannedTotalInvested > 0 ? ((plannedCapital - plannedTotalInvested) / plannedTotalInvested) * 100 : 0;
+    
+    // Differenza tra performance reale e pianificata
+    const difference = actualGrowthRate - plannedGrowthRate;
     const isOutperforming = difference > 0;
 
     let message = "In linea con il piano originale";
     if (Math.abs(difference) > 0.1) {
       message = isOutperforming 
-        ? "La strategia è sopra le aspettative"
-        : "La strategia è sotto le aspettative";
+        ? `Strategia sovraperformante del ${Math.abs(difference).toFixed(2)}%`
+        : `Strategia sottoperformante del ${Math.abs(difference).toFixed(2)}%`;
     }
 
     return {
-      actualReturn,
-      plannedReturn,
+      actualReturn: actualGrowthRate,
+      plannedReturn: plannedGrowthRate,
       difference,
       isOutperforming,
       actualCapital,

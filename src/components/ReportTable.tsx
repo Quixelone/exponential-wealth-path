@@ -18,6 +18,9 @@ interface ReportTableProps {
   onRemovePACOverride?: (day: number) => void;
   defaultPACAmount: number;
   investmentStartDate: string | Date;
+  currentConfigId?: string | null;
+  currentConfigName?: string;
+  onSaveToStrategy?: () => Promise<void>;
 }
 
 const ReportTable: React.FC<ReportTableProps> = ({
@@ -28,7 +31,10 @@ const ReportTable: React.FC<ReportTableProps> = ({
   onUpdatePACInReport,
   onRemovePACOverride,
   defaultPACAmount,
-  investmentStartDate
+  investmentStartDate,
+  currentConfigId,
+  currentConfigName,
+  onSaveToStrategy
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -310,6 +316,9 @@ const ReportTable: React.FC<ReportTableProps> = ({
         onUpdateDailyReturn={onUpdateDailyReturnInReport}
         onUpdatePAC={onUpdatePACInReport}
         defaultPACAmount={defaultPACAmount}
+        currentConfigId={currentConfigId}
+        currentConfigName={currentConfigName}
+        onSaveToStrategy={onSaveToStrategy}
       />
     </ModernTooltipProvider>
   );

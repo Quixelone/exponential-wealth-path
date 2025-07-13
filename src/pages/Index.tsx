@@ -73,6 +73,12 @@ const Index = () => {
     removePACOverride(day);
   };
 
+  const handleSaveToStrategy = async () => {
+    if (currentConfigId && currentConfigName) {
+      await updateCurrentConfiguration(currentConfigId, currentConfigName);
+    }
+  };
+
   const handleQuickSave = async () => {
     try {
       if (currentConfigId && currentConfigName) {
@@ -177,6 +183,9 @@ const Index = () => {
                   onRemovePACOverride={handleRemovePACOverride}
                   defaultPACAmount={config.pacConfig.amount}
                   investmentStartDate={config.pacConfig.startDate}
+                  currentConfigId={currentConfigId}
+                  currentConfigName={currentConfigName}
+                  onSaveToStrategy={handleSaveToStrategy}
                 />
               </div>
             </div>

@@ -19,6 +19,9 @@ interface RowEditDialogProps {
   onUpdateDailyReturn: (day: number, newReturn: number) => void;
   onUpdatePAC: (day: number, newPAC: number) => void;
   defaultPACAmount: number;
+  currentConfigId?: string | null;
+  currentConfigName?: string;
+  onSaveToStrategy?: () => Promise<void>;
 }
 
 const RowEditDialog: React.FC<RowEditDialogProps> = ({
@@ -28,7 +31,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   currency,
   onUpdateDailyReturn,
   onUpdatePAC,
-  defaultPACAmount
+  defaultPACAmount,
+  currentConfigId,
+  currentConfigName,
+  onSaveToStrategy
 }) => {
   const [returnRate, setReturnRate] = useState<number>(0);
   const [pacAmount, setPacAmount] = useState<number>(0);
@@ -60,13 +66,23 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (Math.abs(returnRate - item.dailyReturn) > 0.001) {
       onUpdateDailyReturn(item.day, returnRate);
     }
     if (Math.abs(pacAmount - item.pacAmount) > 0.01) {
       onUpdatePAC(item.day, pacAmount);
     }
+    
+    // Se stiamo modificando una strategia esistente, salva automaticamente
+    if (currentConfigId && onSaveToStrategy) {
+      try {
+        await onSaveToStrategy();
+      } catch (error) {
+        console.error('Error saving strategy:', error);
+      }
+    }
+    
     onOpenChange(false);
   };
 
@@ -234,6 +250,18 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
         
         {/* Sticky footer with actions */}
         <div className="flex-shrink-0 border-t border-border pt-4 mt-4">
+          {/* Info about current strategy */}
+          {currentConfigId && currentConfigName && (
+            <div className="mb-3 p-2 bg-primary/5 border border-primary/20 rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                Stai modificando la strategia: <span className="font-medium text-primary">{currentConfigName}</span>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Le modifiche verranno salvate automaticamente nella strategia esistente
+              </p>
+            </div>
+          )}
+          
           <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
             <Button 
               variant="outline" 
@@ -250,10 +278,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             >
               <Save className="h-4 w-4 mr-2" />
               <span className="sm:hidden">
-                {hasChanges ? 'Salva' : 'Nessuna Modifica'}
+                {hasChanges ? (currentConfigId ? 'Aggiorna Strategia' : 'Salva') : 'Nessuna Modifica'}
               </span>
               <span className="hidden sm:inline">
-                {hasChanges ? 'Salva Modifiche' : 'Nessuna Modifica'}
+                {hasChanges ? (currentConfigId ? 'Aggiorna Strategia' : 'Salva Modifiche') : 'Nessuna Modifica'}
               </span>
             </Button>
           </div>
