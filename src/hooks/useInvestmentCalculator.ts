@@ -4,9 +4,11 @@ import { useConfigurationManager } from './useConfigurationManager';
 import { useInvestmentData } from './useInvestmentData';
 import { useInvestmentOperations } from './useInvestmentOperations';
 import { usePersistedConfigLoader } from './usePersistedConfigLoader';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Custom hook principale per usare il calcolatore d'investimento e tutte le sue API
 export const useInvestmentCalculator = () => {
+  const { user, loading: authLoading } = useAuth();
   const {
     configState,
     setConfig,
@@ -35,14 +37,14 @@ export const useInvestmentCalculator = () => {
 
   const loadInitialized = useRef(false);
 
-  // Load configurations only once on mount
+  // Load configurations only once on mount, but wait for user authentication
   React.useEffect(() => {
-    if (!loadInitialized.current) {
+    if (!loadInitialized.current && !authLoading && user) {
       loadInitialized.current = true;
-      console.log('🔄 InvestmentCalculator: Initial configuration load');
+      console.log('🔄 InvestmentCalculator: User authenticated, loading configurations');
       loadConfigurations();
     }
-  }, [loadConfigurations]);
+  }, [loadConfigurations, authLoading, user]);
 
   // Use the persisted config loader to restore user's last selected strategy
   const { persistedConfigLoadAttempted } = usePersistedConfigLoader({
