@@ -105,10 +105,7 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                   variant={hasUnsavedChanges ? "default" : "outline"}
                 >
                   <Save className="h-4 w-4" />
-                  <span className="sm:hidden">Salva</span>
-                  <span className="hidden sm:inline">
-                    {currentConfigId ? 'Aggiorna Strategia' : 'Salva Strategia'}
-                  </span>
+                  Salva
                 </Button>
               )}
             </div>
