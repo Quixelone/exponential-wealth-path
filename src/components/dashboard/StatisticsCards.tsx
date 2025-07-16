@@ -26,21 +26,6 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
   const roiPercentage = totalInvested > 0 ? ((totalProfit / totalInvested) * 100) : 0;
   const totalDays = finalData.day || 0;
   
-  // Performance vs Plan calculation
-  const actualCapital = currentData.finalCapital || 0;
-  const actualInvested = currentData.totalInvested || 0;
-  const actualROI = actualInvested > 0 ? ((actualCapital - actualInvested) / actualInvested * 100) : 0;
-  
-  // Calculate what the capital would be with standard returns only
-  const standardDailyReturn = 0.001; // Default daily return rate
-  const currentDay = currentData.day || 0;
-  const plannedCapital = actualInvested * Math.pow(1 + standardDailyReturn, currentDay);
-  const plannedProfit = plannedCapital - actualInvested;
-  const plannedROI = actualInvested > 0 ? (plannedProfit / actualInvested * 100) : 0;
-  
-  const performanceDifference = actualROI - plannedROI;
-  const isOutperforming = performanceDifference > 0;
-  
   const stats = [
     {
       title: 'Capitale Finale',
@@ -79,15 +64,6 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
       description: 'Rendimento percentuale'
     },
     {
-      title: 'Performance vs Attesa',
-      value: `${performanceDifference > 0 ? '+' : ''}${performanceDifference.toFixed(2)}%`,
-      change: isOutperforming ? 'Sopra' : 'Sotto',
-      changeType: isOutperforming ? 'positive' as const : 'negative' as const,
-      icon: isOutperforming ? TrendingUp : TrendingDown,
-      gradient: isOutperforming ? 'gradient-success' : 'gradient-warning',
-      description: isOutperforming ? 'Strategia performante' : 'Sotto aspettative'
-    },
-    {
       title: 'Giorni Investimento',
       value: totalDays.toString(),
       change: '+30',
@@ -99,7 +75,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-6">
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 mb-6">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         

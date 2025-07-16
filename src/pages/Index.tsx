@@ -6,7 +6,7 @@ import ConfigurationPanel from '@/components/ConfigurationPanel';
 import InvestmentChart from '@/components/InvestmentChart';
 import ReportTable from '@/components/ReportTable';
 import PaymentReminders from '@/components/PaymentReminders';
-
+import PerformanceVsPlan from '@/components/PerformanceVsPlan';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceInfo } from '@/hooks/use-mobile';
@@ -167,6 +167,12 @@ const Index = () => {
               {/* Charts and Results */}
               <div className={`${!isMobile ? 'xl:col-span-3' : ''} space-y-${isMobile ? '4' : '6'}`}>
                 <InvestmentChart data={investmentData} currency={config.currency} />
+
+                <PerformanceVsPlan 
+                  data={investmentData}
+                  currency={config.currency}
+                  currentDay={Math.min(Math.floor((new Date().getTime() - new Date(config.pacConfig.startDate).getTime()) / (1000 * 60 * 60 * 24)), config.timeHorizon)}
+                />
                 
                 <ReportTable 
                   data={investmentData} 
