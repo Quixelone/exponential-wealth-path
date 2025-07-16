@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, Plus, AlertCircle, RefreshCw } from 'lucide-react';
+import { Target, Plus, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
 import NewConfigurationButton from '@/components/configuration/NewConfigurationButton';
+import ConfigurationPanel from '@/components/ConfigurationPanel';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -28,12 +29,24 @@ const Strategies: React.FC = () => {
 
   const {
     config,
+    updateConfig,
     dailyReturns,
+    updateDailyReturn,
+    removeDailyReturn,
+    exportToCSV,
     dailyPACOverrides,
+    updatePACForDay,
+    removePACOverride,
     loadSavedConfiguration,
     currentConfigId,
     currentConfigName,
-    hasUnsavedChanges
+    hasUnsavedChanges,
+    saveCurrentConfiguration,
+    updateCurrentConfiguration,
+    undoConfiguration,
+    redoConfiguration,
+    canUndo,
+    canRedo
   } = useInvestmentCalculator();
 
   const handleCreateNewConfiguration = async (name: string, copyFromCurrent: boolean) => {
@@ -196,14 +209,25 @@ const Strategies: React.FC = () => {
   const renderStrategiesContent = () => {
     return (
       <div className="space-y-6">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Gestione Strategie
-          </h1>
-          <p className="text-muted-foreground">
-            Crea, modifica e gestisci le tue strategie di investimento
-          </p>
+        {/* Header with back button */}
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Dashboard
+          </Button>
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Gestione Strategie
+            </h1>
+            <p className="text-muted-foreground">
+              Configura e gestisci le tue strategie di investimento
+            </p>
+          </div>
         </div>
 
         {/* Error State */}
@@ -229,6 +253,29 @@ const Strategies: React.FC = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Configuration Panel */}
+        <ConfigurationPanel
+          config={config}
+          onConfigChange={updateConfig}
+          customReturns={dailyReturns}
+          onUpdateDailyReturn={updateDailyReturn}
+          onRemoveDailyReturn={removeDailyReturn}
+          onExportCSV={exportToCSV}
+          isAdmin={isAdmin}
+          dailyPACOverrides={dailyPACOverrides}
+          onUpdatePACForDay={updatePACForDay}
+          onRemovePACOverride={removePACOverride}
+          hasUnsavedChanges={hasUnsavedChanges}
+          currentConfigId={currentConfigId}
+          currentConfigName={currentConfigName}
+          onSaveStrategy={saveCurrentConfiguration}
+          onUpdateStrategy={updateCurrentConfiguration}
+          onUndo={undoConfiguration}
+          onRedo={redoConfiguration}
+          canUndo={canUndo}
+          canRedo={canRedo}
+        />
 
         {/* Nuova Strategia */}
         <Card className="border-primary/20">
