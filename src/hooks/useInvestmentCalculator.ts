@@ -78,10 +78,8 @@ export const useInvestmentCalculator = () => {
   const {
     updateConfig,
     updateDailyReturn,
-    updateDailyReturnDirect, // NEW: Direct update function
     removeDailyReturn,
     updatePACForDay,
-    updatePACForDayDirect, // NEW: Direct update function
     removePACOverride,
     exportToCSV
   } = useInvestmentOperations({
@@ -101,12 +99,10 @@ export const useInvestmentCalculator = () => {
     investmentData,
     dailyReturns: configState.dailyReturns,
     updateDailyReturn,
-    updateDailyReturnDirect, // NEW: Direct update function
     removeDailyReturn,
     exportToCSV,
     dailyPACOverrides: configState.dailyPACOverrides,
     updatePACForDay,
-    updatePACForDayDirect, // NEW: Direct update function
     removePACOverride,
     currentConfigId: configState.currentConfigId,
     currentConfigName: configState.currentConfigName,
