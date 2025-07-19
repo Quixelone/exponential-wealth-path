@@ -67,24 +67,34 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   };
 
   const handleSave = async () => {
-    // Applica sempre le modifiche ai dati in memoria
-    if (Math.abs(returnRate - item.dailyReturn) > 0.001) {
-      onUpdateDailyReturn(item.day, returnRate);
-    }
-    if (Math.abs(pacAmount - item.pacAmount) > 0.01) {
-      onUpdatePAC(item.day, pacAmount);
-    }
+    const hasReturnChange = Math.abs(returnRate - item.dailyReturn) > 0.001;
+    const hasPacChange = Math.abs(pacAmount - item.pacAmount) > 0.01;
     
-    // Salva automaticamente se c'è una strategia attiva, altrimenti le modifiche 
-    // rimangono in memoria finché l'utente non salva manualmente
-    if (currentConfigId && onSaveToStrategy) {
+    // Salva prima nella strategia se esiste, poi applica le modifiche
+    if (currentConfigId && onSaveToStrategy && (hasReturnChange || hasPacChange)) {
       try {
+        // Prima applica le modifiche ai dati in memoria
+        if (hasReturnChange) {
+          onUpdateDailyReturn(item.day, returnRate);
+        }
+        if (hasPacChange) {
+          onUpdatePAC(item.day, pacAmount);
+        }
+        
+        // Poi salva immediatamente la strategia
         await onSaveToStrategy();
         console.log('✅ Modifiche salvate automaticamente nella strategia:', currentConfigName);
       } catch (error) {
         console.error('❌ Errore salvando la strategia:', error);
       }
-    } else {
+    } else if (hasReturnChange || hasPacChange) {
+      // Se non c'è strategia attiva, applica solo le modifiche in memoria
+      if (hasReturnChange) {
+        onUpdateDailyReturn(item.day, returnRate);
+      }
+      if (hasPacChange) {
+        onUpdatePAC(item.day, pacAmount);
+      }
       console.log('ℹ️ Modifiche applicate in memoria - nessuna strategia attiva da aggiornare');
     }
     
