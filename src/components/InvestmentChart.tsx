@@ -8,12 +8,14 @@ import { formatCurrency, Currency } from '@/lib/utils';
 interface InvestmentChartProps {
   data: InvestmentData[];
   currency: Currency;
+  currentDay?: number;
   showProjections?: boolean;
 }
 
 const InvestmentChart: React.FC<InvestmentChartProps> = ({ 
   data, 
   currency,
+  currentDay,
   showProjections = false 
 }) => {
   const formatTooltip = (value: any, name: string) => {
@@ -90,6 +92,14 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
                   strokeWidth={1}
                 />
               ))}
+              {currentDay && currentDay > 0 && (
+                <ReferenceLine 
+                  x={currentDay} 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={3}
+                  label={{ value: "Oggi", position: "top" }}
+                />
+              )}
             </LineChart>
           </ResponsiveContainer>
         </div>
