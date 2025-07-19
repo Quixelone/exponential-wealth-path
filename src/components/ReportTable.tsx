@@ -165,6 +165,17 @@ const ReportTable: React.FC<ReportTableProps> = ({
                   className="pl-9 w-full sm:w-56"
                 />
               </div>
+              {currentConfigId && currentInvestmentDay && onSaveToStrategy && (
+                <Button 
+                  onClick={onSaveToStrategy}
+                  variant="default" 
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Salva al Giorno {currentInvestmentDay}
+                </Button>
+              )}
               <Button onClick={onExportCSV} variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-2" />
                 Esporta CSV
