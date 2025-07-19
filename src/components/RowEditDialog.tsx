@@ -17,7 +17,9 @@ interface RowEditDialogProps {
   item: InvestmentData | null;
   currency: Currency;
   onUpdateDailyReturn: (day: number, newReturn: number) => void;
+  onUpdateDailyReturnDirect?: (day: number, newReturn: number) => void; // NEW: Direct update function
   onUpdatePAC: (day: number, newPAC: number) => void;
+  onUpdatePACDirect?: (day: number, newPAC: number) => void; // NEW: Direct update function
   defaultPACAmount: number;
   currentConfigId?: string | null;
   currentConfigName?: string;
@@ -30,7 +32,9 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   item,
   currency,
   onUpdateDailyReturn,
+  onUpdateDailyReturnDirect,
   onUpdatePAC,
+  onUpdatePACDirect,
   defaultPACAmount,
   currentConfigId,
   currentConfigName,
@@ -88,25 +92,34 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
       hasPacChange,
       originalConfigId,
       currentConfigId,
-      originalConfigName
+      originalConfigName,
+      hasDirectFunctions: !!(onUpdateDailyReturnDirect && onUpdatePACDirect)
     });
     
     // Use the original config ID for saving, even if current one becomes null
     if (originalConfigId && onSaveToStrategy && (hasReturnChange || hasPacChange)) {
       try {
-        console.log('✅ RowEditDialog: Usando ID strategia originale per il salvataggio:', originalConfigId);
+        console.log('✅ RowEditDialog: Usando strategia DIRETTA con ID originale:', originalConfigId);
         
-        // Prima applica le modifiche ai dati in memoria
-        if (hasReturnChange) {
-          console.log('🔄 Applicando modifica rendimento:', returnRate);
+        // Use DIRECT functions that don't nullify currentConfigId
+        if (hasReturnChange && onUpdateDailyReturnDirect) {
+          console.log('🔄 Applicando modifica rendimento DIRETTA:', returnRate);
+          onUpdateDailyReturnDirect(item.day, returnRate);
+        } else if (hasReturnChange) {
+          console.log('⚠️ Fallback a modifica rendimento normale:', returnRate);
           onUpdateDailyReturn(item.day, returnRate);
         }
-        if (hasPacChange) {
-          console.log('🔄 Applicando modifica PAC:', pacAmount);
+        
+        if (hasPacChange && onUpdatePACDirect) {
+          console.log('🔄 Applicando modifica PAC DIRETTA:', pacAmount);
+          onUpdatePACDirect(item.day, pacAmount);
+        } else if (hasPacChange) {
+          console.log('⚠️ Fallback a modifica PAC normale:', pacAmount);
           onUpdatePAC(item.day, pacAmount);
         }
         
-        // Poi salva immediatamente la strategia
+        // Now save to strategy - currentConfigId should still be valid
+        console.log('💾 Salvando nella strategia dopo modifiche dirette...');
         await onSaveToStrategy();
         console.log('✅ Modifiche salvate automaticamente nella strategia:', originalConfigName);
       } catch (error) {

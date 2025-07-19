@@ -65,6 +65,21 @@ export const useInvestmentOperations = ({
     }
   }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
+  // NEW: Function that updates daily return without nullifying currentConfigId
+  const updateDailyReturnDirect = useCallback((day: number, returnRate: number) => {
+    console.log('🔄 updateDailyReturnDirect: Updating return for day', day, 'to', returnRate, '% WITHOUT nullifying currentConfigId');
+    
+    saveConfigurationToHistory(`Modifica rendimento giorno ${day}: ${returnRate}%`);
+    
+    setDailyReturns(prev => ({
+      ...prev,
+      [day]: returnRate
+    }));
+    
+    // DO NOT nullify currentConfigId - this is the key difference
+    console.log('✅ updateDailyReturnDirect: Return updated, currentConfigId preserved');
+  }, [setDailyReturns, saveConfigurationToHistory]);
+
   const removeDailyReturn = useCallback((day: number) => {
     saveConfigurationToHistory(`Rimozione rendimento personalizzato giorno ${day}`);
     
@@ -96,6 +111,24 @@ export const useInvestmentOperations = ({
       setCurrentConfigId(null);
     }
   }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
+
+  // NEW: Function that updates PAC without nullifying currentConfigId
+  const updatePACForDayDirect = useCallback((day: number, pacAmount: number) => {
+    console.log('🔄 updatePACForDayDirect: Updating PAC for day', day, 'to', pacAmount, 'WITHOUT nullifying currentConfigId');
+    
+    saveConfigurationToHistory(`Modifica PAC giorno ${day}: €${pacAmount}`);
+    
+    setDailyPACOverrides(prev => {
+      const updated = {
+        ...prev,
+        [day]: pacAmount
+      };
+      return updated;
+    });
+    
+    // DO NOT nullify currentConfigId - this is the key difference
+    console.log('✅ updatePACForDayDirect: PAC updated, currentConfigId preserved');
+  }, [setDailyPACOverrides, saveConfigurationToHistory]);
 
   const removePACOverride = useCallback((day: number) => {
     saveConfigurationToHistory(`Rimozione PAC personalizzato giorno ${day}`);
@@ -162,8 +195,10 @@ export const useInvestmentOperations = ({
   return {
     updateConfig,
     updateDailyReturn,
+    updateDailyReturnDirect, // NEW: Direct update without nullifying currentConfigId
     removeDailyReturn,
     updatePACForDay,
+    updatePACForDayDirect, // NEW: Direct update without nullifying currentConfigId
     removePACOverride,
     exportToCSV
   };
