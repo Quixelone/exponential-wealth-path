@@ -67,6 +67,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   };
 
   const handleSave = async () => {
+    // Applica sempre le modifiche ai dati in memoria
     if (Math.abs(returnRate - item.dailyReturn) > 0.001) {
       onUpdateDailyReturn(item.day, returnRate);
     }
@@ -74,13 +75,17 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
       onUpdatePAC(item.day, pacAmount);
     }
     
-    // Se stiamo modificando una strategia esistente, salva automaticamente
+    // Salva automaticamente se c'è una strategia attiva, altrimenti le modifiche 
+    // rimangono in memoria finché l'utente non salva manualmente
     if (currentConfigId && onSaveToStrategy) {
       try {
         await onSaveToStrategy();
+        console.log('✅ Modifiche salvate automaticamente nella strategia:', currentConfigName);
       } catch (error) {
-        console.error('Error saving strategy:', error);
+        console.error('❌ Errore salvando la strategia:', error);
       }
+    } else {
+      console.log('ℹ️ Modifiche applicate in memoria - nessuna strategia attiva da aggiornare');
     }
     
     onOpenChange(false);
