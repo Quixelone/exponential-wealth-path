@@ -158,7 +158,7 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
                 strokeDasharray="6 6"
                 label={{ 
                   value: "Oggi", 
-                  position: "topRight",
+                  position: "top",
                   style: { 
                     fill: "hsl(var(--warning))",
                     fontSize: 12,
