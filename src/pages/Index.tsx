@@ -152,7 +152,11 @@ const Index = () => {
 
           <TabsContent value="investments" className={`space-y-${isMobile ? '4' : '6'}`}>
             <div className="space-y-6">
-              <InvestmentChart data={investmentData} currency={config.currency} />
+              <InvestmentChart 
+                data={investmentData} 
+                currency={config.currency}
+                currentDay={currentDayIndex}
+              />
 
               <PerformanceVsPlan 
                 data={investmentData}

@@ -3,18 +3,36 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { InvestmentData } from '@/types/investment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartContainer, ChartConfig, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { formatCurrency, Currency } from '@/lib/utils';
 
 interface InvestmentChartProps {
   data: InvestmentData[];
   currency: Currency;
   showProjections?: boolean;
+  currentDay?: number;
 }
+
+const chartConfig = {
+  finalCapital: {
+    label: "Capitale Totale",
+    color: "hsl(var(--primary))",
+  },
+  totalPACInvested: {
+    label: "PAC Investito", 
+    color: "hsl(var(--secondary))",
+  },
+  pacDays: {
+    label: "Versamenti PAC",
+    color: "hsl(var(--accent))",
+  },
+} satisfies ChartConfig;
 
 const InvestmentChart: React.FC<InvestmentChartProps> = ({ 
   data, 
   currency,
-  showProjections = false 
+  showProjections = false,
+  currentDay
 }) => {
   const formatTooltip = (value: any, name: string) => {
     if (name === 'finalCapital') {
@@ -39,73 +57,127 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
         </p>
       </CardHeader>
       <CardContent>
-        <div className="h-[500px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis 
-                dataKey="day"
-                stroke="hsl(var(--muted-foreground))"
-                tick={{ fontSize: 12 }}
-                label={{ value: 'Giorni', position: 'insideBottom', offset: -5 }}
+        <ChartContainer config={chartConfig} className="h-[500px] w-full">
+          <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+            <XAxis 
+              dataKey="day"
+              stroke="hsl(var(--muted-foreground))"
+              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tickLine={{ stroke: "hsl(var(--border))" }}
+              axisLine={{ stroke: "hsl(var(--border))" }}
+              label={{ 
+                value: 'Giorni', 
+                position: 'insideBottom', 
+                offset: -10,
+                style: { textAnchor: 'middle', fill: "hsl(var(--muted-foreground))" }
+              }}
+            />
+            <YAxis 
+              stroke="hsl(var(--muted-foreground))"
+              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tickLine={{ stroke: "hsl(var(--border))" }}
+              axisLine={{ stroke: "hsl(var(--border))" }}
+              tickFormatter={(value) => formatCurrency(value, currency)}
+              label={{ 
+                value: `Capitale (${currency})`, 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fill: "hsl(var(--muted-foreground))" }
+              }}
+            />
+            <Tooltip 
+              formatter={formatTooltip}
+              labelFormatter={(day) => `Giorno ${day}`}
+              contentStyle={{
+                backgroundColor: 'hsl(var(--card))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '12px',
+                boxShadow: '0 4px 12px -4px rgba(0, 0, 0, 0.15)',
+                padding: '12px'
+              }}
+              labelStyle={{
+                color: 'hsl(var(--foreground))',
+                fontWeight: 600,
+                marginBottom: '8px'
+              }}
+            />
+            
+            {/* Capitale Totale - Linea principale con gradiente */}
+            <Line
+              type="monotone"
+              dataKey="finalCapital"
+              stroke="var(--color-finalCapital)"
+              strokeWidth={3}
+              dot={false}
+              activeDot={{ 
+                r: 6, 
+                fill: 'var(--color-finalCapital)',
+                stroke: 'hsl(var(--background))',
+                strokeWidth: 2
+              }}
+              style={{
+                filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+              }}
+            />
+            
+            {/* PAC Investito - Linea tratteggiata */}
+            <Line
+              type="monotone"
+              dataKey="totalPACInvested"
+              stroke="var(--color-totalPACInvested)"
+              strokeWidth={2}
+              strokeDasharray="8 4"
+              dot={false}
+              activeDot={{ 
+                r: 5, 
+                fill: 'var(--color-totalPACInvested)',
+                stroke: 'hsl(var(--background))',
+                strokeWidth: 2
+              }}
+            />
+            
+            {/* Linee di riferimento per i versamenti PAC */}
+            {pacDays.map((pacDay, index) => (
+              <ReferenceLine 
+                key={`pac-${index}`}
+                x={pacDay.day} 
+                stroke="var(--color-pacDays)" 
+                strokeDasharray="3 3"
+                strokeWidth={1}
+                opacity={0.6}
               />
-              <YAxis 
-                stroke="hsl(var(--muted-foreground))"
-                tick={{ fontSize: 12 }}
-                tickFormatter={(value) => formatCurrency(value, currency)}
-                label={{ value: `Capitale (${currency})`, angle: -90, position: 'insideLeft' }}
-              />
-              <Tooltip 
-                formatter={formatTooltip}
-                labelFormatter={(day) => `Giorno ${day}`}
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            ))}
+            
+            {/* Linea del giorno corrente */}
+            {currentDay !== undefined && (
+              <ReferenceLine 
+                x={currentDay} 
+                stroke="hsl(var(--warning))" 
+                strokeWidth={2}
+                strokeDasharray="6 6"
+                label={{ 
+                  value: "Oggi", 
+                  position: "topRight",
+                  style: { 
+                    fill: "hsl(var(--warning))",
+                    fontSize: 12,
+                    fontWeight: 600
+                  }
                 }}
               />
-              <Line
-                type="monotone"
-                dataKey="finalCapital"
-                stroke="hsl(var(--primary))"
-                strokeWidth={3}
-                dot={false}
-                activeDot={{ r: 6, fill: 'hsl(var(--primary))' }}
-              />
-              <Line
-                type="monotone"
-                dataKey="totalPACInvested"
-                stroke="hsl(var(--secondary))"
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                dot={false}
-              />
-              {pacDays.map((pacDay, index) => (
-                <ReferenceLine 
-                  key={`pac-${index}`}
-                  x={pacDay.day} 
-                  stroke="hsl(var(--accent))" 
-                  strokeDasharray="2 2"
-                  strokeWidth={1}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="flex flex-wrap gap-6 mt-4 justify-center">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-0.5 bg-primary"></div>
-            <span className="text-sm text-muted-foreground">Capitale Totale</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-0.5 bg-secondary border-dashed border-t-2 border-secondary"></div>
-            <span className="text-sm text-muted-foreground">PAC Investito</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-0.5 bg-accent border-dashed border-t-2 border-accent"></div>
-            <span className="text-sm text-muted-foreground">Versamenti PAC</span>
-          </div>
+            )}
+          </LineChart>
+        </ChartContainer>
+        
+        {/* Leggenda moderna */}
+        <div className="mt-6">
+          <ChartLegend>
+            <ChartLegendContent 
+              className="flex flex-wrap justify-center gap-6"
+              nameKey="label"
+            />
+          </ChartLegend>
         </div>
       </CardContent>
     </Card>
