@@ -152,11 +152,7 @@ const Index = () => {
 
           <TabsContent value="investments" className={`space-y-${isMobile ? '4' : '6'}`}>
             <div className="space-y-6">
-              <InvestmentChart 
-                data={investmentData} 
-                currency={config.currency}
-                currentDay={Math.min(Math.floor((new Date().getTime() - new Date(config.pacConfig.startDate).getTime()) / (1000 * 60 * 60 * 24)), config.timeHorizon)}
-              />
+              <InvestmentChart data={investmentData} currency={config.currency} />
 
               <PerformanceVsPlan 
                 data={investmentData}

@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { formatCurrency, Currency } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { InvestmentData } from '@/types/investment';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2 } from 'lucide-react';
@@ -17,22 +17,16 @@ import { toast } from '@/hooks/use-toast';
 
 interface ReportTableProps {
   data: InvestmentData[];
-  currency: Currency;
-  onExportCSV?: () => void;
-  onUpdateDailyReturnInReport?: (day: number, newReturn: number) => void;
-  onUpdatePACInReport?: (day: number, newPAC: number) => void;
+  currency: string;
+  onItemEdit?: (item: InvestmentData) => void;
   onRemoveCustomReturn?: (day: number) => void;
   onRemovePACOverride?: (day: number) => void;
-  defaultPACAmount?: number;
-  investmentStartDate?: Date;
-  currentConfigId?: string | null;
-  currentConfigName?: string | null;
-  onSaveToStrategy?: () => Promise<void>;
 }
 
 const ReportTable: React.FC<ReportTableProps> = ({
   data,
   currency,
+  onItemEdit,
   onRemoveCustomReturn,
   onRemovePACOverride
 }) => {
@@ -71,7 +65,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
     if (currentConfigId) {
       try {
         console.log('🔄 ReportTable: Saving to strategy', currentConfigId);
-        await updateCurrentConfiguration(currentConfigId, currentConfigName || 'Strategia');
+        await updateCurrentConfiguration(currentConfigId, config, {});
         toast({
           title: "Strategia aggiornata",
           description: `La strategia "${currentConfigName}" è stata aggiornata con successo`,
