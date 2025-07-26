@@ -152,8 +152,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   const handlePacAmountInputChange = (value: string) => {
     setPacAmountInput(value);
-    // Non aggiornare il valore numerico se l'input è incompleto (es: "100." o "100,")
-    if (value.endsWith('.') || value.endsWith(',') || value === '') {
+    // Permetti input temporanei come "0", "0.", "0.5", etc.
+    if (value === '' || value === '0' || value.endsWith('.') || value.endsWith(',')) {
       return;
     }
     const numValue = parseFloat(value);
