@@ -38,6 +38,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 }) => {
   const [returnRate, setReturnRate] = useState<number>(0);
   const [pacAmount, setPacAmount] = useState<number>(0);
+  const [returnRateInput, setReturnRateInput] = useState<string>('');
+  const [pacAmountInput, setPacAmountInput] = useState<string>('');
   const [hasChanges, setHasChanges] = useState(false);
   
   // Store the original config ID to use for saving even if it becomes null during modifications
@@ -48,6 +50,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     if (item) {
       setReturnRate(item.dailyReturn);
       setPacAmount(item.pacAmount);
+      setReturnRateInput(item.dailyReturn.toString());
+      setPacAmountInput(item.pacAmount.toFixed(2));
       setHasChanges(false);
     }
   }, [item]);
@@ -127,9 +131,48 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     onOpenChange(false);
   };
 
+  const handleReturnRateInputChange = (value: string) => {
+    setReturnRateInput(value);
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      setReturnRate(numValue);
+      setReturnRateInput(numValue.toString());
+    }
+  };
+
+  const handleReturnRateInputBlur = () => {
+    const numValue = parseFloat(returnRateInput);
+    if (isNaN(numValue)) {
+      setReturnRateInput(returnRate.toString());
+    } else {
+      setReturnRate(numValue);
+      setReturnRateInput(numValue.toString());
+    }
+  };
+
+  const handlePacAmountInputChange = (value: string) => {
+    setPacAmountInput(value);
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 0) {
+      setPacAmount(numValue);
+    }
+  };
+
+  const handlePacAmountInputBlur = () => {
+    const numValue = parseFloat(pacAmountInput);
+    if (isNaN(numValue) || numValue < 0) {
+      setPacAmountInput(pacAmount.toFixed(2));
+    } else {
+      setPacAmount(numValue);
+      setPacAmountInput(numValue.toFixed(2));
+    }
+  };
+
   const handleCancel = () => {
     setReturnRate(item.dailyReturn);
     setPacAmount(item.pacAmount);
+    setReturnRateInput(item.dailyReturn.toString());
+    setPacAmountInput(item.pacAmount.toFixed(2));
     setHasChanges(false);
     onOpenChange(false);
   };
@@ -182,10 +225,11 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                   <Label htmlFor="return-input" className="text-sm">Percentuale (%)</Label>
                   <Input
                     id="return-input"
-                    type="number"
-                    value={returnRate}
-                    onChange={(e) => setReturnRate(Number(e.target.value) || 0)}
-                    step={0.001}
+                    type="text"
+                    inputMode="decimal"
+                    value={returnRateInput}
+                    onChange={(e) => handleReturnRateInputChange(e.target.value)}
+                    onBlur={handleReturnRateInputBlur}
                     placeholder="Es: 0.500"
                     className="font-mono"
                   />
@@ -204,7 +248,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                 <Label className="text-sm text-muted-foreground">Regola con il cursore</Label>
                 <Slider
                   value={[returnRate]}
-                  onValueChange={(value) => setReturnRate(value[0])}
+                  onValueChange={(value) => {
+                    setReturnRate(value[0]);
+                    setReturnRateInput(value[0].toString());
+                  }}
                   min={-10}
                   max={10}
                   step={0.01}
@@ -237,11 +284,12 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                   <Label htmlFor="pac-input" className="text-sm">Importo ({currency})</Label>
                   <Input
                     id="pac-input"
-                    type="number"
-                    value={pacAmount.toFixed(2)}
-                    onChange={(e) => setPacAmount(Number(e.target.value))}
-                    min={0}
-                    step={1}
+                    type="text"
+                    inputMode="decimal"
+                    value={pacAmountInput}
+                    onChange={(e) => handlePacAmountInputChange(e.target.value)}
+                    onBlur={handlePacAmountInputBlur}
+                    placeholder="Es: 100.00"
                     className="font-mono"
                   />
                 </div>
