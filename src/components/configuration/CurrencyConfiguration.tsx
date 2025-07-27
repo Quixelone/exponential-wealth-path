@@ -16,6 +16,10 @@ const CurrencyConfiguration: React.FC<CurrencyConfigurationProps> = ({
   selectedCurrency,
   onCurrencyChange
 }) => {
+  // Debug currency changes
+  React.useEffect(() => {
+    console.log('💱 CurrencyConfiguration currency updated:', selectedCurrency);
+  }, [selectedCurrency]);
   const currencies = [
     { value: 'EUR' as Currency, label: 'Euro (€)', symbol: '€' },
     { value: 'USD' as Currency, label: 'US Dollar ($)', symbol: '$' },

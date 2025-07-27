@@ -103,14 +103,24 @@ const Index = () => {
     }
   };
 
+  // Debug currency propagation
+  React.useEffect(() => {
+    console.log('🏠 Index page config.currency updated:', config.currency);
+  }, [config.currency]);
+
   const renderMainContent = () => {
     return (
       <div className="space-y-6">
         {/* Statistics Cards */}
-        <StatisticsCards summary={summary} currency={config.currency} />
+        <StatisticsCards 
+          key={`stats-${config.currency}`}
+          summary={summary} 
+          currency={config.currency} 
+        />
         
         {/* Current Strategy Progress */}
         <CurrentStrategyProgress 
+          key={`progress-${config.currency}`}
           summary={summary} 
           currency={config.currency} 
           currentDayIndex={currentDayIndex}
@@ -153,18 +163,21 @@ const Index = () => {
           <TabsContent value="investments" className={`space-y-${isMobile ? '4' : '6'}`}>
             <div className="space-y-6">
               <InvestmentChart 
+                key={`chart-${config.currency}`}
                 data={investmentData} 
                 currency={config.currency}
                 currentDay={currentDayIndex}
               />
 
               <PerformanceVsPlan 
+                key={`performance-${config.currency}`}
                 data={investmentData}
                 currency={config.currency}
                 currentDay={Math.min(Math.floor((new Date().getTime() - new Date(config.pacConfig.startDate).getTime()) / (1000 * 60 * 60 * 24)), config.timeHorizon)}
               />
               
               <ReportTable 
+                key={`table-${config.currency}`}
                 data={investmentData} 
                 currency={config.currency}
                 onExportCSV={exportToCSV}

@@ -28,11 +28,19 @@ export function formatCurrency(
   currency: Currency = 'EUR',
   options?: { decimals?: number }
 ): string {
-  const locale = currencyLocales[currency];
-  const symbol = currencySymbols[currency];
+  // Ensure currency is always defined
+  const safeCurrency = currency || 'EUR';
+  
+  // Debug currency changes
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔄 formatCurrency called with:', { value, safeCurrency, options });
+  }
+  
+  const locale = currencyLocales[safeCurrency];
+  const symbol = currencySymbols[safeCurrency];
   
   // Per USDT usiamo un formato personalizzato dato che non è una valuta ISO standard
-  if (currency === 'USDT') {
+  if (safeCurrency === 'USDT') {
     return `${symbol}${new Intl.NumberFormat(locale, {
       minimumFractionDigits: options?.decimals ?? 2,
       maximumFractionDigits: options?.decimals ?? 2,
@@ -43,7 +51,7 @@ export function formatCurrency(
   // Per EUR e USD usiamo il formato standard Intl
   return new Intl.NumberFormat(locale, {
     style: "currency",
-    currency: currency,
+    currency: safeCurrency,
     minimumFractionDigits: options?.decimals ?? 2,
     maximumFractionDigits: options?.decimals ?? 2,
     useGrouping: true,

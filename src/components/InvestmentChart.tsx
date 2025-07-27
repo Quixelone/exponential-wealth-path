@@ -34,6 +34,10 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
   showProjections = false,
   currentDay
 }) => {
+  // Debug currency changes and force re-render
+  React.useEffect(() => {
+    console.log('📈 InvestmentChart currency updated:', currency);
+  }, [currency]);
   const formatTooltip = (value: any, name: string) => {
     if (name === 'finalCapital') {
       return [formatCurrency(value, currency), 'Capitale Totale'];

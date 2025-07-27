@@ -38,6 +38,11 @@ const ReportTable: React.FC<ReportTableProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Debug currency changes
+  React.useEffect(() => {
+    console.log('📋 ReportTable currency updated:', currency);
+  }, [currency]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InvestmentData | null>(null);
   const hasManuallyNavigated = useRef(false);
