@@ -133,10 +133,13 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   const handleReturnRateInputChange = (value: string) => {
     setReturnRateInput(value);
+    // Permetti input temporanei come "0", "0.", "-0.5", etc.
+    if (value === '' || value === '0' || value === '-0' || value.endsWith('.') || value.endsWith(',')) {
+      return;
+    }
     const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
       setReturnRate(numValue);
-      setReturnRateInput(numValue.toString());
     }
   };
 
