@@ -1,4 +1,3 @@
-
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -33,7 +32,7 @@ export function formatCurrency(
   
   // Debug currency changes
   if (process.env.NODE_ENV === 'development') {
-    console.log('🔄 formatCurrency called with:', { value, safeCurrency, options });
+    console.log('💰 formatCurrency called with:', { value, safeCurrency, options });
   }
   
   const locale = currencyLocales[safeCurrency];

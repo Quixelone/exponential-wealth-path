@@ -20,6 +20,11 @@ const CurrencyConfiguration: React.FC<CurrencyConfigurationProps> = ({
   React.useEffect(() => {
     console.log('💱 CurrencyConfiguration currency updated:', selectedCurrency);
   }, [selectedCurrency]);
+  const handleCurrencyChange = (value: Currency) => {
+    console.log('💱 CurrencyConfiguration: Changing currency to:', value);
+    onCurrencyChange(value);
+  };
+
   const currencies = [
     { value: 'EUR' as Currency, label: 'Euro (€)', symbol: '€' },
     { value: 'USD' as Currency, label: 'US Dollar ($)', symbol: '$' },
@@ -39,7 +44,7 @@ const CurrencyConfiguration: React.FC<CurrencyConfigurationProps> = ({
           <Label htmlFor="currency-select">Seleziona Valuta</Label>
           <Select
             value={selectedCurrency}
-            onValueChange={(value: Currency) => onCurrencyChange(value)}
+            onValueChange={handleCurrencyChange}
           >
             <SelectTrigger id="currency-select">
               <SelectValue placeholder="Seleziona una valuta" />

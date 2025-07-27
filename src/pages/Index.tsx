@@ -113,14 +113,14 @@ const Index = () => {
       <div className="space-y-6">
         {/* Statistics Cards */}
         <StatisticsCards 
-          key={`stats-${config.currency}`}
+          key={`stats-${config.currency}-${Date.now()}`}
           summary={summary} 
           currency={config.currency} 
         />
         
         {/* Current Strategy Progress */}
         <CurrentStrategyProgress 
-          key={`progress-${config.currency}`}
+          key={`progress-${config.currency}-${Date.now()}`}
           summary={summary} 
           currency={config.currency} 
           currentDayIndex={currentDayIndex}
@@ -163,21 +163,21 @@ const Index = () => {
           <TabsContent value="investments" className={`space-y-${isMobile ? '4' : '6'}`}>
             <div className="space-y-6">
               <InvestmentChart 
-                key={`chart-${config.currency}`}
+                key={`chart-${config.currency}-${Date.now()}`}
                 data={investmentData} 
                 currency={config.currency}
                 currentDay={currentDayIndex}
               />
 
               <PerformanceVsPlan 
-                key={`performance-${config.currency}`}
+                key={`performance-${config.currency}-${Date.now()}`}
                 data={investmentData}
                 currency={config.currency}
                 currentDay={Math.min(Math.floor((new Date().getTime() - new Date(config.pacConfig.startDate).getTime()) / (1000 * 60 * 60 * 24)), config.timeHorizon)}
               />
               
               <ReportTable 
-                key={`table-${config.currency}`}
+                key={`table-${config.currency}-${Date.now()}`}
                 data={investmentData} 
                 currency={config.currency}
                 onExportCSV={exportToCSV}
