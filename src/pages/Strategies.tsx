@@ -69,6 +69,9 @@ const Strategies: React.FC = () => {
             title: "Strategia creata",
             description: `La strategia "${name}" è stata creata copiando la configurazione corrente.`,
           });
+          
+          // Navigate to main page to configure the new strategy
+          navigate('/');
           // Non ricaricare le configurazioni per evitare di sovrascrivere la selezione corrente
         } else {
           console.error('❌ Strategies: Save returned null/false');

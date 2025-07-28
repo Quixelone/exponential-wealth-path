@@ -164,6 +164,12 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         pacConfig={config.pacConfig}
         onPACConfigChange={(pacConfigUpdate) => onConfigChange({ pacConfig: { ...config.pacConfig, ...pacConfigUpdate } }, true)}
         currency={config.currency || 'EUR'}
+        customReturns={customReturns}
+        onUpdateDailyReturn={onUpdateDailyReturn}
+        onRemoveDailyReturn={onRemoveDailyReturn}
+        dailyPACOverrides={dailyPACOverrides}
+        onUpdatePACForDay={onUpdatePACForDay}
+        onRemovePACOverride={onRemovePACOverride}
       />
 
       {/* Export */}
