@@ -22,6 +22,7 @@ interface PACPaymentModifierProps {
   onUpdatePayment: (paymentId: string, newAmount: number, newDate: string) => void;
   onTogglePayment: (paymentId: string, isActive: boolean) => void;
   onAddPayment: (amount: number, date: string) => void;
+  currency?: 'EUR' | 'USD' | 'USDT';
 }
 
 const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
@@ -29,7 +30,8 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
   pacFrequency,
   onUpdatePayment,
   onTogglePayment,
-  onAddPayment
+  onAddPayment,
+  currency = 'EUR'
 }) => {
   const [payments, setPayments] = useState<PACPayment[]>([
     {
@@ -66,7 +68,7 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
   const [newPaymentDate, setNewPaymentDate] = useState('');
 
   const formatCurrencyValue = (value: number, whole = false) => {
-    return whole ? formatCurrencyWhole(value) : formatCurrency(value);
+    return whole ? formatCurrencyWhole(value, currency) : formatCurrency(value, currency);
   };
 
   const calculateNextPaymentDate = (startDate: string, frequency: string): string => {
@@ -290,7 +292,7 @@ const PACPaymentModifier: React.FC<PACPaymentModifierProps> = ({
                   ) : (
                     <div className="mb-2">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium">{formatCurrency(payment.amount)}</span>
+                        <span className="font-medium">{formatCurrency(payment.amount, currency)}</span>
                         <Badge className={`text-xs px-2 py-1 ${getStatusColor(payment.status)}`}>
                           {getStatusText(payment.status)}
                         </Badge>

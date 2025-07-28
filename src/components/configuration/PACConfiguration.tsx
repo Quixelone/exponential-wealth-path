@@ -16,12 +16,14 @@ interface PACConfigurationProps {
   pacConfig: PACConfig;
   onPACConfigChange: (config: Partial<PACConfig>) => void;
   nextPACInfo?: { nextPACDay: number; description: string };
+  currency?: 'EUR' | 'USD' | 'USDT';
 }
 
 const PACConfiguration: React.FC<PACConfigurationProps> = ({
   pacConfig,
   onPACConfigChange,
-  nextPACInfo
+  nextPACInfo,
+  currency = 'EUR'
 }) => {
   const handleDateChange = (date: Date | undefined) => {
     if (date) {
@@ -47,14 +49,20 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="pac-amount">Importo Rata</Label>
-          <Input
-            id="pac-amount"
-            type="number"
-            value={pacConfig.amount}
-            onChange={(e) => onPACConfigChange({ amount: Number(e.target.value) })}
-            min={0}
-            step={10}
-          />
+          <div className="relative">
+            <Input
+              id="pac-amount"
+              type="number"
+              value={pacConfig.amount}
+              onChange={(e) => onPACConfigChange({ amount: Number(e.target.value) })}
+              min={0}
+              step={10}
+              className="pr-12"
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <span className="text-sm text-muted-foreground">{currency}</span>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">

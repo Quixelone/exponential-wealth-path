@@ -163,6 +163,7 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       <PACConfiguration
         pacConfig={config.pacConfig}
         onPACConfigChange={(pacConfigUpdate) => onConfigChange({ pacConfig: { ...config.pacConfig, ...pacConfigUpdate } }, true)}
+        currency={config.currency || 'EUR'}
       />
 
       {/* Export */}

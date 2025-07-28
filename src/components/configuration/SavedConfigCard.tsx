@@ -64,7 +64,7 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
         <div className="grid grid-cols-2 gap-3 text-xs mb-4 flex-1">
           <div className="space-y-1">
             <span className="text-muted-foreground block">Capitale:</span>
-            <div className="font-medium truncate">{formatCurrencyWhole(savedConfig.config.initialCapital)}</div>
+            <div className="font-medium truncate">{formatCurrencyWhole(savedConfig.config.initialCapital, savedConfig.config.currency || 'EUR')}</div>
           </div>
           <div className="space-y-1">
             <span className="text-muted-foreground block">Giorni:</span>
@@ -72,7 +72,7 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
           </div>
           <div className="space-y-1">
             <span className="text-muted-foreground block">PAC:</span>
-            <div className="font-medium truncate">{formatCurrencyWhole(savedConfig.config.pacConfig.amount)}</div>
+            <div className="font-medium truncate">{formatCurrencyWhole(savedConfig.config.pacConfig.amount, savedConfig.config.currency || 'EUR')}</div>
           </div>
           <div className="space-y-1">
             <span className="text-muted-foreground block">Frequenza:</span>
