@@ -50,17 +50,22 @@ const persistConfigName = (configName: string) => {
 };
 
 // Stato di default configurazione investimento
-export const getDefaultConfig = (): InvestmentConfig & { currency: Currency } => ({
-  initialCapital: 1000,
-  timeHorizon: 1000,
-  dailyReturnRate: 0.2,
-  currency: 'EUR' as Currency,
-  pacConfig: {
-    amount: 100,
-    frequency: 'weekly',
-    startDate: new Date(), // Sempre oggi
-  }
-});
+export const getDefaultConfig = (): InvestmentConfig & { currency: Currency } => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Normalizza a 00:00:00 per evitare problemi di timezone
+  
+  return {
+    initialCapital: 1000,
+    timeHorizon: 1000,
+    dailyReturnRate: 0.2,
+    currency: 'EUR' as Currency,
+    pacConfig: {
+      amount: 100,
+      frequency: 'weekly',
+      startDate: today,
+    }
+  };
+};
 
 export const useInvestmentConfigState = () => {
   // Initialize with empty state first, will be populated based on persistence logic
@@ -150,7 +155,7 @@ export const useInvestmentConfigState = () => {
     setCurrentConfigName('');
     setConfig({
       ...getDefaultConfig(),
-      pacConfig: { ...getDefaultConfig().pacConfig, startDate: new Date() }, // startDate sempre oggi
+      pacConfig: { ...getDefaultConfig().pacConfig, startDate: getDefaultConfig().pacConfig.startDate }, // Usa la data normalizzata
     });
     clearHistory(); // Reset history when creating new configuration
   }, [resetCustomData, saveConfigurationToHistory, clearHistory, setCurrentConfigId, setCurrentConfigName]);
