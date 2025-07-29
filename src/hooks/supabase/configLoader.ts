@@ -4,6 +4,7 @@ import { InvestmentConfig } from '@/types/investment';
 import { SavedConfiguration } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthValidation } from './configValidation';
+import { Currency } from '@/lib/utils';
 
 export const useConfigLoader = () => {
   const { toast } = useToast();
@@ -57,6 +58,7 @@ export const useConfigLoader = () => {
           initialCapital: dbConfig.initial_capital,
           timeHorizon: dbConfig.time_horizon,
           dailyReturnRate: dbConfig.daily_return_rate,
+          currency: (dbConfig.currency as Currency) || 'EUR',
           pacConfig: {
             amount: dbConfig.pac_amount,
             frequency: dbConfig.pac_frequency as 'daily' | 'weekly' | 'monthly' | 'custom',

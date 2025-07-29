@@ -79,13 +79,11 @@ export const useInvestmentConfigState = () => {
 
   // Enhanced setters that persist to localStorage
   const setCurrentConfigId = useCallback((configId: string | null) => {
-    console.log('🔄 investmentConfigState: Setting currentConfigId', { configId, persist: true });
     setCurrentConfigIdState(configId);
     persistConfigId(configId);
   }, []);
 
   const setCurrentConfigName = useCallback((configName: string) => {
-    console.log('🔄 investmentConfigState: Setting currentConfigName', { configName, persist: true });
     setCurrentConfigNameState(configName);
     persistConfigName(configName);
   }, []);

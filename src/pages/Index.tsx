@@ -103,10 +103,6 @@ const Index = () => {
     }
   };
 
-  // Debug currency propagation
-  React.useEffect(() => {
-    console.log('🏠 Index page config.currency updated:', config.currency);
-  }, [config.currency]);
 
   const renderMainContent = () => {
     return (

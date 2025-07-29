@@ -30,10 +30,6 @@ export function formatCurrency(
   // Ensure currency is always defined
   const safeCurrency = currency || 'EUR';
   
-  // Debug currency changes
-  if (process.env.NODE_ENV === 'development') {
-    console.log('💰 formatCurrency called with:', { value, safeCurrency, options });
-  }
   
   const locale = currencyLocales[safeCurrency];
   const symbol = currencySymbols[safeCurrency];

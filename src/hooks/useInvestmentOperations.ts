@@ -33,10 +33,16 @@ export const useInvestmentOperations = ({
     const description = getConfigUpdateDescription(newConfig);
     saveConfigurationToHistory(description);
     
-    setConfig(prev => ({ ...prev, ...newConfig }));
+    // Ensure currency is always defined when updating
+    const configWithCurrency = {
+      ...newConfig,
+      currency: newConfig.currency || configState.config.currency || 'EUR'
+    };
     
-    // Mark as unsaved if we have a current config
-    if (configState.currentConfigId) {
+    setConfig(prev => ({ ...prev, ...configWithCurrency }));
+    
+    // Mark as unsaved if we have a current config (but don't for currency changes alone)
+    if (configState.currentConfigId && Object.keys(newConfig).some(key => key !== 'currency')) {
       setCurrentConfigId(null);
     }
     

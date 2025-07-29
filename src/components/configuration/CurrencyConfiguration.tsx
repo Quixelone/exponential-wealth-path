@@ -16,12 +16,7 @@ const CurrencyConfiguration: React.FC<CurrencyConfigurationProps> = ({
   selectedCurrency,
   onCurrencyChange
 }) => {
-  // Debug currency changes
-  React.useEffect(() => {
-    console.log('💱 CurrencyConfiguration currency updated:', selectedCurrency);
-  }, [selectedCurrency]);
   const handleCurrencyChange = (value: Currency) => {
-    console.log('💱 CurrencyConfiguration: Changing currency to:', value);
     onCurrencyChange(value);
   };
 

@@ -39,29 +39,21 @@ export const useConfigurationManager = () => {
 
   // Load saved configuration with enhanced persistence tracking
   const loadSavedConfiguration = useCallback((savedConfig: any) => {
-    console.log('🔄 ConfigurationManager: Loading saved configuration', { 
-      configId: savedConfig.id, 
-      name: savedConfig.name,
-      currentConfigId: configState.currentConfigId,
-      source: 'user_selection',
-      willPersist: true
-    });
-    
     // Save current state to history before loading new configuration
     saveConfigurationToHistory(`Caricamento configurazione: ${savedConfig.name}`);
     
+    // Ensure currency is always present when loading
+    const configWithCurrency = {
+      ...savedConfig.config,
+      currency: savedConfig.config.currency || 'EUR'
+    };
+    
     // Set all configuration data atomically - persistence is handled automatically
-    setConfig(savedConfig.config);
+    setConfig(configWithCurrency);
     setDailyReturns(savedConfig.dailyReturns);
     setDailyPACOverrides(savedConfig.dailyPACOverrides || {});
-    setCurrentConfigId(savedConfig.id); // This will persist to localStorage
-    setCurrentConfigName(savedConfig.name); // This will persist to localStorage
-    
-    console.log('✅ ConfigurationManager: Configuration loaded and persisted to localStorage', { 
-      newConfigId: savedConfig.id, 
-      newName: savedConfig.name,
-      source: 'user_selection'
-    });
+    setCurrentConfigId(savedConfig.id);
+    setCurrentConfigName(savedConfig.name);
   }, [setConfig, setDailyReturns, setDailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
   // Determina configurazione "salvata" attuale

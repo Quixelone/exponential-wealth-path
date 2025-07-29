@@ -70,8 +70,7 @@ const Strategies: React.FC = () => {
             description: `La strategia "${name}" è stata creata copiando la configurazione corrente.`,
           });
           
-          // Navigate to main page to configure the new strategy
-          navigate('/');
+          // Stay on strategies page after creating the configuration
           // Non ricaricare le configurazioni per evitare di sovrascrivere la selezione corrente
         } else {
           console.error('❌ Strategies: Save returned null/false');
@@ -82,12 +81,11 @@ const Strategies: React.FC = () => {
           });
         }
       } else {
-        // Crea una nuova strategia e naviga al dashboard
+        // Crea una nuova strategia e resta nella pagina strategie
         toast({
           title: "Nuova strategia",
-          description: "Redirecting al dashboard per configurare la nuova strategia.",
+          description: "Configura i parametri della nuova strategia.",
         });
-        navigate('/');
       }
     } catch (error) {
       console.error('❌ Strategies: Error creating configuration', error);
