@@ -5,7 +5,7 @@ import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import SavedConfigurationsPanel from '@/components/configuration/SavedConfigurationsPanel';
-import NewConfigurationButton from '@/components/configuration/NewConfigurationButton';
+import NewStrategyWizard from '@/components/configuration/NewStrategyWizard';
 import ConfigurationPanel from '@/components/ConfigurationPanel';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -101,6 +101,46 @@ const Strategies: React.FC = () => {
     }
   };
 
+  const handleWizardCreate = async (payload: {
+    name: string;
+    copyFromCurrent: boolean;
+    currency: 'EUR' | 'USD' | 'USDT';
+    params?: {
+      initialCapital: number;
+      timeHorizon: number;
+      dailyReturnRate: number;
+      pacAmount: number;
+      pacFrequency: 'daily' | 'weekly' | 'monthly' | 'custom';
+      pacCustomDays?: number;
+      pacStartDate: Date;
+    };
+  }) => {
+    const { name, copyFromCurrent, currency, params } = payload;
+    if (copyFromCurrent) {
+      await handleCreateNewConfiguration(name, true, currency);
+      return;
+    }
+
+    // Create new local configuration using quick params
+    createNewConfiguration();
+    updateConfig({
+      currency,
+      initialCapital: params?.initialCapital,
+      timeHorizon: params?.timeHorizon,
+      dailyReturnRate: params?.dailyReturnRate,
+      pacConfig: {
+        amount: params?.pacAmount ?? 0,
+        frequency: params?.pacFrequency ?? 'monthly',
+        customDays: params?.pacFrequency === 'custom' ? params?.pacCustomDays : undefined,
+        startDate: params?.pacStartDate ?? new Date(),
+      }
+    });
+
+    toast({
+      title: 'Nuova strategia',
+      description: `Strategia "${name}" creata. Imposta i parametri e salva quando pronto.`,
+    });
+  };
   const handleLoadConfiguration = (config: any) => {
     console.log('🔄 Strategies: Loading configuration', { configId: config.id, name: config.name });
     try {
@@ -291,10 +331,10 @@ const Strategies: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <NewConfigurationButton 
-              onCreateNew={handleCreateNewConfiguration}
+            <NewStrategyWizard
+              onCreate={handleWizardCreate}
               hasCurrentConfig={!!currentConfigId}
-              currentConfigName={currentConfigName || "Configurazione attuale"}
+              currentConfigName={currentConfigName || 'Configurazione attuale'}
             />
           </CardContent>
         </Card>
