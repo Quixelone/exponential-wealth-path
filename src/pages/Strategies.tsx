@@ -30,6 +30,7 @@ const Strategies: React.FC = () => {
   const {
     config,
     updateConfig,
+    createNewConfiguration,
     dailyReturns,
     updateDailyReturn,
     removeDailyReturn,
@@ -49,8 +50,8 @@ const Strategies: React.FC = () => {
     canRedo
   } = useInvestmentCalculator();
 
-  const handleCreateNewConfiguration = async (name: string, copyFromCurrent: boolean) => {
-    console.log('🔄 Strategies: Creating new configuration', { name, copyFromCurrent });
+  const handleCreateNewConfiguration = async (name: string, copyFromCurrent: boolean, currency: 'EUR' | 'USD' | 'USDT') => {
+    console.log('🔄 Strategies: Creating new configuration', { name, copyFromCurrent, currency });
     try {
       if (copyFromCurrent) {
         // Salva la configurazione corrente con il nuovo nome
@@ -81,12 +82,15 @@ const Strategies: React.FC = () => {
           });
         }
       } else {
-        // Crea una nuova strategia e resta nella pagina strategie
+        // Crea una nuova strategia base e imposta la valuta scelta
+        createNewConfiguration();
+        updateConfig({ currency });
         toast({
           title: "Nuova strategia",
-          description: "Configura i parametri della nuova strategia.",
+          description: `Strategia "${name}" creata. Imposta i parametri e salva quando pronto.`,
         });
       }
+
     } catch (error) {
       console.error('❌ Strategies: Error creating configuration', error);
       toast({

@@ -3,7 +3,7 @@ import React from 'react';
 import NewConfigurationDialog from './NewConfigurationDialog';
 
 interface NewConfigurationButtonProps {
-  onCreateNew: (name: string, copyFromCurrent: boolean) => void;
+  onCreateNew: (name: string, copyFromCurrent: boolean, currency: 'EUR' | 'USD' | 'USDT') => void;
   hasCurrentConfig: boolean;
   currentConfigName: string;
 }

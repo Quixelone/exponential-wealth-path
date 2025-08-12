@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Plus, AlertTriangle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface NewConfigurationDialogProps {
-  onCreateNew: (name: string, copyFromCurrent: boolean) => void;
+  onCreateNew: (name: string, copyFromCurrent: boolean, currency: 'EUR' | 'USD' | 'USDT') => void;
   hasCurrentConfig: boolean;
   currentConfigName: string;
 }
@@ -21,12 +22,14 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
   const [open, setOpen] = useState(false);
   const [configName, setConfigName] = useState('');
   const [createMode, setCreateMode] = useState<'empty' | 'copy'>('empty');
+  const [currency, setCurrency] = useState<'EUR' | 'USD' | 'USDT'>('EUR');
 
   const handleCreate = () => {
     if (configName.trim()) {
-      onCreateNew(configName.trim(), createMode === 'copy');
+      onCreateNew(configName.trim(), createMode === 'copy', currency);
       setConfigName('');
       setCreateMode('empty');
+      setCurrency('EUR');
       setOpen(false);
     }
   };
@@ -56,6 +59,29 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
               placeholder="Es: Strategia aggressiva"
               className="w-full"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="currency-select">Valuta</Label>
+            <Select
+              value={currency}
+              onValueChange={(val) => setCurrency(val as 'EUR' | 'USD' | 'USDT')}
+              disabled={createMode === 'copy'}
+            >
+              <SelectTrigger id="currency-select">
+                <SelectValue placeholder="Seleziona valuta" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="EUR">Euro (€)</SelectItem>
+                <SelectItem value="USD">US Dollar ($)</SelectItem>
+                <SelectItem value="USDT">Tether (USDT)</SelectItem>
+              </SelectContent>
+            </Select>
+            {createMode === 'copy' && (
+              <p className="text-xs text-muted-foreground">
+                La valuta verrà mantenuta uguale alla strategia copiata.
+              </p>
+            )}
           </div>
 
           {hasCurrentConfig && (
