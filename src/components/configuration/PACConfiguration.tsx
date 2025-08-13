@@ -11,8 +11,6 @@ import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { PACConfig } from '@/types/investment';
-import DailyReturnTracker from './DailyReturnTracker';
-import DailyPACTracker from './DailyPACTracker';
 import PACPaymentModifier from './PACPaymentModifier';
 
 interface PACConfigurationProps {
