@@ -207,12 +207,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => {
     try {
-      console.log('🚀 Starting registration process for:', email);
+      console.log('🚀 Starting registration with email verification for:', email);
       
       const userData: any = {
         email,
         password,
-        options: {}
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
       };
 
       if (firstName || lastName || phone) {

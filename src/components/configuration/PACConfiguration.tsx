@@ -155,34 +155,16 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
         </CardContent>
       </Card>
 
-      {/* Tracciamento rendimenti giornalieri */}
-      <DailyReturnTracker
-        timeHorizon={365}
-        customReturns={customReturns}
-        onUpdateDailyReturn={onUpdateDailyReturn}
-        onRemoveDailyReturn={onRemoveDailyReturn}
-      />
-
-      {/* Tracciamento modifiche PAC */}
+      {/* Solo PACPaymentModifier per versamenti programmati */}
       {pacConfig.frequency !== 'custom' && pacConfig.amount > 0 && (
-        <>
-          <DailyPACTracker
-            timeHorizon={365}
-            dailyPACOverrides={dailyPACOverrides}
-            onUpdatePACForDay={onUpdatePACForDay}
-            onRemovePACOverride={onRemovePACOverride}
-            defaultPACAmount={pacConfig.amount}
-            currency={currency}
-          />
-          <PACPaymentModifier
-            pacAmount={pacConfig.amount}
-            pacFrequency={pacConfig.frequency}
-            onUpdatePayment={() => {}}
-            onTogglePayment={() => {}}
-            onAddPayment={() => {}}
-            currency={currency}
-          />
-        </>
+        <PACPaymentModifier
+          pacAmount={pacConfig.amount}
+          pacFrequency={pacConfig.frequency}
+          onUpdatePayment={() => {}}
+          onTogglePayment={() => {}}
+          onAddPayment={() => {}}
+          currency={currency}
+        />
       )}
     </div>
   );

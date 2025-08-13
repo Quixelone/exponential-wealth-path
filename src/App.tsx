@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import Strategies from "./pages/Strategies";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
@@ -29,6 +30,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/strategies" element={<Strategies />} />
                 <Route path="/user-management" element={<UserManagement />} />
                 <Route path="/settings" element={<Settings />} />
