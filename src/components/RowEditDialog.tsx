@@ -60,7 +60,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     originalConfigName
   }), [currentConfigId, currentConfigName, originalConfigId, originalConfigName]);
 
-  // Debounced save per evitare salvataggi multipli - DEVE essere chiamato prima di qualsiasi early return
+  // Debounced save per evitare salvataggi multipli - DEVE essere definito dopo configData
   const debouncedSave = useDebouncedCallback(async () => {
     if (!item) return;
     
@@ -70,9 +70,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     console.log('🔄 RowEditDialog: Salvando modifiche giorno', item.day, {
       hasReturnChange,
       hasPacChange,
-      originalConfigId,
-      currentConfigId,
-      originalConfigName
+      configData
     });
     
     // Use the original config ID for saving, even if current one becomes null
