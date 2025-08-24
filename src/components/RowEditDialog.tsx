@@ -47,44 +47,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   const [originalConfigId, setOriginalConfigId] = useState<string | null>(null);
   const [originalConfigName, setOriginalConfigName] = useState<string>('');
 
-  useEffect(() => {
-    if (item) {
-      setReturnRate(item.dailyReturn);
-      setPacAmount(item.pacAmount);
-      setReturnRateInput(item.dailyReturn.toString());
-      setPacAmountInput(item.pacAmount.toFixed(2));
-      setHasChanges(false);
-    }
-  }, [item]);
-
-  // Store original config info when dialog opens
-  useEffect(() => {
-    if (open) {
-      setOriginalConfigId(currentConfigId);
-      setOriginalConfigName(currentConfigName || '');
-      console.log('🔄 RowEditDialog: Memorizzato ID strategia originale:', currentConfigId);
-    }
-  }, [open, currentConfigId, currentConfigName]);
-
-  useEffect(() => {
-    if (item) {
-      const returnChanged = Math.abs(returnRate - item.dailyReturn) > 0.001;
-      const pacChanged = Math.abs(pacAmount - item.pacAmount) > 0.01;
-      setHasChanges(returnChanged || pacChanged);
-    }
-  }, [returnRate, pacAmount, item]);
-
-  if (!item) return null;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('it-IT', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  // Debounced save per evitare salvataggi multipli
+  // Debounced save per evitare salvataggi multipli - DEVE essere chiamato prima di qualsiasi early return
   const debouncedSave = useDebouncedCallback(async () => {
     if (!item) return;
     
@@ -132,6 +95,43 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
       console.log('ℹ️ Modifiche applicate in memoria - nessuna strategia attiva da aggiornare');
     }
   }, 500);
+
+  useEffect(() => {
+    if (item) {
+      setReturnRate(item.dailyReturn);
+      setPacAmount(item.pacAmount);
+      setReturnRateInput(item.dailyReturn.toString());
+      setPacAmountInput(item.pacAmount.toFixed(2));
+      setHasChanges(false);
+    }
+  }, [item]);
+
+  // Store original config info when dialog opens
+  useEffect(() => {
+    if (open) {
+      setOriginalConfigId(currentConfigId);
+      setOriginalConfigName(currentConfigName || '');
+      console.log('🔄 RowEditDialog: Memorizzato ID strategia originale:', currentConfigId);
+    }
+  }, [open, currentConfigId, currentConfigName]);
+
+  useEffect(() => {
+    if (item) {
+      const returnChanged = Math.abs(returnRate - item.dailyReturn) > 0.001;
+      const pacChanged = Math.abs(pacAmount - item.pacAmount) > 0.01;
+      setHasChanges(returnChanged || pacChanged);
+    }
+  }, [returnRate, pacAmount, item]);
+
+  if (!item) return null;
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('it-IT', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
 
   const handleSave = async () => {
     await debouncedSave();
