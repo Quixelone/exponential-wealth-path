@@ -16,10 +16,7 @@ interface StatisticsCardsProps {
 }
 
 const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) => {
-  // Debug currency changes
-  React.useEffect(() => {
-    console.log('📊 StatisticsCards currency updated:', currency);
-  }, [currency]);
+  // Removed debug currency log to prevent unnecessary re-renders
   // Calcola valori derivati dal summary (usando la struttura corretta con current/final)
   const finalData = summary?.final || summary?.current || {};
   const currentData = summary?.current || {};

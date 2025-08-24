@@ -39,10 +39,10 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Debug currency changes
-  React.useEffect(() => {
-    console.log('📋 ReportTable currency updated:', currency);
-  }, [currency]);
+  // Rimuovo log di debug inutile
+  // React.useEffect(() => {
+  //   console.log('📋 ReportTable currency updated:', currency);
+  // }, [currency]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InvestmentData | null>(null);
   const hasManuallyNavigated = useRef(false);
@@ -79,20 +79,19 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
-  // Naviga automaticamente alla pagina contenente il giorno corrente SOLO se l'utente non ha mai navigato manualmente
+  // Naviga automaticamente alla pagina contenente il giorno corrente SOLO se necessario
   useEffect(() => {
-    if (currentInvestmentDay && !searchTerm && !hasManuallyNavigated.current) {
+    if (currentInvestmentDay && !searchTerm && !hasManuallyNavigated.current && data.length > 0) {
       const currentDayItem = data.find(item => item.day === currentInvestmentDay);
       if (currentDayItem) {
         const currentDayIndex = data.indexOf(currentDayItem);
         const pageWithCurrentDay = Math.floor(currentDayIndex / itemsPerPage) + 1;
         if (pageWithCurrentDay !== currentPage) {
-          console.log('🎯 Auto-navigating to page with current day:', pageWithCurrentDay);
           setCurrentPage(pageWithCurrentDay);
         }
       }
     }
-  }, [currentInvestmentDay, data, searchTerm, itemsPerPage]);
+  }, [currentInvestmentDay, searchTerm, itemsPerPage, data.length]); // Rimuovi 'data' dalle dependencies
 
   const handleEditRow = (item: InvestmentData) => {
     setSelectedItem(item);
@@ -134,16 +133,16 @@ const ReportTable: React.FC<ReportTableProps> = ({
     hasManuallyNavigated.current = false; // Reset del flag quando si filtra
   };
 
-  // Debug pagination state
-  console.log('📊 ReportTable pagination state:', {
-    currentPage,
-    totalPages,
-    filteredDataLength: filteredData.length,
-    itemsPerPage,
-    startIndex,
-    paginatedDataLength: paginatedData.length,
-    hasManuallyNavigated: hasManuallyNavigated.current
-  });
+  // Rimuovo i log di debug che causano re-render inutili
+  // console.log('📊 ReportTable pagination state:', {
+  //   currentPage,
+  //   totalPages, 
+  //   filteredDataLength: filteredData.length,
+  //   itemsPerPage,
+  //   startIndex,
+  //   paginatedDataLength: paginatedData.length,
+  //   hasManuallyNavigated: hasManuallyNavigated.current
+  // });
 
   return (
     <ModernTooltipProvider>

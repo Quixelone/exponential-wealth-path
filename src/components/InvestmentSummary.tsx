@@ -22,10 +22,7 @@ interface InvestmentSummaryProps {
 }
 
 const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary, currency }) => {
-  // Debug currency changes
-  React.useEffect(() => {
-    console.log('💰 InvestmentSummary currency updated:', currency);
-  }, [currency]);
+  // Removed debug currency log to prevent unnecessary re-renders
   const formatPercentage = (value: number) => {
     return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
   };

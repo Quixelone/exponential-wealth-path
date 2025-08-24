@@ -16,10 +16,7 @@ const PerformanceVsPlan: React.FC<PerformanceVsPlanProps> = ({
   currency, 
   currentDay 
 }) => {
-  // Debug currency changes
-  React.useEffect(() => {
-    console.log('🎯 PerformanceVsPlan currency updated:', currency);
-  }, [currency]);
+  // Removed debug currency log to prevent unnecessary re-renders
   // Calcola la performance dall'inizio al giorno attuale
   const calculatePerformanceVsPlan = () => {
     if (!data.length || currentDay === 0) {
