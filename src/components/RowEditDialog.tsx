@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,6 +47,19 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   const [originalConfigId, setOriginalConfigId] = useState<string | null>(null);
   const [originalConfigName, setOriginalConfigName] = useState<string>('');
 
+  // Stabilizza le funzioni con useCallback per evitare re-render
+  const stableOnUpdateDailyReturn = useCallback(onUpdateDailyReturn, [onUpdateDailyReturn]);
+  const stableOnUpdatePAC = useCallback(onUpdatePAC, [onUpdatePAC]);
+  const stableOnSaveToStrategy = useCallback(onSaveToStrategy || (() => Promise.resolve()), [onSaveToStrategy]);
+
+  // Memorizza i valori di configurazione per evitare cambi di riferimento
+  const configData = useMemo(() => ({
+    currentConfigId,
+    currentConfigName: currentConfigName || '',
+    originalConfigId,
+    originalConfigName
+  }), [currentConfigId, currentConfigName, originalConfigId, originalConfigName]);
+
   // Debounced save per evitare salvataggi multipli - DEVE essere chiamato prima di qualsiasi early return
   const debouncedSave = useDebouncedCallback(async () => {
     if (!item) return;
@@ -63,23 +76,23 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     });
     
     // Use the original config ID for saving, even if current one becomes null
-    if (originalConfigId && onSaveToStrategy && (hasReturnChange || hasPacChange)) {
+    if (configData.originalConfigId && stableOnSaveToStrategy && (hasReturnChange || hasPacChange)) {
       try {
-        console.log('✅ RowEditDialog: Usando ID strategia originale per il salvataggio:', originalConfigId);
+        console.log('✅ RowEditDialog: Usando ID strategia originale per il salvataggio:', configData.originalConfigId);
         
         // Prima applica le modifiche ai dati in memoria
         if (hasReturnChange) {
           console.log('🔄 Applicando modifica rendimento:', returnRate);
-          onUpdateDailyReturn(item.day, returnRate);
+          stableOnUpdateDailyReturn(item.day, returnRate);
         }
         if (hasPacChange) {
           console.log('🔄 Applicando modifica PAC:', pacAmount);
-          onUpdatePAC(item.day, pacAmount);
+          stableOnUpdatePAC(item.day, pacAmount);
         }
         
         // Poi salva immediatamente la strategia
-        await onSaveToStrategy();
-        console.log('✅ Modifiche salvate automaticamente nella strategia:', originalConfigName);
+        await stableOnSaveToStrategy();
+        console.log('✅ Modifiche salvate automaticamente nella strategia:', configData.originalConfigName);
       } catch (error) {
         console.error('❌ Errore salvando la strategia:', error);
       }
@@ -87,10 +100,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
       // Se non c'è strategia attiva, applica solo le modifiche in memoria
       console.log('ℹ️ Nessuna strategia attiva, applicando solo modifiche in memoria');
       if (hasReturnChange) {
-        onUpdateDailyReturn(item.day, returnRate);
+        stableOnUpdateDailyReturn(item.day, returnRate);
       }
       if (hasPacChange) {
-        onUpdatePAC(item.day, pacAmount);
+        stableOnUpdatePAC(item.day, pacAmount);
       }
       console.log('ℹ️ Modifiche applicate in memoria - nessuna strategia attiva da aggiornare');
     }
@@ -106,14 +119,14 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     }
   }, [item]);
 
-  // Store original config info when dialog opens
+  // Store original config info when dialog opens - usa configData memorizzato
   useEffect(() => {
     if (open) {
-      setOriginalConfigId(currentConfigId);
-      setOriginalConfigName(currentConfigName || '');
-      console.log('🔄 RowEditDialog: Memorizzato ID strategia originale:', currentConfigId);
+      setOriginalConfigId(configData.currentConfigId);
+      setOriginalConfigName(configData.currentConfigName);
+      console.log('🔄 RowEditDialog: Memorizzato ID strategia originale:', configData.currentConfigId);
     }
-  }, [open, currentConfigId, currentConfigName]);
+  }, [open, configData.currentConfigId, configData.currentConfigName]);
 
   useEffect(() => {
     if (item) {

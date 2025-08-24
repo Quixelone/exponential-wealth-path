@@ -9,6 +9,10 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
   delay: number
 ): T {
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const callbackRef = useRef(callback);
+  
+  // Mantieni sempre il callback più recente
+  callbackRef.current = callback;
 
   return useCallback(
     ((...args: any[]) => {
@@ -19,9 +23,9 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
 
       // Crea un nuovo timeout
       timeoutRef.current = setTimeout(() => {
-        callback(...args);
+        callbackRef.current(...args);
       }, delay);
     }) as T,
-    [callback, delay]
+    [delay] // Rimuovi callback dalle dependencies per stabilità
   );
 }
