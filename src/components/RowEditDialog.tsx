@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { TrendingUp, TrendingDown, Calendar, PiggyBank, Percent, Save, X } from 'lucide-react';
 import { InvestmentData } from '@/types/investment';
 import { formatCurrency, Currency } from '@/lib/utils';
+import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
 
 interface RowEditDialogProps {
   open: boolean;
@@ -83,7 +84,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     });
   };
 
-  const handleSave = async () => {
+  // Debounced save per evitare salvataggi multipli
+  const debouncedSave = useDebouncedCallback(async () => {
+    if (!item) return;
+    
     const hasReturnChange = Math.abs(returnRate - item.dailyReturn) > 0.001;
     const hasPacChange = Math.abs(pacAmount - item.pacAmount) > 0.01;
     
@@ -127,7 +131,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
       }
       console.log('ℹ️ Modifiche applicate in memoria - nessuna strategia attiva da aggiornare');
     }
-    
+  }, 500);
+
+  const handleSave = async () => {
+    await debouncedSave();
     onOpenChange(false);
   };
 
