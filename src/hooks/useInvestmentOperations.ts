@@ -41,10 +41,7 @@ export const useInvestmentOperations = ({
     
     setConfig(prev => ({ ...prev, ...configWithCurrency }));
     
-    // Mark as unsaved if we have a current config (but don't for currency changes alone)
-    if (configState.currentConfigId && Object.keys(newConfig).some(key => key !== 'currency')) {
-      setCurrentConfigId(null);
-    }
+    // No longer automatically mark as unsaved - user controls when to save
     
     if (
       reset ||
@@ -65,10 +62,7 @@ export const useInvestmentOperations = ({
       [day]: returnRate
     }));
     
-    // Mark as unsaved
-    if (configState.currentConfigId) {
-      setCurrentConfigId(null);
-    }
+    // No longer automatically mark as unsaved - user controls when to save
   }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const removeDailyReturn = useCallback((day: number) => {
@@ -80,10 +74,7 @@ export const useInvestmentOperations = ({
       return newReturns;
     });
     
-    // Mark as unsaved
-    if (configState.currentConfigId) {
-      setCurrentConfigId(null);
-    }
+    // No longer automatically mark as unsaved - user controls when to save
   }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const updatePACForDay = useCallback((day: number, pacAmount: number) => {
@@ -97,10 +88,7 @@ export const useInvestmentOperations = ({
       return updated;
     });
     
-    // Mark as unsaved
-    if (configState.currentConfigId) {
-      setCurrentConfigId(null);
-    }
+    // No longer automatically mark as unsaved - user controls when to save
   }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const removePACOverride = useCallback((day: number) => {
@@ -112,10 +100,7 @@ export const useInvestmentOperations = ({
       return updated;
     });
     
-    // Mark as unsaved
-    if (configState.currentConfigId) {
-      setCurrentConfigId(null);
-    }
+    // No longer automatically mark as unsaved - user controls when to save
   }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
   const exportToCSV = useCallback(() => {

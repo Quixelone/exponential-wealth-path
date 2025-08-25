@@ -60,52 +60,29 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     originalConfigName
   }), [currentConfigId, currentConfigName, originalConfigId, originalConfigName]);
 
-  // Debounced save per evitare salvataggi multipli - DEVE essere definito dopo configData
-  const debouncedSave = useDebouncedCallback(async () => {
+  // Apply changes to memory only - no automatic Supabase saving
+  const applyChanges = useCallback(() => {
     if (!item) return;
     
     const hasReturnChange = Math.abs(returnRate - item.dailyReturn) > 0.001;
     const hasPacChange = Math.abs(pacAmount - item.pacAmount) > 0.01;
     
-    console.log('🔄 RowEditDialog: Salvando modifiche giorno', item.day, {
-      hasReturnChange,
-      hasPacChange,
-      configData
-    });
-    
-    // Use the original config ID for saving, even if current one becomes null
-    if (configData.originalConfigId && stableOnSaveToStrategy && (hasReturnChange || hasPacChange)) {
-      try {
-        console.log('✅ RowEditDialog: Usando ID strategia originale per il salvataggio:', configData.originalConfigId);
-        
-        // Prima applica le modifiche ai dati in memoria
-        if (hasReturnChange) {
-          console.log('🔄 Applicando modifica rendimento:', returnRate);
-          stableOnUpdateDailyReturn(item.day, returnRate);
-        }
-        if (hasPacChange) {
-          console.log('🔄 Applicando modifica PAC:', pacAmount);
-          stableOnUpdatePAC(item.day, pacAmount);
-        }
-        
-        // Poi salva immediatamente la strategia
-        await stableOnSaveToStrategy();
-        console.log('✅ Modifiche salvate automaticamente nella strategia:', configData.originalConfigName);
-      } catch (error) {
-        console.error('❌ Errore salvando la strategia:', error);
-      }
-    } else if (hasReturnChange || hasPacChange) {
-      // Se non c'è strategia attiva, applica solo le modifiche in memoria
-      console.log('ℹ️ Nessuna strategia attiva, applicando solo modifiche in memoria');
+    if (hasReturnChange || hasPacChange) {
+      console.log('🔄 RowEditDialog: Applicando modifiche in memoria per il giorno', item.day, {
+        hasReturnChange,
+        hasPacChange
+      });
+      
       if (hasReturnChange) {
         stableOnUpdateDailyReturn(item.day, returnRate);
       }
       if (hasPacChange) {
         stableOnUpdatePAC(item.day, pacAmount);
       }
-      console.log('ℹ️ Modifiche applicate in memoria - nessuna strategia attiva da aggiornare');
+      
+      console.log('✅ Modifiche applicate in memoria (no salvataggio automatico)');
     }
-  }, 500);
+  }, [item, returnRate, pacAmount, stableOnUpdateDailyReturn, stableOnUpdatePAC]);
 
   useEffect(() => {
     if (item) {
@@ -144,8 +121,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     });
   };
 
-  const handleSave = async () => {
-    await debouncedSave();
+  const handleSave = () => {
+    applyChanges();
     onOpenChange(false);
   };
 
@@ -367,10 +344,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
           {originalConfigId && originalConfigName && (
             <div className="mb-3 p-2 bg-primary/5 border border-primary/20 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                Stai modificando la strategia: <span className="font-medium text-primary">{originalConfigName}</span>
+                Strategia attiva: <span className="font-medium text-primary">{originalConfigName}</span>
               </p>
               <p className="text-xs text-muted-foreground">
-                Le modifiche verranno salvate automaticamente nella strategia esistente
+                Le modifiche saranno applicate alla configurazione. Usa il pulsante "Salva" nella configurazione per salvare su Supabase.
               </p>
             </div>
           )}
@@ -391,10 +368,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             >
               <Save className="h-4 w-4 mr-2" />
               <span className="sm:hidden">
-                {hasChanges ? (originalConfigId ? 'Aggiorna Strategia' : 'Salva') : 'Nessuna Modifica'}
+                {hasChanges ? 'Applica' : 'Nessuna Modifica'}
               </span>
               <span className="hidden sm:inline">
-                {hasChanges ? (originalConfigId ? 'Aggiorna Strategia' : 'Salva Modifiche') : 'Nessuna Modifica'}
+                {hasChanges ? 'Applica Modifiche' : 'Nessuna Modifica'}
               </span>
             </Button>
           </div>
