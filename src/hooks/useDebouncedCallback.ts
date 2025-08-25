@@ -4,10 +4,10 @@ import { useCallback, useRef } from 'react';
  * Hook per creare callback con debouncing
  * Previene chiamate multiple in rapida successione
  */
-export function useDebouncedCallback<T extends (...args: any[]) => any>(
+export const useDebouncedCallback = <T extends (...args: any[]) => any>(
   callback: T,
   delay: number
-): T {
+): T => {
   const timeoutRef = useRef<NodeJS.Timeout>();
   const callbackRef = useRef(callback);
   
@@ -28,4 +28,4 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     }) as T,
     [delay] // Rimuovi callback dalle dependencies per stabilità
   );
-}
+};
