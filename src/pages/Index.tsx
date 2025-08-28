@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, Bell, Settings } from 'lucide-react';
+import { TrendingUp, Bell, Settings, Target } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import InvestmentChart from '@/components/InvestmentChart';
 import ReportTable from '@/components/ReportTable';
 import PaymentReminders from '@/components/PaymentReminders';
@@ -113,6 +115,30 @@ const Index = () => {
           summary={summary} 
           currency={config.currency} 
         />
+        
+        {/* Strategy Header */}
+        <Card className="p-4 border-l-4 border-l-primary">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Target className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">
+                  {currentConfigName || "Strategia temporanea"}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {currentConfigId ? "Strategia salvata" : "Non salvata"}
+                </p>
+              </div>
+            </div>
+            {hasUnsavedChanges && (
+              <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
+                Modifiche non salvate
+              </Badge>
+            )}
+          </div>
+        </Card>
         
         {/* Current Strategy Progress */}
         <CurrentStrategyProgress 
