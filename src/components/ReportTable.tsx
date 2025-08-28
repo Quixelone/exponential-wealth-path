@@ -91,7 +91,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
         }
       }
     }
-  }, [currentInvestmentDay, searchTerm, itemsPerPage, data.length]); // Rimuovi 'data' dalle dependencies
+  }, [currentInvestmentDay, searchTerm, itemsPerPage]); // Rimosso data.length per evitare re-render continui
 
   const handleEditRow = (item: InvestmentData) => {
     setSelectedItem(item);
@@ -103,26 +103,16 @@ const ReportTable: React.FC<ReportTableProps> = ({
   };
 
   const handleNextPage = () => {
-    console.log('🔄 Next page clicked - Current page:', currentPage, 'Total pages:', totalPages);
-    hasManuallyNavigated.current = true; // Segna che l'utente ha navigato manualmente
+    hasManuallyNavigated.current = true;
     if (currentPage < totalPages) {
-      const newPage = currentPage + 1;
-      console.log('📄 Moving to page:', newPage);
-      setCurrentPage(newPage);
-    } else {
-      console.log('⚠️ Already on last page');
+      setCurrentPage(currentPage + 1);
     }
   };
 
   const handlePrevPage = () => {
-    console.log('🔄 Previous page clicked - Current page:', currentPage);
-    hasManuallyNavigated.current = true; // Segna che l'utente ha navigato manualmente
+    hasManuallyNavigated.current = true;
     if (currentPage > 1) {
-      const newPage = currentPage - 1;
-      console.log('📄 Moving to page:', newPage);
-      setCurrentPage(newPage);
-    } else {
-      console.log('⚠️ Already on first page');
+      setCurrentPage(currentPage - 1);
     }
   };
 
