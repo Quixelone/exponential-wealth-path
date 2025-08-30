@@ -12,6 +12,7 @@ export interface DatabaseConfig {
   pac_frequency: 'daily' | 'weekly' | 'monthly' | 'custom';
   pac_custom_days: number | null;
   pac_start_date: string;
+  use_real_btc_prices?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -38,6 +39,29 @@ export interface SavedConfiguration {
   config: InvestmentConfig;
   dailyReturns: { [day: number]: number };
   dailyPACOverrides: { [day: number]: number };
+  created_at: string;
+  updated_at: string;
+}
+
+// BTC tracking types
+export interface DatabaseBTCPrice {
+  id: string;
+  date: string;
+  price_usd: number;
+  source: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DatabaseActualTrade {
+  id: string;
+  config_id: string;
+  day: number;
+  trade_date: string;
+  btc_amount: number;
+  fill_price_usd: number;
+  trade_type: string;
+  notes?: string;
   created_at: string;
   updated_at: string;
 }

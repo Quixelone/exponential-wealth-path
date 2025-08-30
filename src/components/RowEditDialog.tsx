@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -193,7 +193,9 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             <Calendar className="h-6 w-6 text-primary" />
             Modifica Giorno {item.day}
           </DialogTitle>
-          <p className="text-muted-foreground">{formatDate(item.date)}</p>
+          <DialogDescription className="text-muted-foreground">
+            {formatDate(item.date)} - Modifica i parametri di rendimento e PAC per questo giorno specifico.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 overflow-y-auto flex-1 px-1">
