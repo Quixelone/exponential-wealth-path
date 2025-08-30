@@ -9,7 +9,9 @@ import InvestmentChart from '@/components/InvestmentChart';
 import ReportTable from '@/components/ReportTable';
 import PaymentReminders from '@/components/PaymentReminders';
 import PerformanceVsPlan from '@/components/PerformanceVsPlan';
+import { RealVsTheoreticalSummary } from '@/components/RealVsTheoreticalSummary';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
+import { useActualTrades } from '@/hooks/useActualTrades';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceInfo } from '@/hooks/use-mobile';
 import StatisticsCards from '@/components/dashboard/StatisticsCards';
@@ -51,6 +53,11 @@ const Index = () => {
     canUndo,
     canRedo
   } = useInvestmentCalculator();
+
+  // Load actual trades for the current configuration
+  const { trades: actualTrades } = useActualTrades({ 
+    configId: currentConfigId 
+  });
   // Redirect to auth if not logged in
   useEffect(() => {
     if (!user) {
@@ -148,6 +155,13 @@ const Index = () => {
           currentDayIndex={currentDayIndex}
           dailyReturns={dailyReturns}
           originalDailyReturnRate={config.dailyReturnRate}
+        />
+
+        {/* Real vs Theoretical Performance */}
+        <RealVsTheoreticalSummary
+          investmentData={investmentData}
+          actualTrades={actualTrades}
+          currency={config.currency || 'EUR'}
         />
 
         {/* Edit Strategy Button */}

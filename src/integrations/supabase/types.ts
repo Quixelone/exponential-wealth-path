@@ -7,13 +7,79 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      actual_trades: {
+        Row: {
+          btc_amount: number
+          config_id: string
+          created_at: string
+          day: number
+          fill_price_usd: number
+          id: string
+          notes: string | null
+          trade_date: string
+          trade_type: string
+          updated_at: string
+        }
+        Insert: {
+          btc_amount: number
+          config_id: string
+          created_at?: string
+          day: number
+          fill_price_usd: number
+          id?: string
+          notes?: string | null
+          trade_date: string
+          trade_type?: string
+          updated_at?: string
+        }
+        Update: {
+          btc_amount?: number
+          config_id?: string
+          created_at?: string
+          day?: number
+          fill_price_usd?: number
+          id?: string
+          notes?: string | null
+          trade_date?: string
+          trade_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      btc_prices: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          price_usd: number
+          source: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          price_usd: number
+          source?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          price_usd?: number
+          source?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       daily_pac_overrides: {
         Row: {
           config_id: string
@@ -92,6 +158,7 @@ export type Database = {
           pac_start_date: string
           time_horizon: number
           updated_at: string
+          use_real_btc_prices: boolean | null
           user_id: string | null
         }
         Insert: {
@@ -107,6 +174,7 @@ export type Database = {
           pac_start_date: string
           time_horizon: number
           updated_at?: string
+          use_real_btc_prices?: boolean | null
           user_id?: string | null
         }
         Update: {
@@ -122,6 +190,7 @@ export type Database = {
           pac_start_date?: string
           time_horizon?: number
           updated_at?: string
+          use_real_btc_prices?: boolean | null
           user_id?: string | null
         }
         Relationships: []

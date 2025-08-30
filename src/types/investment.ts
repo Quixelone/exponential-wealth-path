@@ -12,6 +12,11 @@ export interface InvestmentData {
   totalInterest: number;
   isCustomReturn?: boolean;
   isCustomPAC?: boolean; // FIX: Added property for custom PAC editing
+  // Real BTC tracking
+  realBTCPrice?: number;
+  realBTCValue?: number;
+  hasActualTrade?: boolean;
+  theoreticalVsRealDiff?: number;
 }
 
 export interface PACConfig {
@@ -30,6 +35,7 @@ export interface InvestmentConfig {
   dailyReturnRate: number;
   currency?: 'EUR' | 'USD' | 'USDT';
   pacConfig: PACConfig;
+  useRealBTCPrices?: boolean;
 }
 
 export interface ScenarioComparison {
@@ -42,4 +48,28 @@ export interface DailyReturnEntry {
   day: number;
   returnRate: number;
   date: string;
+}
+
+// BTC price tracking
+export interface BTCPrice {
+  id: string;
+  date: string;
+  price_usd: number;
+  source: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Actual trade tracking
+export interface ActualTrade {
+  id: string;
+  config_id: string;
+  day: number;
+  trade_date: string;
+  btc_amount: number;
+  fill_price_usd: number;
+  trade_type: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
 }

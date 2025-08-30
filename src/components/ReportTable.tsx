@@ -4,10 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3, Calendar, DollarSign, TrendingDown } from 'lucide-react';
 import { ModernTooltipProvider, ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/ModernTooltip';
 import { Currency, formatCurrency } from '@/lib/utils';
 import RowEditDialog from './RowEditDialog';
+import { TradeRecordDialog } from './TradeRecordDialog';
+import { useActualTrades } from '@/hooks/useActualTrades';
 
 interface ReportTableProps {
   data: InvestmentData[];
@@ -44,9 +46,15 @@ const ReportTable: React.FC<ReportTableProps> = ({
   //   console.log('📋 ReportTable currency updated:', currency);
   // }, [currency]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [tradeDialogOpen, setTradeDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InvestmentData | null>(null);
   const hasManuallyNavigated = useRef(false);
   const itemsPerPage = 20;
+
+  // Load actual trades
+  const { trades, loadTrades, getTradeForDay } = useActualTrades({ 
+    configId: currentConfigId 
+  });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit', day: '2-digit'});
@@ -96,6 +104,11 @@ const ReportTable: React.FC<ReportTableProps> = ({
   const handleEditRow = (item: InvestmentData) => {
     setSelectedItem(item);
     setEditDialogOpen(true);
+  };
+
+  const handleTradeRecord = (item: InvestmentData) => {
+    setSelectedItem(item);
+    setTradeDialogOpen(true);
   };
 
   const isCurrentDay = (dayNumber: number) => {
@@ -190,13 +203,15 @@ const ReportTable: React.FC<ReportTableProps> = ({
                   <TableHead className="text-right">% Ricavo</TableHead>
                   <TableHead className="text-right">Ricavo Giorno</TableHead>
                   <TableHead className="text-right font-mono">Capitale Finale</TableHead>
-                  <TableHead className="w-24 text-center">Azioni</TableHead>
+                  <TableHead className="text-right">Valore Reale</TableHead>
+                  <TableHead className="text-right">Differenza</TableHead>
+                  <TableHead className="w-32 text-center">Azioni</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
                       Nessun dato da visualizzare per i filtri applicati.
                     </TableCell>
                   </TableRow>
@@ -205,6 +220,10 @@ const ReportTable: React.FC<ReportTableProps> = ({
                     const dailyGain = item.interestEarnedDaily;
                     const isPositiveGain = dailyGain >= 0;
                     const isToday = isCurrentDay(item.day);
+                    const actualTrade = getTradeForDay(item.day);
+                    const realValue = actualTrade ? actualTrade.btc_amount * actualTrade.fill_price_usd : null;
+                    const difference = realValue ? realValue - item.finalCapital : null;
+                    const diffPercentage = difference && item.finalCapital > 0 ? (difference / item.finalCapital) * 100 : null;
 
                     return (
                       <TableRow 
@@ -244,22 +263,83 @@ const ReportTable: React.FC<ReportTableProps> = ({
                         <TableCell className={`text-right font-mono font-semibold ${isToday ? 'text-primary' : ''}`}>
                           {formatCurrency(item.finalCapital, currency)}
                         </TableCell>
+                        <TableCell className="text-right font-mono">
+                          {realValue ? (
+                            <span className="text-green-600 font-semibold">
+                              {formatCurrency(realValue, 'USD')}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right font-mono">
+                          {difference !== null ? (
+                            <div className="flex flex-col items-end">
+                              <span className={difference >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                {difference >= 0 ? '+' : ''}{formatCurrency(Math.abs(difference), 'USD')}
+                              </span>
+                              {diffPercentage !== null && (
+                                <span className={`text-xs ${diffPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  ({diffPercentage >= 0 ? '+' : ''}{diffPercentage.toFixed(2)}%)
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">-</span>
+                          )}
+                        </TableCell>
                         <TableCell className="text-center">
-                          <ModernTooltip>
-                            <ModernTooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEditRow(item)}
-                                className="h-8 px-2 text-primary hover:text-primary/80 hover:bg-primary/10"
-                              >
-                                <Edit3 className="h-4 w-4" />
-                              </Button>
-                            </ModernTooltipTrigger>
-                            <ModernTooltipContent>
-                              <p>Modifica rendimento e PAC per il giorno {item.day}</p>
-                            </ModernTooltipContent>
-                          </ModernTooltip>
+                          <div className="flex items-center justify-center gap-1">
+                            <ModernTooltip>
+                              <ModernTooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEditRow(item)}
+                                  className="h-8 px-2 text-primary hover:text-primary/80 hover:bg-primary/10"
+                                >
+                                  <Edit3 className="h-4 w-4" />
+                                </Button>
+                              </ModernTooltipTrigger>
+                              <ModernTooltipContent>
+                                <p>Modifica rendimento e PAC per il giorno {item.day}</p>
+                              </ModernTooltipContent>
+                            </ModernTooltip>
+                            
+                            {actualTrade ? (
+                              <ModernTooltip>
+                                <ModernTooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleTradeRecord(item)}
+                                    className="h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                  >
+                                    <DollarSign className="h-4 w-4" />
+                                  </Button>
+                                </ModernTooltipTrigger>
+                                <ModernTooltipContent>
+                                  <p>Trade registrato - Clicca per modificare</p>
+                                </ModernTooltipContent>
+                              </ModernTooltip>
+                            ) : (
+                              <ModernTooltip>
+                                <ModernTooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleTradeRecord(item)}
+                                    className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                  >
+                                    <TrendingDown className="h-4 w-4" />
+                                  </Button>
+                                </ModernTooltipTrigger>
+                                <ModernTooltipContent>
+                                  <p>Registra trade reale per il giorno {item.day}</p>
+                                </ModernTooltipContent>
+                              </ModernTooltip>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
@@ -325,6 +405,16 @@ const ReportTable: React.FC<ReportTableProps> = ({
         currentConfigName={currentConfigName}
         onSaveToStrategy={onSaveToStrategy}
       />
+
+      {selectedItem && (
+        <TradeRecordDialog
+          open={tradeDialogOpen}
+          onOpenChange={setTradeDialogOpen}
+          item={selectedItem}
+          configId={currentConfigId}
+          onTradeRecorded={loadTrades}
+        />
+      )}
     </ModernTooltipProvider>
   );
 };
