@@ -10,16 +10,27 @@ export interface SecurityEvent {
 
 export const logSecurityEvent = async (event: SecurityEvent) => {
   try {
-    // In a production environment, you might want to send this to a dedicated security logging service
     console.log('🔒 Security Event:', {
       timestamp: new Date().toISOString(),
       ...event
     });
 
-    // For now, we'll just log to console. In production, consider:
-    // - Sending to external security service (e.g., Datadog, Splunk)
-    // - Storing in dedicated security audit table
-    // - Triggering alerts for critical events
+    // Log to our security audit table
+    const { error } = await supabase
+      .from('security_audit_log')
+      .insert({
+        user_id: event.user_id || (await supabase.auth.getUser()).data.user?.id,
+        action: event.event_type,
+        table_name: 'security_events',
+        record_id: crypto.randomUUID(),
+        accessed_fields: Object.keys(event.details),
+        ip_address: event.ip_address,
+        user_agent: event.user_agent
+      });
+
+    if (error) {
+      console.error('Failed to log security event to database:', error);
+    }
     
   } catch (error) {
     console.error('Failed to log security event:', error);

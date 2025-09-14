@@ -286,8 +286,48 @@ export type Database = {
           },
         ]
       }
+      security_audit_log: {
+        Row: {
+          accessed_fields: string[] | null
+          action: string
+          admin_user_id: string | null
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          record_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          accessed_fields?: string[] | null
+          action: string
+          admin_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          record_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          accessed_fields?: string[] | null
+          action?: string
+          admin_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          record_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
+          admin_role: Database["public"]["Enums"]["admin_role_type"] | null
           avatar_url: string | null
           created_at: string | null
           email: string | null
@@ -302,6 +342,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          admin_role?: Database["public"]["Enums"]["admin_role_type"] | null
           avatar_url?: string | null
           created_at?: string | null
           email?: string | null
@@ -316,6 +357,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          admin_role?: Database["public"]["Enums"]["admin_role_type"] | null
           avatar_url?: string | null
           created_at?: string | null
           email?: string | null
@@ -381,9 +423,23 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_admin_with_role: {
+        Args: { required_role?: Database["public"]["Enums"]["admin_role_type"] }
+        Returns: boolean
+      }
       is_user_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      log_sensitive_access: {
+        Args: {
+          accessed_fields?: string[]
+          action_type: string
+          record_id: string
+          table_name: string
+          target_user_id?: string
+        }
+        Returns: undefined
       }
       update_user_login: {
         Args: { user_uuid: string }
@@ -391,7 +447,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      admin_role_type: "admin_readonly" | "admin_full" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -518,6 +574,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      admin_role_type: ["admin_readonly", "admin_full", "super_admin"],
+    },
   },
 } as const

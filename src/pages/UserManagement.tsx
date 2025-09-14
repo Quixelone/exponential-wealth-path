@@ -11,6 +11,7 @@ interface UserData {
   id: string;
   email: string | null;
   role: string;
+  admin_role: string | null;
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
@@ -116,7 +117,11 @@ const UserManagement = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
       <UserManagementHeader />
       <div className="max-w-7xl mx-auto p-6">
-        <UserManagementTabs users={users} onUpdateUserRole={updateUserRole} />
+      <UserManagementTabs 
+        users={users} 
+        onUpdateUserRole={updateUserRole}
+        onRefresh={fetchUsers}
+      />
       </div>
     </div>
   );
