@@ -13,6 +13,7 @@ import CurrencyConfiguration from './configuration/CurrencyConfiguration';
 import ExportSection from './configuration/ExportSection';
 import UndoRedoControls from './configuration/UndoRedoControls';
 import SaveConfigDialog from './configuration/SaveConfigDialog';
+import { PACPaymentReport } from './pac-payments/PACPaymentReport';
 import { Badge } from '@/components/ui/badge';
 
 interface ConfigurationPanelProps {
@@ -171,6 +172,15 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         onUpdatePACForDay={onUpdatePACForDay}
         onRemovePACOverride={onRemovePACOverride}
       />
+
+      {/* PAC Payment Report - Only show if we have a saved configuration */}
+      {currentConfigId && (
+        <PACPaymentReport
+          configId={currentConfigId}
+          config={{ ...config, id: currentConfigId }}
+          currency={config.currency || 'EUR'}
+        />
+      )}
 
       {/* Export */}
       <ExportSection onExportCSV={onExportCSV} />

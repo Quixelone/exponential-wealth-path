@@ -236,6 +236,48 @@ export type Database = {
           },
         ]
       }
+      pac_payments: {
+        Row: {
+          config_id: string
+          created_at: string
+          executed_amount: number | null
+          executed_date: string | null
+          execution_notes: string | null
+          id: string
+          is_executed: boolean
+          payment_method: string | null
+          scheduled_amount: number
+          scheduled_date: string
+          updated_at: string
+        }
+        Insert: {
+          config_id: string
+          created_at?: string
+          executed_amount?: number | null
+          executed_date?: string | null
+          execution_notes?: string | null
+          id?: string
+          is_executed?: boolean
+          payment_method?: string | null
+          scheduled_amount: number
+          scheduled_date: string
+          updated_at?: string
+        }
+        Update: {
+          config_id?: string
+          created_at?: string
+          executed_amount?: number | null
+          executed_date?: string | null
+          execution_notes?: string | null
+          id?: string
+          is_executed?: boolean
+          payment_method?: string | null
+          scheduled_amount?: number
+          scheduled_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_reminders: {
         Row: {
           amount: number | null
