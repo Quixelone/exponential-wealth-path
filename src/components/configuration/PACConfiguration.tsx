@@ -12,6 +12,7 @@ import { it } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { PACConfig } from '@/types/investment';
 import PACPaymentModifier from './PACPaymentModifier';
+import { PACPaymentTracker } from './PACPaymentTracker';
 
 interface PACConfigurationProps {
   pacConfig: PACConfig;
@@ -162,6 +163,20 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
           onTogglePayment={() => {}}
           onAddPayment={() => {}}
           currency={currency}
+        />
+      )}
+
+      {/* PAC Payment Tracker - Simple alert and checkbox system */}
+      {pacConfig.amount > 0 && pacConfig.startDate && (
+        <PACPaymentTracker
+          config={{ 
+            pacConfig,
+            timeHorizon: 365, // Default time horizon for tracking
+            initialCapital: 0,
+            dailyReturnRate: 0,
+            currency: 'EUR'
+          }}
+          dailyPACOverrides={dailyPACOverrides}
         />
       )}
     </div>
