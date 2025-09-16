@@ -12,7 +12,7 @@ import { formatCurrency } from '@/lib/utils';
 interface DailyPACTrackerProps {
   timeHorizon: number;
   dailyPACOverrides: { [day: number]: number };
-  onUpdatePACForDay: (day: number, pacAmount: number) => void;
+  onUpdatePACForDay: (day: number, pacAmount: number | null) => void;
   onRemovePACOverride: (day: number) => void;
   defaultPACAmount: number;
   currency: 'EUR' | 'USD' | 'USDT';

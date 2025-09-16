@@ -20,27 +20,28 @@ interface PACPayment {
 interface PACPaymentTrackerProps {
   config: InvestmentConfig;
   dailyPACOverrides?: { [day: number]: number };
+  onUpdatePACForDay?: (day: number, amount: number | null) => void;
+  onMarkPaymentComplete?: (day: number, isComplete: boolean) => void;
 }
 
 export const PACPaymentTracker: React.FC<PACPaymentTrackerProps> = ({
   config,
-  dailyPACOverrides = {}
+  dailyPACOverrides = {},
+  onUpdatePACForDay,
+  onMarkPaymentComplete
 }) => {
-  const [completedPayments, setCompletedPayments] = useState<Set<string>>(new Set());
+  const [completedPayments, setCompletedPayments] = useState<Set<number>>(new Set());
 
-  // Load completed payments from localStorage
+  // Initialize completed payments from dailyPACOverrides (use 0 amount as completed marker)
   useEffect(() => {
-    const saved = localStorage.getItem('pac-completed-payments');
-    if (saved) {
-      setCompletedPayments(new Set(JSON.parse(saved)));
-    }
-  }, []);
-
-  // Save completed payments to localStorage
-  const saveCompletedPayments = (payments: Set<string>) => {
-    localStorage.setItem('pac-completed-payments', JSON.stringify([...payments]));
-    setCompletedPayments(payments);
-  };
+    const completed = new Set<number>();
+    Object.entries(dailyPACOverrides).forEach(([day, amount]) => {
+      if (amount === 0) {
+        completed.add(parseInt(day));
+      }
+    });
+    setCompletedPayments(completed);
+  }, [dailyPACOverrides]);
 
   // Generate PAC payments based on configuration
   const payments = useMemo((): PACPayment[] => {
@@ -48,41 +49,48 @@ export const PACPaymentTracker: React.FC<PACPaymentTrackerProps> = ({
     const startDate = new Date(config.pacConfig.startDate);
     const today = new Date();
     let currentDate = new Date(startDate);
-    let dayCounter = 0;
+    let dayCounter = 1; // Start from day 1 to match database indices
 
     // Generate payments for the time horizon
-    while (dayCounter < config.timeHorizon) {
-      const paymentId = `${format(currentDate, 'yyyy-MM-dd')}-${dayCounter}`;
+    while (dayCounter <= config.timeHorizon) {
       const baseAmount = config.pacConfig.amount;
-      const overrideAmount = dailyPACOverrides[dayCounter + 1];
+      const overrideAmount = dailyPACOverrides[dayCounter];
       const amount = overrideAmount !== undefined ? overrideAmount : baseAmount;
+      
+      // Only include payments that should happen based on frequency
+      const shouldIncludePayment = (() => {
+        switch (config.pacConfig.frequency) {
+          case 'daily':
+            return true;
+          case 'weekly':
+            return (dayCounter - 1) % 7 === 0;
+          case 'monthly':
+            return (dayCounter - 1) % 30 === 0;
+          case 'custom':
+            return (dayCounter - 1) % (config.pacConfig.customDays || 1) === 0;
+          default:
+            return false;
+        }
+      })();
 
-      if (amount > 0) {
-        payments.push({
-          id: paymentId,
-          date: new Date(currentDate),
-          amount,
-          isCompleted: completedPayments.has(paymentId),
-          isOverdue: isBefore(currentDate, today) && !isToday(currentDate),
-          isToday: isToday(currentDate)
-        });
+      if (shouldIncludePayment) {
+        const isCompleted = completedPayments.has(dayCounter);
+        const isScheduledAmount = amount > 0 && !isCompleted;
+        
+        if (isScheduledAmount || isCompleted) {
+          payments.push({
+            id: `day-${dayCounter}`,
+            date: new Date(currentDate),
+            amount: isCompleted ? (overrideAmount || baseAmount) : amount,
+            isCompleted,
+            isOverdue: isBefore(currentDate, today) && !isToday(currentDate),
+            isToday: isToday(currentDate)
+          });
+        }
       }
 
-      // Advance date based on frequency
-      switch (config.pacConfig.frequency) {
-        case 'daily':
-          currentDate = addDays(currentDate, 1);
-          break;
-        case 'weekly':
-          currentDate = addWeeks(currentDate, 1);
-          break;
-        case 'monthly':
-          currentDate = addMonths(currentDate, 1);
-          break;
-        case 'custom':
-          currentDate = addDays(currentDate, config.pacConfig.customDays || 1);
-          break;
-      }
+      // Always advance by 1 day for day counter
+      currentDate = addDays(currentDate, 1);
       dayCounter++;
     }
 
@@ -90,13 +98,23 @@ export const PACPaymentTracker: React.FC<PACPaymentTrackerProps> = ({
   }, [config, dailyPACOverrides, completedPayments]);
 
   const togglePaymentCompletion = (paymentId: string) => {
-    const newCompleted = new Set(completedPayments);
-    if (newCompleted.has(paymentId)) {
-      newCompleted.delete(paymentId);
-    } else {
-      newCompleted.add(paymentId);
+    const dayNumber = parseInt(paymentId.replace('day-', ''));
+    const isCurrentlyCompleted = completedPayments.has(dayNumber);
+    
+    if (onMarkPaymentComplete) {
+      onMarkPaymentComplete(dayNumber, !isCurrentlyCompleted);
     }
-    saveCompletedPayments(newCompleted);
+    
+    if (onUpdatePACForDay) {
+      if (isCurrentlyCompleted) {
+        // Unmark as completed - restore original amount
+        const baseAmount = config.pacConfig.amount;
+        onUpdatePACForDay(dayNumber, baseAmount);
+      } else {
+        // Mark as completed - set amount to 0 to indicate completion
+        onUpdatePACForDay(dayNumber, 0);
+      }
+    }
   };
 
   // Get current alerts

@@ -25,7 +25,7 @@ interface ConfigurationPanelProps {
   onExportCSV: () => void;
   isAdmin?: boolean;
   dailyPACOverrides: { [day: number]: number };
-  onUpdatePACForDay: (day: number, pacAmount: number) => void;
+  onUpdatePACForDay: (day: number, pacAmount: number | null) => void;
   onRemovePACOverride: (day: number) => void;
   hasUnsavedChanges?: boolean;
   // Strategy management

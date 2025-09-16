@@ -23,7 +23,7 @@ interface PACConfigurationProps {
   onUpdateDailyReturn: (day: number, returnRate: number) => void;
   onRemoveDailyReturn: (day: number) => void;
   dailyPACOverrides: { [day: number]: number };
-  onUpdatePACForDay: (day: number, pacAmount: number) => void;
+  onUpdatePACForDay: (day: number, pacAmount: number | null) => void;
   onRemovePACOverride: (day: number) => void;
 }
 
@@ -177,6 +177,10 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
             currency: 'EUR'
           }}
           dailyPACOverrides={dailyPACOverrides}
+          onUpdatePACForDay={onUpdatePACForDay}
+          onMarkPaymentComplete={(day, isComplete) => {
+            console.log(`Marcatura versamento giorno ${day}: ${isComplete ? 'completato' : 'non completato'}`);
+          }}
         />
       )}
     </div>

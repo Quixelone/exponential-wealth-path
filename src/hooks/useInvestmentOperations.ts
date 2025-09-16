@@ -77,16 +77,28 @@ export const useInvestmentOperations = ({
     // No longer automatically mark as unsaved - user controls when to save
   }, [setDailyReturns, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
 
-  const updatePACForDay = useCallback((day: number, pacAmount: number) => {
-    saveConfigurationToHistory(`Modifica PAC giorno ${day}: €${pacAmount}`);
-    
-    setDailyPACOverrides(prev => {
-      const updated = {
-        ...prev,
-        [day]: pacAmount
-      };
-      return updated;
-    });
+  const updatePACForDay = useCallback((day: number, pacAmount: number | null) => {
+    if (pacAmount === null) {
+      // Remove the PAC override
+      saveConfigurationToHistory(`Rimozione PAC personalizzato giorno ${day}`);
+      
+      setDailyPACOverrides(prev => {
+        const updated = { ...prev };
+        delete updated[day];
+        return updated;
+      });
+    } else {
+      // Update or add PAC override
+      saveConfigurationToHistory(`Modifica PAC giorno ${day}: €${pacAmount}`);
+      
+      setDailyPACOverrides(prev => {
+        const updated = {
+          ...prev,
+          [day]: pacAmount
+        };
+        return updated;
+      });
+    }
     
     // No longer automatically mark as unsaved - user controls when to save
   }, [setDailyPACOverrides, setCurrentConfigId, configState.currentConfigId, saveConfigurationToHistory]);
