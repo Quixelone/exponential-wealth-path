@@ -154,17 +154,7 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
         </CardContent>
       </Card>
 
-      {/* Solo PACPaymentModifier per versamenti programmati */}
-      {pacConfig.frequency !== 'custom' && pacConfig.amount > 0 && (
-        <PACPaymentModifier
-          pacAmount={pacConfig.amount}
-          pacFrequency={pacConfig.frequency}
-          onUpdatePayment={() => {}}
-          onTogglePayment={() => {}}
-          onAddPayment={() => {}}
-          currency={currency}
-        />
-      )}
+      {/* PACPaymentModifier nascosto per problemi di usabilità */}
 
       {/* PAC Payment Tracker - Simple alert and checkbox system */}
       {pacConfig.amount > 0 && pacConfig.startDate && (
