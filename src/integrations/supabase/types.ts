@@ -159,7 +159,7 @@ export type Database = {
           time_horizon: number
           updated_at: string
           use_real_btc_prices: boolean | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -175,7 +175,7 @@ export type Database = {
           time_horizon: number
           updated_at?: string
           use_real_btc_prices?: boolean | null
-          user_id?: string | null
+          user_id?: string
         }
         Update: {
           created_at?: string
@@ -191,9 +191,17 @@ export type Database = {
           time_horizon?: number
           updated_at?: string
           use_real_btc_prices?: boolean | null
-          user_id?: string | null
+          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_investment_configs_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notification_settings: {
         Row: {

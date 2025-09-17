@@ -44,12 +44,19 @@ export const usePortfolioAnalytics = () => {
       setLoading(true);
       
       // Fetch investment configs with user data and related returns/overrides
+      // Only fetch configs with valid user_id that exists in user_profiles
       const { data: configsData, error: configError } = await supabase
         .from('investment_configs')
         .select(`
           *,
           daily_returns (*),
-          daily_pac_overrides (*)
+          daily_pac_overrides (*),
+          user_profiles!inner (
+            id,
+            email,
+            first_name,
+            last_name
+          )
         `)
         .order('created_at', { ascending: false });
 
@@ -63,15 +70,6 @@ export const usePortfolioAnalytics = () => {
         return;
       }
 
-      // Fetch user profiles separately
-      const { data: userProfiles, error: userError } = await supabase
-        .from('user_profiles')
-        .select('id, email, first_name, last_name');
-
-      if (userError) {
-        console.error('Error fetching user profiles:', userError);
-      }
-
       // Fetch actual trades separately
       const { data: actualTrades, error: tradesError } = await supabase
         .from('actual_trades')
@@ -82,7 +80,6 @@ export const usePortfolioAnalytics = () => {
       }
 
       // Create lookup maps
-      const userProfilesMap = new Map(userProfiles?.map(profile => [profile.id, profile]) || []);
       const tradesMap = new Map();
       
       actualTrades?.forEach(trade => {
@@ -165,7 +162,10 @@ export const usePortfolioAnalytics = () => {
           realPerformance = currentPerformance;
         }
 
-        const userProfile = userProfilesMap.get(configData.user_id);
+        // Get user profile data from the joined result
+        const userProfile = Array.isArray(configData.user_profiles) 
+          ? configData.user_profiles[0] 
+          : configData.user_profiles;
 
         return {
           id: configData.id,
