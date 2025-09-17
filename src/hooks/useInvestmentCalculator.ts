@@ -42,9 +42,17 @@ export const useInvestmentCalculator = () => {
     if (!loadInitialized.current && !authLoading && user) {
       loadInitialized.current = true;
       console.log('🔄 InvestmentCalculator: User authenticated, loading configurations');
-      loadConfigurations();
+      loadConfigurations().then(() => {
+        // Se non ci sono configurazioni salvate, crea una strategia di esempio
+        setTimeout(() => {
+          if (savedConfigs.length === 0 && !configState.currentConfigId) {
+            console.log('🔄 Creating example strategy since no saved configs exist');
+            createNewConfiguration();
+          }
+        }, 100);
+      });
     }
-  }, [loadConfigurations, authLoading, user]);
+  }, [loadConfigurations, authLoading, user, savedConfigs.length, configState.currentConfigId, createNewConfiguration]);
 
   // Use the persisted config loader to restore user's last selected strategy
   const { persistedConfigLoadAttempted } = usePersistedConfigLoader({
