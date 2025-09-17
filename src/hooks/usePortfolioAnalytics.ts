@@ -44,7 +44,7 @@ export const usePortfolioAnalytics = () => {
       setLoading(true);
       
       // Fetch investment configs with user data and related returns/overrides
-      // Using inner join to ensure only configs with valid user profiles are returned
+      // Using inner join to ensure only configs with valid users are fetched
       const { data: configsData, error: configError } = await supabase
         .from('investment_configs')
         .select(`
@@ -79,7 +79,7 @@ export const usePortfolioAnalytics = () => {
         console.error('Error fetching actual trades:', tradesError);
       }
 
-      // Create trades lookup map
+      // Create lookup maps
       const tradesMap = new Map();
       
       actualTrades?.forEach(trade => {
@@ -162,7 +162,7 @@ export const usePortfolioAnalytics = () => {
           realPerformance = currentPerformance;
         }
 
-        // Get user profile from the joined data
+        // Get user profile data from the joined query
         const userProfile = configData.user_profiles;
 
         return {
