@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { PACConfig } from '@/types/investment';
-
+import PACPaymentModifier from './PACPaymentModifier';
 import { PACPaymentTracker } from './PACPaymentTracker';
 
 interface PACConfigurationProps {
@@ -154,6 +154,17 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
         </CardContent>
       </Card>
 
+      {/* Solo PACPaymentModifier per versamenti programmati */}
+      {pacConfig.frequency !== 'custom' && pacConfig.amount > 0 && (
+        <PACPaymentModifier
+          pacAmount={pacConfig.amount}
+          pacFrequency={pacConfig.frequency}
+          onUpdatePayment={() => {}}
+          onTogglePayment={() => {}}
+          onAddPayment={() => {}}
+          currency={currency}
+        />
+      )}
 
       {/* PAC Payment Tracker - Simple alert and checkbox system */}
       {pacConfig.amount > 0 && pacConfig.startDate && (
