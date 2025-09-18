@@ -26,7 +26,7 @@ export const usePersistedConfigLoader = ({
     if (
       !persistedConfigLoadAttempted.current &&
       !supabaseLoading &&
-      savedConfigs.length > 0 &&
+      savedConfigs.length >= 0 && // Cambiato da > 0 per gestire anche il caso di nessuna configurazione
       currentConfigId
     ) {
       persistedConfigLoadAttempted.current = true;
@@ -45,13 +45,27 @@ export const usePersistedConfigLoader = ({
       } else {
         console.log('⚠️ PersistedConfigLoader: Persisted config not found, clearing persistence', {
           persistedConfigId: currentConfigId,
-          availableConfigs: savedConfigs.map(c => ({ id: c.id, name: c.name }))
+          availableConfigs: savedConfigs.map(c => ({ id: c.id, name: c.name })),
+          reason: 'Configuration may have been deleted'
         });
         
-        // Persisted config no longer exists, clear it
+        // Persisted config no longer exists, clear it and reset to default state
         setCurrentConfigId(null);
         setCurrentConfigName('');
+        
+        // Log per debugging del problema specifico
+        console.log('🧹 PersistedConfigLoader: Cleared orphaned configuration reference');
       }
+    }
+    
+    // Anche quando non c'è currentConfigId ma il loading è finito, marca come tentato
+    if (
+      !persistedConfigLoadAttempted.current &&
+      !supabaseLoading &&
+      !currentConfigId
+    ) {
+      persistedConfigLoadAttempted.current = true;
+      console.log('📝 PersistedConfigLoader: No persisted config found, using default state');
     }
   }, [savedConfigs, currentConfigId, supabaseLoading, loadSavedConfiguration, setCurrentConfigId, setCurrentConfigName]);
 

@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { InvestmentConfig } from '@/types/investment';
 import { Currency } from '@/lib/utils';
 import { useConfigurationHistory } from './useConfigurationHistory';
+import { clearActiveConfigState, STORAGE_KEYS } from '@/utils/userStateCleanup';
 
 // Keys for localStorage persistence
 const CURRENT_CONFIG_ID_KEY = 'investment_current_config_id';
@@ -158,6 +159,18 @@ export const useInvestmentConfigState = () => {
     clearHistory(); // Reset history when creating new configuration
   }, [resetCustomData, saveConfigurationToHistory, clearHistory, setCurrentConfigId, setCurrentConfigName]);
 
+  // Funzione di emergenza per pulire lo stato corrotto
+  const emergencyStateReset = useCallback((reason: string = 'State corruption detected') => {
+    console.log('🚨 investmentConfigState: Emergency state reset', { reason });
+    clearActiveConfigState(reason);
+    setCurrentConfigId(null);
+    setCurrentConfigName('');
+    setConfig(getDefaultConfig());
+    setDailyReturns({});
+    setDailyPACOverrides({});
+    clearHistory();
+  }, [clearHistory, setCurrentConfigId, setCurrentConfigName]);
+
   return {
     configState: { config, dailyReturns, dailyPACOverrides, currentConfigId, currentConfigName },
     setConfig,
@@ -167,6 +180,7 @@ export const useInvestmentConfigState = () => {
     setCurrentConfigName,
     createNewConfiguration,
     resetCustomData,
+    emergencyStateReset,
     // History operations
     saveConfigurationToHistory,
     undoConfiguration,

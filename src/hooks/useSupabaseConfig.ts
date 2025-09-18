@@ -106,6 +106,15 @@ export const useSupabaseConfig = () => {
     try {
       await deleteConfig(configId);
       console.log('✅ useSupabaseConfig: Delete successful, updating local state');
+      
+      // Verifica se la configurazione eliminata era quella attiva
+      const currentConfigId = localStorage.getItem('investment_current_config_id');
+      if (currentConfigId === configId) {
+        console.log('🧹 useSupabaseConfig: Deleted configuration was active, clearing localStorage');
+        localStorage.removeItem('investment_current_config_id');
+        localStorage.removeItem('investment_current_config_name');
+      }
+      
       setSavedConfigs(prev => prev.filter(config => config.id !== configId));
     } catch (err) {
       console.error('❌ useSupabaseConfig: Delete failed', err);
