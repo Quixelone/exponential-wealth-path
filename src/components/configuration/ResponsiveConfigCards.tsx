@@ -79,9 +79,9 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
                     <TrendingUp className="h-3 w-3" />
                     <span>Rendimento</span>
                   </div>
-                  <div className="font-medium">
-                    {(config.config.dailyReturnRate * 100).toFixed(3)}%
-                  </div>
+                   <div className="font-medium">
+                     {config.config.dailyReturnRate.toFixed(3)}%
+                   </div>
                 </div>
               </div>
 
