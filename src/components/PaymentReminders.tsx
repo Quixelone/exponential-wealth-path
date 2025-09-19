@@ -110,6 +110,8 @@ const PaymentReminders = () => {
           user_id: user?.id,
           ...notificationSettings,
           ...settings
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) {

@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageSquare, Send, CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,6 +34,7 @@ interface TestSummary {
 
 const NotificationTester = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [chatId, setChatId] = useState('');
   const [messageCount, setMessageCount] = useState(1);
   const [customMessage, setCustomMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +42,7 @@ const NotificationTester = () => {
   const [testSummary, setTestSummary] = useState<TestSummary | null>(null);
   const { toast } = useToast();
 
-  const handleTest = async () => {
+  const handleWhatsAppTest = async () => {
     if (!phoneNumber.trim()) {
       toast({
         title: "Errore",
@@ -108,6 +110,74 @@ const NotificationTester = () => {
     }
   };
 
+  const handleTelegramTest = async () => {
+    if (!chatId.trim()) {
+      toast({
+        title: "Errore",
+        description: "Inserisci un Chat ID Telegram valido",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validazione formato Chat ID
+    const chatIdRegex = /^(@[\w\d_]+|\d+)$/;
+    if (!chatIdRegex.test(chatId)) {
+      toast({
+        title: "Formato non valido",
+        description: "Il Chat ID deve essere in formato @username o ID numerico",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    setTestResults([]);
+    setTestSummary(null);
+
+    try {
+      console.log(`Starting Telegram test: ${messageCount} messages to ${chatId}`);
+
+      const { data, error } = await supabase.functions.invoke('test-telegram', {
+        body: {
+          chat_id: chatId,
+          message_count: messageCount,
+          test_message: customMessage.trim() || undefined
+        }
+      });
+
+      if (error) {
+        console.error('Test Telegram error:', error);
+        throw new Error(error.message || 'Errore durante il test');
+      }
+
+      console.log('Test Telegram response:', data);
+
+      if (data?.success) {
+        setTestResults(data.detailed_results || []);
+        setTestSummary(data.summary);
+        
+        toast({
+          title: "Test completato!",
+          description: data.message,
+          variant: data.summary.successful > 0 ? "default" : "destructive",
+        });
+      } else {
+        throw new Error(data?.error || 'Test fallito');
+      }
+
+    } catch (error: any) {
+      console.error('Error testing Telegram:', error);
+      toast({
+        title: "Errore nel test",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'success':
@@ -136,74 +206,149 @@ const NotificationTester = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
-            Test Notifiche WhatsApp
+            Test Notifiche
           </CardTitle>
           <CardDescription>
-            Testa l'invio di notifiche WhatsApp per verificare la configurazione di Twilio
+            Testa l'invio di notifiche WhatsApp e Telegram per verificare le configurazioni
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Numero WhatsApp</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+393331234567"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                disabled={isLoading}
-              />
-              <p className="text-xs text-muted-foreground">
-                Formato internazionale richiesto (es. +393331234567)
-              </p>
-            </div>
+        <CardContent>
+          <Tabs defaultValue="whatsapp" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
+              <TabsTrigger value="telegram">Telegram</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="whatsapp" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Numero WhatsApp</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+393331234567"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    disabled={isLoading}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Formato internazionale richiesto (es. +393331234567)
+                  </p>
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="count">Numero di messaggi</Label>
-              <Select value={messageCount.toString()} onValueChange={(value) => setMessageCount(parseInt(value))}>
-                <SelectTrigger disabled={isLoading}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 5, 10].map(num => (
-                    <SelectItem key={num} value={num.toString()}>
-                      {num} messaggio{num > 1 ? 'i' : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="count">Numero di messaggi</Label>
+                  <Select value={messageCount.toString()} onValueChange={(value) => setMessageCount(parseInt(value))}>
+                    <SelectTrigger disabled={isLoading}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 5, 10].map(num => (
+                        <SelectItem key={num} value={num.toString()}>
+                          {num} messaggio{num > 1 ? 'i' : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="message">Messaggio personalizzato (opzionale)</Label>
-            <Textarea
-              id="message"
-              placeholder="Lascia vuoto per usare il messaggio di test predefinito..."
-              value={customMessage}
-              onChange={(e) => setCustomMessage(e.target.value)}
-              disabled={isLoading}
-              rows={3}
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="message">Messaggio personalizzato (opzionale)</Label>
+                <Textarea
+                  id="message"
+                  placeholder="Lascia vuoto per usare il messaggio di test predefinito..."
+                  value={customMessage}
+                  onChange={(e) => setCustomMessage(e.target.value)}
+                  disabled={isLoading}
+                  rows={3}
+                />
+              </div>
 
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Nota:</strong> Assicurati che il numero WhatsApp sia registrato nella sandbox di Twilio 
-              e che abbia inviato il messaggio di conferma "join sandbox-xxxxxxx" al numero +1 415 523 8886.
-            </AlertDescription>
-          </Alert>
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Nota:</strong> Assicurati che il numero WhatsApp sia registrato nella sandbox di Twilio 
+                  e che abbia inviato il messaggio di conferma "join sandbox-xxxxxxx" al numero +1 415 523 8886.
+                </AlertDescription>
+              </Alert>
 
-          <Button 
-            onClick={handleTest} 
-            disabled={isLoading || !phoneNumber.trim()}
-            className="w-full"
-          >
-            <Send className="h-4 w-4 mr-2" />
-            {isLoading ? 'Invio in corso...' : `Testa WhatsApp (${messageCount} messaggio${messageCount > 1 ? 'i' : ''})`}
-          </Button>
+              <Button 
+                onClick={handleWhatsAppTest} 
+                disabled={isLoading || !phoneNumber.trim()}
+                className="w-full"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                {isLoading ? 'Invio in corso...' : `Testa WhatsApp (${messageCount} messaggio${messageCount > 1 ? 'i' : ''})`}
+              </Button>
+            </TabsContent>
+
+            <TabsContent value="telegram" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="chatId">Chat ID Telegram</Label>
+                  <Input
+                    id="chatId"
+                    type="text"
+                    placeholder="@username o 123456789"
+                    value={chatId}
+                    onChange={(e) => setChatId(e.target.value)}
+                    disabled={isLoading}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Usa @username o ID numerico
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="count-telegram">Numero di messaggi</Label>
+                  <Select value={messageCount.toString()} onValueChange={(value) => setMessageCount(parseInt(value))}>
+                    <SelectTrigger disabled={isLoading}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 5, 10].map(num => (
+                        <SelectItem key={num} value={num.toString()}>
+                          {num} messaggio{num > 1 ? 'i' : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="message-telegram">Messaggio personalizzato (opzionale)</Label>
+                <Textarea
+                  id="message-telegram"
+                  placeholder="Lascia vuoto per usare il messaggio di test predefinito..."
+                  value={customMessage}
+                  onChange={(e) => setCustomMessage(e.target.value)}
+                  disabled={isLoading}
+                  rows={3}
+                />
+              </div>
+
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Come ottenere il Chat ID:</strong>
+                  <br />1. Avvia una chat con il bot @userinfobot su Telegram
+                  <br />2. Invia /start per ottenere il tuo Chat ID
+                  <br />3. Usa l'ID numerico o @username per i test
+                </AlertDescription>
+              </Alert>
+
+              <Button 
+                onClick={handleTelegramTest} 
+                disabled={isLoading || !chatId.trim()}
+                className="w-full"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                {isLoading ? 'Invio in corso...' : `Testa Telegram (${messageCount} messaggio${messageCount > 1 ? 'i' : ''})`}
+              </Button>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
