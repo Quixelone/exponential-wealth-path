@@ -116,30 +116,61 @@ const Strategies: React.FC = () => {
     };
   }) => {
     const { name, copyFromCurrent, currency, params } = payload;
+    console.log('🔄 [Strategies] handleWizardCreate called:', { name, copyFromCurrent, currency, params });
+    
     if (copyFromCurrent) {
       await handleCreateNewConfiguration(name, true, currency);
       return;
     }
 
-    // Create new local configuration using quick params
-    createNewConfiguration();
-    updateConfig({
-      currency,
-      initialCapital: params?.initialCapital,
-      timeHorizon: params?.timeHorizon,
-      dailyReturnRate: params?.dailyReturnRate,
-      pacConfig: {
-        amount: params?.pacAmount ?? 0,
-        frequency: params?.pacFrequency ?? 'monthly',
-        customDays: params?.pacFrequency === 'custom' ? params?.pacCustomDays : undefined,
-        startDate: params?.pacStartDate ?? new Date(),
+    try {
+      // Create new local configuration using quick params
+      createNewConfiguration();
+      
+      const newConfig = {
+        currency,
+        initialCapital: params?.initialCapital ?? 1000,
+        timeHorizon: params?.timeHorizon ?? 365,
+        dailyReturnRate: params?.dailyReturnRate ?? 0.1,
+        pacConfig: {
+          amount: params?.pacAmount ?? 100,
+          frequency: params?.pacFrequency ?? 'monthly',
+          customDays: params?.pacFrequency === 'custom' ? params?.pacCustomDays : undefined,
+          startDate: params?.pacStartDate ?? new Date(),
+        }
+      };
+      
+      console.log('🔄 [Strategies] Updating config with:', newConfig);
+      updateConfig(newConfig);
+      
+      // Salva automaticamente la nuova strategia
+      console.log('🔄 [Strategies] Auto-saving new strategy:', name);
+      const result = await saveConfiguration(name, { 
+        ...config, 
+        ...newConfig 
+      }, {}, {});
+      
+      if (result) {
+        console.log('✅ [Strategies] New strategy auto-saved with ID:', result);
+        toast({
+          title: 'Strategia creata e salvata',
+          description: `La strategia "${name}" è stata creata e salvata automaticamente.`,
+        });
+      } else {
+        console.error('❌ [Strategies] Auto-save failed');
+        toast({
+          title: 'Strategia creata',
+          description: `La strategia "${name}" è stata creata. Salvala manualmente per conservarla.`,
+        });
       }
-    });
-
-    toast({
-      title: 'Nuova strategia',
-      description: `Strategia "${name}" creata. Imposta i parametri e salva quando pronto.`,
-    });
+    } catch (error) {
+      console.error('❌ [Strategies] Error in handleWizardCreate:', error);
+      toast({
+        title: "Errore",
+        description: "Errore durante la creazione della strategia.",
+        variant: "destructive"
+      });
+    }
   };
   const handleLoadConfiguration = (config: any) => {
     console.log('🔄 Strategies: Loading configuration', { configId: config.id, name: config.name });

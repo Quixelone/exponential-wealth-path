@@ -15,7 +15,20 @@ export const useConfigSaver = () => {
     dailyPACOverrides: { [day: number]: number } = {}
   ): Promise<string | null> => {
     try {
-      console.log('🔄 Inizio salvataggio configurazione:', { name, dailyPACOverrides });
+      console.log('🔄 [configSaver] Inizio salvataggio configurazione:', { 
+        name, 
+        config: {
+          initialCapital: config.initialCapital,
+          timeHorizon: config.timeHorizon,
+          dailyReturnRate: config.dailyReturnRate,
+          currency: config.currency,
+          pacAmount: config.pacConfig.amount,
+          pacFrequency: config.pacConfig.frequency
+        },
+        dailyReturnsCount: Object.keys(dailyReturns).length,
+        dailyPACOverridesCount: Object.keys(dailyPACOverrides).length,
+        dailyPACOverrides 
+      });
       
       const user = await validateUser();
       if (!user) {
