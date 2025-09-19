@@ -98,6 +98,47 @@ const UserManagement = () => {
     }
   };
 
+  const deleteUser = async (userId: string, userEmail: string) => {
+    try {
+      console.log('🗑️ Attempting to delete user:', userId);
+      
+      const { data, error } = await supabase.rpc('delete_user_safely', {
+        target_user_id: userId
+      });
+
+      if (error) {
+        console.error('❌ Error deleting user:', error);
+        toast({
+          title: "Errore",
+          description: error.message || "Impossibile eliminare l'utente",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data === true) {
+        toast({
+          title: "Utente eliminato",
+          description: `L'utente ${userEmail} è stato eliminato con successo`,
+        });
+        fetchUsers();
+      } else {
+        toast({
+          title: "Errore",
+          description: "L'eliminazione dell'utente non è riuscita",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('💥 Unexpected error deleting user:', error);
+      toast({
+        title: "Errore",
+        description: "Errore inaspettato durante l'eliminazione",
+        variant: "destructive",
+      });
+    }
+  };
+
   // SEMPLIFICATO: Solo loading se necessario
   if (authLoading || loading) {
     console.log('⏳ Showing loading screen');
@@ -120,6 +161,7 @@ const UserManagement = () => {
       <UserManagementTabs 
         users={users} 
         onUpdateUserRole={updateUserRole}
+        onDeleteUser={deleteUser}
         onRefresh={fetchUsers}
       />
       </div>

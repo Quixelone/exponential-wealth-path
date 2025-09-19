@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Phone, Mail } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Calendar, Phone, Mail, Trash2 } from 'lucide-react';
 
 interface UserData {
   id: string;
@@ -21,9 +23,11 @@ interface UserData {
 interface UsersTableProps {
   users: UserData[];
   onUpdateUserRole: (userId: string, newRole: string) => Promise<void>;
+  onDeleteUser: (userId: string, userEmail: string) => Promise<void>;
 }
 
-const UsersTable = ({ users, onUpdateUserRole }: UsersTableProps) => {
+const UsersTable = ({ users, onUpdateUserRole, onDeleteUser }: UsersTableProps) => {
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Mai';
     return new Date(dateString).toLocaleDateString('it-IT', {
@@ -118,18 +122,61 @@ const UsersTable = ({ users, onUpdateUserRole }: UsersTableProps) => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Select
-                    value={user.role}
-                    onValueChange={(value) => onUpdateUserRole(user.id, value)}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">Utente</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={user.role}
+                      onValueChange={(value) => onUpdateUserRole(user.id, value)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">Utente</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                          disabled={deletingUserId === user.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Elimina Utente</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Sei sicuro di voler eliminare l'utente <strong>{user.email}</strong>?
+                            <br />
+                            <span className="text-destructive font-medium">
+                              Questa azione è irreversibile e eliminerà tutti i dati associati all'utente.
+                            </span>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Annulla</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={async () => {
+                              setDeletingUserId(user.id);
+                              try {
+                                await onDeleteUser(user.id, user.email || 'Utente sconosciuto');
+                              } finally {
+                                setDeletingUserId(null);
+                              }
+                            }}
+                            className="bg-destructive hover:bg-destructive/90"
+                          >
+                            Elimina
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

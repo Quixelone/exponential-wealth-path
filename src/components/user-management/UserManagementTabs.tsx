@@ -23,10 +23,11 @@ interface UserData {
 interface UserManagementTabsProps {
   users: UserData[];
   onUpdateUserRole: (userId: string, newRole: string) => Promise<void>;
+  onDeleteUser: (userId: string, userEmail: string) => Promise<void>;
   onRefresh: () => void;
 }
 
-const UserManagementTabs = ({ users, onUpdateUserRole, onRefresh }: UserManagementTabsProps) => {
+const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }: UserManagementTabsProps) => {
   return (
     <div className="w-full">
       <Tabs defaultValue="users" className="w-full">
@@ -51,7 +52,7 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onRefresh }: UserManageme
         
         <TabsContent value="users" className="space-y-8 mt-6">
           <UserStatsCards users={users} />
-          <UsersTable users={users} onUpdateUserRole={onUpdateUserRole} />
+          <UsersTable users={users} onUpdateUserRole={onUpdateUserRole} onDeleteUser={onDeleteUser} />
         </TabsContent>
         
         <TabsContent value="portfolio" className="mt-6">
