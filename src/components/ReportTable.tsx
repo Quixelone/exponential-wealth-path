@@ -23,6 +23,7 @@ interface ReportTableProps {
   currentConfigId?: string | null;
   currentConfigName?: string;
   onSaveToStrategy?: () => Promise<void>;
+  readOnly?: boolean;
 }
 
 const ReportTable: React.FC<ReportTableProps> = ({
@@ -36,7 +37,8 @@ const ReportTable: React.FC<ReportTableProps> = ({
   investmentStartDate,
   currentConfigId,
   currentConfigName,
-  onSaveToStrategy
+  onSaveToStrategy,
+  readOnly = false
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -205,7 +207,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                   <TableHead className="text-right font-mono">Capitale Finale</TableHead>
                   <TableHead className="text-right">Valore Reale</TableHead>
                   <TableHead className="text-right">Differenza</TableHead>
-                  <TableHead className="w-32 text-center">Azioni</TableHead>
+                  {!readOnly && <TableHead className="w-32 text-center">Azioni</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -288,59 +290,61 @@ const ReportTable: React.FC<ReportTableProps> = ({
                             <span className="text-muted-foreground text-sm">-</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <ModernTooltip>
-                              <ModernTooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEditRow(item)}
-                                  className="h-8 px-2 text-primary hover:text-primary/80 hover:bg-primary/10"
-                                >
-                                  <Edit3 className="h-4 w-4" />
-                                </Button>
-                              </ModernTooltipTrigger>
-                              <ModernTooltipContent>
-                                <p>Modifica rendimento e PAC per il giorno {item.day}</p>
-                              </ModernTooltipContent>
-                            </ModernTooltip>
-                            
-                            {actualTrade ? (
+                        {!readOnly && (
+                          <TableCell className="text-center">
+                            <div className="flex items-center justify-center gap-1">
                               <ModernTooltip>
                                 <ModernTooltipTrigger asChild>
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleTradeRecord(item)}
-                                    className="h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                    onClick={() => handleEditRow(item)}
+                                    className="h-8 px-2 text-primary hover:text-primary/80 hover:bg-primary/10"
                                   >
-                                    <DollarSign className="h-4 w-4" />
+                                    <Edit3 className="h-4 w-4" />
                                   </Button>
                                 </ModernTooltipTrigger>
                                 <ModernTooltipContent>
-                                  <p>Trade registrato - Clicca per modificare</p>
+                                  <p>Modifica rendimento e PAC per il giorno {item.day}</p>
                                 </ModernTooltipContent>
                               </ModernTooltip>
-                            ) : (
-                              <ModernTooltip>
-                                <ModernTooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleTradeRecord(item)}
-                                    className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                  >
-                                    <TrendingDown className="h-4 w-4" />
-                                  </Button>
-                                </ModernTooltipTrigger>
-                                <ModernTooltipContent>
-                                  <p>Registra trade reale per il giorno {item.day}</p>
-                                </ModernTooltipContent>
-                              </ModernTooltip>
-                            )}
-                          </div>
-                        </TableCell>
+                              
+                              {actualTrade ? (
+                                <ModernTooltip>
+                                  <ModernTooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleTradeRecord(item)}
+                                      className="h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                    >
+                                      <DollarSign className="h-4 w-4" />
+                                    </Button>
+                                  </ModernTooltipTrigger>
+                                  <ModernTooltipContent>
+                                    <p>Trade registrato - Clicca per modificare</p>
+                                  </ModernTooltipContent>
+                                </ModernTooltip>
+                              ) : (
+                                <ModernTooltip>
+                                  <ModernTooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleTradeRecord(item)}
+                                      className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                    >
+                                      <TrendingDown className="h-4 w-4" />
+                                    </Button>
+                                  </ModernTooltipTrigger>
+                                  <ModernTooltipContent>
+                                    <p>Registra trade reale per il giorno {item.day}</p>
+                                  </ModernTooltipContent>
+                                </ModernTooltip>
+                              )}
+                            </div>
+                          </TableCell>
+                        )}
                       </TableRow>
                     );
                   })

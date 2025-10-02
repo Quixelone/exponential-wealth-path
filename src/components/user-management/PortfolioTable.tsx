@@ -5,8 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, ArrowUpDown, Download, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Search, ArrowUpDown, Download, TrendingUp, TrendingDown, Minus, Eye } from 'lucide-react';
 import { PortfolioStrategy } from '@/hooks/usePortfolioAnalytics';
+import { StrategyDetailDialog } from './StrategyDetailDialog';
 
 interface PortfolioTableProps {
   strategies: PortfolioStrategy[];
@@ -20,6 +21,12 @@ const PortfolioTable = ({ strategies }: PortfolioTableProps) => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortField, setSortField] = useState<SortField>('currentPerformance');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [selectedStrategy, setSelectedStrategy] = useState<{
+    configId: string;
+    userId: string;
+    name: string;
+    userName: string;
+  } | null>(null);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('it-IT', {
@@ -130,8 +137,9 @@ const PortfolioTable = ({ strategies }: PortfolioTableProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <>
+      <Card>
+        <CardHeader>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <CardTitle className="text-xl">Portfolio Dettagliato</CardTitle>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -215,6 +223,7 @@ const PortfolioTable = ({ strategies }: PortfolioTableProps) => {
                   </div>
                 </TableHead>
                 <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-right">Azioni</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -274,6 +283,24 @@ const PortfolioTable = ({ strategies }: PortfolioTableProps) => {
                   <TableCell className="text-center">
                     {getStatusBadge(strategy.status)}
                   </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setSelectedStrategy({
+                          configId: strategy.id,
+                          userId: strategy.user_id,
+                          name: strategy.name,
+                          userName: strategy.user_name || 'Utente',
+                        })
+                      }
+                      className="flex items-center gap-2"
+                    >
+                      <Eye className="h-4 w-4" />
+                      Dettagli
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -290,6 +317,16 @@ const PortfolioTable = ({ strategies }: PortfolioTableProps) => {
         </div>
       </CardContent>
     </Card>
+
+    <StrategyDetailDialog
+      open={!!selectedStrategy}
+      onOpenChange={(open) => !open && setSelectedStrategy(null)}
+      configId={selectedStrategy?.configId || null}
+      userId={selectedStrategy?.userId || null}
+      strategyName={selectedStrategy?.name || ""}
+      userDisplayName={selectedStrategy?.userName || ""}
+    />
+  </>
   );
 };
 
