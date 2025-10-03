@@ -6,6 +6,7 @@ import { Loader2, User, Mail, TrendingUp, Calendar, FileText } from 'lucide-reac
 import { useUserStrategyDetail } from '@/hooks/useUserStrategyDetail';
 import { StrategyHealthCheck } from './StrategyHealthCheck';
 import { StrategyConfigSummary } from './StrategyConfigSummary';
+import { StrategyActivityTimeline } from './StrategyActivityTimeline';
 import StatisticsCards from '@/components/dashboard/StatisticsCards';
 import InvestmentChart from '@/components/InvestmentChart';
 import ReportTable from '@/components/ReportTable';
@@ -127,7 +128,7 @@ export const StrategyDetailDialog = ({
           ) : (
             <div className="space-y-6 pb-6">
               {/* User and Strategy Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <StrategyConfigSummary config={strategyDetail.config} strategyName={strategyName} />
                 <StrategyHealthCheck
                   lastModified={strategyDetail.lastModified}
@@ -136,6 +137,13 @@ export const StrategyDetailDialog = ({
                   pacOverridesCount={strategyDetail.dailyPACOverrides.size}
                   actualTradesCount={strategyDetail.actualTrades.length}
                   expectedDays={strategyDetail.config.timeHorizon}
+                />
+                <StrategyActivityTimeline
+                  createdAt={strategyDetail.createdAt}
+                  lastModified={strategyDetail.lastModified}
+                  dailyReturnsCount={strategyDetail.dailyReturns.size}
+                  pacOverridesCount={strategyDetail.dailyPACOverrides.size}
+                  actualTrades={strategyDetail.actualTrades}
                 />
               </div>
 
