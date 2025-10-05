@@ -63,8 +63,8 @@ export const StrategyDetailDialog = ({
     const currentData = investmentData[currentDayIndex];
     const finalData = investmentData[investmentData.length - 1];
 
-    const currentInvested = currentData.capitalBeforePAC + currentData.totalPACInvested;
-    const finalInvested = finalData.capitalBeforePAC + finalData.totalPACInvested;
+    const currentInvested = strategyDetail.config.initialCapital + currentData.totalPACInvested;
+    const finalInvested = strategyDetail.config.initialCapital + finalData.totalPACInvested;
 
     return {
       current: {
