@@ -45,7 +45,7 @@ export const StrategyDetailDialog = ({
   }, [strategyDetail]);
 
   const summary = useMemo(() => {
-    if (investmentData.length === 0) {
+    if (investmentData.length === 0 || !strategyDetail) {
       return {
         current: { capital: 0, invested: 0, interest: 0, totalReturn: 0 },
         final: { capital: 0, invested: 0, interest: 0, totalReturn: 0 },
@@ -53,28 +53,31 @@ export const StrategyDetailDialog = ({
     }
 
     const currentDayIndex = Math.min(
-      Math.floor(
-        (new Date().getTime() - new Date(strategyDetail?.config.pacConfig.startDate || new Date()).getTime()) /
+      Math.max(0, Math.floor(
+        (new Date().getTime() - new Date(strategyDetail.config.pacConfig.startDate).getTime()) /
           (1000 * 60 * 60 * 24)
-      ),
+      )),
       investmentData.length - 1
     );
 
-    const currentData = investmentData[Math.max(0, currentDayIndex)] || investmentData[0];
+    const currentData = investmentData[currentDayIndex];
     const finalData = investmentData[investmentData.length - 1];
+
+    const currentInvested = currentData.capitalBeforePAC + currentData.totalPACInvested;
+    const finalInvested = finalData.capitalBeforePAC + finalData.totalPACInvested;
 
     return {
       current: {
         capital: currentData.finalCapital,
-        invested: currentData.totalPACInvested,
+        invested: currentInvested,
         interest: currentData.totalInterest,
-        totalReturn: ((currentData.finalCapital / currentData.totalPACInvested - 1) * 100) || 0,
+        totalReturn: currentInvested > 0 ? ((currentData.finalCapital / currentInvested - 1) * 100) : 0,
       },
       final: {
         capital: finalData.finalCapital,
-        invested: finalData.totalPACInvested,
+        invested: finalInvested,
         interest: finalData.totalInterest,
-        totalReturn: ((finalData.finalCapital / finalData.totalPACInvested - 1) * 100) || 0,
+        totalReturn: finalInvested > 0 ? ((finalData.finalCapital / finalInvested - 1) * 100) : 0,
       },
     };
   }, [investmentData, strategyDetail]);

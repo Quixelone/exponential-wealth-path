@@ -55,7 +55,7 @@ export const StrategyConfigSummary = ({ config, strategyName }: StrategyConfigSu
               Ritorno giornaliero
             </div>
             <p className="text-lg font-semibold text-foreground">
-              {(config.dailyReturnRate * 100).toFixed(3)}%
+              {config.dailyReturnRate.toFixed(3)}%
             </p>
           </div>
 
