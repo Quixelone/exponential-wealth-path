@@ -83,33 +83,19 @@ export const useUserStrategyDetail = (configId: string | null, userId: string | 
 
         if (tradesError) throw tradesError;
 
-        // Transform data - convert daily returns to decimal format
+        // Transform data - keep as percentage (will be converted in calculation)
         const dailyReturnsMap = new Map<number, number>(
-          (returnsData || []).map((r: DailyReturn) => {
-            let returnRate = r.return_rate;
-            // If value > 1, assume it was stored as percentage and convert
-            if (returnRate > 1) {
-              returnRate = returnRate / 100;
-            }
-            return [r.day, returnRate];
-          })
+          (returnsData || []).map((r: DailyReturn) => [r.day, r.return_rate])
         );
 
         const dailyPACOverridesMap = new Map<number, number>(
           (pacData || []).map((p: DailyPACOverride) => [p.day, p.pac_amount])
         );
 
-        // Convert daily return rate to decimal format (0.20 for 20%)
-        // If value > 1, assume it was stored as percentage and convert
-        let dailyReturnRate = Number(configData.daily_return_rate);
-        if (dailyReturnRate > 1) {
-          dailyReturnRate = dailyReturnRate / 100;
-        }
-
         const config: InvestmentConfig = {
           initialCapital: Number(configData.initial_capital),
           timeHorizon: configData.time_horizon,
-          dailyReturnRate,
+          dailyReturnRate: Number(configData.daily_return_rate),
           currency: configData.currency as 'EUR' | 'USD' | 'USDT',
           pacConfig: {
             amount: Number(configData.pac_amount),
