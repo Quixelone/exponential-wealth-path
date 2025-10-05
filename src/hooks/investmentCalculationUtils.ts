@@ -66,7 +66,7 @@ export const calculateInvestment = ({
     const dailyReturn = dailyReturns[day] ?? config.dailyReturnRate;
     const isCustomReturn = dailyReturns.hasOwnProperty(day);
 
-    const interestEarnedDaily = capitalAfterPAC * (dailyReturn / 100);
+    const interestEarnedDaily = capitalAfterPAC * dailyReturn;
     currentCapital += interestEarnedDaily;
 
     const totalInterest = currentCapital - config.initialCapital - totalPACInvested;
