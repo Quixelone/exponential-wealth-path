@@ -46,10 +46,9 @@ export const StrategyDetailDialog = ({
 
   const summary = useMemo(() => {
     if (investmentData.length === 0 || !strategyDetail) {
-      console.log('❌ No investment data or strategy detail');
       return {
-        current: { capital: 0, invested: 0, interest: 0, totalReturn: 0 },
-        final: { capital: 0, invested: 0, interest: 0, totalReturn: 0 },
+        current: { finalCapital: 0, totalInvested: 0, interest: 0, totalReturn: 0, day: 0 },
+        final: { finalCapital: 0, totalInvested: 0, interest: 0, totalReturn: 0, day: 0 },
       };
     }
 
@@ -61,40 +60,26 @@ export const StrategyDetailDialog = ({
       investmentData.length - 1
     );
 
-    console.log('📊 Summary calculation:', {
-      investmentDataLength: investmentData.length,
-      currentDayIndex,
-      initialCapital: strategyDetail.config.initialCapital
-    });
-
     const currentData = investmentData[currentDayIndex];
     const finalData = investmentData[investmentData.length - 1];
-
-    console.log('📊 Current and final data:', {
-      currentData,
-      finalData
-    });
 
     const currentInvested = strategyDetail.config.initialCapital + currentData.totalPACInvested;
     const finalInvested = strategyDetail.config.initialCapital + finalData.totalPACInvested;
 
-    console.log('📊 Invested amounts:', {
-      currentInvested,
-      finalInvested
-    });
-
     return {
       current: {
-        capital: currentData.finalCapital,
-        invested: currentInvested,
+        finalCapital: currentData.finalCapital,
+        totalInvested: currentInvested,
         interest: currentData.totalInterest,
         totalReturn: currentInvested > 0 ? ((currentData.finalCapital / currentInvested - 1) * 100) : 0,
+        day: currentDayIndex,
       },
       final: {
-        capital: finalData.finalCapital,
-        invested: finalInvested,
+        finalCapital: finalData.finalCapital,
+        totalInvested: finalInvested,
         interest: finalData.totalInterest,
         totalReturn: finalInvested > 0 ? ((finalData.finalCapital / finalInvested - 1) * 100) : 0,
+        day: strategyDetail.config.timeHorizon,
       },
     };
   }, [investmentData, strategyDetail]);
