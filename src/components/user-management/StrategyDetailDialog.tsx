@@ -46,6 +46,7 @@ export const StrategyDetailDialog = ({
 
   const summary = useMemo(() => {
     if (investmentData.length === 0 || !strategyDetail) {
+      console.log('❌ No investment data or strategy detail');
       return {
         current: { capital: 0, invested: 0, interest: 0, totalReturn: 0 },
         final: { capital: 0, invested: 0, interest: 0, totalReturn: 0 },
@@ -60,11 +61,27 @@ export const StrategyDetailDialog = ({
       investmentData.length - 1
     );
 
+    console.log('📊 Summary calculation:', {
+      investmentDataLength: investmentData.length,
+      currentDayIndex,
+      initialCapital: strategyDetail.config.initialCapital
+    });
+
     const currentData = investmentData[currentDayIndex];
     const finalData = investmentData[investmentData.length - 1];
 
+    console.log('📊 Current and final data:', {
+      currentData,
+      finalData
+    });
+
     const currentInvested = strategyDetail.config.initialCapital + currentData.totalPACInvested;
     const finalInvested = strategyDetail.config.initialCapital + finalData.totalPACInvested;
+
+    console.log('📊 Invested amounts:', {
+      currentInvested,
+      finalInvested
+    });
 
     return {
       current: {
