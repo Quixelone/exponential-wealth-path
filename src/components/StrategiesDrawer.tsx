@@ -190,6 +190,7 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
                 onCreateNew={handleCreateNewConfiguration}
                 hasCurrentConfig={!!currentConfigId}
                 currentConfigName={currentConfigName || "Configurazione attuale"}
+                hasUnsavedChanges={hasUnsavedChanges}
               />
             </CardContent>
           </Card>

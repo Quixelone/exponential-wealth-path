@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceInfo } from '@/hooks/use-mobile';
 import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
@@ -8,6 +8,7 @@ import ModernHeader from '@/components/dashboard/ModernHeader';
 import MobileHeader from '@/components/mobile/MobileHeader';
 import MobileDrawer from '@/components/mobile/MobileDrawer';
 import BottomNavigation from '@/components/mobile/BottomNavigation';
+import UnsavedChangesAlert from '@/components/configuration/UnsavedChangesAlert';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -18,8 +19,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
   const { user, userProfile, loading: authLoading, signOut, isAdmin } = useAuth();
   const { isMobile, isTablet } = useDeviceInfo();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [showNavigationAlert, setShowNavigationAlert] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -41,6 +45,29 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges]);
+
+  // Navigation guard
+  const guardedNavigate = (path: string) => {
+    if (hasUnsavedChanges && location.pathname !== path) {
+      setPendingNavigation(path);
+      setShowNavigationAlert(true);
+    } else {
+      navigate(path);
+    }
+  };
+
+  const confirmNavigation = () => {
+    if (pendingNavigation) {
+      navigate(pendingNavigation);
+      setPendingNavigation(null);
+      setShowNavigationAlert(false);
+    }
+  };
+
+  const cancelNavigation = () => {
+    setPendingNavigation(null);
+    setShowNavigationAlert(false);
+  };
 
   const handleLogout = async () => {
     if (hasUnsavedChanges) {
@@ -78,12 +105,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
             <ModernSidebar 
               isAdmin={isAdmin}
               onCollapseChange={setIsSidebarCollapsed}
+              onNavigate={guardedNavigate}
             />
             <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
               <ModernHeader 
                 userProfile={userProfile}
                 onLogout={handleLogout}
-                onSettings={() => navigate('/settings')}
+                onSettings={() => guardedNavigate('/settings')}
                 isAdmin={isAdmin}
               />
               <main className="flex-1 p-6">
@@ -107,15 +135,23 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
               isOpen={isMobileDrawerOpen}
               onClose={() => setIsMobileDrawerOpen(false)}
               isAdmin={isAdmin}
+              onNavigate={guardedNavigate}
             />
             <div className="pt-14 pb-20 px-4">
               {children}
             </div>
             <BottomNavigation 
-              isAdmin={isAdmin} 
+              isAdmin={isAdmin}
+              onNavigate={guardedNavigate}
             />
           </>
         )}
+
+        <UnsavedChangesAlert
+          open={showNavigationAlert}
+          onContinue={confirmNavigation}
+          onCancel={cancelNavigation}
+        />
       </div>
     </ModernTooltipProvider>
   );

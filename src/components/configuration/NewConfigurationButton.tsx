@@ -6,18 +6,21 @@ interface NewConfigurationButtonProps {
   onCreateNew: (name: string, copyFromCurrent: boolean, currency: 'EUR' | 'USD' | 'USDT') => void;
   hasCurrentConfig: boolean;
   currentConfigName: string;
+  hasUnsavedChanges?: boolean;
 }
 
 const NewConfigurationButton: React.FC<NewConfigurationButtonProps> = ({
   onCreateNew,
   hasCurrentConfig,
-  currentConfigName
+  currentConfigName,
+  hasUnsavedChanges = false
 }) => {
   return (
     <NewConfigurationDialog
       onCreateNew={onCreateNew}
       hasCurrentConfig={hasCurrentConfig}
       currentConfigName={currentConfigName}
+      hasUnsavedChanges={hasUnsavedChanges}
     />
   );
 };

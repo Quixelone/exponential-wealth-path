@@ -63,8 +63,11 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
   }
 
   const handleNavigation = (path: string) => {
-    navigate(path);
-    onNavigate?.(path);
+    if (onNavigate) {
+      onNavigate(path);
+    } else {
+      navigate(path);
+    }
   };
 
   const isActivePath = (path: string) => {

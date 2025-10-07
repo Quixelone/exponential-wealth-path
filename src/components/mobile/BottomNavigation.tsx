@@ -12,9 +12,10 @@ import { cn } from '@/lib/utils';
 interface BottomNavigationProps {
   isAdmin?: boolean;
   onStrategiesClick?: () => void;
+  onNavigate?: (path: string) => void;
 }
 
-const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategiesClick }) => {
+const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategiesClick, onNavigate }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -60,6 +61,8 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
   const handleNavigation = (item: any) => {
     if (item.onClick) {
       item.onClick();
+    } else if (onNavigate) {
+      onNavigate(item.path);
     } else {
       navigate(item.path);
     }

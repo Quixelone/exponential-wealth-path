@@ -117,7 +117,13 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
           </CardTitle>
           <div className="flex items-center gap-2">
             {hasUnsavedChanges && (
-              <Badge variant="destructive" className="animate-pulse">Modificato</Badge>
+              <Badge 
+                variant="destructive" 
+                className="animate-pulse"
+                title="Hai modifiche non salvate. Salva prima di cambiare pagina o chiudere."
+              >
+                Modificato
+              </Badge>
             )}
             <SaveConfigDialog
               open={saveDialogOpen}

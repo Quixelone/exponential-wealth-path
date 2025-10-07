@@ -7,31 +7,58 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Plus, AlertTriangle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import UnsavedChangesAlert from './UnsavedChangesAlert';
 
 interface NewConfigurationDialogProps {
   onCreateNew: (name: string, copyFromCurrent: boolean, currency: 'EUR' | 'USD' | 'USDT') => void;
   hasCurrentConfig: boolean;
   currentConfigName: string;
+  hasUnsavedChanges?: boolean;
 }
 
 const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
   onCreateNew,
   hasCurrentConfig,
-  currentConfigName
+  currentConfigName,
+  hasUnsavedChanges = false
 }) => {
   const [open, setOpen] = useState(false);
   const [configName, setConfigName] = useState('');
   const [createMode, setCreateMode] = useState<'empty' | 'copy'>('empty');
   const [currency, setCurrency] = useState<'EUR' | 'USD' | 'USDT'>('EUR');
+  const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
+  const [pendingCreate, setPendingCreate] = useState<{ name: string; copyMode: boolean; currency: 'EUR' | 'USD' | 'USDT' } | null>(null);
 
-  const handleCreate = () => {
+  const handleCreateAttempt = () => {
     if (configName.trim()) {
-      onCreateNew(configName.trim(), createMode === 'copy', currency);
-      setConfigName('');
-      setCreateMode('empty');
-      setCurrency('EUR');
-      setOpen(false);
+      if (hasUnsavedChanges) {
+        setPendingCreate({ name: configName.trim(), copyMode: createMode === 'copy', currency });
+        setShowUnsavedAlert(true);
+      } else {
+        executeCreate(configName.trim(), createMode === 'copy', currency);
+      }
     }
+  };
+
+  const executeCreate = (name: string, copyMode: boolean, curr: 'EUR' | 'USD' | 'USDT') => {
+    onCreateNew(name, copyMode, curr);
+    setConfigName('');
+    setCreateMode('empty');
+    setCurrency('EUR');
+    setOpen(false);
+  };
+
+  const confirmCreate = () => {
+    if (pendingCreate) {
+      executeCreate(pendingCreate.name, pendingCreate.copyMode, pendingCreate.currency);
+      setPendingCreate(null);
+      setShowUnsavedAlert(false);
+    }
+  };
+
+  const cancelCreate = () => {
+    setPendingCreate(null);
+    setShowUnsavedAlert(false);
   };
 
   return (
@@ -114,13 +141,19 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
               Annulla
             </Button>
             <Button
-              onClick={handleCreate}
+              onClick={handleCreateAttempt}
               disabled={!configName.trim()}
             >
               Crea Configurazione
             </Button>
           </div>
         </div>
+
+        <UnsavedChangesAlert
+          open={showUnsavedAlert}
+          onContinue={confirmCreate}
+          onCancel={cancelCreate}
+        />
       </DialogContent>
     </Dialog>
   );

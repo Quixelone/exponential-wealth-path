@@ -22,9 +22,10 @@ interface MobileDrawerProps {
   onClose: () => void;
   isAdmin?: boolean;
   onStrategiesClick?: () => void;
+  onNavigate?: (path: string) => void;
 }
 
-const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin, onStrategiesClick }) => {
+const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin, onStrategiesClick, onNavigate }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -60,7 +61,11 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin, o
   }
 
   const handleNavigation = (path: string) => {
-    navigate(path);
+    if (onNavigate) {
+      onNavigate(path);
+    } else {
+      navigate(path);
+    }
     onClose();
   };
 
