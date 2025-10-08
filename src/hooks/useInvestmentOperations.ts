@@ -16,7 +16,13 @@ interface UseInvestmentOperationsProps {
   setCurrentConfigId: (id: string | null) => void;
   investmentData: any[];
   saveConfigurationToHistory: (description: string) => void;
-  updateCurrentConfiguration?: (configId: string, name: string) => Promise<void>;
+  updateCurrentConfiguration?: (
+    configId: string, 
+    name: string, 
+    config: InvestmentConfig,
+    dailyReturns: { [day: number]: number },
+    dailyPACOverrides: { [day: number]: number }
+  ) => Promise<void>;
   saveCurrentConfiguration?: (name: string) => Promise<void>;
 }
 
@@ -32,12 +38,22 @@ export const useInvestmentOperations = ({
   saveCurrentConfiguration
 }: UseInvestmentOperationsProps) => {
   
-  // Auto-save helper function
-  const autoSave = useCallback(async () => {
+  // Auto-save helper function - accepts updated data directly to avoid race conditions
+  const autoSave = useCallback(async (
+    updatedDailyReturns: { [day: number]: number },
+    updatedDailyPACOverrides: { [day: number]: number }
+  ) => {
     if (configState.currentConfigId && configState.currentConfigName && updateCurrentConfiguration) {
-      await updateCurrentConfiguration(configState.currentConfigId, configState.currentConfigName);
+      // Pass the updated data directly, not from configState
+      await updateCurrentConfiguration(
+        configState.currentConfigId, 
+        configState.currentConfigName,
+        configState.config,
+        updatedDailyReturns,
+        updatedDailyPACOverrides
+      );
     }
-  }, [configState.currentConfigId, configState.currentConfigName, updateCurrentConfiguration]);
+  }, [configState.currentConfigId, configState.currentConfigName, configState.config, updateCurrentConfiguration]);
   
   const updateConfig = useCallback((newConfig: Partial<InvestmentConfig>, reset: boolean = false) => {
     // Save to history before making changes
@@ -68,67 +84,77 @@ export const useInvestmentOperations = ({
   const updateDailyReturn = useCallback(async (day: number, returnRate: number) => {
     saveConfigurationToHistory(`Modifica rendimento giorno ${day}: ${returnRate}%`);
     
-    setDailyReturns(prev => ({
-      ...prev,
+    // 1. Calculate new data BEFORE updating state
+    const newDailyReturns = {
+      ...configState.dailyReturns,
       [day]: returnRate
-    }));
+    };
     
-    // Auto-save if configuration exists
-    await autoSave();
-  }, [setDailyReturns, saveConfigurationToHistory, autoSave]);
+    // 2. Update React state
+    setDailyReturns(newDailyReturns);
+    
+    // 3. Auto-save with calculated data (not stale state)
+    await autoSave(newDailyReturns, configState.dailyPACOverrides);
+  }, [setDailyReturns, saveConfigurationToHistory, autoSave, configState.dailyReturns, configState.dailyPACOverrides]);
 
   const removeDailyReturn = useCallback(async (day: number) => {
     saveConfigurationToHistory(`Rimozione rendimento personalizzato giorno ${day}`);
     
-    setDailyReturns(prev => {
-      const newReturns = { ...prev };
-      delete newReturns[day];
-      return newReturns;
-    });
+    // 1. Calculate new data
+    const newDailyReturns = { ...configState.dailyReturns };
+    delete newDailyReturns[day];
     
-    // Auto-save if configuration exists
-    await autoSave();
-  }, [setDailyReturns, saveConfigurationToHistory, autoSave]);
+    // 2. Update React state
+    setDailyReturns(newDailyReturns);
+    
+    // 3. Auto-save with calculated data
+    await autoSave(newDailyReturns, configState.dailyPACOverrides);
+  }, [setDailyReturns, saveConfigurationToHistory, autoSave, configState.dailyReturns, configState.dailyPACOverrides]);
 
   const updatePACForDay = useCallback(async (day: number, pacAmount: number | null) => {
+    let newDailyPACOverrides: { [day: number]: number };
+    
     if (pacAmount === null) {
       // Remove the PAC override
       saveConfigurationToHistory(`Rimozione PAC personalizzato giorno ${day}`);
       
-      setDailyPACOverrides(prev => {
-        const updated = { ...prev };
-        delete updated[day];
-        return updated;
-      });
+      // 1. Calculate new data
+      newDailyPACOverrides = { ...configState.dailyPACOverrides };
+      delete newDailyPACOverrides[day];
+      
+      // 2. Update React state
+      setDailyPACOverrides(newDailyPACOverrides);
     } else {
       // Update or add PAC override
       saveConfigurationToHistory(`Modifica PAC giorno ${day}: €${pacAmount}`);
       
-      setDailyPACOverrides(prev => {
-        const updated = {
-          ...prev,
-          [day]: pacAmount
-        };
-        return updated;
-      });
+      // 1. Calculate new data
+      newDailyPACOverrides = {
+        ...configState.dailyPACOverrides,
+        [day]: pacAmount
+      };
+      
+      // 2. Update React state
+      setDailyPACOverrides(newDailyPACOverrides);
     }
     
-    // Auto-save if configuration exists
-    await autoSave();
-  }, [setDailyPACOverrides, saveConfigurationToHistory, autoSave]);
+    // 3. Auto-save with calculated data
+    await autoSave(configState.dailyReturns, newDailyPACOverrides);
+  }, [setDailyPACOverrides, saveConfigurationToHistory, autoSave, configState.dailyReturns, configState.dailyPACOverrides]);
 
   const removePACOverride = useCallback(async (day: number) => {
     saveConfigurationToHistory(`Rimozione PAC personalizzato giorno ${day}`);
     
-    setDailyPACOverrides(prev => {
-      const updated = { ...prev };
-      delete updated[day];
-      return updated;
-    });
+    // 1. Calculate new data
+    const newDailyPACOverrides = { ...configState.dailyPACOverrides };
+    delete newDailyPACOverrides[day];
     
-    // Auto-save if configuration exists
-    await autoSave();
-  }, [setDailyPACOverrides, saveConfigurationToHistory, autoSave]);
+    // 2. Update React state
+    setDailyPACOverrides(newDailyPACOverrides);
+    
+    // 3. Auto-save with calculated data
+    await autoSave(configState.dailyReturns, newDailyPACOverrides);
+  }, [setDailyPACOverrides, saveConfigurationToHistory, autoSave, configState.dailyReturns, configState.dailyPACOverrides]);
 
   const exportToCSV = useCallback(() => {
     const csvContent = [

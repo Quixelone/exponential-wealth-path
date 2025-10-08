@@ -121,9 +121,15 @@ export const useConfigurationManager = () => {
     }
   }, [saveConfiguration, configState.config, configState.dailyReturns, configState.dailyPACOverrides, setCurrentConfigId, setCurrentConfigName, saveConfigurationToHistory]);
 
-  const updateCurrentConfiguration = useCallback(async (configId: string, name: string) => {
+  const updateCurrentConfiguration = useCallback(async (
+    configId: string, 
+    name: string,
+    config = configState.config,
+    dailyReturns = configState.dailyReturns,
+    dailyPACOverrides = configState.dailyPACOverrides
+  ) => {
     console.log('🔄 ConfigurationManager: Updating configuration', { configId, name });
-    const success = await updateConfiguration(configId, name, configState.config, configState.dailyReturns, configState.dailyPACOverrides);
+    const success = await updateConfiguration(configId, name, config, dailyReturns, dailyPACOverrides);
     if (success) {
       console.log('✅ ConfigurationManager: Configuration updated, persisting to localStorage', { configId, name });
       // Ensure we maintain the current config context and persist it
