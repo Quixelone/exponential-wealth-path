@@ -65,19 +65,6 @@ const Index = () => {
     }
   }, [user, navigate]);
 
-  // Warn user about unsaved changes before closing tab/window
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges]);
-
   if (!user) {
     return null; // Will redirect to auth via useEffect
   }

@@ -191,7 +191,9 @@ export const useInvestmentCalculator = () => {
     setDailyPACOverrides,
     setCurrentConfigId,
     investmentData,
-    saveConfigurationToHistory
+    saveConfigurationToHistory,
+    updateCurrentConfiguration,
+    saveCurrentConfiguration
   });
 
   /**
