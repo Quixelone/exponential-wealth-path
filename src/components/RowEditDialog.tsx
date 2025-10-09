@@ -370,10 +370,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             >
               <Save className="h-4 w-4 mr-2" />
               <span className="sm:hidden">
-                {hasChanges ? 'Applica' : 'Nessuna Modifica'}
+                {hasChanges ? 'Applica e Salva' : 'Nessuna Modifica'}
               </span>
               <span className="hidden sm:inline">
-                {hasChanges ? 'Applica Modifiche' : 'Nessuna Modifica'}
+                {hasChanges ? 'Applica e Salva' : 'Nessuna Modifica'}
               </span>
             </Button>
           </div>

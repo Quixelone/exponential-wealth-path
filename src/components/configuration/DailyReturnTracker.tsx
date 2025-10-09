@@ -99,7 +99,7 @@ const DailyReturnTracker: React.FC<DailyReturnTrackerProps> = ({
                 className="w-full h-10"
                 disabled={selectedDay < 1 || selectedDay > timeHorizon || returnRate === '' || isNaN(parseFloat(returnRate))}
               >
-                Aggiungi
+                Aggiungi e Salva
               </Button>
             </div>
           </div>

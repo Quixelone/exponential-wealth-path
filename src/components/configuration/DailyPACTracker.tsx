@@ -83,7 +83,7 @@ const DailyPACTracker: React.FC<DailyPACTrackerProps> = ({
               className="w-full h-10"
               disabled={selectedDay < 1 || selectedDay > timeHorizon || pacAmount < 0}
             >
-              Imposta PAC
+              Imposta e Salva
             </Button>
           </div>
         </div>
