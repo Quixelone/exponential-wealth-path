@@ -43,8 +43,31 @@ export const useInvestmentOperations = ({
     updatedDailyReturns: { [day: number]: number },
     updatedDailyPACOverrides: { [day: number]: number }
   ) => {
-    if (configState.currentConfigId && configState.currentConfigName && updateCurrentConfiguration) {
-      // Pass the updated data directly, not from configState
+    console.log('🔄 AutoSave triggered', {
+      hasConfigId: !!configState.currentConfigId,
+      hasConfigName: !!configState.currentConfigName,
+      hasUpdateFunction: !!updateCurrentConfiguration,
+      configId: configState.currentConfigId,
+      configName: configState.currentConfigName
+    });
+
+    if (!configState.currentConfigId) {
+      console.warn('⚠️ AutoSave skipped: No configuration ID');
+      return;
+    }
+    
+    if (!configState.currentConfigName) {
+      console.warn('⚠️ AutoSave skipped: No configuration name');
+      return;
+    }
+    
+    if (!updateCurrentConfiguration) {
+      console.warn('⚠️ AutoSave skipped: No update function available');
+      return;
+    }
+
+    try {
+      console.log('💾 Executing auto-save to Supabase...');
       await updateCurrentConfiguration(
         configState.currentConfigId, 
         configState.currentConfigName,
@@ -52,6 +75,9 @@ export const useInvestmentOperations = ({
         updatedDailyReturns,
         updatedDailyPACOverrides
       );
+      console.log('✅ Auto-save completed successfully');
+    } catch (error) {
+      console.error('❌ Auto-save failed:', error);
     }
   }, [configState.currentConfigId, configState.currentConfigName, configState.config, updateCurrentConfiguration]);
   
