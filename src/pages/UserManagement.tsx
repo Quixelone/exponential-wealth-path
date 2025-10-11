@@ -46,13 +46,15 @@ const UserManagement = () => {
     try {
       console.log('📊 Fetching users data...');
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // Fetch user profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('❌ Error fetching users:', error);
+      if (profilesError) {
+        console.error('❌ Error fetching profiles:', profilesError);
         toast({
           title: "Errore",
           description: "Impossibile caricare gli utenti",
@@ -61,8 +63,34 @@ const UserManagement = () => {
         return;
       }
 
-      console.log('✅ Users data loaded successfully:', data?.length, 'users');
-      setUsers(data || []);
+      // Fetch user roles
+      const { data: roles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) {
+        console.error('❌ Error fetching roles:', rolesError);
+      }
+
+      // Merge profiles with roles
+      const usersWithRoles = (profiles || []).map(profile => {
+        const userRoles = (roles || []).filter(r => r.user_id === profile.id);
+        const hasAdminRole = userRoles.some(r => 
+          ['admin_readonly', 'admin_full', 'super_admin'].includes(r.role)
+        );
+        const adminRole = userRoles.find(r => 
+          ['admin_readonly', 'admin_full', 'super_admin'].includes(r.role)
+        )?.role || null;
+
+        return {
+          ...profile,
+          role: hasAdminRole ? 'admin' : 'user',
+          admin_role: adminRole
+        };
+      });
+
+      console.log('✅ Users data loaded successfully:', usersWithRoles?.length, 'users');
+      setUsers(usersWithRoles);
     } catch (error) {
       console.error('💥 Unexpected error:', error);
     } finally {

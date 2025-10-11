@@ -462,6 +462,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_sessions: {
         Row: {
           created_at: string
@@ -508,8 +532,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_admin_level: {
+        Args: {
+          _required_role?: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       delete_user_safely: {
         Args: { target_user_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
         Returns: boolean
       }
       is_admin: {
@@ -521,6 +559,10 @@ export type Database = {
         Returns: boolean
       }
       is_user_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_user_admin_new: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
@@ -541,6 +583,7 @@ export type Database = {
     }
     Enums: {
       admin_role_type: "admin_readonly" | "admin_full" | "super_admin"
+      app_role: "admin_readonly" | "admin_full" | "super_admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -669,6 +712,7 @@ export const Constants = {
   public: {
     Enums: {
       admin_role_type: ["admin_readonly", "admin_full", "super_admin"],
+      app_role: ["admin_readonly", "admin_full", "super_admin", "user"],
     },
   },
 } as const

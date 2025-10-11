@@ -7,6 +7,7 @@ interface UserProfile {
   id: string;
   email: string | null;
   role: 'admin' | 'user';
+  admin_role?: string | null;
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
@@ -70,8 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             .from('user_profiles')
             .insert({
               id: userId,
-              email: user?.email || null,
-              role: 'user'
+              email: user?.email || null
             })
             .select()
             .single();
@@ -80,13 +80,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             console.error('❌ Error creating profile:', createError);
             return;
           }
+
+          // Create default user role
+          if (newProfile) {
+            await supabase
+              .from('user_roles')
+              .insert({
+                user_id: newProfile.id,
+                role: 'user'
+              });
+          }
           
           if (newProfile) {
             console.log('✅ New profile created:', newProfile);
             setUserProfile({
               id: newProfile.id,
               email: newProfile.email,
-              role: newProfile.role as 'admin' | 'user',
+              role: 'user',
               first_name: newProfile.first_name,
               last_name: newProfile.last_name,
               phone: newProfile.phone,
@@ -447,7 +457,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const isAdmin = userProfile?.role === 'admin';
+  const isAdmin = userProfile?.role === 'admin' || userProfile?.admin_role !== null;
 
   const value: AuthContextType = {
     user,

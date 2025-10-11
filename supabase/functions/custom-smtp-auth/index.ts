@@ -13,12 +13,61 @@ interface SMTPAuthRequest {
   redirectTo?: string;
 }
 
+// Simple in-memory rate limiter
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MAX_REQUESTS = 5; // 5 requests per hour per IP
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+  
+  record.count++;
+  return true;
+}
+
+function validateEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 255;
+}
+
+function validatePassword(password: string): boolean {
+  return password.length >= 8 && password.length <= 100;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Extract IP address for rate limiting
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+    
+    // Check rate limit
+    if (!checkRateLimit(ip)) {
+      console.warn(`🚫 Rate limit exceeded for IP: ${ip}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Too many requests. Please try again later.',
+          retryAfter: 3600 
+        }),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -26,7 +75,30 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { email, password, type, redirectTo }: SMTPAuthRequest = await req.json();
 
-    console.log(`🔐 Processing ${type} request for email: ${email}`);
+    // Input validation
+    if (!email || !validateEmail(email)) {
+      console.error('❌ Invalid email format');
+      return new Response(
+        JSON.stringify({ error: 'Invalid email format' }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    if (type === 'signup' && password && !validatePassword(password)) {
+      console.error('❌ Invalid password format');
+      return new Response(
+        JSON.stringify({ error: 'Password must be between 8 and 100 characters' }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log(`🔐 Processing ${type} request for email: ${email} from IP: ${ip}`);
 
     let result;
     

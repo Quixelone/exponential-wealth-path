@@ -110,15 +110,41 @@ export const useSecurity = () => {
 
   const updateUserAdminRole = async (userId: string, adminRole: 'admin_readonly' | 'admin_full' | 'super_admin' | null) => {
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ 
-          admin_role: adminRole,
-          role: adminRole ? 'admin' : 'user'
-        })
-        .eq('id', userId);
+      // First, remove all existing admin roles for this user
+      const { error: deleteError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+        .in('role', ['admin_readonly', 'admin_full', 'super_admin']);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
+
+      // If adminRole is provided, insert the new role
+      if (adminRole) {
+        const { error: insertError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: userId,
+            role: adminRole
+          });
+
+        if (insertError) throw insertError;
+      } else {
+        // If removing admin role, ensure user role exists
+        const { error: userRoleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: userId,
+            role: 'user'
+          })
+          .select()
+          .single();
+
+        // Ignore if user role already exists
+        if (userRoleError && !userRoleError.message.includes('duplicate')) {
+          throw userRoleError;
+        }
+      }
 
       // Log the role change
       await logSecurityEvent({
