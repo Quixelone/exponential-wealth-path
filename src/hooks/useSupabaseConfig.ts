@@ -57,8 +57,26 @@ export const useSupabaseConfig = () => {
     try {
       const result = await updateConfig(configId, name, config, dailyReturns, dailyPACOverrides);
       console.log('✅ useSupabaseConfig: Update successful', { result });
-      // NON ricaricare tutte le configurazioni per semplici aggiornamenti daily returns
-      // Questo evita re-render inutili e sfarfallio
+      
+      if (result) {
+        // Aggiorna lo stato locale senza ricaricare dal database
+        // Questo evita re-render ma mantiene il confronto aggiornato
+        console.log('🔄 useSupabaseConfig: Updating local state after successful update');
+        setSavedConfigs(prev => prev.map(savedConfig => {
+          if (savedConfig.id === configId) {
+            return {
+              ...savedConfig,
+              name,
+              config,
+              dailyReturns,
+              dailyPACOverrides
+            };
+          }
+          return savedConfig;
+        }));
+        console.log('✅ useSupabaseConfig: Local state updated');
+      }
+      
       return result;
     } catch (err) {
       console.error('❌ useSupabaseConfig: Update failed', err);
