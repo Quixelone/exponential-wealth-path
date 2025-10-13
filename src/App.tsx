@@ -8,7 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import AuthCallback from "./pages/AuthCallback";
+import AuthCallback from '@/pages/AuthCallback';
 import Strategies from "./pages/Strategies";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
