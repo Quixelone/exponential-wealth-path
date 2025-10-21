@@ -65,11 +65,16 @@ export interface ActualTrade {
   id: string;
   config_id: string;
   day: number;
+  option_sold_date?: string;
+  expiration_date?: string;
   trade_date: string;
-  btc_amount: number;
-  fill_price_usd: number;
+  btc_amount: number | null;
+  fill_price_usd: number | null;
   strike_price?: number;
   trade_type: string;
+  option_status: 'filled' | 'expired_otm';
+  premium_received_usdt?: number;
+  premium_currency?: string;
   notes?: string;
   created_at: string;
   updated_at: string;

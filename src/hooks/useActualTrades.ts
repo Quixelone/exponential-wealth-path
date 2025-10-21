@@ -27,7 +27,7 @@ export const useActualTrades = ({ configId }: UseActualTradesProps) => {
         .order('day', { ascending: true });
 
       if (error) throw error;
-      setTrades(data || []);
+      setTrades((data || []) as ActualTrade[]);
     } catch (error) {
       console.error('Error loading trades:', error);
       toast({

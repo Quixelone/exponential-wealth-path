@@ -202,8 +202,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
                   <TableHead className="w-28">Data</TableHead>
                   <TableHead className="text-right">Capitale Iniziale</TableHead>
                   <TableHead className="text-right">PAC</TableHead>
-                  <TableHead className="text-right">Strike Price</TableHead>
-                  <TableHead className="text-center">Tipo</TableHead>
+                  <TableHead className="text-center">Trade Reale</TableHead>
                   <TableHead className="text-right">% Ricavo</TableHead>
                   <TableHead className="text-right">Ricavo Giorno</TableHead>
                   <TableHead className="text-right font-mono">Capitale Finale</TableHead>
@@ -215,7 +214,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
               <TableBody>
                 {paginatedData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                       Nessun dato da visualizzare per i filtri applicati.
                     </TableCell>
                   </TableRow>
@@ -225,7 +224,11 @@ const ReportTable: React.FC<ReportTableProps> = ({
                     const isPositiveGain = dailyGain >= 0;
                     const isToday = isCurrentDay(item.day);
                     const actualTrade = getTradeForDay(item.day);
-                    const realValue = actualTrade ? actualTrade.btc_amount * actualTrade.fill_price_usd : null;
+                    const realValue = actualTrade 
+                      ? (actualTrade.option_status === 'filled' 
+                          ? (actualTrade.btc_amount || 0) * (actualTrade.fill_price_usd || 0)
+                          : (actualTrade.premium_received_usdt || 0))
+                      : null;
                     const difference = realValue ? realValue - item.finalCapital : null;
                     const diffPercentage = difference && item.finalCapital > 0 ? (difference / item.finalCapital) * 100 : null;
 
@@ -257,20 +260,45 @@ const ReportTable: React.FC<ReportTableProps> = ({
                         </TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(item.pacAmount, currency)}</TableCell>
-                        <TableCell className="text-right font-mono">
-                          {actualTrade?.strike_price ? (
-                            <span className="text-blue-600 font-semibold">
-                              ${actualTrade.strike_price.toLocaleString()}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">-</span>
-                          )}
-                        </TableCell>
                         <TableCell className="text-center">
                           {actualTrade ? (
-                            <Badge variant={actualTrade.trade_type === 'buy_btc' ? 'default' : 'secondary'}>
-                              {actualTrade.trade_type === 'buy_btc' ? 'Buy' : 'Sell'}
-                            </Badge>
+                            <div className="space-y-2">
+                              {actualTrade.option_status === 'filled' ? (
+                                <>
+                                  <Badge variant="default" className="bg-green-600">
+                                    Fillata
+                                  </Badge>
+                                  <div className="text-sm font-mono">
+                                    {actualTrade.btc_amount?.toFixed(8)} BTC
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    @ ${actualTrade.fill_price_usd?.toLocaleString()}
+                                  </div>
+                                  {actualTrade.strike_price && (
+                                    <div className="text-xs text-blue-600">
+                                      Strike: ${actualTrade.strike_price.toLocaleString()}
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <Badge variant="secondary" className="bg-blue-600">
+                                    Scaduta OTM
+                                  </Badge>
+                                  <div className="text-sm font-mono text-blue-600">
+                                    +${actualTrade.premium_received_usdt?.toLocaleString()} USDT
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    Premio trattenuto
+                                  </div>
+                                </>
+                              )}
+                              {actualTrade.option_sold_date && (
+                                <div className="text-xs text-muted-foreground">
+                                  Sold: {formatDate(actualTrade.option_sold_date)}
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             <span className="text-muted-foreground text-sm">-</span>
                           )}

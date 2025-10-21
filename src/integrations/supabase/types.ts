@@ -16,39 +16,54 @@ export type Database = {
     Tables: {
       actual_trades: {
         Row: {
-          btc_amount: number
+          btc_amount: number | null
           config_id: string
           created_at: string
           day: number
-          fill_price_usd: number
+          expiration_date: string | null
+          fill_price_usd: number | null
           id: string
           notes: string | null
+          option_sold_date: string | null
+          option_status: string | null
+          premium_currency: string | null
+          premium_received_usdt: number | null
           strike_price: number | null
           trade_date: string
           trade_type: string
           updated_at: string
         }
         Insert: {
-          btc_amount: number
+          btc_amount?: number | null
           config_id: string
           created_at?: string
           day: number
-          fill_price_usd: number
+          expiration_date?: string | null
+          fill_price_usd?: number | null
           id?: string
           notes?: string | null
+          option_sold_date?: string | null
+          option_status?: string | null
+          premium_currency?: string | null
+          premium_received_usdt?: number | null
           strike_price?: number | null
           trade_date: string
           trade_type?: string
           updated_at?: string
         }
         Update: {
-          btc_amount?: number
+          btc_amount?: number | null
           config_id?: string
           created_at?: string
           day?: number
-          fill_price_usd?: number
+          expiration_date?: string | null
+          fill_price_usd?: number | null
           id?: string
           notes?: string | null
+          option_sold_date?: string | null
+          option_status?: string | null
+          premium_currency?: string | null
+          premium_received_usdt?: number | null
           strike_price?: number | null
           trade_date?: string
           trade_type?: string
