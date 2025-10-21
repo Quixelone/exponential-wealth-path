@@ -87,10 +87,34 @@ export const useInvestmentData = ({ config, dailyReturns, dailyPACOverrides }: U
         pacOverridesCount: Object.keys(dailyPACOverrides).length
       });
 
+      // DEBUG: Log input data
+      console.log('🔍 User Dashboard - Calculating with:', {
+        initialCapital: config.initialCapital,
+        pacAmount: config.pacConfig.amount,
+        pacFrequency: config.pacConfig.frequency,
+        dailyReturnsCount: Object.keys(dailyReturns).length,
+        dailyPACOverridesCount: Object.keys(dailyPACOverrides).length,
+        sampleDailyReturns: Object.fromEntries(
+          Object.entries(dailyReturns).slice(0, 5)
+        )
+      });
+
       const calculatedData = calculateInvestment({
         config,
         dailyReturns,
         dailyPACOverrides
+      });
+
+      // DEBUG: Log risultati calcolo
+      console.log('📊 User Dashboard - Calculation results:', {
+        day20: calculatedData[20] ? {
+          capitalBeforePAC: calculatedData[20].capitalBeforePAC,
+          pacAmount: calculatedData[20].pacAmount,
+          capitalAfterPAC: calculatedData[20].capitalAfterPAC,
+          dailyReturn: calculatedData[20].dailyReturn,
+          interestEarnedDaily: calculatedData[20].interestEarnedDaily,
+          finalCapital: calculatedData[20].finalCapital
+        } : 'N/A'
       });
 
       // Salva nel cache

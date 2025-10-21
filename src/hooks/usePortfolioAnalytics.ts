@@ -139,11 +139,39 @@ export const usePortfolioAnalytics = () => {
           dailyPACOverrides[po.day] = Number(po.pac_amount);
         });
 
+        // DEBUG: Log input data per questa config
+        console.log('🔍 Admin Dashboard - Processing config:', {
+          configId: configData.id,
+          configName: configData.name,
+          userName: `${configData.user_profiles?.first_name} ${configData.user_profiles?.last_name}`,
+          initialCapital: config.initialCapital,
+          pacAmount: config.pacConfig.amount,
+          pacFrequency: config.pacConfig.frequency,
+          dailyReturnsCount: Object.keys(dailyReturns).length,
+          dailyPACOverridesCount: Object.keys(dailyPACOverrides).length,
+          sampleDailyReturns: Object.fromEntries(
+            Object.entries(dailyReturns).slice(0, 5)
+          )
+        });
+
         // Usa SEMPRE calculateInvestment (stessa logica della dashboard utente)
         const investmentData = calculateInvestment({
           config,
           dailyReturns,
           dailyPACOverrides
+        });
+
+        // DEBUG: Log risultati calcolo
+        console.log('📊 Admin Dashboard - Calculation results:', {
+          configId: configData.id,
+          day20: investmentData[20] ? {
+            capitalBeforePAC: investmentData[20].capitalBeforePAC,
+            pacAmount: investmentData[20].pacAmount,
+            capitalAfterPAC: investmentData[20].capitalAfterPAC,
+            dailyReturn: investmentData[20].dailyReturn,
+            interestEarnedDaily: investmentData[20].interestEarnedDaily,
+            finalCapital: investmentData[20].finalCapital
+          } : 'N/A'
         });
 
         // Determina se ci sono versamenti reali registrati (per badge "PAC Reali")
