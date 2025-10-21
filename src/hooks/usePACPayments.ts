@@ -233,6 +233,73 @@ export const usePACPayments = (configId?: string) => {
     }
   }, [configId]);
 
+  // Create or update PAC payment (for sync with checkbox UI)
+  const createOrUpdatePACPayment = async (
+    configId: string,
+    scheduledDate: string,
+    scheduledAmount: number,
+    isExecuted: boolean,
+    executedAmount?: number
+  ) => {
+    try {
+      setLoading(true);
+
+      // Check if payment already exists
+      const { data: existing, error: fetchError } = await supabase
+        .from('pac_payments')
+        .select('*')
+        .eq('config_id', configId)
+        .eq('scheduled_date', scheduledDate)
+        .maybeSingle();
+
+      if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+
+      if (existing) {
+        // Update existing payment
+        const { error: updateError } = await supabase
+          .from('pac_payments')
+          .update({
+            is_executed: isExecuted,
+            executed_date: isExecuted ? format(new Date(), 'yyyy-MM-dd') : null,
+            executed_amount: isExecuted ? (executedAmount || scheduledAmount) : null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Create new payment
+        const { error: insertError } = await supabase
+          .from('pac_payments')
+          .insert({
+            config_id: configId,
+            scheduled_date: scheduledDate,
+            scheduled_amount: scheduledAmount,
+            is_executed: isExecuted,
+            executed_date: isExecuted ? format(new Date(), 'yyyy-MM-dd') : null,
+            executed_amount: isExecuted ? (executedAmount || scheduledAmount) : null,
+          });
+
+        if (insertError) throw insertError;
+      }
+
+      // Reload payments
+      if (configId) {
+        await loadPayments(configId);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Errore nella sincronizzazione del versamento';
+      setError(errorMessage);
+      toast({
+        title: "Errore",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     payments,
     stats,
@@ -242,5 +309,6 @@ export const usePACPayments = (configId?: string) => {
     generateScheduledPayments,
     executePayment,
     undoExecution,
+    createOrUpdatePACPayment,
   };
 };

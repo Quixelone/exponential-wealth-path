@@ -7,6 +7,7 @@ import { format, addDays, addWeeks, addMonths, isBefore, isToday, parseISO } fro
 import { it } from 'date-fns/locale';
 import { InvestmentConfig } from '@/types/investment';
 import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { usePACPayments } from '@/hooks/usePACPayments';
 
 interface PACPayment {
   id: string;
@@ -19,6 +20,7 @@ interface PACPayment {
 
 interface PACPaymentTrackerProps {
   config: InvestmentConfig;
+  configId?: string;
   dailyPACOverrides?: { [day: number]: number };
   onUpdatePACForDay?: (day: number, amount: number | null) => void;
   onMarkPaymentComplete?: (day: number, isComplete: boolean) => void;
@@ -26,11 +28,13 @@ interface PACPaymentTrackerProps {
 
 export const PACPaymentTracker: React.FC<PACPaymentTrackerProps> = ({
   config,
+  configId,
   dailyPACOverrides = {},
   onUpdatePACForDay,
   onMarkPaymentComplete
 }) => {
   const [completedPayments, setCompletedPayments] = useState<Set<number>>(new Set());
+  const { createOrUpdatePACPayment } = usePACPayments();
 
   // Initialize completed payments from dailyPACOverrides (use 0 amount as completed marker)
   useEffect(() => {
@@ -97,23 +101,40 @@ export const PACPaymentTracker: React.FC<PACPaymentTrackerProps> = ({
     return payments.sort((a, b) => a.date.getTime() - b.date.getTime());
   }, [config, dailyPACOverrides, completedPayments]);
 
-  const togglePaymentCompletion = (paymentId: string) => {
+  const togglePaymentCompletion = async (paymentId: string) => {
     const dayNumber = parseInt(paymentId.replace('day-', ''));
     const isCurrentlyCompleted = completedPayments.has(dayNumber);
+    const baseAmount = config.pacConfig.amount;
+    
+    // Calculate the scheduled date for this payment
+    const startDate = new Date(config.pacConfig.startDate);
+    const scheduledDate = addDays(startDate, dayNumber - 1);
+    const scheduledDateStr = format(scheduledDate, 'yyyy-MM-dd');
     
     if (onMarkPaymentComplete) {
       onMarkPaymentComplete(dayNumber, !isCurrentlyCompleted);
     }
     
+    // 1. Update daily_pac_overrides (existing behavior)
     if (onUpdatePACForDay) {
       if (isCurrentlyCompleted) {
         // Unmark as completed - restore original amount
-        const baseAmount = config.pacConfig.amount;
         onUpdatePACForDay(dayNumber, baseAmount);
       } else {
         // Mark as completed - set amount to 0 to indicate completion
         onUpdatePACForDay(dayNumber, 0);
       }
+    }
+    
+    // 2. NEW: Synchronize with pac_payments table (only if configId is available)
+    if (configId && createOrUpdatePACPayment) {
+      await createOrUpdatePACPayment(
+        configId,
+        scheduledDateStr,
+        baseAmount,
+        !isCurrentlyCompleted, // New execution state
+        baseAmount // Executed amount (same as scheduled for checkbox UI)
+      );
     }
   };
 

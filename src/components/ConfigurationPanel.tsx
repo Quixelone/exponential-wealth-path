@@ -171,6 +171,7 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
         dailyPACOverrides={dailyPACOverrides}
         onUpdatePACForDay={onUpdatePACForDay}
         onRemovePACOverride={onRemovePACOverride}
+        configId={currentConfigId}
       />
 
 

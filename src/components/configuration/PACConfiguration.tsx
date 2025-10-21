@@ -25,6 +25,7 @@ interface PACConfigurationProps {
   dailyPACOverrides: { [day: number]: number };
   onUpdatePACForDay: (day: number, pacAmount: number | null) => void;
   onRemovePACOverride: (day: number) => void;
+  configId?: string | null;
 }
 
 const PACConfiguration: React.FC<PACConfigurationProps> = ({
@@ -37,7 +38,8 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
   onRemoveDailyReturn,
   dailyPACOverrides,
   onUpdatePACForDay,
-  onRemovePACOverride
+  onRemovePACOverride,
+  configId
 }) => {
   const handleDateChange = (date: Date | undefined) => {
     if (date) {
@@ -166,6 +168,7 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
             dailyReturnRate: 0,
             currency: 'EUR'
           }}
+          configId={configId || undefined}
           dailyPACOverrides={dailyPACOverrides}
           onUpdatePACForDay={onUpdatePACForDay}
           onMarkPaymentComplete={(day, isComplete) => {
