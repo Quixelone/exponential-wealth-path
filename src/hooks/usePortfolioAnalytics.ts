@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { calculateInvestment } from './investmentCalculationUtils';
 import { InvestmentConfig, PACConfig } from '@/types/investment';
+import { useDebouncedCallback } from './useDebouncedCallback';
 
 export interface PortfolioStrategy {
   id: string;
@@ -208,6 +209,11 @@ export const usePortfolioAnalytics = () => {
         worstPerformers: sortedByPerformance.slice(-5).reverse()
       });
 
+      console.log('✅ Portfolio Analytics: Data refreshed', {
+        strategiesCount: processedStrategies.length,
+        totalCapital
+      });
+
     } catch (error) {
       console.error('Unexpected error fetching portfolio data:', error);
       toast({
@@ -220,8 +226,89 @@ export const usePortfolioAnalytics = () => {
     }
   };
 
-  useEffect(() => {
+  // Debounced fetch per evitare chiamate multiple in rapida successione
+  const debouncedFetch = useDebouncedCallback(() => {
+    console.log('🔄 Portfolio Analytics: Real-time update triggered');
     fetchPortfolioData();
+  }, 500);
+
+  useEffect(() => {
+    console.log('📊 Portfolio Analytics: Initial fetch');
+    fetchPortfolioData();
+
+    // Setup real-time subscriptions
+    const configsChannel = supabase
+      .channel('portfolio_configs_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'investment_configs'
+        },
+        (payload) => {
+          console.log('Config changed:', payload);
+          debouncedFetch();
+        }
+      )
+      .subscribe();
+
+    const returnsChannel = supabase
+      .channel('portfolio_returns_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'daily_returns'
+        },
+        () => {
+          console.log('Daily returns changed');
+          debouncedFetch();
+        }
+      )
+      .subscribe();
+
+    const pacChannel = supabase
+      .channel('portfolio_pac_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'daily_pac_overrides'
+        },
+        () => {
+          console.log('PAC overrides changed');
+          debouncedFetch();
+        }
+      )
+      .subscribe();
+
+    const tradesChannel = supabase
+      .channel('portfolio_trades_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'actual_trades'
+        },
+        () => {
+          console.log('Actual trades changed');
+          debouncedFetch();
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscriptions
+    return () => {
+      console.log('🧹 Portfolio Analytics: Cleaning up subscriptions');
+      supabase.removeChannel(configsChannel);
+      supabase.removeChannel(returnsChannel);
+      supabase.removeChannel(pacChannel);
+      supabase.removeChannel(tradesChannel);
+    };
   }, []);
 
   return {

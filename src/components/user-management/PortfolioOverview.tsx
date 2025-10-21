@@ -1,11 +1,12 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, TrendingDown, DollarSign, Users, Target, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Users, Target, Activity, RefreshCw } from 'lucide-react';
 import { usePortfolioAnalytics } from '@/hooks/usePortfolioAnalytics';
 import PortfolioTable from './PortfolioTable';
+import { Button } from '@/components/ui/button';
 
 const PortfolioOverview = () => {
-  const { strategies, summary, loading } = usePortfolioAnalytics();
+  const { strategies, summary, loading, refetch } = usePortfolioAnalytics();
 
   if (loading) {
     return (
@@ -58,6 +59,18 @@ const PortfolioOverview = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header with Refresh Button */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Portfolio Analytics</h2>
+          <p className="text-sm text-muted-foreground">Aggiornamenti in tempo reale</p>
+        </div>
+        <Button onClick={refetch} disabled={loading} variant="outline">
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Aggiorna Dati
+        </Button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
