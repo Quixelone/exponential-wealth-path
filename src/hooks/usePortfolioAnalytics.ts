@@ -150,6 +150,16 @@ export const usePortfolioAnalytics = () => {
         });
       });
 
+      // DEBUG: Log PAC overrides distribution
+      console.log('🔍 PAC Overrides Distribution:', {
+        totalPACOverrides: allDailyPACOverrides?.length || 0,
+        configsWithPACOverrides: Array.from(dailyPACOverridesMap.entries()).map(([configId, overrides]) => ({
+          configId: configId.substring(0, 8),
+          count: overrides.length,
+          samples: overrides.slice(0, 3)
+        }))
+      });
+
       const tradesMap = new Map();
       actualTrades?.forEach(trade => {
         if (!tradesMap.has(trade.config_id)) {
