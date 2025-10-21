@@ -139,22 +139,53 @@ export const usePortfolioAnalytics = () => {
           dailyPACOverrides[po.day] = Number(po.pac_amount);
         });
 
-        // Check if this config has real PAC payments
+        // Check if this config has real PAC payments or executed overrides
         const configPayments = paymentsMap.get(configData.id) || [];
-        const hasRealPayments = configPayments.length > 0;
-
-        // Calculate investment data - use real payments if available, otherwise use theoretical PAC
-        const investmentData = hasRealPayments
-          ? calculateInvestmentWithRealPayments({
-              config,
-              dailyReturns,
-              realPayments: configPayments,
-            })
-          : calculateInvestment({
-              config,
-              dailyReturns,
-              dailyPACOverrides
+        
+        // Convert dailyPACOverrides with amount=0 to simulated payments
+        const simulatedPayments: Array<{ executed_date: string; executed_amount: number }> = [];
+        Object.entries(dailyPACOverrides).forEach(([dayStr, amount]) => {
+          const day = parseInt(dayStr);
+          const amountNum = Number(amount);
+          
+          // If amount is 0, it means the payment was executed (marked by user)
+          if (amountNum === 0) {
+            const paymentDate = new Date(configData.pac_start_date);
+            paymentDate.setDate(paymentDate.getDate() + day);
+            
+            simulatedPayments.push({
+              executed_date: paymentDate.toISOString().split('T')[0],
+              executed_amount: config.pacConfig.amount, // Use standard PAC amount
             });
+          }
+        });
+
+        const hasRealPayments = configPayments.length > 0 || simulatedPayments.length > 0;
+
+        // Calculate investment data with intelligent priority system
+        let investmentData;
+        if (configPayments.length > 0) {
+          // Priority 1: Use real pac_payments if available
+          investmentData = calculateInvestmentWithRealPayments({
+            config,
+            dailyReturns,
+            realPayments: configPayments,
+          });
+        } else if (simulatedPayments.length > 0) {
+          // Priority 2: Use dailyPACOverrides (amount=0) as simulated payments
+          investmentData = calculateInvestmentWithRealPayments({
+            config,
+            dailyReturns,
+            realPayments: simulatedPayments,
+          });
+        } else {
+          // Priority 3: Use theoretical PAC calculation
+          investmentData = calculateInvestment({
+            config,
+            dailyReturns,
+            dailyPACOverrides
+          });
+        }
 
         // Calculate current day
         const startDate = new Date(configData.pac_start_date);
