@@ -23,6 +23,7 @@ export type Database = {
           fill_price_usd: number
           id: string
           notes: string | null
+          strike_price: number | null
           trade_date: string
           trade_type: string
           updated_at: string
@@ -35,6 +36,7 @@ export type Database = {
           fill_price_usd: number
           id?: string
           notes?: string | null
+          strike_price?: number | null
           trade_date: string
           trade_type?: string
           updated_at?: string
@@ -47,6 +49,7 @@ export type Database = {
           fill_price_usd?: number
           id?: string
           notes?: string | null
+          strike_price?: number | null
           trade_date?: string
           trade_type?: string
           updated_at?: string

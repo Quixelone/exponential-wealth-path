@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InvestmentData } from '@/types/investment';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -27,10 +28,23 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     btc_amount: '',
+    strike_price: '',
     fill_price_usd: '',
     trade_date: item.date,
+    trade_type: 'buy_btc',
     notes: ''
   });
+
+  const calculatedValue = useMemo(() => {
+    const btcAmount = parseFloat(formData.btc_amount);
+    const strikePrice = parseFloat(formData.strike_price);
+    const fillPrice = formData.fill_price_usd ? parseFloat(formData.fill_price_usd) : strikePrice;
+    
+    if (!isNaN(btcAmount) && !isNaN(fillPrice)) {
+      return btcAmount * fillPrice;
+    }
+    return null;
+  }, [formData]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!configId) {
@@ -43,6 +57,10 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
     }
     setLoading(true);
     try {
+      const fillPrice = formData.fill_price_usd 
+        ? parseFloat(formData.fill_price_usd) 
+        : parseFloat(formData.strike_price);
+
       const {
         error
       } = await supabase.from('actual_trades').insert({
@@ -50,21 +68,24 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
         day: item.day,
         trade_date: formData.trade_date,
         btc_amount: parseFloat(formData.btc_amount),
-        fill_price_usd: parseFloat(formData.fill_price_usd),
-        trade_type: 'option_fill',
+        strike_price: parseFloat(formData.strike_price),
+        fill_price_usd: fillPrice,
+        trade_type: formData.trade_type,
         notes: formData.notes || null
       });
       if (error) throw error;
       toast({
         title: "Trade registrato",
-        description: "Il trade è stato salvato con successo"
+        description: `${formData.trade_type === 'buy_btc' ? 'Buy' : 'Sell'} BTC registrato con successo`
       });
       onTradeRecorded();
       onOpenChange(false);
       setFormData({
         btc_amount: '',
+        strike_price: '',
         fill_price_usd: '',
         trade_date: item.date,
+        trade_type: 'buy_btc',
         notes: ''
       });
     } catch (error) {
@@ -96,6 +117,42 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
             }))} required />
             </div>
             <div>
+              <Label htmlFor="trade_type">Tipo Opzione</Label>
+              <Select 
+                value={formData.trade_type}
+                onValueChange={(value) => setFormData(prev => ({
+                  ...prev,
+                  trade_type: value
+                }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="buy_btc">Buy BTC (Call Sold)</SelectItem>
+                  <SelectItem value="sell_btc">Sell BTC (Put Sold)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="strike_price">Strike Price (USDT)</Label>
+              <Input 
+                id="strike_price"
+                type="number"
+                step="0.01"
+                placeholder="45000.00"
+                value={formData.strike_price}
+                onChange={e => setFormData(prev => ({
+                  ...prev,
+                  strike_price: e.target.value
+                }))}
+                required
+              />
+            </div>
+            <div>
               <Label htmlFor="btc_amount">Quantità BTC</Label>
               <Input id="btc_amount" type="number" step="0.00000001" placeholder="0.00123456" value={formData.btc_amount} onChange={e => setFormData(prev => ({
               ...prev,
@@ -105,12 +162,31 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
           </div>
           
           <div>
-            <Label htmlFor="fill_price_usd">Prezzo eseguito (USDT)</Label>
-            <Input id="fill_price_usd" type="number" step="0.01" placeholder="45000.00" value={formData.fill_price_usd} onChange={e => setFormData(prev => ({
+            <Label htmlFor="fill_price_usd">Prezzo BTC eseguito (opzionale)</Label>
+            <Input id="fill_price_usd" type="number" step="0.01" placeholder="45523.18" value={formData.fill_price_usd} onChange={e => setFormData(prev => ({
             ...prev,
             fill_price_usd: e.target.value
-          }))} required />
+          }))} />
+            <p className="text-xs text-muted-foreground mt-1">
+              Lascia vuoto per usare lo strike price
+            </p>
           </div>
+
+          {calculatedValue && (
+            <div className="bg-primary/10 p-3 rounded-lg">
+              <div className="text-sm font-medium mb-2">Preview Calcolo:</div>
+              <div className="space-y-1 text-sm">
+                <div>BTC: {formData.btc_amount}</div>
+                <div>Strike: ${parseFloat(formData.strike_price).toLocaleString()}</div>
+                {formData.fill_price_usd && (
+                  <div>Fill Price: ${parseFloat(formData.fill_price_usd).toLocaleString()}</div>
+                )}
+                <div className="font-bold text-lg mt-2">
+                  Valore Trade: ${calculatedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div>
             <Label htmlFor="notes">Note (opzionale)</Label>

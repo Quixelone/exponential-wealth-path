@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3, Calendar, DollarSign, TrendingDown } from 'lucide-react';
 import { ModernTooltipProvider, ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/ModernTooltip';
 import { Currency, formatCurrency } from '@/lib/utils';
@@ -201,7 +202,8 @@ const ReportTable: React.FC<ReportTableProps> = ({
                   <TableHead className="w-28">Data</TableHead>
                   <TableHead className="text-right">Capitale Iniziale</TableHead>
                   <TableHead className="text-right">PAC</TableHead>
-                  <TableHead className="text-right">Capitale Post PAC</TableHead>
+                  <TableHead className="text-right">Strike Price</TableHead>
+                  <TableHead className="text-center">Tipo</TableHead>
                   <TableHead className="text-right">% Ricavo</TableHead>
                   <TableHead className="text-right">Ricavo Giorno</TableHead>
                   <TableHead className="text-right font-mono">Capitale Finale</TableHead>
@@ -255,7 +257,24 @@ const ReportTable: React.FC<ReportTableProps> = ({
                         </TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(item.pacAmount, currency)}</TableCell>
-                        <TableCell className="text-right font-mono">{formatCurrency(item.capitalAfterPAC, currency)}</TableCell>
+                        <TableCell className="text-right font-mono">
+                          {actualTrade?.strike_price ? (
+                            <span className="text-blue-600 font-semibold">
+                              ${actualTrade.strike_price.toLocaleString()}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {actualTrade ? (
+                            <Badge variant={actualTrade.trade_type === 'buy_btc' ? 'default' : 'secondary'}>
+                              {actualTrade.trade_type === 'buy_btc' ? 'Buy' : 'Sell'}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">-</span>
+                          )}
+                        </TableCell>
                         <TableCell className={`text-right font-mono ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {item.dailyReturn.toFixed(3)}%
                         </TableCell>

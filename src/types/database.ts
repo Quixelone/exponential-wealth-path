@@ -60,6 +60,7 @@ export interface DatabaseActualTrade {
   trade_date: string;
   btc_amount: number;
   fill_price_usd: number;
+  strike_price?: number;
   trade_type: string;
   notes?: string;
   created_at: string;
