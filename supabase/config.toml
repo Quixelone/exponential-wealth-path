@@ -87,3 +87,13 @@ verify_jwt = true
 name = "custom-smtp-auth"
 source = "./supabase/functions/custom-smtp-auth"
 verify_jwt = false
+
+[[edge_runtime.function]]
+name = "fetch-btc-price"
+source = "./supabase/functions/fetch-btc-price"
+verify_jwt = false
+
+[[edge_runtime.function]]
+name = "sync-btc-prices"
+source = "./supabase/functions/sync-btc-prices"
+verify_jwt = false

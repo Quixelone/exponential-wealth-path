@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { InvestmentData } from '@/types/investment';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useBTCPrice } from '@/hooks/useBTCPrice';
 import { TrendingUp, AlertCircle, CheckCircle2, XCircle, Calendar } from 'lucide-react';
 
 interface TradeRecordDialogProps {
@@ -57,6 +58,23 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
     trade_type: 'buy_btc',
     notes: ''
   });
+
+  // Fetch BTC price automatically for expiration date
+  const { 
+    price: btcPriceAtExpiration, 
+    loading: loadingBTCPrice,
+    error: btcPriceError 
+  } = useBTCPrice(formData.expiration_date);
+
+  // Auto-fill strike price when BTC price is fetched
+  useEffect(() => {
+    if (btcPriceAtExpiration && !formData.strike_price) {
+      setFormData(prev => ({
+        ...prev,
+        strike_price: btcPriceAtExpiration.toFixed(2)
+      }));
+    }
+  }, [btcPriceAtExpiration]);
 
   const calculatedValue = useMemo(() => {
     if (formData.option_status === 'filled') {
@@ -292,19 +310,35 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
             {/* SCENARIO 1: Opzione Fillata */}
             <TabsContent value="filled" className="space-y-4 mt-4">
               {/* Strike Price */}
-              <div className="space-y-2 border-2 border-green-500/30 rounded-lg p-4 bg-green-50/50 dark:bg-green-950/20">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                  <Label htmlFor="strike_price" className="text-base font-semibold">
-                    Strike Price (USDT)
-                  </Label>
-                  <Badge variant="default" className="ml-auto bg-green-600">Obbligatorio</Badge>
+              <div className="space-y-2 border-2 border-primary/30 rounded-lg p-4 bg-primary/5">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    <Label htmlFor="strike_price" className="text-base font-semibold">
+                      Strike Price (USDT)
+                    </Label>
+                  </div>
+                  {loadingBTCPrice && (
+                    <Badge variant="outline" className="animate-pulse">
+                      🔄 Caricamento prezzo...
+                    </Badge>
+                  )}
+                  {btcPriceAtExpiration && !loadingBTCPrice && (
+                    <Badge variant="secondary" className="bg-green-500/20 text-green-700 dark:text-green-300">
+                      ✅ BTC: ${btcPriceAtExpiration.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                    </Badge>
+                  )}
+                  {btcPriceError && (
+                    <Badge variant="destructive" className="text-xs">
+                      ⚠️ {btcPriceError}
+                    </Badge>
+                  )}
                 </div>
                 <Input 
                   id="strike_price"
                   type="number"
                   step="0.01"
-                  placeholder="Es: 45000"
+                  placeholder={loadingBTCPrice ? "Recupero prezzo..." : "45000"}
                   value={formData.strike_price}
                   onChange={e => setFormData(prev => ({
                     ...prev,
@@ -312,9 +346,10 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
                   }))}
                   className="text-lg font-mono"
                   required={formData.option_status === 'filled'}
+                  disabled={loadingBTCPrice}
                 />
                 <p className="text-xs text-muted-foreground">
-                  💡 Prezzo concordato per l'acquisto/vendita di BTC
+                  💡 Prezzo recuperato automaticamente da CoinMarketCap per la data di scadenza
                 </p>
               </div>
 
@@ -356,7 +391,7 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
                   id="fill_price_usd" 
                   type="number" 
                   step="0.01" 
-                  placeholder="45523.18" 
+                  placeholder={btcPriceAtExpiration ? `Default: ${btcPriceAtExpiration.toFixed(2)}` : "45523.18"}
                   value={formData.fill_price_usd} 
                   onChange={e => setFormData(prev => ({
                     ...prev,
@@ -364,6 +399,12 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
                   }))}
                   className="font-mono"
                 />
+                {btcPriceAtExpiration && formData.fill_price_usd && (
+                  <p className="text-xs mt-1 font-medium">
+                    {parseFloat(formData.fill_price_usd) > btcPriceAtExpiration ? '📈 Sopra strike' : '📉 Sotto strike'}
+                    {' - '}Differenza: ${Math.abs(parseFloat(formData.fill_price_usd) - btcPriceAtExpiration).toFixed(2)}
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground mt-1">
                   Lascia vuoto per usare automaticamente lo strike price
                 </p>
