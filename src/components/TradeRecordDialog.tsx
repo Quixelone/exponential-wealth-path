@@ -7,11 +7,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { InvestmentData } from '@/types/investment';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { InvestmentData, ActualTrade } from '@/types/investment';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useBTCPrice } from '@/hooks/useBTCPrice';
-import { TrendingUp, AlertCircle, CheckCircle2, XCircle, Calendar } from 'lucide-react';
+import { TrendingUp, AlertCircle, CheckCircle2, XCircle, Calendar, Trash2 } from 'lucide-react';
 
 interface TradeRecordDialogProps {
   open: boolean;
@@ -32,6 +33,7 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [existingTrade, setExistingTrade] = useState<ActualTrade | null>(null);
 
   const calculatePreviousDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -66,15 +68,49 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
     error: btcPriceError 
   } = useBTCPrice(formData.expiration_date);
 
-  // Auto-fill strike price when BTC price is fetched
+  // Load existing trade on open
   useEffect(() => {
-    if (btcPriceAtExpiration && !formData.strike_price) {
+    if (open && configId) {
+      const fetchExistingTrade = async () => {
+        const { data: tradeData } = await supabase
+          .from('actual_trades')
+          .select('*')
+          .eq('config_id', configId)
+          .eq('day', item.day)
+          .maybeSingle();
+        
+        if (tradeData) {
+          setExistingTrade(tradeData as ActualTrade);
+          // Pre-fill form with existing data
+          setFormData({
+            option_sold_date: tradeData.option_sold_date || '',
+            expiration_date: tradeData.expiration_date || '',
+            option_status: tradeData.option_status as 'filled' | 'expired_otm',
+            btc_amount: tradeData.btc_amount?.toString() || '',
+            strike_price: tradeData.strike_price?.toString() || '',
+            fill_price_usd: tradeData.fill_price_usd?.toString() || '',
+            premium_received_usdt: tradeData.premium_received_usdt?.toString() || '',
+            premium_currency: tradeData.premium_currency || 'USDT',
+            trade_type: tradeData.trade_type,
+            notes: tradeData.notes || ''
+          });
+        } else {
+          setExistingTrade(null);
+        }
+      };
+      fetchExistingTrade();
+    }
+  }, [open, configId, item.day]);
+
+  // Auto-fill strike price when BTC price is fetched (only for new trades)
+  useEffect(() => {
+    if (btcPriceAtExpiration && !formData.strike_price && !existingTrade) {
       setFormData(prev => ({
         ...prev,
         strike_price: btcPriceAtExpiration.toFixed(2)
       }));
     }
-  }, [btcPriceAtExpiration]);
+  }, [btcPriceAtExpiration, existingTrade]);
 
   const calculatedValue = useMemo(() => {
     if (formData.option_status === 'filled') {
@@ -180,16 +216,35 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
         };
       }
 
-      const { error } = await supabase.from('actual_trades').insert(tradeData);
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Trade registrato",
-        description: formData.option_status === 'filled' 
-          ? `Opzione fillata: ${formData.btc_amount} BTC a $${tradeData.fill_price_usd}` 
-          : `Opzione scaduta OTM: Premio $${formData.premium_received_usdt} USDT`
-      });
+      let result;
+      if (existingTrade) {
+        // UPDATE MODE
+        result = await supabase
+          .from('actual_trades')
+          .update(tradeData)
+          .eq('id', existingTrade.id);
+        
+        if (result.error) throw result.error;
+        
+        toast({
+          title: "✅ Trade aggiornato",
+          description: "Le modifiche sono state salvate con successo"
+        });
+      } else {
+        // INSERT MODE
+        result = await supabase
+          .from('actual_trades')
+          .insert(tradeData);
+        
+        if (result.error) throw result.error;
+        
+        toast({
+          title: "✅ Trade registrato",
+          description: formData.option_status === 'filled' 
+            ? `Opzione fillata: ${formData.btc_amount} BTC a $${tradeData.fill_price_usd}` 
+            : `Opzione scaduta OTM: Premio $${formData.premium_received_usdt} USDT`
+        });
+      }
       
       onTradeRecorded();
       onOpenChange(false);
@@ -225,7 +280,12 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
-            Registra Trade Reale - Giorno {item.day}
+            {existingTrade ? '✏️ Modifica Trade' : '📝 Registra Trade'} - Giorno {item.day}
+            {existingTrade && (
+              <Badge variant="secondary" className="ml-2 bg-blue-500/20 text-blue-700 dark:text-blue-300">
+                📝 Modalità Modifica
+              </Badge>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -566,18 +626,73 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
             />
           </div>
 
-          <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Annulla
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Registrazione...' : 'Registra Trade'}
-            </Button>
+          <DialogFooter className="flex justify-between">
+            {existingTrade && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button type="button" variant="destructive" className="gap-2">
+                    <Trash2 className="h-4 w-4" />
+                    Elimina Trade
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>⚠️ Conferma Eliminazione</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Vuoi eliminare definitivamente il trade del Giorno {item.day}?
+                      Questa azione non può essere annullata.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annulla</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={async () => {
+                        try {
+                          const { error } = await supabase
+                            .from('actual_trades')
+                            .delete()
+                            .eq('id', existingTrade.id);
+                          
+                          if (error) throw error;
+                          
+                          toast({
+                            title: "🗑️ Trade eliminato",
+                            description: "Il trade è stato rimosso con successo"
+                          });
+                          
+                          onTradeRecorded();
+                          onOpenChange(false);
+                        } catch (error) {
+                          console.error('Error deleting trade:', error);
+                          toast({
+                            title: "Errore",
+                            description: "Impossibile eliminare il trade",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                      className="bg-destructive text-destructive-foreground"
+                    >
+                      Elimina Definitivamente
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+
+            <div className="flex gap-2 ml-auto">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                disabled={loading}
+              >
+                Annulla
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Salvataggio...' : (existingTrade ? '💾 Salva Modifiche' : '✅ Registra Trade')}
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
