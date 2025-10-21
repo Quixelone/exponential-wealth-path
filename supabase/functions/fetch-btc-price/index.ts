@@ -40,41 +40,35 @@ serve(async (req) => {
       );
     }
 
-    // Fetch from CoinMarketCap
-    const CMC_API_KEY = Deno.env.get('CMC_API_KEY');
-    if (!CMC_API_KEY) {
-      throw new Error('CMC_API_KEY not configured');
-    }
+    // Fetch from CoinGecko (free, no API key needed)
+    // Convert date format from YYYY-MM-DD to DD-MM-YYYY for CoinGecko
+    const [year, month, day] = date.split('-');
+    const formattedDate = `${day}-${month}-${year}`;
 
-    // Convert date to timestamp for CoinMarketCap API
-    const startTime = `${date}T00:00:00Z`;
-    const endTime = `${date}T23:59:59Z`;
-
-    console.log(`Fetching BTC price from CoinMarketCap for ${date}...`);
+    console.log(`Fetching BTC price from CoinGecko for ${date}...`);
     
-    const cmcResponse = await fetch(
-      `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/historical?id=1&time_start=${startTime}&time_end=${endTime}`,
+    const geckoResponse = await fetch(
+      `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${formattedDate}`,
       {
         headers: {
-          'X-CMC_PRO_API_KEY': CMC_API_KEY,
           'Accept': 'application/json'
         }
       }
     );
 
-    if (!cmcResponse.ok) {
-      const errorText = await cmcResponse.text();
-      console.error('CoinMarketCap API error:', errorText);
-      throw new Error(`CoinMarketCap API error: ${cmcResponse.status}`);
+    if (!geckoResponse.ok) {
+      const errorText = await geckoResponse.text();
+      console.error('CoinGecko API error:', errorText);
+      throw new Error(`CoinGecko API error: ${geckoResponse.status}`);
     }
 
-    const cmcData = await cmcResponse.json();
+    const geckoData = await geckoResponse.json();
     
-    if (!cmcData.data || !cmcData.data.quotes || cmcData.data.quotes.length === 0) {
+    if (!geckoData.market_data || !geckoData.market_data.current_price || !geckoData.market_data.current_price.usd) {
       throw new Error('No price data available for this date');
     }
 
-    const btcPrice = cmcData.data.quotes[0].quote.USD.price;
+    const btcPrice = geckoData.market_data.current_price.usd;
     console.log(`BTC price for ${date}: $${btcPrice}`);
 
     // Save to cache
@@ -83,7 +77,7 @@ serve(async (req) => {
       .insert({
         date,
         price_usd: btcPrice,
-        source: 'coinmarketcap'
+        source: 'coingecko'
       });
 
     if (insertError) {

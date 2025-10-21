@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-async function fetchAndStoreBTCPrice(supabase: any, date: string, cmcApiKey: string) {
+async function fetchAndStoreBTCPrice(supabase: any, date: string) {
   try {
     // Check if price already exists
     const { data: existing } = await supabase
@@ -20,33 +20,35 @@ async function fetchAndStoreBTCPrice(supabase: any, date: string, cmcApiKey: str
       return { success: true, cached: true };
     }
 
-    // Fetch from CoinMarketCap
-    const startTime = `${date}T00:00:00Z`;
-    const endTime = `${date}T23:59:59Z`;
+    // Fetch from CoinGecko (free, no API key needed)
+    // Convert date format from YYYY-MM-DD to DD-MM-YYYY for CoinGecko
+    const [year, month, day] = date.split('-');
+    const formattedDate = `${day}-${month}-${year}`;
 
-    console.log(`Fetching BTC price from CoinMarketCap for ${date}...`);
+    console.log(`Fetching BTC price from CoinGecko for ${date}...`);
     
     const response = await fetch(
-      `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/historical?id=1&time_start=${startTime}&time_end=${endTime}`,
+      `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${formattedDate}`,
       {
         headers: {
-          'X-CMC_PRO_API_KEY': cmcApiKey,
           'Accept': 'application/json'
         }
       }
     );
 
     if (!response.ok) {
-      throw new Error(`CoinMarketCap API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('CoinGecko API error:', errorText);
+      throw new Error(`CoinGecko API error: ${response.status}`);
     }
 
     const data = await response.json();
     
-    if (!data.data || !data.data.quotes || data.data.quotes.length === 0) {
+    if (!data.market_data || !data.market_data.current_price || !data.market_data.current_price.usd) {
       throw new Error('No price data available for this date');
     }
 
-    const btcPrice = data.data.quotes[0].quote.USD.price;
+    const btcPrice = data.market_data.current_price.usd;
     console.log(`BTC price for ${date}: $${btcPrice}`);
 
     // Store in database
@@ -55,7 +57,7 @@ async function fetchAndStoreBTCPrice(supabase: any, date: string, cmcApiKey: str
       .insert({
         date,
         price_usd: btcPrice,
-        source: 'coinmarketcap_cron'
+        source: 'coingecko_cron'
       });
 
     if (insertError) {
@@ -78,11 +80,6 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const cmcApiKey = Deno.env.get('CMC_API_KEY');
-
-    if (!cmcApiKey) {
-      throw new Error('CMC_API_KEY not configured');
-    }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -98,8 +95,8 @@ serve(async (req) => {
 
     // Fetch prices for both dates
     const results = await Promise.all([
-      fetchAndStoreBTCPrice(supabase, yesterdayStr, cmcApiKey),
-      fetchAndStoreBTCPrice(supabase, todayStr, cmcApiKey)
+      fetchAndStoreBTCPrice(supabase, yesterdayStr),
+      fetchAndStoreBTCPrice(supabase, todayStr)
     ]);
 
     const response = {
