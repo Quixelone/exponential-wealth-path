@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from '@/pages/AuthCallback';
+import Landing from "./pages/Landing";
 import Strategies from "./pages/Strategies";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
@@ -28,6 +29,7 @@ const App = () => {
             <Sonner />
             <BrowserRouter>
               <Routes>
+                <Route path="/landing" element={<Landing />} />
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
