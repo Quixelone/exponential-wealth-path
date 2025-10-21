@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { calculateInvestment } from './investmentCalculationUtils';
+import { calculateInvestment, calculateInvestmentWithRealPayments } from './investmentCalculationUtils';
 import { InvestmentConfig, PACConfig } from '@/types/investment';
 import { useDebouncedCallback } from './useDebouncedCallback';
 
@@ -22,6 +22,7 @@ export interface PortfolioStrategy {
   status: 'above' | 'inline' | 'below';
   realBalance?: number;
   realPerformance?: number;
+  hasRealPayments?: boolean;
 }
 
 export interface PortfolioSummary {
@@ -80,6 +81,16 @@ export const usePortfolioAnalytics = () => {
         console.error('Error fetching actual trades:', tradesError);
       }
 
+      // Fetch PAC payments (only executed ones)
+      const { data: pacPayments, error: paymentsError } = await supabase
+        .from('pac_payments')
+        .select('*')
+        .eq('is_executed', true);
+
+      if (paymentsError) {
+        console.error('Error fetching PAC payments:', paymentsError);
+      }
+
       // Create lookup maps
       const tradesMap = new Map();
       
@@ -88,6 +99,17 @@ export const usePortfolioAnalytics = () => {
           tradesMap.set(trade.config_id, []);
         }
         tradesMap.get(trade.config_id).push(trade);
+      });
+
+      const paymentsMap = new Map<string, Array<{ executed_date: string; executed_amount: number }>>();
+      pacPayments?.forEach(payment => {
+        if (!paymentsMap.has(payment.config_id)) {
+          paymentsMap.set(payment.config_id, []);
+        }
+        paymentsMap.get(payment.config_id)?.push({
+          executed_date: payment.executed_date!,
+          executed_amount: payment.executed_amount!,
+        });
       });
 
       const processedStrategies: PortfolioStrategy[] = configsData?.map(configData => {
@@ -117,12 +139,22 @@ export const usePortfolioAnalytics = () => {
           dailyPACOverrides[po.day] = Number(po.pac_amount);
         });
 
-        // Calculate investment data
-        const investmentData = calculateInvestment({
-          config,
-          dailyReturns,
-          dailyPACOverrides
-        });
+        // Check if this config has real PAC payments
+        const configPayments = paymentsMap.get(configData.id) || [];
+        const hasRealPayments = configPayments.length > 0;
+
+        // Calculate investment data - use real payments if available, otherwise use theoretical PAC
+        const investmentData = hasRealPayments
+          ? calculateInvestmentWithRealPayments({
+              config,
+              dailyReturns,
+              realPayments: configPayments,
+            })
+          : calculateInvestment({
+              config,
+              dailyReturns,
+              dailyPACOverrides
+            });
 
         // Calculate current day
         const startDate = new Date(configData.pac_start_date);
@@ -183,7 +215,8 @@ export const usePortfolioAnalytics = () => {
           activeDays,
           status,
           realBalance,
-          realPerformance
+          realPerformance,
+          hasRealPayments
         };
       }) || [];
 
@@ -285,21 +318,37 @@ export const usePortfolioAnalytics = () => {
       )
       .subscribe();
 
-    const tradesChannel = supabase
-      .channel('portfolio_trades_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'actual_trades'
-        },
-        () => {
-          console.log('Actual trades changed');
-          debouncedFetch();
-        }
-      )
-      .subscribe();
+      const tradesChannel = supabase
+        .channel('portfolio_trades_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'actual_trades'
+          },
+          () => {
+            console.log('Actual trades changed');
+            debouncedFetch();
+          }
+        )
+        .subscribe();
+
+      const paymentsChannel = supabase
+        .channel('portfolio_payments_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'pac_payments'
+          },
+          () => {
+            console.log('PAC payments changed');
+            debouncedFetch();
+          }
+        )
+        .subscribe();
 
     // Cleanup subscriptions
     return () => {
@@ -308,6 +357,7 @@ export const usePortfolioAnalytics = () => {
       supabase.removeChannel(returnsChannel);
       supabase.removeChannel(pacChannel);
       supabase.removeChannel(tradesChannel);
+      supabase.removeChannel(paymentsChannel);
     };
   }, []);
 

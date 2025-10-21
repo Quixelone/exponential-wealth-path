@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, ArrowUpDown, Download, TrendingUp, TrendingDown, Minus, Eye } from 'lucide-react';
+import { Search, ArrowUpDown, Download, TrendingUp, TrendingDown, Minus, Eye, CheckCircle2, Calculator } from 'lucide-react';
 import { PortfolioStrategy } from '@/hooks/usePortfolioAnalytics';
 import { StrategyDetailDialog } from './StrategyDetailDialog';
 
@@ -230,11 +230,24 @@ const PortfolioTable = ({ strategies }: PortfolioTableProps) => {
               {filteredAndSortedStrategies.map((strategy) => (
                 <TableRow key={strategy.id} className="hover:bg-muted/50">
                   <TableCell>
-                    <div>
+                    <div className="space-y-1">
                       <p className="font-medium">{strategy.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(strategy.created_at).toLocaleDateString('it-IT')}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(strategy.created_at).toLocaleDateString('it-IT')}
+                        </p>
+                        {strategy.hasRealPayments ? (
+                          <Badge variant="default" className="text-xs flex items-center gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            PAC Reali
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                            <Calculator className="h-3 w-3" />
+                            PAC Teorici
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>

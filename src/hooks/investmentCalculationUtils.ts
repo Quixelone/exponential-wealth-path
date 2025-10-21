@@ -90,6 +90,82 @@ export const calculateInvestment = ({
   return results;
 };
 
+// Calcola investimento usando versamenti PAC reali registrati
+interface CalculateInvestmentWithRealPaymentsParams {
+  config: InvestmentConfig;
+  dailyReturns: { [day: number]: number };
+  realPayments: Array<{
+    executed_date: string;
+    executed_amount: number;
+  }>;
+}
+
+export const calculateInvestmentWithRealPayments = ({
+  config,
+  dailyReturns,
+  realPayments,
+}: CalculateInvestmentWithRealPaymentsParams): InvestmentData[] => {
+  const results: InvestmentData[] = [];
+  let currentCapital = config.initialCapital;
+  let totalPACInvested = 0;
+  
+  const baseDate = new Date(
+    typeof config.pacConfig.startDate === "string"
+      ? config.pacConfig.startDate
+      : config.pacConfig.startDate
+  );
+  baseDate.setHours(0, 0, 0, 0);
+
+  // Crea mappa dei versamenti per data
+  const paymentsByDate = new Map<string, number>();
+  realPayments.forEach(payment => {
+    const dateKey = payment.executed_date;
+    paymentsByDate.set(dateKey, (paymentsByDate.get(dateKey) || 0) + payment.executed_amount);
+  });
+
+  for (let day = 0; day <= config.timeHorizon; day++) {
+    const currentDate = new Date(baseDate);
+    currentDate.setDate(baseDate.getDate() + day);
+    const dateKey = currentDate.toISOString().split('T')[0];
+
+    const capitalBeforePAC = currentCapital;
+
+    // Usa i versamenti reali se disponibili per questa data
+    const pacAmount = paymentsByDate.get(dateKey) || 0;
+    const isCustomPAC = pacAmount > 0;
+    
+    currentCapital += pacAmount;
+    totalPACInvested += pacAmount;
+
+    const capitalAfterPAC = currentCapital;
+
+    const dailyReturn = dailyReturns[day] ?? config.dailyReturnRate;
+    const isCustomReturn = dailyReturns.hasOwnProperty(day);
+
+    const interestEarnedDaily = capitalAfterPAC * (dailyReturn / 100);
+    currentCapital += interestEarnedDaily;
+
+    const totalInterest = currentCapital - config.initialCapital - totalPACInvested;
+
+    results.push({
+      day,
+      date: dateKey,
+      capitalBeforePAC,
+      pacAmount,
+      capitalAfterPAC,
+      dailyReturn,
+      interestEarnedDaily,
+      finalCapital: currentCapital,
+      totalPACInvested,
+      totalInterest,
+      isCustomReturn,
+      isCustomPAC, // Indica che è un versamento reale
+    });
+  }
+
+  return results;
+};
+
 // Mostra info su prossimo PAC:
 export const getNextPACInfo = (pacConfig: PACConfig) => {
   const { frequency, customDays } = pacConfig;
