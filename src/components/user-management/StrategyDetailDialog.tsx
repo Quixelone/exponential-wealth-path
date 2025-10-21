@@ -37,11 +37,45 @@ export const StrategyDetailDialog = ({
   const investmentData = useMemo(() => {
     if (!strategyDetail) return [];
     
-    return calculateInvestment({
-      config: strategyDetail.config,
-      dailyReturns: Object.fromEntries(strategyDetail.dailyReturns),
-      dailyPACOverrides: Object.fromEntries(strategyDetail.dailyPACOverrides),
+    const dailyReturnsObj = Object.fromEntries(strategyDetail.dailyReturns);
+    const dailyPACOverridesObj = Object.fromEntries(strategyDetail.dailyPACOverrides);
+
+    // DEBUG: Log input data
+    console.log('🔍 Strategy Detail Dialog - Calculating with:', {
+      userName: strategyDetail.userName,
+      initialCapital: strategyDetail.config.initialCapital,
+      pacAmount: strategyDetail.config.pacConfig.amount,
+      pacFrequency: strategyDetail.config.pacConfig.frequency,
+      dailyReturnsCount: Object.keys(dailyReturnsObj).length,
+      dailyPACOverridesCount: Object.keys(dailyPACOverridesObj).length,
+      sampleDailyReturns: Object.fromEntries(
+        Object.entries(dailyReturnsObj).slice(0, 5)
+      )
     });
+    
+    const result = calculateInvestment({
+      config: strategyDetail.config,
+      dailyReturns: dailyReturnsObj,
+      dailyPACOverrides: dailyPACOverridesObj,
+    });
+
+    // DEBUG: Log calculation results
+    console.log('📊 Strategy Detail Dialog - Calculation results:', {
+      userName: strategyDetail.userName,
+      day20: result[20] ? {
+        capitalBeforePAC: result[20].capitalBeforePAC,
+        pacAmount: result[20].pacAmount,
+        capitalAfterPAC: result[20].capitalAfterPAC,
+        dailyReturn: result[20].dailyReturn,
+        interestEarnedDaily: result[20].interestEarnedDaily,
+        finalCapital: result[20].finalCapital
+      } : 'N/A',
+      day28: result[28] ? {
+        finalCapital: result[28].finalCapital
+      } : 'N/A'
+    });
+
+    return result;
   }, [strategyDetail]);
 
   const summary = useMemo(() => {
