@@ -31,16 +31,18 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
     strike_price: '',
     fill_price_usd: '',
     trade_date: item.date,
-    trade_type: 'buy_btc',
+    trade_type: 'option_fill',
     notes: ''
   });
 
   const calculatedValue = useMemo(() => {
     const btcAmount = parseFloat(formData.btc_amount);
-    const strikePrice = parseFloat(formData.strike_price);
-    const fillPrice = formData.fill_price_usd ? parseFloat(formData.fill_price_usd) : strikePrice;
+    const strikePrice = formData.strike_price ? parseFloat(formData.strike_price) : null;
+    const fillPrice = formData.fill_price_usd 
+      ? parseFloat(formData.fill_price_usd) 
+      : strikePrice;
     
-    if (!isNaN(btcAmount) && !isNaN(fillPrice)) {
+    if (!isNaN(btcAmount) && fillPrice && !isNaN(fillPrice)) {
       return btcAmount * fillPrice;
     }
     return null;
@@ -59,7 +61,17 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
     try {
       const fillPrice = formData.fill_price_usd 
         ? parseFloat(formData.fill_price_usd) 
-        : parseFloat(formData.strike_price);
+        : (formData.strike_price ? parseFloat(formData.strike_price) : null);
+
+      if (!fillPrice) {
+        toast({
+          title: "Errore",
+          description: "Inserisci almeno lo strike price o il fill price",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
 
       const {
         error
@@ -68,7 +80,7 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
         day: item.day,
         trade_date: formData.trade_date,
         btc_amount: parseFloat(formData.btc_amount),
-        strike_price: parseFloat(formData.strike_price),
+        strike_price: formData.strike_price ? parseFloat(formData.strike_price) : null,
         fill_price_usd: fillPrice,
         trade_type: formData.trade_type,
         notes: formData.notes || null
@@ -149,7 +161,6 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
                   ...prev,
                   strike_price: e.target.value
                 }))}
-                required
               />
             </div>
             <div>
@@ -168,7 +179,10 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
             fill_price_usd: e.target.value
           }))} />
             <p className="text-xs text-muted-foreground mt-1">
-              Lascia vuoto per usare lo strike price
+              (Opzionale - lascia vuoto per usare lo strike price)
+            </p>
+            <p className="text-xs text-amber-600 mt-1">
+              ⚠️ Almeno uno tra Strike Price e Fill Price è obbligatorio
             </p>
           </div>
 
@@ -177,7 +191,9 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
               <div className="text-sm font-medium mb-2">Preview Calcolo:</div>
               <div className="space-y-1 text-sm">
                 <div>BTC: {formData.btc_amount}</div>
-                <div>Strike: ${parseFloat(formData.strike_price).toLocaleString()}</div>
+                {formData.strike_price && (
+                  <div>Strike: ${parseFloat(formData.strike_price).toLocaleString()}</div>
+                )}
                 {formData.fill_price_usd && (
                   <div>Fill Price: ${parseFloat(formData.fill_price_usd).toLocaleString()}</div>
                 )}
