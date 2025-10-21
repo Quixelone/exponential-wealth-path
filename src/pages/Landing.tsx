@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import LandingNavbar from '@/components/landing/LandingNavbar';
+import '@/styles/landing.css';
 import LandingHero from '@/components/landing/LandingHero';
 import ComparisonTable from '@/components/landing/ComparisonTable';
 import HowItWorks from '@/components/landing/HowItWorks';
