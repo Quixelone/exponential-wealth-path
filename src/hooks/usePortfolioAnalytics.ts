@@ -45,14 +45,12 @@ export const usePortfolioAnalytics = () => {
     try {
       setLoading(true);
       
-      // Fetch investment configs with user data and related returns/overrides
+      // Fetch investment configs with user data
       // Using inner join to ensure only configs with valid users are fetched
       const { data: configsData, error: configError } = await supabase
         .from('investment_configs')
         .select(`
           *,
-          daily_returns (*),
-          daily_pac_overrides (*),
           user_profiles!inner (
             id,
             email,
@@ -72,10 +70,39 @@ export const usePortfolioAnalytics = () => {
         return;
       }
 
+      if (!configsData || configsData.length === 0) {
+        console.log('⚠️ No investment configs found');
+        setStrategies([]);
+        setSummary(null);
+        return;
+      }
+
+      // Fetch all daily returns for all configs in one query
+      const configIds = configsData.map(c => c.id);
+      const { data: allDailyReturns, error: returnsError } = await supabase
+        .from('daily_returns')
+        .select('*')
+        .in('config_id', configIds);
+
+      if (returnsError) {
+        console.error('Error fetching daily returns:', returnsError);
+      }
+
+      // Fetch all daily PAC overrides for all configs in one query
+      const { data: allDailyPACOverrides, error: pacOverridesError } = await supabase
+        .from('daily_pac_overrides')
+        .select('*')
+        .in('config_id', configIds);
+
+      if (pacOverridesError) {
+        console.error('Error fetching PAC overrides:', pacOverridesError);
+      }
+
       // Fetch actual trades separately
       const { data: actualTrades, error: tradesError } = await supabase
         .from('actual_trades')
-        .select('*');
+        .select('*')
+        .in('config_id', configIds);
 
       if (tradesError) {
         console.error('Error fetching actual trades:', tradesError);
@@ -85,15 +112,45 @@ export const usePortfolioAnalytics = () => {
       const { data: pacPayments, error: paymentsError } = await supabase
         .from('pac_payments')
         .select('*')
-        .eq('is_executed', true);
+        .eq('is_executed', true)
+        .in('config_id', configIds);
 
       if (paymentsError) {
         console.error('Error fetching PAC payments:', paymentsError);
       }
 
-      // Create lookup maps
+      console.log('📊 Portfolio Analytics - Data fetched:', {
+        configsCount: configsData.length,
+        dailyReturnsCount: allDailyReturns?.length || 0,
+        dailyPACOverridesCount: allDailyPACOverrides?.length || 0,
+        actualTradesCount: actualTrades?.length || 0,
+        pacPaymentsCount: pacPayments?.length || 0
+      });
+
+      // Create lookup maps for efficient access
+      const dailyReturnsMap = new Map<string, Array<{ day: number; return_rate: number }>>();
+      allDailyReturns?.forEach(dr => {
+        if (!dailyReturnsMap.has(dr.config_id)) {
+          dailyReturnsMap.set(dr.config_id, []);
+        }
+        dailyReturnsMap.get(dr.config_id)?.push({
+          day: dr.day,
+          return_rate: Number(dr.return_rate)
+        });
+      });
+
+      const dailyPACOverridesMap = new Map<string, Array<{ day: number; pac_amount: number }>>();
+      allDailyPACOverrides?.forEach(po => {
+        if (!dailyPACOverridesMap.has(po.config_id)) {
+          dailyPACOverridesMap.set(po.config_id, []);
+        }
+        dailyPACOverridesMap.get(po.config_id)?.push({
+          day: po.day,
+          pac_amount: Number(po.pac_amount)
+        });
+      });
+
       const tradesMap = new Map();
-      
       actualTrades?.forEach(trade => {
         if (!tradesMap.has(trade.config_id)) {
           tradesMap.set(trade.config_id, []);
@@ -128,15 +185,17 @@ export const usePortfolioAnalytics = () => {
           useRealBTCPrices: configData.use_real_btc_prices || false
         };
 
-        // Build daily returns and PAC overrides
+        // Build daily returns and PAC overrides from lookup maps
         const dailyReturns: { [day: number]: number } = {};
-        configData.daily_returns?.forEach((dr: any) => {
-          dailyReturns[dr.day] = Number(dr.return_rate);
+        const configDailyReturns = dailyReturnsMap.get(configData.id) || [];
+        configDailyReturns.forEach(dr => {
+          dailyReturns[dr.day] = dr.return_rate;
         });
 
         const dailyPACOverrides: { [day: number]: number } = {};
-        configData.daily_pac_overrides?.forEach((po: any) => {
-          dailyPACOverrides[po.day] = Number(po.pac_amount);
+        const configDailyPACOverrides = dailyPACOverridesMap.get(configData.id) || [];
+        configDailyPACOverrides.forEach(po => {
+          dailyPACOverrides[po.day] = po.pac_amount;
         });
 
         // DEBUG: Log input data per questa config
