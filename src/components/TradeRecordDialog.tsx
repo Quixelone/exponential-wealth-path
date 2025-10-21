@@ -73,20 +73,36 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
     if (open && configId) {
       const fetchExistingTrade = async () => {
         console.log('🔍 Caricamento trade esistente per:', { configId, day: item.day });
-        const { data: tradeData, error } = await supabase
+        
+        // Prima controlla se ci sono duplicati
+        const { data: allTrades, error: checkError } = await supabase
           .from('actual_trades')
           .select('*')
           .eq('config_id', configId)
           .eq('day', item.day)
-          .maybeSingle();
+          .order('created_at', { ascending: false });
         
-        if (error) {
-          console.error('❌ Errore caricamento trade:', error);
+        if (checkError) {
+          console.error('❌ Errore caricamento trade:', checkError);
+          setExistingTrade(null);
+          return;
         }
         
-        if (tradeData) {
+        if (allTrades && allTrades.length > 0) {
+          if (allTrades.length > 1) {
+            console.warn('⚠️ Trovati duplicati! Trade multipli per lo stesso giorno:', allTrades.length);
+            toast({
+              title: "⚠️ Duplicati rilevati",
+              description: `Trovati ${allTrades.length} trade per questo giorno. Mostro il più recente.`,
+              variant: "destructive"
+            });
+          }
+          
+          // Prende il più recente (primo dopo l'ordinamento)
+          const tradeData = allTrades[0];
           console.log('✅ Trade esistente trovato:', tradeData);
           setExistingTrade(tradeData as ActualTrade);
+          
           // Pre-fill form with existing data
           setFormData({
             option_sold_date: tradeData.option_sold_date || '',
