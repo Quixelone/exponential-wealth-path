@@ -464,6 +464,7 @@ const ReportTable: React.FC<ReportTableProps> = ({
           item={selectedItem}
           configId={currentConfigId}
           onTradeRecorded={loadTrades}
+          data={data}
         />
       )}
     </ModernTooltipProvider>

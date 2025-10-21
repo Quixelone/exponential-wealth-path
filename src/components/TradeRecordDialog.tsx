@@ -72,14 +72,20 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
   useEffect(() => {
     if (open && configId) {
       const fetchExistingTrade = async () => {
-        const { data: tradeData } = await supabase
+        console.log('🔍 Caricamento trade esistente per:', { configId, day: item.day });
+        const { data: tradeData, error } = await supabase
           .from('actual_trades')
           .select('*')
           .eq('config_id', configId)
           .eq('day', item.day)
           .maybeSingle();
         
+        if (error) {
+          console.error('❌ Errore caricamento trade:', error);
+        }
+        
         if (tradeData) {
+          console.log('✅ Trade esistente trovato:', tradeData);
           setExistingTrade(tradeData as ActualTrade);
           // Pre-fill form with existing data
           setFormData({
@@ -95,10 +101,13 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
             notes: tradeData.notes || ''
           });
         } else {
+          console.log('ℹ️ Nessun trade esistente trovato');
           setExistingTrade(null);
         }
       };
       fetchExistingTrade();
+    } else {
+      console.log('⚠️ Dialog aperto ma configId mancante:', { open, configId });
     }
   }, [open, configId, item.day]);
 
