@@ -8,14 +8,18 @@ import {
   Settings, 
   Users, 
   Bell,
-  Search
+  Search,
+  Database
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { formatDistanceToNow } from 'date-fns';
+import { it } from 'date-fns/locale';
 
 interface ModernHeaderProps {
   userProfile?: any;
   isAdmin?: boolean;
   hasUnsavedChanges?: boolean;
+  lastDatabaseSync?: Date | null;
   onLogout: () => void;
   onSettings: () => void;
   onUserManagement?: (e: React.MouseEvent) => void;
@@ -25,6 +29,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
   userProfile,
   isAdmin,
   hasUnsavedChanges,
+  lastDatabaseSync,
   onLogout,
   onSettings,
   onUserManagement
@@ -32,6 +37,10 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
   const displayName = userProfile?.first_name && userProfile?.last_name 
     ? `${userProfile.first_name} ${userProfile.last_name}`
     : userProfile?.email || 'Utente';
+
+  const syncText = lastDatabaseSync
+    ? `Sincronizzato ${formatDistanceToNow(lastDatabaseSync, { addSuffix: true, locale: it })}`
+    : 'Nessuna sincronizzazione recente';
 
   return (
     <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between">
@@ -61,6 +70,16 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
           {isAdmin && (
             <Badge variant="secondary" className="bg-primary/10 text-primary">
               Admin
+            </Badge>
+          )}
+          {lastDatabaseSync && (
+            <Badge 
+              variant="outline" 
+              className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 flex items-center gap-1"
+              title={syncText}
+            >
+              <Database className="h-3 w-3" />
+              <span className="text-xs">{syncText}</span>
             </Badge>
           )}
           {hasUnsavedChanges && (

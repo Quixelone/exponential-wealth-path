@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceInfo } from '@/hooks/use-mobile';
+import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
 import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
 import ModernSidebar from '@/components/dashboard/ModernSidebar';
 import ModernHeader from '@/components/dashboard/ModernHeader';
@@ -18,6 +19,7 @@ interface AppLayoutProps {
 const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = false }) => {
   const { user, userProfile, loading: authLoading, signOut, isAdmin } = useAuth();
   const { isMobile, isTablet } = useDeviceInfo();
+  const { lastDatabaseSync } = useInvestmentCalculator();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
@@ -113,6 +115,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
                 onLogout={handleLogout}
                 onSettings={() => guardedNavigate('/settings')}
                 isAdmin={isAdmin}
+                hasUnsavedChanges={hasUnsavedChanges}
+                lastDatabaseSync={lastDatabaseSync}
               />
               <main className="flex-1 p-6">
                 {children}

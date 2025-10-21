@@ -10,7 +10,7 @@
  * @version 1.0.0
  */
 
-import React, { useRef, useMemo, useCallback } from 'react';
+import React, { useRef, useMemo, useCallback, useState } from 'react';
 import { useConfigurationManager } from './useConfigurationManager';
 import { useInvestmentData } from './useInvestmentData';
 import { useInvestmentOperations } from './useInvestmentOperations';
@@ -18,6 +18,7 @@ import { usePersistedConfigLoader } from './usePersistedConfigLoader';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger, useContextLogger } from '@/utils/logger';
 import { handleError, safeAsync } from '@/utils/errorHandler';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Hook principale per il sistema di calcolo degli investimenti
@@ -51,9 +52,13 @@ import { handleError, safeAsync } from '@/utils/errorHandler';
 export const useInvestmentCalculator = () => {
   // Logger con contesto specifico per questo hook
   const contextLogger = useContextLogger('InvestmentCalculator');
+  const { toast } = useToast();
   
   // Stato di autenticazione
   const { user, loading: authLoading } = useAuth();
+  
+  // Track last database sync timestamp
+  const [lastDatabaseSync, setLastDatabaseSync] = useState<Date | null>(null);
   
   // Manager delle configurazioni con tutte le operazioni CRUD e cronologia
   const {
@@ -213,6 +218,56 @@ export const useInvestmentCalculator = () => {
   }, [nextPACInfo]);
 
   /**
+   * Force reload all data from database, bypassing any local cache
+   * Useful when user wants to ensure they see the latest server data
+   */
+  const forceReloadFromDatabase = useCallback(async () => {
+    try {
+      contextLogger.info('Force reloading data from database');
+      
+      toast({
+        title: "Ricaricamento in corso...",
+        description: "Sincronizzazione con il database",
+      });
+
+      // Reload all configurations from database
+      await loadConfigurations();
+      
+      // If there's a current config, reload it specifically to get fresh data
+      if (configState.currentConfigId) {
+        const freshConfig = savedConfigs.find(c => c.id === configState.currentConfigId);
+        if (freshConfig) {
+          loadSavedConfiguration(freshConfig);
+        }
+      }
+      
+      // Update last sync timestamp
+      setLastDatabaseSync(new Date());
+      
+      toast({
+        title: "✅ Dati ricaricati con successo",
+        description: "I dati sono stati sincronizzati dal database",
+      });
+      
+      contextLogger.info('Force reload completed successfully');
+    } catch (error) {
+      contextLogger.error('Force reload failed', error);
+      toast({
+        title: "Errore nel ricaricamento",
+        description: "Si è verificato un errore durante la sincronizzazione",
+        variant: "destructive",
+      });
+    }
+  }, [
+    contextLogger, 
+    toast, 
+    loadConfigurations, 
+    configState.currentConfigId, 
+    savedConfigs, 
+    loadSavedConfiguration
+  ]);
+
+  /**
    * API pubblica del calcolatore di investimenti
    * Tutte le funzioni e dati necessari per gestire il sistema di investimento
    */
@@ -259,6 +314,10 @@ export const useInvestmentCalculator = () => {
     clearHistory,
     getCurrentSnapshot,
     
+    // Database sync
+    forceReloadFromDatabase,
+    lastDatabaseSync,
+    
     // Utilità
     exportToCSV
   }), [
@@ -276,6 +335,7 @@ export const useInvestmentCalculator = () => {
     hasUnsavedChanges,
     canUndo,
     canRedo,
+    lastDatabaseSync,
     // Funzioni stabili
     updateConfig,
     createNewConfiguration,
@@ -292,6 +352,7 @@ export const useInvestmentCalculator = () => {
     redoConfiguration,
     clearHistory,
     getCurrentSnapshot,
+    forceReloadFromDatabase,
     exportToCSV
   ]);
 };

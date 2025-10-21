@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, Bell, Settings, Target } from 'lucide-react';
+import { TrendingUp, Bell, Settings, Target, RefreshCw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -51,7 +51,9 @@ const Index = () => {
     undoConfiguration,
     redoConfiguration,
     canUndo,
-    canRedo
+    canRedo,
+    forceReloadFromDatabase,
+    lastDatabaseSync
   } = useInvestmentCalculator();
 
   // Load actual trades for the current configuration
@@ -164,8 +166,8 @@ const Index = () => {
           currency={config.currency || 'EUR'}
         />
 
-        {/* Edit Strategy Button */}
-        <div className="flex justify-center">
+        {/* Edit Strategy and Reload Buttons */}
+        <div className="flex justify-center gap-3">
           <Button 
             onClick={() => navigate('/strategies')}
             variant="outline"
@@ -174,6 +176,17 @@ const Index = () => {
           >
             <Settings className="h-5 w-5" />
             Modifica Configurazione
+          </Button>
+          
+          <Button 
+            onClick={forceReloadFromDatabase}
+            variant="outline"
+            size="lg"
+            className="flex items-center gap-2 bg-primary/5 hover:bg-primary/10 border-primary/20"
+            disabled={supabaseLoading}
+          >
+            <RefreshCw className={`h-5 w-5 ${supabaseLoading ? 'animate-spin' : ''}`} />
+            Ricarica dal Database
           </Button>
         </div>
 
