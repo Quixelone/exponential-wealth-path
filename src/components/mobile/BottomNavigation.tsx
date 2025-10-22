@@ -23,7 +23,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
     {
       icon: LayoutDashboard,
       label: 'Dashboard',
-      path: '/',
+      path: '/app',
     },
     {
       icon: TrendingUp,
@@ -33,9 +33,9 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
     {
       icon: Bell,
       label: 'Notifiche',
-      path: '/#reminders',
+      path: '/app#reminders',
       onClick: () => {
-        navigate('/');
+        navigate('/app');
         // Trigger tab change to reminders
         setTimeout(() => {
           const reminderTab = document.querySelector('[value="reminders"]') as HTMLElement;
@@ -69,11 +69,11 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
   };
 
   const isActivePath = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/';
+    if (path === '/app') {
+      return location.pathname === '/app';
     }
     if (path.includes('#')) {
-      return location.pathname === '/' && path.includes('reminders');
+      return location.pathname === '/app' && path.includes('reminders');
     }
     return location.pathname === path;
   };

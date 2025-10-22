@@ -34,7 +34,7 @@ const UserManagement = () => {
     if (!authLoading) {
       if (isAdmin === false) {
         console.log('🚪 User is not admin, redirecting');
-        navigate('/');
+        navigate('/app');
       } else if (isAdmin === true) {
         console.log('✅ User is admin, fetching users');
         fetchUsers();
