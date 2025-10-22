@@ -63,12 +63,13 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
             <div className="relative">
               <Input
                 id="pac-amount"
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={pacConfig.amount}
                 onChange={(e) => onPACConfigChange({ amount: Number(e.target.value) })}
                 min={0}
                 step={10}
-                className="pr-12"
+                className="pr-12 touch-target text-base"
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <span className="text-sm text-muted-foreground">{currency}</span>
@@ -83,7 +84,7 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal touch-target text-base",
                     !pacConfig.startDate && "text-muted-foreground"
                   )}
                 >
@@ -136,9 +137,11 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
               <Input
                 id="pac-custom-days"
                 type="text"
+                inputMode="numeric"
                 value={pacConfig.customDays?.toString() || ''}
                 onChange={(e) => onPACConfigChange({ customDays: parseInt(e.target.value) || 0 })}
                 placeholder="1,15,30"
+                className="touch-target text-base"
               />
               <p className="text-xs text-muted-foreground">
                 Inserisci i giorni del mese separati da virgola (es: 1,15 per versamenti il 1° e 15 di ogni mese)

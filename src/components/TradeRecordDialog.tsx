@@ -301,62 +301,65 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            {existingTrade ? '✏️ Modifica Trade' : '📝 Registra Trade'} - Giorno {item.day}
-            {existingTrade && (
-              <Badge variant="secondary" className="ml-2 bg-blue-500/20 text-blue-700 dark:text-blue-300">
-                📝 Modalità Modifica
-              </Badge>
-            )}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-2xl sm:max-h-[90vh] mobile-dialog">
+        <div className="mobile-dialog-content">
+          <DialogHeader>
+            <DialogTitle className="text-base sm:text-xl font-bold flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                <span>{existingTrade ? '✏️ Modifica Trade' : '📝 Registra Trade'} - Giorno {item.day}</span>
+              </div>
+              {existingTrade && (
+                <Badge variant="secondary" className="bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs">
+                  📝 Modalità Modifica
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Timeline Opzione */}
-          <div className="bg-primary/5 p-4 rounded-lg border-2 border-primary/20">
-            <div className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-primary" />
-              Timeline Opzione
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="option_sold_date" className="text-xs">
-                  📅 Opzione Venduta
-                </Label>
-                <Input 
-                  id="option_sold_date"
-                  type="date"
-                  value={formData.option_sold_date}
-                  onChange={e => setFormData(prev => ({
-                    ...prev,
-                    option_sold_date: e.target.value
-                  }))}
-                  className="font-mono text-sm"
-                />
+          <form onSubmit={handleSubmit} className="mobile-dialog-body space-y-4 sm:space-y-6">
+            {/* Timeline Opzione */}
+            <div className="bg-primary/5 p-3 sm:p-4 rounded-lg border-2 border-primary/20">
+              <div className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Timeline Opzione
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="option_sold_date" className="text-xs sm:text-sm">
+                    📅 Opzione Venduta
+                  </Label>
+                  <Input 
+                    id="option_sold_date"
+                    type="date"
+                    value={formData.option_sold_date}
+                    onChange={e => setFormData(prev => ({
+                      ...prev,
+                      option_sold_date: e.target.value
+                    }))}
+                    className="font-mono text-base touch-target"
+                  />
                 <p className="text-xs text-muted-foreground mt-1">
                   Giorno {item.day - 1}
                 </p>
               </div>
               
-              <div>
-                <Label htmlFor="expiration_date" className="text-xs">
-                  ⏰ Scadenza/Fill
-                </Label>
-                <Input 
-                  id="expiration_date"
-                  type="date"
-                  value={formData.expiration_date}
-                  onChange={e => setFormData(prev => ({
-                    ...prev,
-                    expiration_date: e.target.value
-                  }))}
-                  className="font-mono text-sm"
-                  required
-                />
+                <div>
+                  <Label htmlFor="expiration_date" className="text-xs sm:text-sm">
+                    ⏰ Scadenza/Fill
+                  </Label>
+                  <Input 
+                    id="expiration_date"
+                    type="date"
+                    value={formData.expiration_date}
+                    onChange={e => setFormData(prev => ({
+                      ...prev,
+                      expiration_date: e.target.value
+                    }))}
+                    className="font-mono text-base touch-target"
+                    required
+                  />
                 <p className="text-xs text-muted-foreground mt-1">
                   Giorno {item.day} (oggi)
                 </p>
@@ -381,25 +384,27 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
             }))}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="filled" className="gap-2">
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-0 h-auto sm:h-10">
+              <TabsTrigger value="filled" className="gap-2 min-h-[44px] text-sm sm:text-base">
                 <CheckCircle2 className="h-4 w-4" />
-                Opzione Fillata (ITM)
+                <span className="hidden sm:inline">Opzione Fillata (ITM)</span>
+                <span className="sm:hidden">Fillata (ITM)</span>
               </TabsTrigger>
-              <TabsTrigger value="expired_otm" className="gap-2">
+              <TabsTrigger value="expired_otm" className="gap-2 min-h-[44px] text-sm sm:text-base">
                 <XCircle className="h-4 w-4" />
-                Opzione Scaduta (OTM)
+                <span className="hidden sm:inline">Opzione Scaduta (OTM)</span>
+                <span className="sm:hidden">Scaduta (OTM)</span>
               </TabsTrigger>
             </TabsList>
 
             {/* SCENARIO 1: Opzione Fillata */}
             <TabsContent value="filled" className="space-y-4 mt-4">
               {/* Strike Price */}
-              <div className="space-y-2 border-2 border-primary/30 rounded-lg p-4 bg-primary/5">
-                <div className="flex items-center justify-between gap-2">
+              <div className="space-y-2 border-2 border-primary/30 rounded-lg p-3 sm:p-4 bg-primary/5">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary" />
-                    <Label htmlFor="strike_price" className="text-base font-semibold">
+                    <Label htmlFor="strike_price" className="text-sm sm:text-base font-semibold">
                       Strike Price (USDT)
                     </Label>
                   </div>
@@ -421,15 +426,15 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
                 </div>
                 <Input 
                   id="strike_price"
-                  type="number"
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
                   placeholder={loadingBTCPrice ? "Recupero prezzo..." : "45000"}
                   value={formData.strike_price}
                   onChange={e => setFormData(prev => ({
                     ...prev,
                     strike_price: e.target.value
                   }))}
-                  className="text-lg font-mono"
+                  className="text-base sm:text-lg font-mono touch-target"
                   required={formData.option_status === 'filled'}
                   disabled={loadingBTCPrice}
                 />
@@ -450,11 +455,11 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
 
               {/* Quantità BTC */}
               <div>
-                <Label htmlFor="btc_amount">Quantità BTC ricevuta/venduta</Label>
+                <Label htmlFor="btc_amount" className="text-sm sm:text-base">Quantità BTC ricevuta/venduta</Label>
                 <Input 
                   id="btc_amount" 
-                  type="number" 
-                  step="0.00000001" 
+                  type="text"
+                  inputMode="decimal"
                   placeholder="0.02198456" 
                   value={formData.btc_amount} 
                   onChange={e => setFormData(prev => ({
@@ -462,27 +467,27 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
                     btc_amount: e.target.value
                   }))} 
                   required={formData.option_status === 'filled'}
-                  className="font-mono"
+                  className="font-mono text-base touch-target"
                 />
               </div>
               
               {/* Fill Price */}
               <div>
-                <Label htmlFor="fill_price_usd">
+                <Label htmlFor="fill_price_usd" className="text-sm sm:text-base">
                   Prezzo BTC eseguito 
                   <span className="text-xs text-muted-foreground ml-2">(opzionale)</span>
                 </Label>
                 <Input 
                   id="fill_price_usd" 
-                  type="number" 
-                  step="0.01" 
+                  type="text"
+                  inputMode="decimal"
                   placeholder={btcPriceAtExpiration ? `Default: ${btcPriceAtExpiration.toFixed(2)}` : "45523.18"}
                   value={formData.fill_price_usd} 
                   onChange={e => setFormData(prev => ({
                     ...prev,
                     fill_price_usd: e.target.value
                   }))}
-                  className="font-mono"
+                  className="font-mono text-base touch-target"
                 />
                 {btcPriceAtExpiration && formData.fill_price_usd && (
                   <p className="text-xs mt-1 font-medium">
@@ -550,46 +555,44 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
                   </div>
                 </div>
 
-                {/* Premio ricevuto */}
-                <div className="space-y-2">
-                  <Label htmlFor="premium_received_usdt" className="text-base font-semibold">
-                    Premio Ricevuto (USDT)
-                  </Label>
-                  <Input 
-                    id="premium_received_usdt"
-                    type="number"
-                    step="0.01"
-                    placeholder="Es: 150.00"
-                    value={formData.premium_received_usdt}
-                    onChange={e => setFormData(prev => ({
-                      ...prev,
-                      premium_received_usdt: e.target.value
-                    }))}
-                    className="text-lg font-mono"
-                    required={formData.option_status === 'expired_otm'}
-                  />
+              <div>
+                <Label htmlFor="premium_received_usdt" className="text-sm sm:text-base font-semibold">
+                  Premio Ricevuto (USDT)
+                </Label>
+                <Input 
+                  id="premium_received_usdt"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="Es: 150.00"
+                  value={formData.premium_received_usdt}
+                  onChange={e => setFormData(prev => ({
+                    ...prev,
+                    premium_received_usdt: e.target.value
+                  }))}
+                  className="text-base sm:text-lg font-mono touch-target"
+                  required={formData.option_status === 'expired_otm'}
+                />
                   <p className="text-xs text-muted-foreground">
                     💰 Importo in USDT che hai ricevuto dalla vendita dell'opzione
                   </p>
                 </div>
 
-                {/* Strike Price per riferimento */}
                 <div className="mt-3">
-                  <Label htmlFor="strike_price_ref" className="text-sm">
+                  <Label htmlFor="strike_price_ref" className="text-xs sm:text-sm">
                     Strike Price (riferimento)
                     <span className="text-xs text-muted-foreground ml-2">(opzionale)</span>
                   </Label>
                   <Input 
                     id="strike_price_ref"
-                    type="number"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
                     placeholder="45000"
                     value={formData.strike_price}
                     onChange={e => setFormData(prev => ({
                       ...prev,
                       strike_price: e.target.value
                     }))}
-                    className="font-mono"
+                    className="font-mono text-base touch-target"
                   />
                 </div>
 
@@ -615,9 +618,9 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
           </Tabs>
 
           {/* Informazioni Strategia */}
-          <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+          <div className="bg-muted/50 p-3 sm:p-4 rounded-lg space-y-2">
             <div className="text-sm font-semibold">Informazioni Strategia</div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div>
                 <div className="text-muted-foreground text-xs">Valore Teorico</div>
                 <div className="font-mono font-bold">
@@ -638,7 +641,7 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
 
           {/* Note */}
           <div>
-            <Label htmlFor="notes">Note (opzionale)</Label>
+            <Label htmlFor="notes" className="text-sm sm:text-base">Note (opzionale)</Label>
             <Textarea 
               id="notes"
               placeholder="Aggiungi note sul trade..."
@@ -648,14 +651,15 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
                 notes: e.target.value
               }))}
               rows={3}
+              className="text-base touch-target min-h-[88px]"
             />
           </div>
 
-          <DialogFooter className="flex justify-between">
+          <DialogFooter className="mobile-dialog-footer flex-col sm:flex-row gap-3 sm:gap-2 justify-between">
             {existingTrade && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button type="button" variant="destructive" className="gap-2">
+                  <Button type="button" variant="destructive" className="w-full sm:w-auto gap-2 touch-target">
                     <Trash2 className="h-4 w-4" />
                     Elimina Trade
                   </Button>
@@ -705,21 +709,27 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
               </AlertDialog>
             )}
 
-            <div className="flex gap-2 ml-auto">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:ml-auto">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
                 disabled={loading}
+                className="w-full sm:w-auto touch-target"
               >
                 Annulla
               </Button>
-              <Button type="submit" disabled={loading}>
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="w-full sm:w-auto touch-target"
+              >
                 {loading ? 'Salvataggio...' : (existingTrade ? '💾 Salva Modifiche' : '✅ Registra Trade')}
               </Button>
             </div>
           </DialogFooter>
         </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

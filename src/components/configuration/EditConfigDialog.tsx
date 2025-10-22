@@ -22,9 +22,9 @@ const EditConfigDialog: React.FC<EditConfigDialogProps> = ({
   loading
 }) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent>
+    <DialogContent className="mobile-dialog">
       <DialogHeader>
-        <DialogTitle>Modifica Nome Configurazione</DialogTitle>
+        <DialogTitle className="text-base sm:text-lg">Modifica Nome Configurazione</DialogTitle>
       </DialogHeader>
       <div className="space-y-4">
         <div>
@@ -33,16 +33,17 @@ const EditConfigDialog: React.FC<EditConfigDialogProps> = ({
             value={configName}
             onChange={(e) => setConfigName(e.target.value)}
             placeholder="Nome configurazione"
-            className="mt-1"
+            className="mt-1 touch-target text-base"
           />
         </div>
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <div className="flex flex-col sm:flex-row justify-end gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto touch-target">
             Annulla
           </Button>
           <Button 
             onClick={onUpdate}
             disabled={!configName.trim() || loading}
+            className="w-full sm:w-auto touch-target"
           >
             {loading ? 'Aggiornando...' : 'Aggiorna'}
           </Button>

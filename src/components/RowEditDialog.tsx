@@ -187,29 +187,30 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] sm:max-h-[85vh] flex flex-col">
-        <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Calendar className="h-6 w-6 text-primary" />
-            Modifica Giorno {item.day}
-          </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            {formatDate(item.date)} - Modifica i parametri di rendimento e PAC per questo giorno specifico.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-2xl sm:max-h-[85vh] mobile-dialog flex flex-col">
+        <div className="mobile-dialog-content">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="flex items-center gap-2 text-base sm:text-xl">
+              <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              Modifica Giorno {item.day}
+            </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
+              {formatDate(item.date)} - Modifica i parametri di rendimento e PAC per questo giorno specifico.
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-6 overflow-y-auto flex-1 px-1">
-          {/* Informazioni attuali */}
-          <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">Capitale Iniziale</Label>
-              <p className="text-lg font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</p>
+          <div className="space-y-4 sm:space-y-6 overflow-y-auto flex-1 px-1 mobile-dialog-body">
+            {/* Informazioni attuali */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 sm:p-4 bg-muted/30 rounded-lg">
+              <div>
+                <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Capitale Iniziale</Label>
+                <p className="text-base sm:text-lg font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</p>
+              </div>
+              <div>
+                <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Capitale Finale Attuale</Label>
+                <p className="text-base sm:text-lg font-mono">{formatCurrency(item.finalCapital, currency)}</p>
+              </div>
             </div>
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">Capitale Finale Attuale</Label>
-              <p className="text-lg font-mono">{formatCurrency(item.finalCapital, currency)}</p>
-            </div>
-          </div>
 
           <Separator />
 
@@ -224,7 +225,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             </div>
             
             <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="return-input" className="text-sm">Percentuale (%)</Label>
                   <Input
@@ -235,7 +236,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                     onChange={(e) => handleReturnRateInputChange(e.target.value)}
                     onBlur={handleReturnRateInputBlur}
                     placeholder="Es: 0.500"
-                    className="font-mono"
+                    className="font-mono touch-target text-base"
                   />
                 </div>
                 <div className="flex items-end">
@@ -283,7 +284,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             </div>
             
             <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="pac-input" className="text-sm">Importo ({currency})</Label>
                   <Input
@@ -294,7 +295,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
                     onChange={(e) => handlePacAmountInputChange(e.target.value)}
                     onBlur={handlePacAmountInputBlur}
                     placeholder="Es: 100.00"
-                    className="font-mono"
+                    className="font-mono touch-target text-base"
                   />
                 </div>
                 <div className="flex items-end">
@@ -321,28 +322,27 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
           {/* Preview Risultati */}
           <div className="space-y-3">
             <Label className="text-base font-medium">Anteprima Risultati</Label>
-            <div className="grid grid-cols-3 gap-4 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-3 sm:p-4 bg-primary/5 border border-primary/20 rounded-lg">
               <div>
-                <Label className="text-sm text-muted-foreground">Capitale Post-PAC</Label>
+                <Label className="text-xs sm:text-sm text-muted-foreground">Capitale Post-PAC</Label>
                 <p className="font-mono text-sm">{formatCurrency(newCapitalAfterPAC, currency)}</p>
               </div>
               <div>
-                <Label className="text-sm text-muted-foreground">Ricavo Giorno</Label>
+                <Label className="text-xs sm:text-sm text-muted-foreground">Ricavo Giorno</Label>
                 <p className={`font-mono text-sm ${newDailyGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {formatCurrency(newDailyGain, currency)}
                 </p>
               </div>
               <div>
-                <Label className="text-sm text-muted-foreground">Capitale Finale</Label>
+                <Label className="text-xs sm:text-sm text-muted-foreground">Capitale Finale</Label>
                 <p className="font-mono text-sm font-semibold">{formatCurrency(newFinalCapital, currency)}</p>
               </div>
             </div>
           </div>
-
-        </div>
+          </div>
         
         {/* Sticky footer with actions */}
-        <div className="flex-shrink-0 border-t border-border pt-4 mt-4">
+        <div className="flex-shrink-0 border-t border-border pt-4 mt-4 mobile-dialog-footer">
           {originalConfigId && originalConfigName && (
             <div className="mb-3 p-2 bg-primary/5 border border-primary/20 rounded-lg">
               <p className="text-sm text-muted-foreground">
@@ -354,7 +354,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             </div>
           )}
           
-          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end">
             <Button 
               variant="outline" 
               onClick={handleCancel}
@@ -369,15 +369,11 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
               className="w-full sm:w-auto bg-primary hover:bg-primary/90 touch-target"
             >
               <Save className="h-4 w-4 mr-2" />
-              <span className="sm:hidden">
-                {hasChanges ? 'Applica e Salva' : 'Nessuna Modifica'}
-              </span>
-              <span className="hidden sm:inline">
-                {hasChanges ? 'Applica e Salva' : 'Nessuna Modifica'}
-              </span>
+              {hasChanges ? 'Applica e Salva' : 'Nessuna Modifica'}
             </Button>
           </div>
         </div>
+      </div>
       </DialogContent>
     </Dialog>
   );

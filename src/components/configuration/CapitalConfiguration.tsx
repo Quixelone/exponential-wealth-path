@@ -52,7 +52,7 @@ const CapitalConfiguration: React.FC<CapitalConfigurationProps> = ({
           min={50}
           max={5000}
           step={50}
-          className="w-full"
+          className="w-full touch-target text-base"
         />
       </CardContent>
     </Card>

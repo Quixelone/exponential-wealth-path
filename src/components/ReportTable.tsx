@@ -155,24 +155,26 @@ const ReportTable: React.FC<ReportTableProps> = ({
       <Card className="animate-fade-in">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <TrendingUp className="h-6 w-6 text-primary" />
-              Report Giornaliero Dettagliato
+            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-base sm:text-lg">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-6 sm:h-6 sm:w-6 text-primary" />
+                <span>Report Giornaliero Dettagliato</span>
+              </div>
               {currentInvestmentDay && (
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
+                <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span>Giorno corrente: {currentInvestmentDay}</span>
                 </div>
               )}
             </CardTitle>
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <div className="relative">
+              <div className="relative w-full sm:w-auto">
                 <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Cerca giorno, data, %..."
                   value={searchTerm}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  className="pl-9 w-full sm:w-56"
+                  className="pl-9 w-full sm:w-56 touch-target"
                 />
               </div>
               {currentConfigId && currentInvestmentDay && onSaveToStrategy && (
@@ -180,41 +182,42 @@ const ReportTable: React.FC<ReportTableProps> = ({
               onClick={onSaveToStrategy}
               variant="default" 
               size="sm"
-              className="bg-primary hover:bg-primary/90"
+              className="bg-primary hover:bg-primary/90 w-full sm:w-auto touch-target"
             >
               <TrendingUp className="h-4 w-4 mr-2" />
-              Conferma Giorno {currentInvestmentDay}
+              <span className="hidden sm:inline">Conferma Giorno {currentInvestmentDay}</span>
+              <span className="sm:hidden">Conferma G.{currentInvestmentDay}</span>
             </Button>
               )}
-              <Button onClick={onExportCSV} variant="outline" size="sm">
+              <Button onClick={onExportCSV} variant="outline" size="sm" className="w-full sm:w-auto touch-target">
                 <Download className="h-4 w-4 mr-2" />
                 Esporta CSV
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-6">
           <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-16 text-center">Giorno</TableHead>
-                  <TableHead className="w-28">Data</TableHead>
-                  <TableHead className="text-right">Capitale Iniziale</TableHead>
-                  <TableHead className="text-right">PAC</TableHead>
-                  <TableHead className="text-center">Trade Reale</TableHead>
-                  <TableHead className="text-right">% Ricavo</TableHead>
-                  <TableHead className="text-right">Ricavo Giorno</TableHead>
-                  <TableHead className="text-right font-mono">Capitale Finale</TableHead>
-                  <TableHead className="text-right">Valore Reale</TableHead>
-                  <TableHead className="text-right">Differenza</TableHead>
-                  {!readOnly && <TableHead className="w-32 text-center">Azioni</TableHead>}
+                <TableRow className="text-xs sm:text-sm">
+                  <TableHead className="w-12 sm:w-16 text-center px-2">Giorno</TableHead>
+                  <TableHead className="w-20 sm:w-28 px-2">Data</TableHead>
+                  <TableHead className="text-right px-2 hidden sm:table-cell">Capitale Iniziale</TableHead>
+                  <TableHead className="text-right px-2">PAC</TableHead>
+                  <TableHead className="text-center px-2 hidden md:table-cell">Trade Reale</TableHead>
+                  <TableHead className="text-right px-2">% Ricavo</TableHead>
+                  <TableHead className="text-right px-2 hidden sm:table-cell">Ricavo Giorno</TableHead>
+                  <TableHead className="text-right font-mono px-2">Capitale Finale</TableHead>
+                  <TableHead className="text-right px-2 hidden lg:table-cell">Valore Reale</TableHead>
+                  <TableHead className="text-right px-2 hidden lg:table-cell">Differenza</TableHead>
+                  {!readOnly && <TableHead className="w-20 sm:w-32 text-center px-2">Azioni</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={11} className="text-center py-8 text-muted-foreground text-sm">
                       Nessun dato da visualizzare per i filtri applicati.
                     </TableCell>
                   </TableRow>
@@ -236,11 +239,11 @@ const ReportTable: React.FC<ReportTableProps> = ({
                       <TableRow 
                         key={item.day} 
                         className={`
-                          hover:bg-muted/50 
+                          hover:bg-muted/50 text-xs sm:text-sm
                           ${isToday ? 'bg-primary/5 border-primary/20 border-2 animate-pulse-gentle' : ''}
                         `}
                       >
-                        <TableCell className="font-medium text-center relative">
+                        <TableCell className="font-medium text-center relative px-2">
                           <div className="flex items-center justify-center gap-1">
                             {item.day}
                             {isToday && (
@@ -255,100 +258,100 @@ const ReportTable: React.FC<ReportTableProps> = ({
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className={`text-sm ${isToday ? 'font-semibold text-primary' : ''}`}>
+                        <TableCell className={`text-xs sm:text-sm px-2 ${isToday ? 'font-semibold text-primary' : ''}`}>
                           {formatDate(item.date)}
                         </TableCell>
-                        <TableCell className="text-right font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</TableCell>
-                        <TableCell className="text-right font-mono">{formatCurrency(item.pacAmount, currency)}</TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="text-right font-mono text-xs sm:text-sm px-2 hidden sm:table-cell">{formatCurrency(item.capitalBeforePAC, currency)}</TableCell>
+                        <TableCell className="text-right font-mono text-xs sm:text-sm px-2">{formatCurrency(item.pacAmount, currency)}</TableCell>
+                        <TableCell className="text-center px-2 hidden md:table-cell">
                           {actualTrade ? (
-                            <div className="space-y-2">
+                            <div className="space-y-1 sm:space-y-2">
                               {actualTrade.option_status === 'filled' ? (
                                 <>
-                                  <Badge variant="default" className="bg-green-600">
+                                  <Badge variant="default" className="bg-green-600 text-xs">
                                     Fillata
                                   </Badge>
-                                  <div className="text-sm font-mono">
+                                  <div className="text-xs sm:text-sm font-mono">
                                     {actualTrade.btc_amount?.toFixed(8)} BTC
                                   </div>
-                                  <div className="text-xs text-muted-foreground">
+                                  <div className="text-[10px] sm:text-xs text-muted-foreground">
                                     @ ${actualTrade.fill_price_usd?.toLocaleString()}
                                   </div>
                                   {actualTrade.strike_price && (
-                                    <div className="text-xs text-blue-600">
+                                    <div className="text-[10px] sm:text-xs text-blue-600">
                                       Strike: ${actualTrade.strike_price.toLocaleString()}
                                     </div>
                                   )}
                                 </>
                               ) : (
                                 <>
-                                  <Badge variant="secondary" className="bg-blue-600">
+                                  <Badge variant="secondary" className="bg-blue-600 text-xs">
                                     Scaduta OTM
                                   </Badge>
-                                  <div className="text-sm font-mono text-blue-600">
+                                  <div className="text-xs sm:text-sm font-mono text-blue-600">
                                     +${actualTrade.premium_received_usdt?.toLocaleString()} USDT
                                   </div>
-                                  <div className="text-xs text-muted-foreground">
+                                  <div className="text-[10px] sm:text-xs text-muted-foreground">
                                     Premio trattenuto
                                   </div>
                                 </>
                               )}
                               {actualTrade.option_sold_date && (
-                                <div className="text-xs text-muted-foreground">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground">
                                   Sold: {formatDate(actualTrade.option_sold_date)}
                                 </div>
                               )}
                             </div>
                           ) : (
-                            <span className="text-muted-foreground text-sm">-</span>
+                            <span className="text-muted-foreground text-xs sm:text-sm">-</span>
                           )}
                         </TableCell>
-                        <TableCell className={`text-right font-mono ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <TableCell className={`text-right font-mono text-xs sm:text-sm px-2 ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {item.dailyReturn.toFixed(3)}%
                         </TableCell>
-                        <TableCell className={`text-right font-mono ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
+                        <TableCell className={`text-right font-mono text-xs sm:text-sm px-2 hidden sm:table-cell ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
                           {formatCurrency(dailyGain, currency)}
                         </TableCell>
-                        <TableCell className={`text-right font-mono font-semibold ${isToday ? 'text-primary' : ''}`}>
+                        <TableCell className={`text-right font-mono font-semibold text-xs sm:text-sm px-2 ${isToday ? 'text-primary' : ''}`}>
                           {formatCurrency(item.finalCapital, currency)}
                         </TableCell>
-                        <TableCell className="text-right font-mono">
+                        <TableCell className="text-right font-mono text-xs sm:text-sm px-2 hidden lg:table-cell">
                           {realValue ? (
-                            <span className="text-green-600 font-semibold">
+                            <span className="text-green-600 font-semibold text-xs sm:text-sm">
                               {formatCurrency(realValue, 'USD')}
                             </span>
                           ) : (
-                            <span className="text-muted-foreground text-sm">-</span>
+                            <span className="text-muted-foreground text-xs sm:text-sm">-</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-right font-mono">
+                        <TableCell className="text-right font-mono text-xs sm:text-sm px-2 hidden lg:table-cell">
                           {difference !== null ? (
                             <div className="flex flex-col items-end">
-                              <span className={difference >= 0 ? 'text-green-600' : 'text-red-600'}>
+                              <span className={`text-xs sm:text-sm ${difference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 {difference >= 0 ? '+' : ''}{formatCurrency(Math.abs(difference), 'USD')}
                               </span>
                               {diffPercentage !== null && (
-                                <span className={`text-xs ${diffPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                <span className={`text-[10px] sm:text-xs ${diffPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                   ({diffPercentage >= 0 ? '+' : ''}{diffPercentage.toFixed(2)}%)
                                 </span>
                               )}
                             </div>
                           ) : (
-                            <span className="text-muted-foreground text-sm">-</span>
+                            <span className="text-muted-foreground text-xs sm:text-sm">-</span>
                           )}
                         </TableCell>
                         {!readOnly && (
-                          <TableCell className="text-center">
-                            <div className="flex items-center justify-center gap-1">
+                          <TableCell className="text-center px-2">
+                            <div className="flex items-center justify-center gap-0.5 sm:gap-1">
                               <ModernTooltip>
                                 <ModernTooltipTrigger asChild>
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleEditRow(item)}
-                                    className="h-8 px-2 text-primary hover:text-primary/80 hover:bg-primary/10"
+                                    className="h-8 w-8 sm:h-8 sm:w-8 px-0 sm:px-2 text-primary hover:text-primary/80 hover:bg-primary/10 touch-target"
                                   >
-                                    <Edit3 className="h-4 w-4" />
+                                    <Edit3 className="h-3 w-3 sm:h-4 sm:w-4" />
                                   </Button>
                                 </ModernTooltipTrigger>
                                 <ModernTooltipContent>
@@ -363,9 +366,9 @@ const ReportTable: React.FC<ReportTableProps> = ({
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => handleTradeRecord(item)}
-                                      className="h-8 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                      className="h-8 w-8 sm:h-8 sm:w-8 px-0 sm:px-2 text-green-600 hover:text-green-700 hover:bg-green-50 touch-target"
                                     >
-                                      <DollarSign className="h-4 w-4" />
+                                      <DollarSign className="h-3 w-3 sm:h-4 sm:w-4" />
                                     </Button>
                                   </ModernTooltipTrigger>
                                   <ModernTooltipContent>
