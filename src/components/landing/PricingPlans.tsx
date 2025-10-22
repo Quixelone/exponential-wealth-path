@@ -94,11 +94,11 @@ const PricingPlans = () => {
 
             <div className="mb-6">
               <div className="flex items-baseline gap-2">
-                <span className="text-5xl font-bold">XX€</span>
+                <span className="text-5xl font-bold">9,90€</span>
                 <span className="text-muted-foreground">/mese</span>
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                Canone mensile da definire
+                per capitale da 1.000€ a 2.500€
               </p>
             </div>
 
