@@ -400,7 +400,7 @@ export type Database = {
           admin_user_id: string | null
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           record_id: string | null
           table_name: string
           user_agent: string | null
@@ -412,7 +412,7 @@ export type Database = {
           admin_user_id?: string | null
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           record_id?: string | null
           table_name: string
           user_agent?: string | null
@@ -424,7 +424,7 @@ export type Database = {
           admin_user_id?: string | null
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           record_id?: string | null
           table_name?: string
           user_agent?: string | null
@@ -508,30 +508,30 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           login_time: string
           logout_time: string | null
-          session_duration: unknown | null
+          session_duration: unknown
           user_agent: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           login_time?: string
           logout_time?: string | null
-          session_duration?: unknown | null
+          session_duration?: unknown
           user_agent?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           login_time?: string
           logout_time?: string | null
-          session_duration?: unknown | null
+          session_duration?: unknown
           user_agent?: string | null
           user_id?: string
         }
@@ -557,10 +557,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      delete_user_safely: {
-        Args: { target_user_id: string }
-        Returns: boolean
-      }
+      delete_user_safely: { Args: { target_user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -568,22 +565,13 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_admin: { Args: never; Returns: boolean }
       is_admin_with_role: {
         Args: { required_role?: Database["public"]["Enums"]["admin_role_type"] }
         Returns: boolean
       }
-      is_user_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_user_admin_new: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_user_admin: { Args: never; Returns: boolean }
+      is_user_admin_new: { Args: never; Returns: boolean }
       log_sensitive_access: {
         Args: {
           accessed_fields?: string[]
@@ -594,10 +582,11 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_user_login: {
-        Args: { user_uuid: string }
-        Returns: undefined
+      reset_user_strategy_state: {
+        Args: { target_user_email: string }
+        Returns: Json
       }
+      update_user_login: { Args: { user_uuid: string }; Returns: undefined }
     }
     Enums: {
       admin_role_type: "admin_readonly" | "admin_full" | "super_admin"

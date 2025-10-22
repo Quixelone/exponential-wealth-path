@@ -25,6 +25,7 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
     saveConfiguration,
     updateConfiguration,
     loadConfigurations,
+    forceReloadStrategies,
   } = useSupabaseConfig();
 
   const {
@@ -223,6 +224,7 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
                   onDeleteConfiguration={handleDeleteConfiguration}
                   onSaveConfiguration={handleSaveConfiguration}
                   onUpdateConfiguration={handleUpdateConfiguration}
+                  onForceReload={forceReloadStrategies}
                   currentConfigId={currentConfigId}
                   currentConfigName={currentConfigName}
                   loading={supabaseLoading}

@@ -25,6 +25,7 @@ const Strategies: React.FC = () => {
     saveConfiguration,
     updateConfiguration,
     loadConfigurations,
+    forceReloadStrategies,
   } = useSupabaseConfig();
 
   const {
@@ -385,6 +386,7 @@ const Strategies: React.FC = () => {
               onDeleteConfiguration={handleDeleteConfiguration}
               onSaveConfiguration={handleSaveConfiguration}
               onUpdateConfiguration={handleUpdateConfiguration}
+              onForceReload={forceReloadStrategies}
               currentConfigId={currentConfigId}
               currentConfigName={currentConfigName}
               loading={supabaseLoading}

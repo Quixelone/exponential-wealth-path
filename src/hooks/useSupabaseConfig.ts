@@ -87,14 +87,14 @@ export const useSupabaseConfig = () => {
     }
   }, [updateConfig]);
 
-  const loadConfigurations = useCallback(async (): Promise<void> => {
+  const loadConfigurations = useCallback(async (force: boolean = false): Promise<void> => {
     // Prevent multiple simultaneous calls with a more robust check
-    if (loadingRef.current) {
+    if (loadingRef.current && !force) {
       console.log('⚠️ useSupabaseConfig: Load already in progress, skipping');
       return;
     }
     
-    console.log('🔄 useSupabaseConfig: Starting loadConfigurations');
+    console.log('🔄 useSupabaseConfig: Starting loadConfigurations', { force });
     loadingRef.current = true;
     setLoading(true);
     setError(null);
@@ -116,6 +116,11 @@ export const useSupabaseConfig = () => {
       loadingRef.current = false;
     }
   }, [loadConfigs]);
+
+  const forceReloadStrategies = useCallback(async (): Promise<void> => {
+    console.log('🔄 useSupabaseConfig: Force reload requested');
+    await loadConfigurations(true);
+  }, [loadConfigurations]);
 
   const deleteConfiguration = useCallback(async (configId: string): Promise<void> => {
     console.log('🔄 useSupabaseConfig: Starting deleteConfiguration', { configId });
@@ -150,6 +155,7 @@ export const useSupabaseConfig = () => {
     saveConfiguration,
     updateConfiguration,
     loadConfigurations,
-    deleteConfiguration
+    deleteConfiguration,
+    forceReloadStrategies
   };
 };

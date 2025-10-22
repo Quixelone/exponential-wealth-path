@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Hook to load persisted configuration after saved configs are loaded
- * This ensures we restore the user's last selected strategy
+ * This ensures we restore the user's last selected strategy with DB fallback
  */
 export const usePersistedConfigLoader = ({
   savedConfigs,
@@ -36,12 +37,12 @@ export const usePersistedConfigLoader = ({
         retryCount
       });
       
-      // Se savedConfigs è vuoto ma c'è un currentConfigId, aspetta un po' e riprova
-      if (savedConfigs.length === 0 && retryCount < 3) {
+      // Se savedConfigs è vuoto ma c'è un currentConfigId, aspetta e riprova più a lungo
+      if (savedConfigs.length === 0 && retryCount < 5) {
         console.log('⏳ PersistedConfigLoader: savedConfigs empty, will retry...', { retryCount });
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
-        }, 500);
+        }, 1000); // Aumentato timeout
         return;
       }
       
@@ -59,19 +60,36 @@ export const usePersistedConfigLoader = ({
         // Load the persisted configuration
         loadSavedConfiguration(persistedConfig);
       } else {
-        console.log('⚠️ PersistedConfigLoader: Persisted config not found, clearing persistence', {
+        console.log('⚠️ PersistedConfigLoader: Config not in list, checking DB directly', {
           persistedConfigId: currentConfigId,
-          availableConfigs: savedConfigs.map(c => ({ id: c.id, name: c.name })),
-          reason: 'Configuration may have been deleted',
           savedConfigsCount: savedConfigs.length
         });
         
-        // Only clear if we're sure savedConfigs is populated
+        // SAFETY: Before clearing, verify the strategy doesn't exist in DB
+        // This prevents data loss from race conditions
         if (savedConfigs.length > 0) {
-          // Persisted config no longer exists, clear it and reset to default state
-          setCurrentConfigId(null);
-          setCurrentConfigName('');
-          console.log('🧹 PersistedConfigLoader: Cleared orphaned configuration reference');
+          supabase
+            .from('investment_configs')
+            .select('id')
+            .eq('id', currentConfigId)
+            .maybeSingle()
+            .then(({ data, error }) => {
+              if (error) {
+                console.error('❌ PersistedConfigLoader: DB check failed', error);
+                return;
+              }
+              
+              if (data) {
+                console.log('🔄 PersistedConfigLoader: Strategy exists in DB but not loaded, forcing reload');
+                // Strategy exists but wasn't loaded - this is a bug, don't clear
+                // User should use force reload button
+              } else {
+                console.log('🧹 PersistedConfigLoader: Strategy deleted from DB, clearing localStorage');
+                // Strategy truly doesn't exist anymore, safe to clear
+                setCurrentConfigId(null);
+                setCurrentConfigName('');
+              }
+            });
         }
       }
     }

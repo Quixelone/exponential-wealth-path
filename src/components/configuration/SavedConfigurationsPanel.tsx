@@ -1,13 +1,15 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Save, FileText, Crown } from 'lucide-react';
+import { Save, FileText, Crown, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import ResponsiveConfigCards from './ResponsiveConfigCards';
 import SaveConfigDialog from './SaveConfigDialog';
 import EditConfigDialog from './EditConfigDialog';
 import UnsavedChangesAlert from './UnsavedChangesAlert';
 import { SavedConfiguration } from '@/types/database';
+import { toast } from 'sonner';
 
 interface SavedConfigurationsPanelProps {
   savedConfigs: SavedConfiguration[];
@@ -15,6 +17,7 @@ interface SavedConfigurationsPanelProps {
   onDeleteConfiguration: (configId: string) => void;
   onSaveConfiguration: (name: string) => void;
   onUpdateConfiguration: (configId: string, name: string) => void;
+  onForceReload?: () => Promise<void>;
   currentConfigId: string | null;
   currentConfigName: string;
   loading: boolean;
@@ -28,6 +31,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
   onDeleteConfiguration,
   onSaveConfiguration,
   onUpdateConfiguration,
+  onForceReload,
   currentConfigId,
   currentConfigName,
   loading,
@@ -41,6 +45,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
   const [editingConfigName, setEditingConfigName] = useState('');
   const [pendingLoadConfig, setPendingLoadConfig] = useState<SavedConfiguration | null>(null);
   const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
 
   // Aggiorna il valore predefinito del nome config
   React.useEffect(() => {
@@ -101,6 +106,20 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
     setShowUnsavedAlert(false);
   };
 
+  const handleForceReload = async () => {
+    if (!onForceReload) return;
+    
+    setIsReloading(true);
+    try {
+      await onForceReload();
+      toast.success('Strategie ricaricate dal database');
+    } catch (error) {
+      toast.error('Errore nel ricaricare le strategie');
+    } finally {
+      setIsReloading(false);
+    }
+  };
+
   return (
     <Card className="animate-fade-in">
       <CardHeader>
@@ -116,6 +135,18 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
             )}
           </CardTitle>
           <div className="flex items-center gap-2">
+            {onForceReload && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleForceReload}
+                disabled={isReloading || loading}
+                className="touch-target"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isReloading ? 'animate-spin' : ''}`} />
+                Ricarica
+              </Button>
+            )}
             {hasUnsavedChanges && (
               <Badge 
                 variant="destructive" 
