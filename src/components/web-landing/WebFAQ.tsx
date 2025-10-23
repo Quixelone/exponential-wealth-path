@@ -30,7 +30,7 @@ const WebFAQ = () => {
     {
       question: 'Posso smettere quando voglio?',
       answer:
-        "Sì, nessun vincolo contrattuale. Puoi cancellare l'abbonamento in qualsiasi momento mantenendo l'accesso alla formazione ricevuta. I tuoi dati rimangono disponibili per 90 giorni.",
+        "Sì, nessun vincolo contrattuale. Puoi cancellare l'abbonamento in qualsiasi momento. Potrai mantenere solo l'uso del pannello per ulteriori 2 mesi, non potrai usufruire della protezione e dei segnali AI.",
     },
     {
       question: 'Quali broker sono supportati?',
