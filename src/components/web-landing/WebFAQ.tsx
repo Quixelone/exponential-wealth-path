@@ -20,7 +20,7 @@ const WebFAQ = () => {
     {
       question: "Qual è il rischio principale?",
       answer:
-        "L'unico rischio è una perdita temporanea se BTC scende molto sotto lo strike di acquisto. Ma la wheel strategy è progettata per recuperare nel tempo grazie ai premi costanti e all'acquisto di BTC a prezzi scontati.",
+        "L'unico rischio è una diminuzione del valore temporanea se BTC scende molto sotto lo strike di acquisto. Ma la wheel strategy è progettata per recuperare nel tempo grazie ai premi costanti e all'acquisto di BTC a prezzi scontati.",
     },
     {
       question: 'Serve esperienza precedente?',
