@@ -37,22 +37,22 @@ const DailyRoutine = () => {
   ];
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-12 sm:py-16 lg:py-20 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-            <Clock className="h-5 w-5 text-primary" />
-            <span className="text-sm font-semibold text-primary">Routine Ottimizzata</span>
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-primary/10 border border-primary/20 mb-4 sm:mb-6">
+            <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+            <span className="text-xs sm:text-sm font-semibold text-primary">Routine Ottimizzata</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
             ⏰ Solo{' '}
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               15 Minuti al Giorno
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground px-4">
             Finestra 10:00-11:00 - Routine semplice e ottimizzata per massimizzare efficienza
           </p>
         </div>
@@ -80,12 +80,12 @@ const DailyRoutine = () => {
                       <span className="text-sm">{step.time}</span>
                     </div>
 
-                    {/* Content Card */}
-                    <div className="flex-1 bg-card border-2 border-primary/20 rounded-xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                      <div className="flex items-start gap-4">
+                    {/* Content Card - Ottimizzato per touch */}
+                    <div className="flex-1 bg-card border-2 border-primary/20 rounded-xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 active:scale-98">
+                      <div className="flex items-start gap-3 sm:gap-4">
                         {/* Icon - Mobile */}
-                        <div className="md:hidden flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Icon className="h-6 w-6 text-primary" />
+                        <div className="md:hidden flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                         </div>
 
                         {/* Icon - Desktop */}
@@ -93,18 +93,18 @@ const DailyRoutine = () => {
                           <Icon className="h-6 w-6 text-primary" />
                         </div>
 
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-bold">{step.title}</h3>
-                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary/10 text-xs font-medium text-secondary">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                            <h3 className="text-base sm:text-lg lg:text-xl font-bold">{step.title}</h3>
+                            <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-secondary/10 text-xs font-medium text-secondary whitespace-nowrap">
                               <Clock className="h-3 w-3" />
                               {step.duration}
                             </span>
                           </div>
-                          <p className="text-muted-foreground">{step.description}</p>
+                          <p className="text-sm sm:text-base text-muted-foreground">{step.description}</p>
 
                           {/* Mobile Time */}
-                          <div className="md:hidden mt-3">
+                          <div className="md:hidden mt-2 sm:mt-3">
                             <span className="text-sm font-bold text-primary">{step.time}</span>
                           </div>
                         </div>

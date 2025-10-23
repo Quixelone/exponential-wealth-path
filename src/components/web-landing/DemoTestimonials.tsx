@@ -34,57 +34,57 @@ const DemoTestimonials = () => {
   ];
 
   return (
-    <section id="demo" className="py-20">
+    <section id="demo" className="py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Demo Section */}
-        <div className="max-w-5xl mx-auto mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+        <div className="max-w-5xl mx-auto mb-12 sm:mb-16 lg:mb-20">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
               🎮{' '}
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Prova la Piattaforma
               </span>
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base sm:text-lg text-muted-foreground px-4">
               Esplora la demo interattiva o prenota una presentazione personalizzata 1:1
             </p>
           </div>
 
-          {/* Demo Mockup */}
-          <div className="relative bg-gradient-to-br from-primary/10 via-secondary/10 to-background border-2 border-primary/20 rounded-2xl p-8 mb-8">
+          {/* Demo Mockup - Ottimizzato per mobile */}
+          <div className="relative bg-gradient-to-br from-primary/10 via-secondary/10 to-background border-2 border-primary/20 rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
             <div className="aspect-video bg-card rounded-xl border-2 border-primary/20 overflow-hidden shadow-2xl flex items-center justify-center">
-              <div className="text-center p-8">
-                <div className="text-6xl mb-4">🎯</div>
-                <h3 className="text-2xl font-bold mb-2">Dashboard Interattiva</h3>
-                <p className="text-muted-foreground mb-6">
+              <div className="text-center p-4 sm:p-6 lg:p-8">
+                <div className="text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4">🎯</div>
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2">Dashboard Interattiva</h3>
+                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 px-4">
                   Esplora tutte le funzionalità della piattaforma in modalità demo
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to="/app">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                  <Link to="/app" className="w-full sm:w-auto">
                     <Button
                       size="lg"
-                      className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+                      className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
                     >
-                      Accedi alla Demo Live
+                      Accedi alla Demo
                     </Button>
                   </Link>
-                  <Button size="lg" variant="outline">
-                    Prenota Presentazione 1:1
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                    Prenota 1:1
                   </Button>
                 </div>
               </div>
             </div>
 
-            {/* Feature Pills */}
-            <div className="mt-6 flex flex-wrap gap-3 justify-center">
-              <span className="px-4 py-2 rounded-full bg-background border text-sm font-medium">
-                ✨ Nessuna carta richiesta
+            {/* Feature Pills - Compatti su mobile */}
+            <div className="mt-4 sm:mt-6 flex flex-wrap gap-2 sm:gap-3 justify-center">
+              <span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-background border text-xs sm:text-sm font-medium whitespace-nowrap">
+                ✨ Nessuna carta
               </span>
-              <span className="px-4 py-2 rounded-full bg-background border text-sm font-medium">
+              <span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-background border text-xs sm:text-sm font-medium whitespace-nowrap">
                 ⚡ Accesso immediato
               </span>
-              <span className="px-4 py-2 rounded-full bg-background border text-sm font-medium">
-                🔒 Dati al sicuro
+              <span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-background border text-xs sm:text-sm font-medium whitespace-nowrap">
+                🔒 Dati sicuri
               </span>
             </div>
           </div>
@@ -101,12 +101,12 @@ const DemoTestimonials = () => {
             </p>
           </div>
 
-          {/* Testimonial Cards */}
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
+          {/* Testimonial Cards - Stack su mobile */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12">
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="bg-card border-2 border-primary/20 rounded-xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+                className="bg-card border-2 border-primary/20 rounded-xl p-5 sm:p-6 hover:shadow-xl transition-all duration-300 active:scale-98"
               >
                 {/* Header */}
                 <div className="flex items-start gap-4 mb-4">

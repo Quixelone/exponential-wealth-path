@@ -6,29 +6,29 @@ const PlatformTech = () => {
     <section id="piattaforma" className="py-20 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 px-4">
             🏗️ Non Solo Segnali.{' '}
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Una Piattaforma FinTech Completa
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground px-4">
             Quello che gli altri non ti danno: la tecnologia per gestire tutto autonomamente
           </p>
         </div>
 
-        {/* 3 Column Features */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        {/* 3 Column Features - Stack su mobile */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12">
           {/* Column 1 - Dashboard */}
-          <div className="group relative bg-card border rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+          <div className="group relative bg-card border rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
             {/* Icon */}
-            <div className="mb-6 p-3 rounded-xl bg-primary/10 w-fit">
-              <BarChart3 className="h-8 w-8 text-primary" />
+            <div className="mb-4 sm:mb-6 p-2 sm:p-3 rounded-xl bg-primary/10 w-fit">
+              <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             </div>
 
-            {/* Screenshot Mockup */}
-            <div className="mb-6 rounded-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5 p-4 h-48 overflow-hidden">
+            {/* Screenshot Mockup - Ridotto su mobile */}
+            <div className="mb-4 sm:mb-6 rounded-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5 p-3 sm:p-4 h-36 sm:h-48 overflow-hidden">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">Crescita Capitale</span>
@@ -48,11 +48,11 @@ const PlatformTech = () => {
             </div>
 
             {/* Content */}
-            <h3 className="text-xl font-bold mb-2">Portfolio Manager Avanzato</h3>
-            <p className="text-muted-foreground mb-4">
+            <h3 className="text-lg sm:text-xl font-bold mb-2">Portfolio Manager Avanzato</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4">
               Calcoli automatici PAC + interesse composto + tracking performance reale vs teorica
             </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-xs font-medium text-primary">
+            <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-primary/10 text-xs font-medium text-primary">
               ✨ Configurazioni multiple salvabili
             </div>
           </div>

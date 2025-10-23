@@ -41,17 +41,17 @@ const Comparison = () => {
   };
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-12 sm:py-16 lg:py-20 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
             🆚 Perché{' '}
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Finanza Creativa è Diverso
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground px-4">
             Non siamo gestori di fondi. Siamo una piattaforma educativa con tecnologia proprietaria.
           </p>
         </div>

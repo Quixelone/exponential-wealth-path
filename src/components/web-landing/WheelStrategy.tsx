@@ -2,13 +2,13 @@ import { ArrowDown, ArrowUp, DollarSign, Shield } from 'lucide-react';
 
 const WheelStrategy = () => {
   return (
-    <section id="strategia" className="py-20">
+    <section id="strategia" className="py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left - Animation/Infographic */}
-          <div className="relative">
-            <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-background border-2 border-primary/20 rounded-2xl p-8">
-              <h3 className="text-xl font-bold mb-6 text-center">Ciclo Wheel Strategy</h3>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {/* Left - Animation/Infographic - Più compatto su mobile */}
+          <div className="relative lg:order-1">
+            <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-background border-2 border-primary/20 rounded-2xl p-4 sm:p-6 lg:p-8">
+              <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-center">Ciclo Wheel Strategy</h3>
 
               {/* Step 1 */}
               <div className="mb-6 animate-fade-in">
@@ -96,16 +96,16 @@ const WheelStrategy = () => {
             </div>
           </div>
 
-          {/* Right - Content */}
-          <div className="space-y-6">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+          {/* Right - Content - Mobile First su piccoli schermi */}
+          <div className="space-y-4 sm:space-y-6 lg:order-2">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
               🎯 La Wheel Strategy che Genera{' '}
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 0.20% al Giorno
               </span>
             </h2>
 
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
               Strategia conservativa di vendita opzioni put che genera reddito costante
               indipendentemente dalla direzione di Bitcoin
             </p>

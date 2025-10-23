@@ -52,17 +52,17 @@ const PricingTiers = () => {
   ];
 
   return (
-    <section id="pricing" className="py-20">
+    <section id="pricing" className="py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
             💰{' '}
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Pricing che Cresce con il Tuo Successo
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground px-4">
             Canone basato sul capitale raggiunto - Allineamento totale di interessi
           </p>
         </div>
@@ -117,46 +117,53 @@ const PricingTiers = () => {
           </table>
         </div>
 
-        {/* Pricing Cards - Mobile */}
-        <div className="lg:hidden grid sm:grid-cols-2 gap-6 mb-12">
-          {tiers.map((tier, index) => (
-            <div
-              key={index}
-              className={`relative bg-card border-2 rounded-xl p-6 hover:shadow-xl transition-all ${
-                tier.popular
-                  ? 'border-primary shadow-lg scale-105'
-                  : 'border-muted hover:border-primary/50'
-              }`}
-            >
-              {tier.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                  PIÙ POPOLARE
-                </div>
-              )}
+        {/* Pricing Cards - Mobile - Scroll orizzontale per più facilità */}
+        <div className="lg:hidden mb-12">
+          <div className="overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory">
+            <div className="flex gap-4 sm:grid sm:grid-cols-2 sm:gap-6">
+              {tiers.map((tier, index) => (
+                <div
+                  key={index}
+                  className={`flex-shrink-0 w-[280px] sm:w-auto relative bg-card border-2 rounded-xl p-5 sm:p-6 transition-all snap-center ${
+                    tier.popular
+                      ? 'border-primary shadow-lg'
+                      : 'border-muted hover:border-primary/50'
+                  }`}
+                >
+                  {tier.popular && (
+                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold whitespace-nowrap">
+                      PIÙ POPOLARE
+                    </div>
+                  )}
 
-              <div className="text-center mb-4">
-                <div className="text-4xl mb-2">{tier.icon}</div>
-                <h3 className="text-xl font-bold mb-1">{tier.name}</h3>
-                <p className="text-sm text-muted-foreground font-mono">{tier.capital}</p>
-              </div>
+                  <div className="text-center mb-4">
+                    <div className="text-3xl sm:text-4xl mb-2">{tier.icon}</div>
+                    <h3 className="text-lg sm:text-xl font-bold mb-1">{tier.name}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground font-mono">{tier.capital}</p>
+                  </div>
 
-              <div className="text-center mb-4">
-                <div className="text-3xl font-bold text-primary mb-1">{tier.price}</div>
-                <div className="text-sm text-muted-foreground">al mese</div>
-              </div>
+                  <div className="text-center mb-4 pb-4 border-b">
+                    <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">{tier.price}</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">al mese</div>
+                  </div>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Rendimento</span>
-                  <span className="font-semibold text-green-500">{tier.returns}</span>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-muted-foreground">Rendimento</span>
+                      <span className="font-semibold text-green-500">{tier.returns}</span>
+                    </div>
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-muted-foreground">Netto</span>
+                      <span className="font-bold">{tier.net}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Netto</span>
-                  <span className="font-bold">{tier.net}</span>
-                </div>
-              </div>
+              ))}
             </div>
-          ))}
+          </div>
+          <p className="text-center text-xs text-muted-foreground mt-2 sm:hidden">
+            ← Scorri per vedere tutti i piani →
+          </p>
         </div>
 
         {/* Important Note */}
