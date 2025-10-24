@@ -122,3 +122,13 @@ verify_jwt = true
 name = "stripe-webhook"
 source = "./supabase/functions/stripe-webhook"
 verify_jwt = false
+
+[[edge_runtime.function]]
+name = "check-subscription-status"
+source = "./supabase/functions/check-subscription-status"
+verify_jwt = true
+
+[[edge_runtime.function]]
+name = "customer-portal"
+source = "./supabase/functions/customer-portal"
+verify_jwt = true

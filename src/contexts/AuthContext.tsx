@@ -23,6 +23,11 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   isAdmin: boolean;
+  subscriptionStatus: {
+    subscribed: boolean;
+    subscription_end: string | null;
+  } | null;
+  checkSubscriptionStatus: () => Promise<void>;
   signUp: (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
@@ -51,6 +56,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<{
+    subscribed: boolean;
+    subscription_end: string | null;
+  } | null>(null);
   const { toast } = useToast();
 
   const fetchUserProfile = useCallback(async (userId: string) => {
@@ -130,6 +139,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user?.email]);
 
+  const checkSubscriptionStatus = useCallback(async () => {
+    if (!session) return;
+    
+    try {
+      console.log('🔍 Checking subscription status...');
+      const { data, error } = await supabase.functions.invoke('check-subscription-status');
+      
+      if (error) {
+        console.error('❌ Error checking subscription:', error);
+        return;
+      }
+      
+      if (data) {
+        console.log('✅ Subscription status:', data);
+        setSubscriptionStatus(data);
+      }
+    } catch (error) {
+      console.error('💥 Unexpected error checking subscription:', error);
+    }
+  }, [session]);
+
   const updateUserLogin = useCallback(async (userId: string) => {
     try {
       const { error } = await supabase.rpc('update_user_login', {
@@ -167,11 +197,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               if (event === 'SIGNED_IN') {
                 await updateUserLogin(session.user.id);
               }
+              await checkSubscriptionStatus();
             }
           }, 0);
         } else {
           console.log('🚪 User signed out, clearing profile');
           setUserProfile(null);
+          setSubscriptionStatus(null);
         }
         
         setLoading(false);
@@ -195,6 +227,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
           if (session?.user) {
             await fetchUserProfile(session.user.id);
+            await checkSubscriptionStatus();
           }
           
           setLoading(false);
@@ -213,7 +246,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [fetchUserProfile, updateUserLogin]);
+  }, [fetchUserProfile, updateUserLogin, checkSubscriptionStatus]);
+
+  // Auto-refresh subscription status every 60 seconds
+  useEffect(() => {
+    if (!session) return;
+    
+    const interval = setInterval(() => {
+      checkSubscriptionStatus();
+    }, 60000); // 60 seconds
+
+    return () => clearInterval(interval);
+  }, [session, checkSubscriptionStatus]);
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => {
     try {
@@ -465,6 +509,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     userProfile,
     loading,
     isAdmin,
+    subscriptionStatus,
+    checkSubscriptionStatus,
     signUp,
     signIn,
     signInWithGoogle,

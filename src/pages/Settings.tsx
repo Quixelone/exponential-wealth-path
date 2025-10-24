@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, Settings as SettingsIcon, CreditCard, Shield } from 'lucide-react';
+import { ArrowLeft, Settings as SettingsIcon, CreditCard, Shield, ExternalLink } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NotificationTester from '@/components/NotificationTester';
 import SettingsHeader from '@/components/settings/SettingsHeader';
@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const Settings = () => {
-  const { user, userProfile, loading: authLoading } = useAuth();
+  const { user, userProfile, loading: authLoading, subscriptionStatus, checkSubscriptionStatus } = useAuth();
   const navigate = useNavigate();
   const [insuranceStatus, setInsuranceStatus] = React.useState<{
     hasInsuredStrategy: boolean;
@@ -21,6 +21,7 @@ const Settings = () => {
     nextPaymentDate: string | null;
   }>({ hasInsuredStrategy: false, hasPaidThisMonth: false, nextPaymentDate: null });
   const [checkingPayment, setCheckingPayment] = React.useState(false);
+  const [openingPortal, setOpeningPortal] = React.useState(false);
 
   const checkInsuranceStatus = React.useCallback(async () => {
     if (!user) return;
@@ -60,6 +61,17 @@ const Settings = () => {
     checkInsuranceStatus();
   }, [checkInsuranceStatus]);
 
+  // Auto-refresh subscription status when returning from Stripe
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success') {
+      checkSubscriptionStatus();
+      toast.success('Pagamento completato con successo!');
+      // Clean up URL
+      window.history.replaceState({}, '', '/settings');
+    }
+  }, [checkSubscriptionStatus]);
+
   const handleStripeCheckout = async () => {
     if (!insuranceStatus.hasInsuredStrategy) {
       toast.error('Devi prima selezionare una strategia da assicurare');
@@ -95,6 +107,24 @@ const Settings = () => {
       toast.error('Errore durante la creazione del checkout');
     } finally {
       setCheckingPayment(false);
+    }
+  };
+
+  const handleCustomerPortal = async () => {
+    setOpeningPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error opening customer portal:', error);
+      toast.error('Errore durante l\'apertura del portale clienti');
+    } finally {
+      setOpeningPortal(false);
     }
   };
 
@@ -187,11 +217,24 @@ const Settings = () => {
                     </Button>
                   </>
                 ) : (
-                  <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
-                    <AlertDescription className="text-green-800 dark:text-green-200">
-                      ✅ Copertura attiva fino al {insuranceStatus.nextPaymentDate ? new Date(insuranceStatus.nextPaymentDate).toLocaleDateString('it-IT') : 'N/A'}
-                    </AlertDescription>
-                  </Alert>
+                  <>
+                    <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+                      <AlertDescription className="text-green-800 dark:text-green-200">
+                        ✅ Copertura attiva fino al {insuranceStatus.nextPaymentDate ? new Date(insuranceStatus.nextPaymentDate).toLocaleDateString('it-IT') : 'N/A'}
+                      </AlertDescription>
+                    </Alert>
+                    {subscriptionStatus?.subscribed && (
+                      <Button 
+                        onClick={handleCustomerPortal}
+                        disabled={openingPortal}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        {openingPortal ? 'Caricamento...' : 'Gestisci Abbonamento'}
+                      </Button>
+                    )}
+                  </>
                 )}
 
                 <div className="text-sm text-muted-foreground space-y-2 pt-4 border-t">
@@ -202,6 +245,11 @@ const Settings = () => {
                     <li>Copertura automatica in caso di mancato fill delle opzioni</li>
                     <li>Accumulo premi virtuali durante il periodo senza fill</li>
                   </ul>
+                  {subscriptionStatus?.subscribed && subscriptionStatus.subscription_end && (
+                    <p className="pt-2 font-medium">
+                      Rinnovo abbonamento: {new Date(subscriptionStatus.subscription_end).toLocaleDateString('it-IT')}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
