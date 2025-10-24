@@ -97,3 +97,18 @@ verify_jwt = false
 name = "sync-btc-prices"
 source = "./supabase/functions/sync-btc-prices"
 verify_jwt = false
+
+[[edge_runtime.function]]
+name = "ai-trading-agent"
+source = "./supabase/functions/ai-trading-agent"
+verify_jwt = false
+
+[[edge_runtime.function]]
+name = "telegram-notification-sender"
+source = "./supabase/functions/telegram-notification-sender"
+verify_jwt = false
+
+[[edge_runtime.function]]
+name = "insurance-payment-checker"
+source = "./supabase/functions/insurance-payment-checker"
+verify_jwt = false

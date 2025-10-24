@@ -71,6 +71,120 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_trading_signals: {
+        Row: {
+          bollinger_position: string | null
+          btc_price_source: string | null
+          btc_price_usd: number
+          confidence_score: number | null
+          config_id: string
+          created_at: string
+          current_expiration: string | null
+          current_position_type: string | null
+          current_strike_price: number | null
+          fill_probability: number | null
+          id: string
+          insurance_activated: boolean | null
+          is_premium_too_low: boolean | null
+          macd_signal: string | null
+          reasoning: string | null
+          recommended_action: string
+          recommended_premium_pct: number | null
+          recommended_strike_price: number | null
+          resistance_level: number | null
+          rsi_14: number | null
+          signal_date: string
+          signal_time: string
+          support_level: number | null
+          telegram_chat_id: string | null
+          telegram_sent: boolean | null
+          telegram_sent_at: string | null
+          updated_at: string
+          user_id: string
+          volatility_24h: number | null
+          will_be_filled: boolean | null
+        }
+        Insert: {
+          bollinger_position?: string | null
+          btc_price_source?: string | null
+          btc_price_usd: number
+          confidence_score?: number | null
+          config_id: string
+          created_at?: string
+          current_expiration?: string | null
+          current_position_type?: string | null
+          current_strike_price?: number | null
+          fill_probability?: number | null
+          id?: string
+          insurance_activated?: boolean | null
+          is_premium_too_low?: boolean | null
+          macd_signal?: string | null
+          reasoning?: string | null
+          recommended_action: string
+          recommended_premium_pct?: number | null
+          recommended_strike_price?: number | null
+          resistance_level?: number | null
+          rsi_14?: number | null
+          signal_date: string
+          signal_time?: string
+          support_level?: number | null
+          telegram_chat_id?: string | null
+          telegram_sent?: boolean | null
+          telegram_sent_at?: string | null
+          updated_at?: string
+          user_id: string
+          volatility_24h?: number | null
+          will_be_filled?: boolean | null
+        }
+        Update: {
+          bollinger_position?: string | null
+          btc_price_source?: string | null
+          btc_price_usd?: number
+          confidence_score?: number | null
+          config_id?: string
+          created_at?: string
+          current_expiration?: string | null
+          current_position_type?: string | null
+          current_strike_price?: number | null
+          fill_probability?: number | null
+          id?: string
+          insurance_activated?: boolean | null
+          is_premium_too_low?: boolean | null
+          macd_signal?: string | null
+          reasoning?: string | null
+          recommended_action?: string
+          recommended_premium_pct?: number | null
+          recommended_strike_price?: number | null
+          resistance_level?: number | null
+          rsi_14?: number | null
+          signal_date?: string
+          signal_time?: string
+          support_level?: number | null
+          telegram_chat_id?: string | null
+          telegram_sent?: boolean | null
+          telegram_sent_at?: string | null
+          updated_at?: string
+          user_id?: string
+          volatility_24h?: number | null
+          will_be_filled?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_trading_signals_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "investment_configs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_trading_signals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       btc_prices: {
         Row: {
           created_at: string
@@ -158,6 +272,140 @@ export type Database = {
             columns: ["config_id"]
             isOneToOne: false
             referencedRelation: "investment_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_coverage_periods: {
+        Row: {
+          base_capital_for_premium: number
+          config_id: string
+          created_at: string
+          daily_fictitious_premium_pct: number | null
+          days_covered: number | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          payout_address: string | null
+          payout_amount_usdt: number | null
+          payout_completed_at: string | null
+          payout_requested: boolean | null
+          payout_tx_hash: string | null
+          start_date: string
+          total_premium_accumulated_usdt: number | null
+          unlocked_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          base_capital_for_premium: number
+          config_id: string
+          created_at?: string
+          daily_fictitious_premium_pct?: number | null
+          days_covered?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          payout_address?: string | null
+          payout_amount_usdt?: number | null
+          payout_completed_at?: string | null
+          payout_requested?: boolean | null
+          payout_tx_hash?: string | null
+          start_date: string
+          total_premium_accumulated_usdt?: number | null
+          unlocked_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          base_capital_for_premium?: number
+          config_id?: string
+          created_at?: string
+          daily_fictitious_premium_pct?: number | null
+          days_covered?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          payout_address?: string | null
+          payout_amount_usdt?: number | null
+          payout_completed_at?: string | null
+          payout_requested?: boolean | null
+          payout_tx_hash?: string | null
+          start_date?: string
+          total_premium_accumulated_usdt?: number | null
+          unlocked_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_coverage_periods_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "investment_configs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_coverage_periods_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_payments: {
+        Row: {
+          created_at: string
+          grace_period_until: string | null
+          id: string
+          is_paid: boolean | null
+          last_check_at: string | null
+          paid_at: string | null
+          payment_amount_eur: number | null
+          payment_due_date: string
+          payment_method: string | null
+          payment_month: string
+          payment_reference: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          grace_period_until?: string | null
+          id?: string
+          is_paid?: boolean | null
+          last_check_at?: string | null
+          paid_at?: string | null
+          payment_amount_eur?: number | null
+          payment_due_date: string
+          payment_method?: string | null
+          payment_month: string
+          payment_reference?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          grace_period_until?: string | null
+          id?: string
+          is_paid?: boolean | null
+          last_check_at?: string | null
+          paid_at?: string | null
+          payment_amount_eur?: number | null
+          payment_due_date?: string
+          payment_method?: string | null
+          payment_month?: string
+          payment_reference?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -431,6 +679,82 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      telegram_notifications_queue: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          message_text: string
+          message_type: string
+          priority: number | null
+          related_coverage_id: string | null
+          related_signal_id: string | null
+          retry_count: number | null
+          scheduled_send_time: string | null
+          sent: boolean | null
+          sent_at: string | null
+          telegram_chat_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_text: string
+          message_type: string
+          priority?: number | null
+          related_coverage_id?: string | null
+          related_signal_id?: string | null
+          retry_count?: number | null
+          scheduled_send_time?: string | null
+          sent?: boolean | null
+          sent_at?: string | null
+          telegram_chat_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_text?: string
+          message_type?: string
+          priority?: number | null
+          related_coverage_id?: string | null
+          related_signal_id?: string | null
+          retry_count?: number | null
+          scheduled_send_time?: string | null
+          sent?: boolean | null
+          sent_at?: string | null
+          telegram_chat_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telegram_notifications_queue_related_coverage_id_fkey"
+            columns: ["related_coverage_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_coverage_periods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "telegram_notifications_queue_related_signal_id_fkey"
+            columns: ["related_signal_id"]
+            isOneToOne: false
+            referencedRelation: "ai_trading_signals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "telegram_notifications_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
