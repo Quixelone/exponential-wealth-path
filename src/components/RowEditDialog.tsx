@@ -187,7 +187,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl sm:max-h-[85vh] mobile-dialog flex flex-col">
+      <DialogContent className="max-w-2xl sm:max-h-[90vh] md:max-h-[85vh] mobile-dialog-compact flex flex-col overflow-hidden">
         <div className="mobile-dialog-content">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center gap-2 text-base sm:text-xl">
@@ -199,9 +199,9 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 sm:space-y-6 overflow-y-auto flex-1 px-1 mobile-dialog-body">
+          <div className="space-y-3 sm:space-y-4 overflow-y-auto flex-1 px-1 mobile-dialog-body">
             {/* Informazioni attuali */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 sm:p-4 bg-muted/30 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-muted/30 rounded-lg">
               <div>
                 <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Capitale Iniziale</Label>
                 <p className="text-base sm:text-lg font-mono">{formatCurrency(item.capitalBeforePAC, currency)}</p>
@@ -215,7 +215,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
           <Separator />
 
           {/* Modifica Rendimento */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Percent className="h-5 w-5 text-primary" />
               <Label className="text-base font-medium">Rendimento Giornaliero</Label>
@@ -224,8 +224,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
               )}
             </div>
             
-            <div className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="return-input" className="text-sm">Percentuale (%)</Label>
                   <Input
@@ -274,7 +274,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
           <Separator />
 
           {/* Modifica PAC */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center gap-2">
               <PiggyBank className="h-5 w-5 text-primary" />
               <Label className="text-base font-medium">Versamento PAC</Label>
@@ -283,8 +283,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
               )}
             </div>
             
-            <div className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="pac-input" className="text-sm">Importo ({currency})</Label>
                   <Input
@@ -322,7 +322,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
           {/* Preview Risultati */}
           <div className="space-y-3">
             <Label className="text-base font-medium">Anteprima Risultati</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-3 sm:p-4 bg-primary/5 border border-primary/20 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
               <div>
                 <Label className="text-xs sm:text-sm text-muted-foreground">Capitale Post-PAC</Label>
                 <p className="font-mono text-sm">{formatCurrency(newCapitalAfterPAC, currency)}</p>
@@ -342,7 +342,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
           </div>
         
         {/* Sticky footer with actions */}
-        <div className="flex-shrink-0 border-t border-border pt-4 mt-4 mobile-dialog-footer">
+        <div className="flex-shrink-0 border-t border-border pt-3 mt-2 bg-background sticky bottom-0 z-10 mobile-dialog-footer shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
           {originalConfigId && originalConfigName && (
             <div className="mb-3 p-2 bg-primary/5 border border-primary/20 rounded-lg">
               <p className="text-sm text-muted-foreground">
