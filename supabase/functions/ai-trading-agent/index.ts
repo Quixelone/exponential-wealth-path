@@ -224,56 +224,43 @@ serve(async (req) => {
 
 // Helper functions
 async function fetchPionexMarketData(): Promise<MarketData> {
-  const PIONEX_API_KEY = Deno.env.get('PIONEX_API_KEY');
-  const PIONEX_API_SECRET = Deno.env.get('PIONEX_API_SECRET');
+  console.log('Fetching BTC market data from Binance...');
   
-  if (!PIONEX_API_KEY || !PIONEX_API_SECRET) {
-    throw new Error('Pionex API credentials not configured');
-  }
-  
-  const timestamp = Date.now();
-  const params = { symbol: 'BTC_USDT' };
-  const signature = createPionexSignature(PIONEX_API_KEY, PIONEX_API_SECRET, timestamp, params);
-  
-  const headers = {
-    'PIONEX-KEY': PIONEX_API_KEY,
-    'PIONEX-SIGNATURE': signature,
-    'PIONEX-TIMESTAMP': timestamp.toString(),
-    'Content-Type': 'application/json'
-  };
-  
+  // Use Binance public API (no auth required) for testing
   // Fetch current ticker
-  const tickerResponse = await fetch(`https://api.pionex.com/api/v1/market/ticker?symbol=BTC_USDT`, {
-    headers
-  });
+  const tickerResponse = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT`);
   
   if (!tickerResponse.ok) {
-    throw new Error(`Pionex ticker API error: ${tickerResponse.statusText}`);
+    throw new Error(`Binance ticker API error: ${tickerResponse.statusText}`);
   }
   
   const tickerData = await tickerResponse.json();
-  const price = parseFloat(tickerData.data.close);
+  const price = parseFloat(tickerData.lastPrice);
+  const high24h = parseFloat(tickerData.highPrice);
+  const low24h = parseFloat(tickerData.lowPrice);
+  const volume24h = parseFloat(tickerData.volume);
   
-  // Fetch kline data for history
+  console.log(`Current BTC price: $${price}`);
+  
+  // Fetch kline data for price history (last 30 hours)
   const klineResponse = await fetch(
-    `https://api.pionex.com/api/v1/market/kline?symbol=BTC_USDT&interval=1h&limit=30`,
-    { headers }
+    `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=30`
   );
   
   if (!klineResponse.ok) {
-    throw new Error(`Pionex kline API error: ${klineResponse.statusText}`);
+    throw new Error(`Binance kline API error: ${klineResponse.statusText}`);
   }
   
   const klineData = await klineResponse.json();
-  const priceHistory = klineData.data.map((k: any) => parseFloat(k.close));
-  const high24h = Math.max(...priceHistory.slice(-24));
-  const low24h = Math.min(...priceHistory.slice(-24));
+  const priceHistory = klineData.map((k: any) => parseFloat(k[4])); // close price is at index 4
+  
+  console.log(`Fetched ${priceHistory.length} hourly price points`);
   
   return {
     price,
     high24h,
     low24h,
-    volume24h: parseFloat(tickerData.data.volume || '0'),
+    volume24h,
     priceHistory
   };
 }
