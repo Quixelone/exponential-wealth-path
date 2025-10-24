@@ -51,7 +51,7 @@ serve(async (req) => {
   try {
     console.log('🤖 AI Trading Agent started at', new Date().toISOString());
     
-    // Get all active users with notification settings
+    // Get only users with insured strategies and notification settings
     const { data: activeUsers, error: usersError } = await supabase
       .from('investment_configs')
       .select(`
@@ -64,7 +64,8 @@ serve(async (req) => {
           id,
           notification_settings(telegram_chat_id, notifications_enabled)
         )
-      `);
+      `)
+      .eq('is_insured', true);
     
     if (usersError) throw usersError;
     

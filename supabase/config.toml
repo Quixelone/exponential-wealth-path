@@ -112,3 +112,13 @@ verify_jwt = false
 name = "insurance-payment-checker"
 source = "./supabase/functions/insurance-payment-checker"
 verify_jwt = false
+
+[[edge_runtime.function]]
+name = "create-insurance-checkout"
+source = "./supabase/functions/create-insurance-checkout"
+verify_jwt = true
+
+[[edge_runtime.function]]
+name = "stripe-webhook"
+source = "./supabase/functions/stripe-webhook"
+verify_jwt = false

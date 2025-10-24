@@ -84,7 +84,8 @@ export const useConfigLoader = () => {
           dailyReturns: dailyReturnsMap,
           dailyPACOverrides: dailyPACOverridesMap,
           created_at: dbConfig.created_at,
-          updated_at: dbConfig.updated_at
+          updated_at: dbConfig.updated_at,
+          is_insured: dbConfig.is_insured || false
         });
       }
       

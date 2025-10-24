@@ -41,6 +41,7 @@ export interface SavedConfiguration {
   dailyPACOverrides: { [day: number]: number };
   created_at: string;
   updated_at: string;
+  is_insured?: boolean;
 }
 
 // BTC tracking types

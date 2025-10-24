@@ -3,10 +3,13 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
-import { Calendar, TrendingUp, Edit, Trash2 } from 'lucide-react';
+import { Calendar, TrendingUp, Edit, Trash2, Shield } from 'lucide-react';
 import { SavedConfiguration } from '@/types/database';
 import { formatCurrencyWhole } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface SavedConfigCardProps {
   savedConfig: SavedConfiguration;
@@ -35,6 +38,33 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
   isCurrent,
   loading,
 }) => {
+  const [isInsured, setIsInsured] = React.useState(savedConfig.is_insured || false);
+  const [updatingInsurance, setUpdatingInsurance] = React.useState(false);
+
+  const handleInsuranceToggle = async (checked: boolean) => {
+    setUpdatingInsurance(true);
+    try {
+      const { error } = await supabase
+        .from('investment_configs')
+        .update({ is_insured: checked })
+        .eq('id', savedConfig.id);
+
+      if (error) throw error;
+
+      setIsInsured(checked);
+      toast.success(checked ? "✅ Strategia assicurata" : "Assicurazione rimossa");
+    } catch (error: any) {
+      console.error("Error updating insurance:", error);
+      if (error.message?.includes('unique')) {
+        toast.error("Puoi assicurare solo una strategia alla volta");
+      } else {
+        toast.error("Errore nell'aggiornare l'assicurazione");
+      }
+    } finally {
+      setUpdatingInsurance(false);
+    }
+  };
+
   return (
     <Card className="border border-gray-200 hover:border-primary/30 transition-colors h-full flex flex-col">
       <CardContent className="p-4 flex flex-col h-full">
@@ -53,11 +83,19 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
               </div>
             </div>
           </div>
-          {isCurrent && (
-            <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
-              Attuale
-            </Badge>
-          )}
+          <div className="flex items-center gap-2 ml-2">
+            {isInsured && (
+              <Badge variant="default" className="text-xs flex items-center gap-1 flex-shrink-0">
+                <Shield className="h-3 w-3" />
+                Assicurata
+              </Badge>
+            )}
+            {isCurrent && (
+              <Badge variant="secondary" className="text-xs flex-shrink-0">
+                Attuale
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Info Grid */}
@@ -80,8 +118,21 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
           </div>
         </div>
 
+        {/* Insurance Toggle */}
+        <div className="flex items-center justify-between py-2 mb-3 border-t border-b text-xs">
+          <div className="flex items-center gap-2">
+            <Shield className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+            <span className="font-medium">Assicura strategia</span>
+          </div>
+          <Switch
+            checked={isInsured}
+            onCheckedChange={handleInsuranceToggle}
+            disabled={updatingInsurance || loading}
+          />
+        </div>
+
         {/* Footer */}
-        <div className="border-t pt-3 mt-auto">
+        <div className="pt-2 mt-auto">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div className="text-xs text-muted-foreground flex-shrink-0">
               {Object.keys(savedConfig.dailyReturns).length} rendimenti personalizzati
