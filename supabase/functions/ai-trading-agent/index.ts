@@ -475,47 +475,121 @@ function determineOptimalStrike(
     };
   }
   
-  // Determine strike based on technical analysis
-  let baseAdjustment = -3.5; // Default -3.5% for PUT
+  // ===== MULTI-STRIKE LOGIC =====
+  // Evaluate 5 different strike options
+  const strikeOptions = [
+    { adjustment: -1.0, label: "Aggressivo" },
+    { adjustment: -2.0, label: "Moderato-Alto" },
+    { adjustment: -3.0, label: "Moderato" },
+    { adjustment: -3.5, label: "Conservativo" },
+    { adjustment: -5.0, label: "Ultra-Conservativo" }
+  ];
   
-  if (rsi < 30) baseAdjustment -= 1.5; // Oversold, more conservative
-  else if (rsi > 70) baseAdjustment += 1; // Overbought, more aggressive
+  // Calculate premium for each strike
+  const evaluatedStrikes = strikeOptions.map(option => {
+    const strikePrice = Math.round((btcPrice * (1 + option.adjustment / 100)) / 100) * 100;
+    const premium = estimatePremium(strikePrice, btcPrice, volatility24h);
+    const distanceFromSpot = Math.abs(strikePrice - btcPrice);
+    
+    // Score = premium * (1 - distance penalty)
+    // Further strikes are slightly penalized
+    const distancePenalty = (distanceFromSpot / btcPrice) * 0.3;
+    const score = premium * (1 - distancePenalty);
+    
+    return {
+      ...option,
+      strikePrice,
+      premium,
+      score,
+      distancePct: option.adjustment
+    };
+  });
   
-  if (macdTrend === 'bullish') baseAdjustment -= 0.5;
-  else if (macdTrend === 'bearish') baseAdjustment += 0.5;
+  // Sort by score (best premium/risk ratio)
+  evaluatedStrikes.sort((a, b) => b.score - a.score);
   
-  if (bollingerPosition === 'lower') baseAdjustment -= 1;
-  else if (bollingerPosition === 'upper') baseAdjustment += 0.5;
+  // Apply preferences based on technical indicators
+  let preferredStrikes = evaluatedStrikes;
   
-  const putStrike = Math.max(
-    Math.round((btcPrice * (1 + baseAdjustment / 100)) / 100) * 100,
-    Math.round((support * 1.01) / 100) * 100
-  );
+  if (rsi < 35) {
+    // Oversold market: prefer more conservative strikes (-3.5%, -5%)
+    preferredStrikes = evaluatedStrikes.filter(s => s.adjustment <= -3.0);
+  } else if (rsi > 65) {
+    // Overbought market: prefer more aggressive strikes (-1%, -2%)
+    preferredStrikes = evaluatedStrikes.filter(s => s.adjustment >= -3.0);
+  }
   
-  const expectedPremium = estimatePremium(putStrike, btcPrice, volatility24h);
+  if (macdTrend === 'bearish' && bollingerPosition === 'upper') {
+    // Weakness signal: more conservative
+    preferredStrikes = evaluatedStrikes.filter(s => s.adjustment <= -2.5);
+  } else if (macdTrend === 'bullish' && bollingerPosition === 'lower') {
+    // Strength signal: can be more aggressive
+    preferredStrikes = evaluatedStrikes.filter(s => s.adjustment >= -3.5);
+  }
   
-  if (expectedPremium < 0.10) {
+  // Select optimal strike with best score among preferred
+  const optimalStrike = preferredStrikes.length > 0 
+    ? preferredStrikes[0] 
+    : evaluatedStrikes[0];
+  
+  // Detailed logging for debugging
+  console.log('📊 Strike Analysis:', {
+    btcPrice: btcPrice.toFixed(2),
+    rsi: rsi.toFixed(1),
+    macdTrend,
+    bollingerPosition,
+    evaluatedStrikes: evaluatedStrikes.map(s => ({
+      strike: s.strikePrice,
+      adjustment: s.distancePct + '%',
+      premium: s.premium.toFixed(3) + '%',
+      score: s.score.toFixed(4)
+    })),
+    optimalChoice: {
+      strike: optimalStrike.strikePrice,
+      label: optimalStrike.label,
+      adjustment: optimalStrike.distancePct + '%',
+      premium: optimalStrike.premium.toFixed(3) + '%',
+      score: optimalStrike.score.toFixed(4)
+    }
+  });
+  
+  // Check minimum threshold
+  if (optimalStrike.premium < 0.10) {
+    // Get top 3 alternatives for reasoning
+    const topAlternatives = evaluatedStrikes.slice(0, 3)
+      .map(s => `  • ${s.distancePct}%: $${s.strikePrice} → ${s.premium.toFixed(3)}%`)
+      .join('\n');
+    
     return {
       action: 'HOLD',
       strikePrice: null,
-      expectedPremiumPct: expectedPremium,
+      expectedPremiumPct: optimalStrike.premium,
       confidence: 0.95,
-      reasoning: `Premio ${expectedPremium.toFixed(3)}% troppo basso. Copertura assicurativa attivata (0.15% garantito).`
+      reasoning: `Miglior premio disponibile: ${optimalStrike.premium.toFixed(3)}% (Strike ${optimalStrike.label} $${optimalStrike.strikePrice}).\n\nAlternative valutate:\n${topAlternatives}\n\nTutti sotto soglia 0.10%. Copertura assicurativa attivata (0.15% garantito).`
     };
   }
   
+  // Calculate confidence based on market conditions
   let confidence = 0.7;
   if (rsi < 40 || rsi > 60) confidence += 0.1;
   if (macdTrend !== 'neutral') confidence += 0.05;
   if (volatility24h < 50) confidence += 0.1;
+  if (optimalStrike.score > 0.10) confidence += 0.05;
   confidence = Math.min(confidence, 0.95);
+  
+  // Build detailed reasoning with alternatives
+  const topAlternatives = evaluatedStrikes.slice(0, 3)
+    .map(s => `  • ${s.distancePct}%: $${s.strikePrice} → ${s.premium.toFixed(3)}%${s.strikePrice === optimalStrike.strikePrice ? ' ⭐' : ''}`)
+    .join('\n');
+  
+  const apyEstimate = (optimalStrike.premium * 365).toFixed(1);
   
   return {
     action: 'SELL_PUT',
-    strikePrice: putStrike,
-    expectedPremiumPct: expectedPremium,
+    strikePrice: optimalStrike.strikePrice,
+    expectedPremiumPct: optimalStrike.premium,
     confidence,
-    reasoning: `RSI ${rsi.toFixed(1)}, MACD ${macdTrend}, Bollinger ${bollingerPosition}. Strike $${putStrike} (${baseAdjustment.toFixed(1)}%). Premio ${expectedPremium.toFixed(2)}%.`
+    reasoning: `✅ Strike Scelto: $${optimalStrike.strikePrice} (${optimalStrike.distancePct}% - ${optimalStrike.label})\n💰 Premio: ${optimalStrike.premium.toFixed(3)}% giornaliero (~${apyEstimate}% APY)\n\n📊 Alternative valutate:\n${topAlternatives}\n\n🎯 Indicatori: RSI ${rsi.toFixed(1)}, MACD ${macdTrend}, Bollinger ${bollingerPosition}, Vol ${volatility24h.toFixed(1)}%`
   };
 }
 
