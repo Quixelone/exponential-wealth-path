@@ -73,28 +73,24 @@ const Settings = () => {
   }, [checkSubscriptionStatus]);
 
   const handleStripeCheckout = async () => {
-    if (!insuranceStatus.hasInsuredStrategy) {
-      toast.error('Devi prima selezionare una strategia da assicurare');
-      return;
-    }
-
     setCheckingPayment(true);
     try {
-      // Get insured config
-      const { data: insuredConfig } = await supabase
+      // First check if user has any configs at all
+      const { data: allConfigs } = await supabase
         .from('investment_configs')
-        .select('id')
-        .eq('user_id', user!.id)
-        .eq('is_insured', true)
-        .single();
+        .select('id, name, is_insured')
+        .eq('user_id', user!.id);
 
-      if (!insuredConfig) {
-        toast.error('Strategia assicurata non trovata');
+      if (!allConfigs || allConfigs.length === 0) {
+        toast.error('Devi prima creare una strategia nella sezione Strategie');
         return;
       }
 
+      // Try to get insured config, or use first available
+      let configId = allConfigs.find(c => c.is_insured)?.id || allConfigs[0].id;
+
       const { data, error } = await supabase.functions.invoke('create-insurance-checkout', {
-        body: { configId: insuredConfig.id },
+        body: { configId },
       });
 
       if (error) throw error;
@@ -194,29 +190,7 @@ const Settings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {!insuranceStatus.hasInsuredStrategy ? (
-                  <Alert>
-                    <AlertDescription>
-                      Vai nella sezione Strategie e seleziona la strategia che vuoi assicurare attivando il toggle "Assicura questa strategia".
-                    </AlertDescription>
-                  </Alert>
-                ) : !insuranceStatus.hasPaidThisMonth ? (
-                  <>
-                    <Alert variant="destructive">
-                      <AlertDescription>
-                        Pagamento mensile in sospeso: €49/mese
-                      </AlertDescription>
-                    </Alert>
-                    <Button 
-                      onClick={handleStripeCheckout} 
-                      disabled={checkingPayment}
-                      className="w-full"
-                    >
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      {checkingPayment ? 'Caricamento...' : 'Paga con Carta (Stripe)'}
-                    </Button>
-                  </>
-                ) : (
+                {insuranceStatus.hasPaidThisMonth ? (
                   <>
                     <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
                       <AlertDescription className="text-green-800 dark:text-green-200">
@@ -235,6 +209,36 @@ const Settings = () => {
                       </Button>
                     )}
                   </>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="flex-shrink-0 w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Shield className="h-7 w-7 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold">€49/mese</p>
+                          <p className="text-sm text-muted-foreground">Copertura completa assicurativa</p>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        onClick={handleStripeCheckout} 
+                        disabled={checkingPayment}
+                        className="w-full"
+                        size="lg"
+                      >
+                        <CreditCard className="mr-2 h-5 w-5" />
+                        {checkingPayment ? 'Caricamento...' : 'Attiva Assicurazione'}
+                      </Button>
+                      
+                      {!insuranceStatus.hasInsuredStrategy && (
+                        <p className="text-xs text-muted-foreground mt-3 text-center">
+                          Dopo l'attivazione, potrai gestire quale strategia assicurare dalla sezione Strategie
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 )}
 
                 <div className="text-sm text-muted-foreground space-y-2 pt-4 border-t">
