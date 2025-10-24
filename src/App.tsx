@@ -6,11 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import SubdomainRedirect from "@/components/SubdomainRedirect";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from '@/pages/AuthCallback';
-import Landing from "./pages/Landing";
 import WebLanding from "./pages/WebLanding";
 import Strategies from "./pages/Strategies";
 import UserManagement from "./pages/UserManagement";
@@ -32,10 +30,8 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <SubdomainRedirect />
               <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/web" element={<WebLanding />} />
+                <Route path="/" element={<WebLanding />} />
                 <Route path="/app" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />

@@ -11,7 +11,7 @@ const WebNavbar = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/web" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Finanza Creativa
             </div>
