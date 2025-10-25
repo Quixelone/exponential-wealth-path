@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, Settings as SettingsIcon, CreditCard, Shield, ExternalLink } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
+import { ArrowLeft, Settings as SettingsIcon, CreditCard, Shield, ExternalLink, CheckCircle2, TrendingUp, AlertTriangle, XCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NotificationTester from '@/components/NotificationTester';
 import SettingsHeader from '@/components/settings/SettingsHeader';
@@ -281,107 +282,249 @@ const Settings = () => {
             <NotificationTester />
           </TabsContent>
 
-          <TabsContent value="insurance">
-            <Card>
+          <TabsContent value="insurance" className="space-y-6">
+            {/* DEMO: Sistema Finanza Points™ */}
+            <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Copertura Assicurativa
-                </CardTitle>
-                <CardDescription>
-                  Gestisci la tua copertura assicurativa mensile
-                  {insuranceStatus.tierName && insuranceStatus.tierPrice && (
-                    <span className="font-semibold text-primary ml-1">
-                      - Tier {insuranceStatus.tierName}: €{insuranceStatus.tierPrice}/mese
-                    </span>
-                  )}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {insuranceStatus.currentCapital !== null && insuranceStatus.tierName && (
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Capitale Attuale</p>
-                        <p className="text-xl font-bold">€{insuranceStatus.currentCapital.toFixed(2)}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Tier Attuale</p>
-                        <p className="text-xl font-bold text-primary">{insuranceStatus.tierName}</p>
-                      </div>
-                    </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="text-2xl">✨</span>
+                      Finanza Points™
+                      <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">DEMO</span>
+                    </CardTitle>
+                    <CardDescription>
+                      Sistema di incentivi per il tuo percorso formativo
+                    </CardDescription>
                   </div>
-                )}
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Punti Disponibili</p>
+                    <p className="text-4xl font-bold text-primary">2,450</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Progress Bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Livello Formativo</span>
+                    <span className="font-semibold text-primary">Studente Avanzato (Livello 5)</span>
+                  </div>
+                  <div className="w-full h-3 bg-secondary/30 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500"
+                      style={{ width: '65%' }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground text-right">
+                    850 punti al prossimo livello (Livello 6: Trader Junior)
+                  </p>
+                </div>
 
-                {insuranceStatus.hasPaidThisMonth ? (
-                  <>
-                    <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
-                      <AlertDescription className="text-green-800 dark:text-green-200">
-                        ✅ Copertura attiva fino al {insuranceStatus.nextPaymentDate ? new Date(insuranceStatus.nextPaymentDate).toLocaleDateString('it-IT') : 'N/A'}
-                      </AlertDescription>
-                    </Alert>
-                    {subscriptionStatus?.subscribed && (
-                      <Button 
-                        onClick={handleCustomerPortal}
-                        disabled={openingPortal}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        {openingPortal ? 'Caricamento...' : 'Gestisci Abbonamento'}
-                      </Button>
-                    )}
-                  </>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="flex-shrink-0 w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Shield className="h-7 w-7 text-primary" />
+                <Separator />
+
+                {/* Come Guadagnare Punti */}
+                <div>
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    Come Guadagnare Punti
+                  </h4>
+                  <div className="grid gap-3">
+                    <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg border">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
+                          <CheckCircle2 className="h-5 w-5 text-green-500" />
                         </div>
                         <div>
-                          <p className="text-2xl font-bold">
-                            {insuranceStatus.tierPrice ? `€${insuranceStatus.tierPrice}` : '€9.90-€159.90'}/mese
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {insuranceStatus.tierName ? `Tier ${insuranceStatus.tierName}` : 'Basato sul tuo capitale'}
-                          </p>
+                          <p className="font-medium text-sm">Completa Simulazione Giornaliera</p>
+                          <p className="text-xs text-muted-foreground">Esegui una strategia simulata</p>
                         </div>
                       </div>
-                      
-                      <Button 
-                        onClick={handleStripeCheckout} 
-                        disabled={checkingPayment}
-                        className="w-full"
-                        size="lg"
-                      >
-                        <CreditCard className="mr-2 h-5 w-5" />
-                        {checkingPayment ? 'Caricamento...' : 'Attiva Assicurazione'}
-                      </Button>
-                      
-                      {!insuranceStatus.hasInsuredStrategy && (
-                        <p className="text-xs text-muted-foreground mt-3 text-center">
-                          Dopo l'attivazione, potrai gestire quale strategia assicurare dalla sezione Strategie
-                        </p>
-                      )}
+                      <span className="font-bold text-green-500">+50 pts</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg border">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                          <CheckCircle2 className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Supera Quiz Formativo</p>
+                          <p className="text-xs text-muted-foreground">Voto minimo 80%</p>
+                        </div>
+                      </div>
+                      <span className="font-bold text-blue-500">+100 pts</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg border">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                          <CheckCircle2 className="h-5 w-5 text-purple-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Partecipa a Webinar Live</p>
+                          <p className="text-xs text-muted-foreground">Presenza confermata</p>
+                        </div>
+                      </div>
+                      <span className="font-bold text-purple-500">+200 pts</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg border">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                          <CheckCircle2 className="h-5 w-5 text-orange-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Streak di 7 Giorni Consecutivi</p>
+                          <p className="text-xs text-muted-foreground">Accesso giornaliero alla piattaforma</p>
+                        </div>
+                      </div>
+                      <span className="font-bold text-orange-500">+500 pts</span>
                     </div>
                   </div>
-                )}
+                </div>
 
-                <div className="text-sm text-muted-foreground space-y-2 pt-4 border-t">
-                  <p><strong>Come funziona:</strong></p>
-                  <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>Canone mensile basato sul capitale raggiunto (€9.90-€159.90)</li>
-                    <li>Protezione attiva fino al 3 del mese successivo</li>
-                    <li>Copertura automatica in caso di mancato fill delle opzioni</li>
-                    <li>Accumulo premi virtuali durante il periodo senza fill</li>
-                    <li>Passaggio automatico di tier quando il capitale cresce</li>
-                  </ul>
-                  {subscriptionStatus?.subscribed && subscriptionStatus.subscription_end && (
-                    <p className="pt-2 font-medium">
-                      Rinnovo abbonamento: {new Date(subscriptionStatus.subscription_end).toLocaleDateString('it-IT')}
+                <Separator />
+
+                {/* Cosa Puoi Sbloccare */}
+                <div>
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-primary" />
+                    Cosa Puoi Sbloccare con i Punti
+                  </h4>
+                  <div className="grid gap-3">
+                    <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-2 border-primary/30">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="font-semibold text-sm mb-1">📚 Modulo Avanzato: Greeks & Volatility</p>
+                          <p className="text-xs text-muted-foreground">Corso completo su Delta, Gamma, Theta, Vega</p>
+                        </div>
+                        <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full whitespace-nowrap">
+                          1,000 pts
+                        </span>
+                      </div>
+                      <Button size="sm" className="w-full mt-2">
+                        Sblocca Ora
+                      </Button>
+                    </div>
+                    
+                    <div className="p-4 bg-gradient-to-r from-secondary/10 to-secondary/5 rounded-lg border-2 border-secondary/30">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="font-semibold text-sm mb-1">🤖 Accesso AI Analytics Avanzato</p>
+                          <p className="text-xs text-muted-foreground">Analisi predittive con algoritmi ML</p>
+                        </div>
+                        <span className="text-xs bg-secondary/20 text-secondary-foreground px-2 py-1 rounded-full whitespace-nowrap">
+                          1,500 pts
+                        </span>
+                      </div>
+                      <Button size="sm" variant="secondary" className="w-full mt-2">
+                        Sblocca Ora
+                      </Button>
+                    </div>
+                    
+                    <div className="p-4 bg-muted/50 rounded-lg border-2 border-muted opacity-60">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="font-semibold text-sm mb-1">👨‍🏫 Sessione 1:1 con Formatore Senior</p>
+                          <p className="text-xs text-muted-foreground">30 minuti di coaching personalizzato</p>
+                        </div>
+                        <span className="text-xs bg-muted px-2 py-1 rounded-full whitespace-nowrap">
+                          3,000 pts
+                        </span>
+                      </div>
+                      <Button size="sm" variant="outline" disabled className="w-full mt-2">
+                        Punti Insufficienti
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <Alert className="border-yellow-500/50 bg-yellow-500/10">
+                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                  <AlertTitle className="text-yellow-700 dark:text-yellow-400">
+                    ℹ️ Sistema di Gamification Educativa
+                  </AlertTitle>
+                  <AlertDescription className="text-yellow-600 dark:text-yellow-300 text-xs">
+                    I Finanza Points™ sono un sistema di incentivi formativi. Non rappresentano valore monetario, 
+                    garanzie di rendimento o protezione assicurativa. Servono solo a motivare l'apprendimento 
+                    e sbloccare contenuti educativi avanzati.
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+
+            {/* Statistiche Formative */}
+            <Card>
+              <CardHeader>
+                <CardTitle>📊 Le Tue Statistiche Formative</CardTitle>
+                <CardDescription>Progressi nel percorso di apprendimento</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-4 bg-primary/5 rounded-lg border text-center">
+                    <p className="text-3xl font-bold text-primary">23</p>
+                    <p className="text-xs text-muted-foreground mt-1">Simulazioni Completate</p>
+                  </div>
+                  <div className="p-4 bg-secondary/5 rounded-lg border text-center">
+                    <p className="text-3xl font-bold text-secondary-foreground">12</p>
+                    <p className="text-xs text-muted-foreground mt-1">Quiz Superati</p>
+                  </div>
+                  <div className="p-4 bg-accent/5 rounded-lg border text-center">
+                    <p className="text-3xl font-bold">8</p>
+                    <p className="text-xs text-muted-foreground mt-1">Moduli Completati</p>
+                  </div>
+                  <div className="p-4 bg-green-500/5 rounded-lg border text-center">
+                    <p className="text-3xl font-bold text-green-500">14</p>
+                    <p className="text-xs text-muted-foreground mt-1">Giorni di Streak</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Come Funziona */}
+            <Card>
+              <CardHeader>
+                <CardTitle>💡 Come Funziona Finanza Points™</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-full bg-primary/10 p-2 flex-shrink-0">
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Sistema di Incentivi Educativi</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Completa simulazioni, quiz e obiettivi didattici per accumulare punti. 
+                      Più ti impegni nella formazione, più contenuti avanzati sblocchi.
                     </p>
-                  )}
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="rounded-full bg-primary/10 p-2 flex-shrink-0">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Progressione Formativa</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Avanza attraverso i livelli formativi (da Studente a Professionista) 
+                      completando obiettivi didattici. Ogni livello sblocca nuove funzionalità.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="rounded-full bg-primary/10 p-2 flex-shrink-0">
+                    <Shield className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Solo Gamification, Non Assicurazione</h4>
+                    <p className="text-sm text-muted-foreground">
+                      I Finanza Points™ non sono una protezione assicurativa, non garantiscono rendimenti 
+                      e non hanno valore monetario. È solo un sistema per rendere l'apprendimento più coinvolgente.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
