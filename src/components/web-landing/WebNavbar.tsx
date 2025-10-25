@@ -35,6 +35,9 @@ const WebNavbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
+            <Link to="/finanza-points-demo">
+              <Button variant="outline">Demo Finanza Points™</Button>
+            </Link>
             <Link to="/auth">
               <Button variant="ghost">Accedi</Button>
             </Link>
@@ -85,6 +88,9 @@ const WebNavbar = () => {
             >
               FAQ
             </a>
+            <Link to="/finanza-points-demo" className="block" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="outline" className="w-full">Demo Finanza Points™</Button>
+            </Link>
             <Link to="/auth" className="block">
               <Button className="w-full">Inizia Gratis</Button>
             </Link>
