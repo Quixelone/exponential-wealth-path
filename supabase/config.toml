@@ -132,3 +132,8 @@ verify_jwt = true
 name = "customer-portal"
 source = "./supabase/functions/customer-portal"
 verify_jwt = true
+
+[[edge_runtime.function]]
+name = "fingenius-chat"
+source = "./supabase/functions/fingenius-chat"
+verify_jwt = true

@@ -16,6 +16,7 @@ import Settings from "./pages/Settings";
 import AISignals from "./pages/AISignals";
 import AITest from "./pages/AITest";
 import FinanzaPointsDemo from "./pages/FinanzaPointsDemo";
+import CoachAI from "./pages/CoachAI";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => {
                 <Route path="/user-management" element={<UserManagement />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/ai-signals" element={<AISignals />} />
+                <Route path="/coach-ai" element={<CoachAI />} />
                 <Route path="/test" element={<AITest />} />
                 <Route path="/finanza-points-demo" element={<FinanzaPointsDemo />} />
                 <Route path="*" element={<NotFound />} />

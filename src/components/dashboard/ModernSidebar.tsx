@@ -9,7 +9,8 @@ import {
   ChevronLeft, 
   ChevronRight,
   Menu,
-  Bot
+  Bot,
+  MessageCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -44,6 +45,12 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       label: 'AI Signals',
       path: '/ai-signals',
       description: 'Segnali AI Trading'
+    },
+    {
+      icon: MessageCircle,
+      label: 'Coach AI',
+      path: '/coach-ai',
+      description: 'Il tuo coach personale'
     },
     {
       icon: TrendingUp,

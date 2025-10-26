@@ -38,6 +38,11 @@ const WebNavbar = () => {
             <Link to="/finanza-points-demo">
               <Button variant="outline">Demo Finanza Points™</Button>
             </Link>
+            <Link to="/coach-ai">
+              <Button variant="ghost" className="flex items-center gap-2">
+                🤖 Coach AI
+              </Button>
+            </Link>
             <Link to="/auth">
               <Button variant="ghost">Accedi</Button>
             </Link>
@@ -90,6 +95,9 @@ const WebNavbar = () => {
             </a>
             <Link to="/finanza-points-demo" className="block" onClick={() => setMobileMenuOpen(false)}>
               <Button variant="outline" className="w-full">Demo Finanza Points™</Button>
+            </Link>
+            <Link to="/coach-ai" className="block" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="ghost" className="w-full">🤖 Coach AI</Button>
             </Link>
             <Link to="/auth" className="block">
               <Button className="w-full">Inizia Gratis</Button>
