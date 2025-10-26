@@ -74,27 +74,35 @@ const CoachAI = () => {
     setIsLoading(true);
 
     try {
+      console.log('[COACH-AI] Getting session...');
       const { data: { session } } = await supabase.auth.getSession();
+      
       if (!session) {
+        console.error('[COACH-AI] No session found');
         throw new Error('Non autenticato');
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fingenius-chat`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`
-          },
-          body: JSON.stringify({
-            messages: [...messages, userMessage].map(m => ({
-              role: m.role,
-              content: m.content
-            }))
-          })
-        }
-      );
+      console.log('[COACH-AI] Session found, user:', session.user?.id);
+      
+      const functionUrl = `https://rsmvjsokqolxgczclqjv.supabase.co/functions/v1/fingenius-chat`;
+      console.log('[COACH-AI] Calling edge function:', functionUrl);
+      console.log('[COACH-AI] Messages to send:', messages.length + 1);
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map(m => ({
+            role: m.role,
+            content: m.content
+          }))
+        })
+      });
+      
+      console.log('[COACH-AI] Response status:', response.status);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Errore sconosciuto' }));
