@@ -12,16 +12,20 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 serve(async (req) => {
+  console.log('[FINGENIUS] Request received, method:', req.method);
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { messages } = await req.json();
+    console.log('[FINGENIUS] Messages count:', messages?.length);
     
     // Get user from auth header
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
+      console.error('[FINGENIUS] Missing authorization header');
       throw new Error('No authorization header');
     }
 
@@ -30,8 +34,11 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
+      console.error('[FINGENIUS] Authentication failed:', authError?.message);
       throw new Error('Unauthorized');
     }
+    
+    console.log('[FINGENIUS] User authenticated:', user.id);
 
     // Fetch user context from database
     const { data: configs } = await supabase
@@ -134,9 +141,20 @@ ${userContext}
 Rispondi sempre in modo conciso (max 3-4 frasi) e amichevole. Mantieni un tono professionale ma mai freddo.`;
 
     if (!openAIApiKey) {
-      throw new Error('OPENAI_API_KEY non configurato');
+      console.error('[FINGENIUS] OPENAI_API_KEY not configured');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Configurazione mancante. La chiave API OpenAI non è stata configurata. Contatta l\'amministratore del sistema.' 
+        }), 
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
+    console.log('[FINGENIUS] Calling OpenAI API with model: gpt-4o-mini');
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -144,43 +162,55 @@ Rispondi sempre in modo conciso (max 3-4 frasi) e amichevole. Mantieni un tono p
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-nano-2025-08-07',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           ...messages
         ],
-        max_completion_tokens: 500,
+        max_tokens: 500,
+        temperature: 0.7,
         stream: true
       }),
     });
+    
+    console.log('[FINGENIUS] OpenAI response status:', response.status);
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: 'Troppi messaggi. Riprova tra qualche minuto.' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'Crediti insufficienti. Contatta il supporto.' }), {
-          status: 402,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
       const errorText = await response.text();
-      console.error('OpenAI API error:', response.status, errorText);
-      return new Response(JSON.stringify({ error: 'Errore OpenAI API' }), {
-        status: 500,
+      console.error('[FINGENIUS] OpenAI API error:', response.status, errorText);
+      
+      let errorMessage = 'Si è verificato un errore con il servizio AI.';
+      
+      if (response.status === 401) {
+        errorMessage = 'Chiave API OpenAI non valida. Contatta l\'amministratore.';
+      } else if (response.status === 429) {
+        errorMessage = 'Troppi messaggi. Riprova tra qualche minuto.';
+      } else if (response.status === 402) {
+        errorMessage = 'Crediti insufficienti. Contatta il supporto.';
+      } else if (response.status === 400) {
+        errorMessage = 'Richiesta non valida. Controlla i parametri.';
+      }
+      
+      return new Response(JSON.stringify({ 
+        error: errorMessage,
+        details: errorText 
+      }), {
+        status: response.status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
+    console.log('[FINGENIUS] Streaming response to client');
+    
     return new Response(response.body, {
       headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
     });
   } catch (error) {
-    console.error('fingenius-chat error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('[FINGENIUS] Error in fingenius-chat function:', error);
+    return new Response(JSON.stringify({ 
+      error: 'Si è verificato un errore imprevisto. Riprova più tardi.',
+      details: error.message 
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

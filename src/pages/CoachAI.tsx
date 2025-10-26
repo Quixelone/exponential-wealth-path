@@ -97,15 +97,17 @@ const CoachAI = () => {
       );
 
       if (!response.ok) {
-        if (response.status === 429) {
-          toast({
-            title: "Troppi messaggi",
-            description: "Hai raggiunto il limite. Riprova tra qualche minuto.",
-            variant: "destructive"
-          });
-          return;
-        }
-        throw new Error('Errore nella risposta');
+        const errorData = await response.json().catch(() => ({ error: 'Errore sconosciuto' }));
+        console.error('[COACH-AI] Edge function error:', response.status, errorData);
+        
+        toast({
+          title: "Errore",
+          description: errorData.error || "Si è verificato un errore. Riprova.",
+          variant: "destructive"
+        });
+        
+        setIsLoading(false);
+        return;
       }
 
       if (!response.body) throw new Error('No response body');
@@ -184,10 +186,10 @@ const CoachAI = () => {
       }
 
     } catch (error) {
-      console.error('Error:', error);
+      console.error('[COACH-AI] Error sending message:', error);
       toast({
         title: "Errore",
-        description: "Si è verificato un errore. Riprova.",
+        description: error instanceof Error ? error.message : "Si è verificato un errore imprevisto. Riprova.",
         variant: "destructive"
       });
     } finally {
