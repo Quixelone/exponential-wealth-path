@@ -70,6 +70,9 @@ export default function AISignals() {
     if (!user) return;
     
     try {
+      console.log('[AI-SIGNALS] Loading signals for user:', user.id);
+      console.log('[AI-SIGNALS] User email:', user.email);
+      
       const { data, error } = await supabase
         .from('ai_trading_signals')
         .select('*')
@@ -78,11 +81,21 @@ export default function AISignals() {
         .order('signal_time', { ascending: false })
         .limit(30);
       
-      if (error) throw error;
+      console.log('[AI-SIGNALS] Query result:', { 
+        dataCount: data?.length || 0, 
+        error: error?.message,
+        errorDetails: error
+      });
+      
+      if (error) {
+        console.error('[AI-SIGNALS] Query error:', error);
+        throw error;
+      }
       
       setSignals(data as AISignal[] || []);
+      console.log('[AI-SIGNALS] Signals loaded successfully:', data?.length || 0);
     } catch (err: any) {
-      console.error('Error loading signals:', err);
+      console.error('[AI-SIGNALS] Error loading signals:', err);
       setError(err.message);
     } finally {
       setLoading(false);
