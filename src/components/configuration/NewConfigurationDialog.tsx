@@ -69,9 +69,9 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
           Nuova Configurazione
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="mobile-dialog sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
             <Plus className="h-5 w-5 text-primary" />
             Crea Nuova Configurazione
           </DialogTitle>
@@ -84,7 +84,7 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
               value={configName}
               onChange={(e) => setConfigName(e.target.value)}
               placeholder="Es: Strategia aggressiva"
-              className="w-full"
+              className="w-full touch-target text-base"
             />
           </div>
 
@@ -136,13 +136,14 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
             </p>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto touch-target">
               Annulla
             </Button>
             <Button
               onClick={handleCreateAttempt}
               disabled={!configName.trim()}
+              className="w-full sm:w-auto touch-target"
             >
               Crea Configurazione
             </Button>

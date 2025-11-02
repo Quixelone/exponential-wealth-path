@@ -37,9 +37,9 @@ const SaveConfigDialog: React.FC<SaveConfigDialogProps> = ({
           : "Salva"}
       </Button>
     </DialogTrigger>
-    <DialogContent>
+    <DialogContent className="mobile-dialog max-h-[90vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>
+        <DialogTitle className="text-base sm:text-lg">
           {isUpdate
             ? (hasUnsavedChanges ? "Salva modifiche alla Configurazione" : "Aggiorna Configurazione")
             : "Salva Configurazione"}
@@ -52,16 +52,17 @@ const SaveConfigDialog: React.FC<SaveConfigDialogProps> = ({
             value={configName}
             onChange={(e) => setConfigName(e.target.value)}
             placeholder={isUpdate ? currentConfigName : "Es: Strategia conservativa"}
-            className="mt-1"
+            className="mt-1 touch-target text-base"
           />
         </div>
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <div className="flex flex-col sm:flex-row justify-end gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto touch-target">
             Annulla
           </Button>
           <Button
             onClick={onSave}
             disabled={!configName.trim() || loading}
+            className="w-full sm:w-auto touch-target"
           >
             {loading
               ? 'Salvando...'

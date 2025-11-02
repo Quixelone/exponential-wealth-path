@@ -22,7 +22,7 @@ const EditConfigDialog: React.FC<EditConfigDialogProps> = ({
   loading
 }) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="mobile-dialog">
+    <DialogContent className="mobile-dialog max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle className="text-base sm:text-lg">Modifica Nome Configurazione</DialogTitle>
       </DialogHeader>
