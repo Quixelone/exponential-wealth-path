@@ -60,6 +60,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     subscribed: boolean;
     subscription_end: string | null;
   } | null>(null);
+  const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
+  const [lastSubscriptionCheck, setLastSubscriptionCheck] = useState<number>(0);
   const { toast } = useToast();
 
   const fetchUserProfile = useCallback(async (userId: string) => {
@@ -140,7 +142,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [user?.email]);
 
   const checkSubscriptionStatus = useCallback(async () => {
-    if (!session) return;
+    if (!session || isCheckingSubscription) return;
+    
+    // Throttle: evita chiamate più frequenti di 3 minuti
+    const now = Date.now();
+    const timeSinceLastCheck = now - lastSubscriptionCheck;
+    const THROTTLE_TIME = 3 * 60 * 1000; // 3 minuti
+    
+    if (timeSinceLastCheck < THROTTLE_TIME) {
+      console.log('⏱️ Subscription check throttled. Last check:', timeSinceLastCheck / 1000, 'seconds ago');
+      return;
+    }
+    
+    setIsCheckingSubscription(true);
+    setLastSubscriptionCheck(now);
     
     try {
       console.log('🔍 Checking subscription status...');
@@ -157,8 +172,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error('💥 Unexpected error checking subscription:', error);
+    } finally {
+      setIsCheckingSubscription(false);
     }
-  }, [session]);
+  }, [session, isCheckingSubscription, lastSubscriptionCheck]);
 
   const updateUserLogin = useCallback(async (userId: string) => {
     try {
@@ -248,13 +265,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, [fetchUserProfile, updateUserLogin, checkSubscriptionStatus]);
 
-  // Auto-refresh subscription status every 60 seconds
+  // Auto-refresh subscription status every 5 minutes
   useEffect(() => {
     if (!session) return;
     
     const interval = setInterval(() => {
       checkSubscriptionStatus();
-    }, 60000); // 60 seconds
+    }, 5 * 60 * 1000); // 5 minuti
 
     return () => clearInterval(interval);
   }, [session, checkSubscriptionStatus]);
