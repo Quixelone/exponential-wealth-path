@@ -893,6 +893,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_user_role_bypass: {
+        Args: {
+          check_role: Database["public"]["Enums"]["app_role"]
+          check_user_id: string
+        }
+        Returns: boolean
+      }
       delete_user_safely: { Args: { target_user_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -903,6 +910,7 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_admin_safe: { Args: never; Returns: boolean }
+      is_admin_via_roles: { Args: never; Returns: boolean }
       is_admin_with_role: {
         Args: { required_role?: Database["public"]["Enums"]["admin_role_type"] }
         Returns: boolean
