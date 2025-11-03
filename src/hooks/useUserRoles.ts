@@ -17,12 +17,15 @@ export const useUserRoles = (userId?: string) => {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const fetchUserRoles = async () => {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
+    if (!userId) {
+      setLoading(false);
+      setRoles([]);
+      return;
+    }
 
+    let mounted = true;
+
+    const fetchUserRoles = async () => {
       try {
         const { data, error: fetchError } = await supabase
           .from('user_roles')
@@ -31,38 +34,28 @@ export const useUserRoles = (userId?: string) => {
 
         if (fetchError) throw fetchError;
 
-        const userRoles = (data || []).map((r: { role: AppRole }) => r.role);
-        setRoles(userRoles);
-        setError(null);
+        if (mounted) {
+          const userRoles = (data || []).map((r: { role: AppRole }) => r.role);
+          setRoles(userRoles);
+          setError(null);
+        }
       } catch (err) {
         console.error('Error fetching user roles:', err);
-        setError(err as Error);
+        if (mounted) {
+          setError(err as Error);
+          setRoles([]);
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchUserRoles();
 
-    // Subscribe to changes
-    const channel = supabase
-      .channel(`user_roles_${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_roles',
-          filter: `user_id=eq.${userId}`,
-        },
-        () => {
-          fetchUserRoles();
-        }
-      )
-      .subscribe();
-
     return () => {
-      supabase.removeChannel(channel);
+      mounted = false;
     };
   }, [userId]);
 
