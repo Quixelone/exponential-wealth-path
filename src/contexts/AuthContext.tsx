@@ -163,7 +163,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     try {
       console.log('🔍 Checking subscription status...');
-      const { data, error } = await supabase.functions.invoke('check-subscription-status');
+      const { data, error } = await supabase.functions.invoke('check-subscription-status', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
       
       if (error) {
         console.error('❌ Error checking subscription:', error);
