@@ -902,6 +902,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_admin_safe: { Args: never; Returns: boolean }
       is_admin_with_role: {
         Args: { required_role?: Database["public"]["Enums"]["admin_role_type"] }
         Returns: boolean
