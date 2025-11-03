@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 interface UserProfile {
   id: string;
@@ -63,6 +64,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
   const [lastSubscriptionCheck, setLastSubscriptionCheck] = useState<number>(0);
   const { toast } = useToast();
+  
+  // Use the new user_roles system for admin checks
+  const { isAdmin: isAdminFromRoles, loading: rolesLoading } = useUserRoles(user?.id);
 
   const fetchUserProfile = useCallback(async (userId: string) => {
     try {
@@ -518,13 +522,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const isAdmin = userProfile?.role === 'admin' || userProfile?.admin_role !== null;
+  // Use the new role system from user_roles table
+  // Also check legacy admin_role for backward compatibility
+  const isAdmin = isAdminFromRoles || userProfile?.role === 'admin' || userProfile?.admin_role !== null;
 
   const value: AuthContextType = {
     user,
     session,
     userProfile,
-    loading,
+    loading: loading || rolesLoading,
     isAdmin,
     subscriptionStatus,
     checkSubscriptionStatus,
