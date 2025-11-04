@@ -272,7 +272,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [fetchUserProfile, updateUserLogin, checkSubscriptionStatus]);
+  }, [fetchUserProfile, updateUserLogin]);
 
   // Auto-refresh subscription status every 15 minutes
   useEffect(() => {

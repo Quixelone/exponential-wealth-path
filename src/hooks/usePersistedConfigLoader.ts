@@ -94,14 +94,31 @@ export const usePersistedConfigLoader = ({
       }
     }
     
-    // Anche quando non c'è currentConfigId ma il loading è finito, marca come tentato
+    // Se non c'è currentConfigId ma ci sono configurazioni salvate, carica la prima automaticamente
     if (
       !persistedConfigLoadAttempted.current &&
       !supabaseLoading &&
-      !currentConfigId
+      !currentConfigId &&
+      savedConfigs.length > 0
     ) {
       persistedConfigLoadAttempted.current = true;
-      console.log('📝 PersistedConfigLoader: No persisted config found, using default state');
+      const firstConfig = savedConfigs[0];
+      console.log('🔄 PersistedConfigLoader: No persisted config but configs exist, loading first one', {
+        configId: firstConfig.id,
+        configName: firstConfig.name
+      });
+      loadSavedConfiguration(firstConfig);
+    }
+    
+    // Se non c'è currentConfigId e non ci sono configurazioni, marca come tentato
+    if (
+      !persistedConfigLoadAttempted.current &&
+      !supabaseLoading &&
+      !currentConfigId &&
+      savedConfigs.length === 0
+    ) {
+      persistedConfigLoadAttempted.current = true;
+      console.log('📝 PersistedConfigLoader: No persisted config and no saved configs, using default state');
     }
   }, [savedConfigs, currentConfigId, supabaseLoading, loadSavedConfiguration, setCurrentConfigId, setCurrentConfigName, retryCount]);
 
