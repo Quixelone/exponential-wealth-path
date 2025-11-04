@@ -146,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [user?.email]);
 
   const checkSubscriptionStatus = useCallback(async () => {
-    if (!session || isCheckingSubscription) return;
+    if (!session?.access_token || isCheckingSubscription) return;
     
     // Throttle: evita chiamate più frequenti di 3 minuti
     const now = Date.now();
@@ -183,7 +183,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsCheckingSubscription(false);
     }
-  }, [session, isCheckingSubscription, lastSubscriptionCheck]);
+  }, [session?.access_token, isCheckingSubscription, lastSubscriptionCheck]);
 
   const updateUserLogin = useCallback(async (userId: string) => {
     try {
@@ -221,8 +221,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               await fetchUserProfile(session.user.id);
               if (event === 'SIGNED_IN') {
                 await updateUserLogin(session.user.id);
+                // Chiama checkSubscriptionStatus SOLO al login
+                await checkSubscriptionStatus();
               }
-              await checkSubscriptionStatus();
             }
           }, 0);
         } else {
@@ -273,16 +274,49 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, [fetchUserProfile, updateUserLogin, checkSubscriptionStatus]);
 
-  // Auto-refresh subscription status every 5 minutes
+  // Auto-refresh subscription status every 15 minutes
   useEffect(() => {
-    if (!session) return;
+    if (!session?.access_token) return;
     
-    const interval = setInterval(() => {
-      checkSubscriptionStatus();
-    }, 5 * 60 * 1000); // 5 minuti
+    // Crea una funzione locale per evitare dipendenze circolari
+    const refreshSubscription = async () => {
+      if (!session?.access_token || isCheckingSubscription) return;
+      
+      const now = Date.now();
+      const timeSinceLastCheck = now - lastSubscriptionCheck;
+      const THROTTLE_TIME = 3 * 60 * 1000;
+      
+      if (timeSinceLastCheck < THROTTLE_TIME) {
+        console.log('⏱️ Auto-refresh throttled');
+        return;
+      }
+      
+      setIsCheckingSubscription(true);
+      setLastSubscriptionCheck(now);
+      
+      try {
+        console.log('🔄 Auto-refreshing subscription status...');
+        const { data, error } = await supabase.functions.invoke('check-subscription-status', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        });
+        
+        if (!error && data) {
+          console.log('✅ Subscription auto-refreshed:', data);
+          setSubscriptionStatus(data);
+        }
+      } catch (error) {
+        console.error('💥 Error auto-refreshing subscription:', error);
+      } finally {
+        setIsCheckingSubscription(false);
+      }
+    };
+    
+    const interval = setInterval(refreshSubscription, 15 * 60 * 1000); // 15 minuti
 
     return () => clearInterval(interval);
-  }, [session, checkSubscriptionStatus]);
+  }, [session?.access_token, isCheckingSubscription, lastSubscriptionCheck]);
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => {
     try {
