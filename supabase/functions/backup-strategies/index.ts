@@ -6,6 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Maximum backup size in MB (50MB limit to prevent memory issues)
+const MAX_BACKUP_SIZE_MB = 50;
+const MAX_BACKUP_SIZE_BYTES = MAX_BACKUP_SIZE_MB * 1024 * 1024;
+
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -66,6 +70,36 @@ const handler = async (req: Request): Promise<Response> => {
             backup_timestamp: new Date().toISOString()
           }
         };
+
+        // Check backup size before saving
+        const backupJson = JSON.stringify(backupData);
+        const backupSizeBytes = new TextEncoder().encode(backupJson).length;
+        const backupSizeMB = (backupSizeBytes / (1024 * 1024)).toFixed(2);
+
+        if (backupSizeBytes > MAX_BACKUP_SIZE_BYTES) {
+          console.warn(`⚠️ Backup for config ${config.id} exceeds size limit: ${backupSizeMB}MB`);
+          
+          // Try to reduce size by limiting historical data to last 90 days
+          const ninetyDaysAgo = new Date();
+          ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+          const cutoffDate = ninetyDaysAgo.toISOString().split('T')[0];
+
+          backupData.daily_returns = backupData.daily_returns.filter((r: any) => r.date >= cutoffDate);
+          backupData.metadata.size_limit_applied = true;
+          backupData.metadata.data_retention_days = 90;
+
+          const reducedBackupJson = JSON.stringify(backupData);
+          const reducedSizeBytes = new TextEncoder().encode(reducedBackupJson).length;
+          const reducedSizeMB = (reducedSizeBytes / (1024 * 1024)).toFixed(2);
+
+          if (reducedSizeBytes > MAX_BACKUP_SIZE_BYTES) {
+            throw new Error(`Backup still too large after reduction: ${reducedSizeMB}MB (limit: ${MAX_BACKUP_SIZE_MB}MB)`);
+          }
+
+          console.log(`✅ Reduced backup size from ${backupSizeMB}MB to ${reducedSizeMB}MB`);
+        } else {
+          console.log(`📦 Backup size: ${backupSizeMB}MB (within ${MAX_BACKUP_SIZE_MB}MB limit)`);
+        }
 
         // Insert or update backup (UPSERT)
         const { error: upsertError } = await supabase
