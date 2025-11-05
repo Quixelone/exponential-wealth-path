@@ -110,3 +110,23 @@ LIMIT 20;
 -- Example: Change AI agent to run every hour instead of every 15 minutes
 -- SELECT cron.unschedule('ai-trading-agent-every-15min');
 -- SELECT cron.schedule('ai-trading-agent-hourly', '0 * * * *', $$ ... $$);
+
+-- ============================================
+-- 4. Daily Strategy Backup
+-- ============================================
+-- Runs daily at 3:00 AM to backup all user strategies
+
+SELECT cron.schedule(
+  'daily-strategy-backup',
+  '0 3 * * *', -- Every day at 3:00 AM
+  $$
+  SELECT net.http_post(
+    url := 'https://rsmvjsokqolxgczclqjv.supabase.co/functions/v1/backup-strategies',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzbXZqc29rcW9seGdjemNscWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDI5MTUsImV4cCI6MjA2NTExODkxNX0.8ruQsbU1HlK_CPsgrIv7JhJgDJsM-XD8daBa1Z2gEmo'
+    ),
+    body := jsonb_build_object('time', now()::text)
+  ) AS request_id;
+  $$
+);

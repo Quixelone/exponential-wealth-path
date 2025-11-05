@@ -185,6 +185,42 @@ export type Database = {
           },
         ]
       }
+      backup_logs: {
+        Row: {
+          backup_date: string
+          configs_backed_up: number | null
+          configs_failed: number | null
+          created_at: string | null
+          error_details: Json | null
+          execution_time_ms: number | null
+          id: string
+          old_backups_deleted: number | null
+          status: string
+        }
+        Insert: {
+          backup_date: string
+          configs_backed_up?: number | null
+          configs_failed?: number | null
+          created_at?: string | null
+          error_details?: Json | null
+          execution_time_ms?: number | null
+          id?: string
+          old_backups_deleted?: number | null
+          status: string
+        }
+        Update: {
+          backup_date?: string
+          configs_backed_up?: number | null
+          configs_failed?: number | null
+          created_at?: string | null
+          error_details?: Json | null
+          execution_time_ms?: number | null
+          id?: string
+          old_backups_deleted?: number | null
+          status?: string
+        }
+        Relationships: []
+      }
       btc_prices: {
         Row: {
           created_at: string
@@ -475,6 +511,21 @@ export type Database = {
           },
         ]
       }
+      kv_store_7c0f82ca: {
+        Row: {
+          key: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       notification_logs: {
         Row: {
           created_at: string
@@ -683,6 +734,33 @@ export type Database = {
           table_name?: string
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      strategy_backups: {
+        Row: {
+          backup_data: Json
+          backup_date: string
+          config_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          backup_data: Json
+          backup_date: string
+          config_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          backup_data?: Json
+          backup_date?: string
+          config_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -901,6 +979,7 @@ export type Database = {
         Returns: boolean
       }
       delete_user_safely: { Args: { target_user_id: string }; Returns: boolean }
+      get_backup_stats: { Args: { user_uuid: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

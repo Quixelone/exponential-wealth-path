@@ -10,6 +10,7 @@ import { ArrowLeft, Settings as SettingsIcon, CreditCard, Shield, ExternalLink, 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NotificationTester from '@/components/NotificationTester';
 import SettingsHeader from '@/components/settings/SettingsHeader';
+import { BackupManager } from '@/components/configuration/BackupManager';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -263,7 +264,7 @@ const Settings = () => {
         </div>
 
         <Tabs defaultValue="notifications" className="w-full">
-          <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-6">
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
               Test Notifiche WhatsApp
@@ -271,6 +272,10 @@ const Settings = () => {
             <TabsTrigger value="insurance" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               Assicurazione
+            </TabsTrigger>
+            <TabsTrigger value="backup" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Backup Strategie
             </TabsTrigger>
             <TabsTrigger value="preferences" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
@@ -528,6 +533,10 @@ const Settings = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="backup">
+            <BackupManager />
           </TabsContent>
 
           <TabsContent value="preferences">
