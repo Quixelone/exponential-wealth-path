@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import pako from 'https://esm.sh/pako@2.1.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -125,7 +126,25 @@ const handler = async (req: Request): Promise<Response> => {
     // 5. Restore: Insert backup data
     console.log('📥 Restoring backup data...');
     
-    const backupData = backup.backup_data as any;
+    let backupData = backup.backup_data as any;
+
+    // Decompress if needed
+    if (backupData.compressed) {
+      console.log('🔓 Decompressing backup data...');
+      try {
+        const binary = atob(backupData.data);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        const decompressed = pako.ungzip(bytes, { to: 'string' });
+        backupData = JSON.parse(decompressed);
+        console.log('✅ Backup decompressed successfully');
+      } catch (error) {
+        console.error('❌ Decompression failed:', error);
+        throw new Error('Failed to decompress backup data');
+      }
+    }
 
     // Update config (preserve id and user_id)
     const { id, user_id, created_at, ...configData } = backupData.config;

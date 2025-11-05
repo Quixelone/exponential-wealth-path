@@ -1,13 +1,14 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+import pako from 'https://esm.sh/pako@2.1.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Maximum backup size in MB (50MB limit to prevent memory issues)
-const MAX_BACKUP_SIZE_MB = 50;
+// Maximum backup size in MB (150MB limit with compression)
+const MAX_BACKUP_SIZE_MB = 150;
 const MAX_BACKUP_SIZE_BYTES = MAX_BACKUP_SIZE_MB * 1024 * 1024;
 
 const supabase = createClient(
@@ -71,15 +72,34 @@ const handler = async (req: Request): Promise<Response> => {
           }
         };
 
-        // Check backup size before saving
+        // Check backup size before compression
         const backupJson = JSON.stringify(backupData);
-        const backupSizeBytes = new TextEncoder().encode(backupJson).length;
-        const backupSizeMB = (backupSizeBytes / (1024 * 1024)).toFixed(2);
+        const originalSizeBytes = new TextEncoder().encode(backupJson).length;
+        const originalSizeMB = (originalSizeBytes / (1024 * 1024)).toFixed(2);
 
-        if (backupSizeBytes > MAX_BACKUP_SIZE_BYTES) {
-          console.warn(`⚠️ Backup for config ${config.id} exceeds size limit: ${backupSizeMB}MB`);
+        console.log(`📦 Original backup size: ${originalSizeMB}MB`);
+
+        // Compress using GZIP
+        const compressed = pako.gzip(backupJson);
+        const base64 = btoa(String.fromCharCode(...new Uint8Array(compressed)));
+        const compressedSizeBytes = base64.length;
+        const compressedSizeMB = (compressedSizeBytes / (1024 * 1024)).toFixed(2);
+        const compressionRatio = ((1 - compressedSizeBytes / originalSizeBytes) * 100).toFixed(1);
+
+        console.log(`✅ Compressed to ${compressedSizeMB}MB (${compressionRatio}% reduction)`);
+
+        const finalBackup = {
+          compressed: true,
+          version: '1.0',
+          data: base64,
+          original_size: originalSizeBytes,
+          compressed_size: compressedSizeBytes
+        };
+
+        if (compressedSizeBytes > MAX_BACKUP_SIZE_BYTES) {
+          console.warn(`⚠️ Backup still exceeds limit after compression: ${compressedSizeMB}MB`);
           
-          // Try to reduce size by limiting historical data to last 90 days
+          // Try to reduce by limiting to last 90 days
           const ninetyDaysAgo = new Date();
           ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
           const cutoffDate = ninetyDaysAgo.toISOString().split('T')[0];
@@ -88,17 +108,20 @@ const handler = async (req: Request): Promise<Response> => {
           backupData.metadata.size_limit_applied = true;
           backupData.metadata.data_retention_days = 90;
 
-          const reducedBackupJson = JSON.stringify(backupData);
-          const reducedSizeBytes = new TextEncoder().encode(reducedBackupJson).length;
+          // Re-compress with reduced data
+          const reducedJson = JSON.stringify(backupData);
+          const reducedCompressed = pako.gzip(reducedJson);
+          const reducedBase64 = btoa(String.fromCharCode(...new Uint8Array(reducedCompressed)));
+          const reducedSizeBytes = reducedBase64.length;
           const reducedSizeMB = (reducedSizeBytes / (1024 * 1024)).toFixed(2);
 
           if (reducedSizeBytes > MAX_BACKUP_SIZE_BYTES) {
             throw new Error(`Backup still too large after reduction: ${reducedSizeMB}MB (limit: ${MAX_BACKUP_SIZE_MB}MB)`);
           }
 
-          console.log(`✅ Reduced backup size from ${backupSizeMB}MB to ${reducedSizeMB}MB`);
-        } else {
-          console.log(`📦 Backup size: ${backupSizeMB}MB (within ${MAX_BACKUP_SIZE_MB}MB limit)`);
+          finalBackup.data = reducedBase64;
+          finalBackup.compressed_size = reducedSizeBytes;
+          console.log(`✅ Reduced backup size to ${reducedSizeMB}MB with 90-day limit`);
         }
 
         // Insert or update backup (UPSERT)
@@ -108,7 +131,7 @@ const handler = async (req: Request): Promise<Response> => {
             user_id: config.user_id,
             config_id: config.id,
             backup_date: today,
-            backup_data: backupData
+            backup_data: finalBackup
           }, {
             onConflict: 'user_id,config_id,backup_date'
           });

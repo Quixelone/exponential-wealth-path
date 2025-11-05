@@ -25,6 +25,11 @@ interface Backup {
   backup_date: string;
   config_id: string;
   backup_data: {
+    compressed?: boolean;
+    version?: string;
+    data?: string;
+    original_size?: number;
+    compressed_size?: number;
     config: any;
     metadata: {
       total_records: number;
@@ -243,9 +248,22 @@ export function BackupManager() {
                       {backup.backup_date === stats?.newest_backup && (
                         <Badge variant="secondary">Più recente</Badge>
                       )}
+                      {backup.backup_data.compressed && (
+                        <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400">
+                          Compresso
+                        </Badge>
+                      )}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {backup.backup_data.config.name} • {backup.backup_data.metadata.total_records} record
+                      {backup.backup_data.config?.name || 'Strategia'} • {backup.backup_data.metadata?.total_records || 0} record
+                      {backup.backup_data.compressed && backup.backup_data.original_size && backup.backup_data.compressed_size && (
+                        <>
+                          {' • '}
+                          {formatBytes(backup.backup_data.original_size)} → {formatBytes(backup.backup_data.compressed_size)}
+                          {' '}
+                          ({((1 - backup.backup_data.compressed_size / backup.backup_data.original_size) * 100).toFixed(0)}%)
+                        </>
+                      )}
                     </div>
                   </div>
                   <Button
