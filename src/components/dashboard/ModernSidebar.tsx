@@ -10,7 +10,8 @@ import {
   ChevronRight,
   Menu,
   Bot,
-  MessageCircle
+  MessageCircle,
+  BookOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -51,6 +52,12 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       label: 'Coach AI',
       path: '/coach-ai',
       description: 'Il tuo coach personale'
+    },
+    {
+      icon: BookOpen,
+      label: 'Educazione',
+      path: '/education',
+      description: 'Corsi e formazione'
     },
     {
       icon: TrendingUp,
