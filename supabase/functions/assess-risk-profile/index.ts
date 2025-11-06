@@ -6,14 +6,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface QuizResponse {
-  crypto_experience: string;
-  trading_frequency: string;
-  risk_tolerance: string;
-  investment_goals: string[];
-  learning_preferences: string;
-  btc_knowledge: string;
-  options_experience: string;
+interface QuizAnswer {
+  question: string;
+  answer: string;
 }
 
 serve(async (req) => {
@@ -42,7 +37,10 @@ serve(async (req) => {
     console.log("User authenticated:", user.id);
 
     // Get quiz responses from request
-    const { quizResponses }: { quizResponses: QuizResponse } = await req.json();
+    const { quizResponses, calculatedRiskLevel }: { 
+      quizResponses: QuizAnswer[];
+      calculatedRiskLevel: string;
+    } = await req.json();
     console.log("Quiz responses received:", JSON.stringify(quizResponses, null, 2));
 
     // Call Lovable AI for risk assessment
@@ -69,17 +67,22 @@ Considera:
 
 Rispondi in italiano con un tono professionale ma accessibile.`;
 
-    const userPrompt = `Valuta questo profilo utente:
+    // Format quiz responses for AI
+    const formattedResponses = quizResponses.map((r, i) => 
+      `${i + 1}. ${r.question}\n   Risposta: ${r.answer}`
+    ).join("\n\n");
 
-Esperienza Crypto: ${quizResponses.crypto_experience}
-Frequenza Trading: ${quizResponses.trading_frequency}
-Tolleranza al Rischio: ${quizResponses.risk_tolerance}
-Obiettivi di Investimento: ${quizResponses.investment_goals.join(", ")}
-Preferenze di Apprendimento: ${quizResponses.learning_preferences}
-Conoscenza Bitcoin: ${quizResponses.btc_knowledge}
-Esperienza Opzioni: ${quizResponses.options_experience}
+    const userPrompt = `Valuta questo profilo utente basato sulle seguenti risposte:
 
-Fornisci una valutazione completa con raccomandazioni di corsi specifiche.`;
+${formattedResponses}
+
+Livello di rischio calcolato: ${calculatedRiskLevel}
+
+Fornisci una valutazione completa con:
+1. Conferma o modifica del livello di rischio
+2. Analisi delle competenze attuali
+3. Raccomandazioni specifiche sui corsi da seguire
+4. Motivazione per ogni raccomandazione`;
 
     console.log("Calling Lovable AI for assessment...");
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -123,32 +126,42 @@ Fornisci una valutazione completa con raccomandazioni di corsi specifiche.`;
     const aiAssessment = aiData.choices[0].message.content;
     console.log("AI assessment received:", aiAssessment.substring(0, 200) + "...");
 
-    // Determine risk level from AI response
-    let riskLevel: "conservative" | "moderate" | "aggressive" | "expert" = "conservative";
+    // Determine risk level from AI response or use calculated one
+    let riskLevel: "conservative" | "moderate" | "aggressive" | "expert" = calculatedRiskLevel as any || "conservative";
     const aiLower = aiAssessment.toLowerCase();
+    
+    // AI can override the calculated risk level if it suggests differently
     if (aiLower.includes("expert") || aiLower.includes("esperto")) {
       riskLevel = "expert";
     } else if (aiLower.includes("aggressive") || aiLower.includes("aggressiv")) {
       riskLevel = "aggressive";
     } else if (aiLower.includes("moderate") || aiLower.includes("moderat")) {
       riskLevel = "moderate";
+    } else if (aiLower.includes("conservativ") || aiLower.includes("prudent")) {
+      riskLevel = "conservative";
     }
 
-    console.log("Determined risk level:", riskLevel);
+    console.log("Risk level - Calculated:", calculatedRiskLevel, "Final:", riskLevel);
 
+    // Extract crypto experience from first question
+    const experienceAnswer = quizResponses.find(r => 
+      r.question.includes("esperienza con il trading")
+    );
+    
     // Save risk profile to database
     const { data: profile, error: profileError } = await supabaseClient
       .from("user_risk_profiles")
       .upsert({
         user_id: user.id,
         risk_level: riskLevel,
-        crypto_experience: quizResponses.crypto_experience,
-        investment_goals: quizResponses.investment_goals,
+        crypto_experience: experienceAnswer?.answer || "unknown",
+        investment_goals: [], // Can be extracted from answers if needed
         recommended_courses: [], // Will be updated when courses are created
         ai_assessment: {
           assessment: aiAssessment,
           timestamp: new Date().toISOString(),
-          model: "google/gemini-2.5-flash"
+          model: "google/gemini-2.5-flash",
+          calculatedRiskLevel
         },
         quiz_responses: quizResponses,
         updated_at: new Date().toISOString()
