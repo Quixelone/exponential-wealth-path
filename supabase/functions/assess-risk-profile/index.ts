@@ -1,86 +1,36 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface QuizResponse {
-  question: string;
-  answer: string;
-}
-
-interface AssessmentRequest {
-  quizResponses: QuizResponse[];
-}
-
-interface RiskProfile {
-  risk_level: 'conservative' | 'moderate' | 'aggressive' | 'expert';
   crypto_experience: string;
+  trading_frequency: string;
+  risk_tolerance: string;
   investment_goals: string[];
-  recommended_courses: string[];
-  ai_assessment: {
-    reasoning: string;
-    strengths: string[];
-    areas_to_improve: string[];
-    learning_path: string;
-  };
+  learning_preferences: string;
+  btc_knowledge: string;
+  options_experience: string;
 }
 
-const SYSTEM_PROMPT = `Sei un esperto consulente finanziario specializzato in criptovalute e strategie di investimento Bitcoin.
-
-Il tuo compito è valutare il profilo di rischio di un utente basandoti sulle risposte a un questionario e fornire:
-
-1. **Livello di Rischio** (risk_level): Scegli uno tra:
-   - "conservative": Principiante, preferisce sicurezza, capital preservation
-   - "moderate": Esperienza base, disposto ad accettare rischi moderati
-   - "aggressive": Esperienza intermedia, cerca rendimenti elevati
-   - "expert": Esperto avanzato, gestisce strategie complesse
-
-2. **Esperienza Crypto** (crypto_experience): Descrizione breve della loro esperienza (2-3 frasi)
-
-3. **Obiettivi di Investimento** (investment_goals): Array di 3-5 obiettivi principali
-
-4. **Corsi Raccomandati** (recommended_courses): Array di titoli dei corsi da seguire in ordine di priorità
-
-5. **Valutazione AI** (ai_assessment):
-   - reasoning: Spiegazione dettagliata della valutazione (3-4 paragrafi)
-   - strengths: Array di 3-4 punti di forza identificati
-   - areas_to_improve: Array di 3-4 aree da migliorare
-   - learning_path: Piano di apprendimento personalizzato (2-3 paragrafi)
-
-Restituisci SOLO un JSON valido nel seguente formato, senza markdown o altro testo:
-
-{
-  "risk_level": "moderate",
-  "crypto_experience": "...",
-  "investment_goals": ["...", "..."],
-  "recommended_courses": ["Corso Base Bitcoin", "Strategie DCA", "..."],
-  "ai_assessment": {
-    "reasoning": "...",
-    "strengths": ["...", "..."],
-    "areas_to_improve": ["...", "..."],
-    "learning_path": "..."
-  }
-}`;
-
-Deno.serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Authenticate user
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Missing authorization header');
-    }
+    console.log("=== Starting risk profile assessment ===");
+    
+    // Get user from JWT
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header provided");
 
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
       {
         global: { headers: { Authorization: authHeader } },
         auth: { persistSession: false }
@@ -88,136 +38,155 @@ Deno.serve(async (req) => {
     );
 
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      throw new Error('User not authenticated');
-    }
+    if (userError || !user) throw new Error("User not authenticated");
+    console.log("User authenticated:", user.id);
 
-    console.log('Processing risk assessment for user:', user.id);
+    // Get quiz responses from request
+    const { quizResponses }: { quizResponses: QuizResponse } = await req.json();
+    console.log("Quiz responses received:", JSON.stringify(quizResponses, null, 2));
 
-    // Parse request body
-    const { quizResponses }: AssessmentRequest = await req.json();
-    
-    if (!quizResponses || !Array.isArray(quizResponses) || quizResponses.length === 0) {
-      throw new Error('Invalid quiz responses');
-    }
+    // Call Lovable AI for risk assessment
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Build user prompt from quiz responses
-    const userPrompt = `Ecco le risposte dell'utente al questionario di valutazione del rischio:
+    const systemPrompt = `Sei un esperto consulente finanziario specializzato in criptovalute e trading di opzioni Bitcoin.
+Il tuo compito è valutare il profilo di rischio dell'utente e raccomandare un percorso educativo personalizzato.
 
-${quizResponses.map((q, idx) => `${idx + 1}. ${q.question}\nRisposta: ${q.answer}`).join('\n\n')}
+Analizza le risposte dell'utente e fornisci:
+1. Livello di rischio (conservative, moderate, aggressive, expert)
+2. Descrizione dettagliata dell'esperienza crypto
+3. Raccomandazioni specifiche sui corsi da seguire
+4. Motivazione per ogni raccomandazione
 
-Valuta il profilo di rischio dell'utente e fornisci una valutazione completa.`;
+Considera:
+- Esperienza crypto attuale
+- Frequenza di trading
+- Tolleranza al rischio
+- Obiettivi di investimento
+- Preferenze di apprendimento
+- Conoscenza Bitcoin
+- Esperienza con opzioni
 
-    // Call Lovable AI Gateway
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
-    }
+Rispondi in italiano con un tono professionale ma accessibile.`;
 
-    console.log('Calling Lovable AI for risk assessment...');
+    const userPrompt = `Valuta questo profilo utente:
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
+Esperienza Crypto: ${quizResponses.crypto_experience}
+Frequenza Trading: ${quizResponses.trading_frequency}
+Tolleranza al Rischio: ${quizResponses.risk_tolerance}
+Obiettivi di Investimento: ${quizResponses.investment_goals.join(", ")}
+Preferenze di Apprendimento: ${quizResponses.learning_preferences}
+Conoscenza Bitcoin: ${quizResponses.btc_knowledge}
+Esperienza Opzioni: ${quizResponses.options_experience}
+
+Fornisci una valutazione completa con raccomandazioni di corsi specifiche.`;
+
+    console.log("Calling Lovable AI for assessment...");
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: "google/gemini-2.5-flash",
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: userPrompt }
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
         ],
         temperature: 0.7,
+        max_tokens: 1500,
       }),
     });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error('Lovable AI error:', aiResponse.status, errorText);
+      console.error("AI gateway error:", aiResponse.status, errorText);
       
       if (aiResponse.status === 429) {
-        throw new Error('Rate limit exceeded. Please try again later.');
+        return new Response(
+          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
       if (aiResponse.status === 402) {
-        throw new Error('Payment required. Please add credits to your Lovable AI workspace.');
+        return new Response(
+          JSON.stringify({ error: "AI credits exhausted. Please add funds to continue." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
-      throw new Error(`AI gateway error: ${aiResponse.status}`);
+      
+      throw new Error(`AI gateway error: ${errorText}`);
     }
 
     const aiData = await aiResponse.json();
-    const aiContent = aiData.choices?.[0]?.message?.content;
-    
-    if (!aiContent) {
-      throw new Error('No response from AI');
+    const aiAssessment = aiData.choices[0].message.content;
+    console.log("AI assessment received:", aiAssessment.substring(0, 200) + "...");
+
+    // Determine risk level from AI response
+    let riskLevel: "conservative" | "moderate" | "aggressive" | "expert" = "conservative";
+    const aiLower = aiAssessment.toLowerCase();
+    if (aiLower.includes("expert") || aiLower.includes("esperto")) {
+      riskLevel = "expert";
+    } else if (aiLower.includes("aggressive") || aiLower.includes("aggressiv")) {
+      riskLevel = "aggressive";
+    } else if (aiLower.includes("moderate") || aiLower.includes("moderat")) {
+      riskLevel = "moderate";
     }
 
-    console.log('AI Response received, parsing...');
+    console.log("Determined risk level:", riskLevel);
 
-    // Parse AI response
-    let riskProfile: RiskProfile;
-    try {
-      // Remove markdown code blocks if present
-      const cleanContent = aiContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      riskProfile = JSON.parse(cleanContent);
-    } catch (parseError) {
-      console.error('Failed to parse AI response:', aiContent);
-      throw new Error('Invalid AI response format');
-    }
-
-    // Validate risk profile
-    const validRiskLevels = ['conservative', 'moderate', 'aggressive', 'expert'];
-    if (!validRiskLevels.includes(riskProfile.risk_level)) {
-      throw new Error('Invalid risk level from AI');
-    }
-
-    // Save to database
-    console.log('Saving risk profile to database...');
-
-    const { error: upsertError } = await supabaseClient
-      .from('user_risk_profiles')
+    // Save risk profile to database
+    const { data: profile, error: profileError } = await supabaseClient
+      .from("user_risk_profiles")
       .upsert({
         user_id: user.id,
-        risk_level: riskProfile.risk_level,
-        crypto_experience: riskProfile.crypto_experience,
-        investment_goals: riskProfile.investment_goals,
-        recommended_courses: [], // Will be populated when courses are created
-        ai_assessment: riskProfile.ai_assessment,
+        risk_level: riskLevel,
+        crypto_experience: quizResponses.crypto_experience,
+        investment_goals: quizResponses.investment_goals,
+        recommended_courses: [], // Will be updated when courses are created
+        ai_assessment: {
+          assessment: aiAssessment,
+          timestamp: new Date().toISOString(),
+          model: "google/gemini-2.5-flash"
+        },
         quiz_responses: quizResponses,
-        updated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }, {
-        onConflict: 'user_id'
-      });
+        onConflict: "user_id"
+      })
+      .select()
+      .single();
 
-    if (upsertError) {
-      console.error('Database error:', upsertError);
-      throw new Error(`Failed to save risk profile: ${upsertError.message}`);
+    if (profileError) {
+      console.error("Error saving profile:", profileError);
+      throw new Error(`Failed to save risk profile: ${profileError.message}`);
     }
 
-    console.log('Risk profile saved successfully');
+    console.log("Risk profile saved successfully:", profile.id);
 
     return new Response(
       JSON.stringify({
         success: true,
-        profile: riskProfile,
-        message: 'Profilo di rischio creato con successo'
+        profile: {
+          id: profile.id,
+          risk_level: riskLevel,
+          ai_assessment: aiAssessment,
+          quiz_responses: quizResponses
+        }
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
   } catch (error) {
-    console.error('Error in assess-risk-profile:', error);
+    console.error("Error in assess-risk-profile:", error);
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : "Unknown error occurred" 
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, "Content-Type": "application/json" } 
       }
     );
   }
