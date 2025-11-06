@@ -170,6 +170,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       
       if (error) {
+        // Silently handle 401 errors (user not authenticated or token expired)
+        if (error.message?.includes('401') || error.message?.includes('JWT')) {
+          console.log('ℹ️ Subscription check skipped (not authenticated)');
+          return;
+        }
         console.error('❌ Error checking subscription:', error);
         return;
       }
@@ -178,7 +183,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('✅ Subscription status:', data);
         setSubscriptionStatus(data);
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Silently handle authentication errors
+      if (error?.message?.includes('401') || error?.message?.includes('JWT')) {
+        console.log('ℹ️ Subscription check skipped (not authenticated)');
+        return;
+      }
       console.error('💥 Unexpected error checking subscription:', error);
     } finally {
       setIsCheckingSubscription(false);
@@ -253,7 +263,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
           if (session?.user) {
             await fetchUserProfile(session.user.id);
-            await checkSubscriptionStatus();
+            // Don't check subscription on init - only on SIGNED_IN event
           }
           
           setLoading(false);
