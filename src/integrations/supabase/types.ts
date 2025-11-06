@@ -248,6 +248,44 @@ export type Database = {
         }
         Relationships: []
       }
+      course_modules: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string | null
+          id: string
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_modules_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "educational_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_pac_overrides: {
         Row: {
           config_id: string
@@ -311,6 +349,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      educational_courses: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          is_published: boolean | null
+          level: Database["public"]["Enums"]["course_level"]
+          prerequisites: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_published?: boolean | null
+          level?: Database["public"]["Enums"]["course_level"]
+          prerequisites?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_published?: boolean | null
+          level?: Database["public"]["Enums"]["course_level"]
+          prerequisites?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       insurance_coverage_periods: {
         Row: {
@@ -526,6 +603,88 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_completions: {
+        Row: {
+          completed_at: string
+          id: string
+          lesson_id: string
+          notes: string | null
+          time_spent_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          lesson_id: string
+          notes?: string | null
+          time_spent_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          lesson_id?: string
+          notes?: string | null
+          time_spent_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_completions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          content: string | null
+          created_at: string
+          estimated_duration_minutes: number | null
+          id: string
+          lesson_type: Database["public"]["Enums"]["lesson_type"]
+          module_id: string
+          order_index: number
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          estimated_duration_minutes?: number | null
+          id?: string
+          lesson_type?: Database["public"]["Enums"]["lesson_type"]
+          module_id: string
+          order_index: number
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          estimated_duration_minutes?: number | null
+          id?: string
+          lesson_type?: Database["public"]["Enums"]["lesson_type"]
+          module_id?: string
+          order_index?: number
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "course_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_logs: {
         Row: {
           created_at: string
@@ -694,6 +853,88 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_attempts: {
+        Row: {
+          answers: Json
+          attempt_number: number
+          completed_at: string
+          id: string
+          passed: boolean
+          quiz_id: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          attempt_number?: number
+          completed_at?: string
+          id?: string
+          passed: boolean
+          quiz_id: string
+          score: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          attempt_number?: number
+          completed_at?: string
+          id?: string
+          passed?: boolean
+          quiz_id?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_id: string | null
+          max_attempts: number | null
+          passing_score: number
+          questions: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_id?: string | null
+          max_attempts?: number | null
+          passing_score?: number
+          questions: Json
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_id?: string | null
+          max_attempts?: number | null
+          passing_score?: number
+          questions?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
         ]
@@ -894,6 +1135,89 @@ export type Database = {
         }
         Relationships: []
       }
+      user_progress: {
+        Row: {
+          completed_at: string | null
+          completion_percentage: number | null
+          course_id: string
+          created_at: string
+          id: string
+          last_accessed_at: string | null
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completion_percentage?: number | null
+          course_id: string
+          created_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completion_percentage?: number | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_progress_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "educational_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_risk_profiles: {
+        Row: {
+          ai_assessment: Json | null
+          created_at: string
+          crypto_experience: string | null
+          id: string
+          investment_goals: string[] | null
+          quiz_responses: Json | null
+          recommended_courses: string[] | null
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_assessment?: Json | null
+          created_at?: string
+          crypto_experience?: string | null
+          id?: string
+          investment_goals?: string[] | null
+          quiz_responses?: Json | null
+          recommended_courses?: string[] | null
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_assessment?: Json | null
+          created_at?: string
+          crypto_experience?: string | null
+          id?: string
+          investment_goals?: string[] | null
+          quiz_responses?: Json | null
+          recommended_courses?: string[] | null
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1015,6 +1339,9 @@ export type Database = {
     Enums: {
       admin_role_type: "admin_readonly" | "admin_full" | "super_admin"
       app_role: "admin_readonly" | "admin_full" | "super_admin" | "user"
+      course_level: "beginner" | "intermediate" | "advanced" | "expert"
+      lesson_type: "video" | "text" | "interactive" | "quiz" | "practical"
+      risk_level: "conservative" | "moderate" | "aggressive" | "expert"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1144,6 +1471,9 @@ export const Constants = {
     Enums: {
       admin_role_type: ["admin_readonly", "admin_full", "super_admin"],
       app_role: ["admin_readonly", "admin_full", "super_admin", "user"],
+      course_level: ["beginner", "intermediate", "advanced", "expert"],
+      lesson_type: ["video", "text", "interactive", "quiz", "practical"],
+      risk_level: ["conservative", "moderate", "aggressive", "expert"],
     },
   },
 } as const

@@ -137,3 +137,18 @@ verify_jwt = true
 name = "fingenius-chat"
 source = "./supabase/functions/fingenius-chat"
 verify_jwt = true
+
+[[edge_runtime.function]]
+name = "assess-risk-profile"
+source = "./supabase/functions/assess-risk-profile"
+verify_jwt = true
+
+[[edge_runtime.function]]
+name = "backup-strategies"
+source = "./supabase/functions/backup-strategies"
+verify_jwt = false
+
+[[edge_runtime.function]]
+name = "restore-strategy-backup"
+source = "./supabase/functions/restore-strategy-backup"
+verify_jwt = true
