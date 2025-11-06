@@ -54,10 +54,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 11% 15%;
 
-    --primary: 235 85% 60%; /* #5D87FF - Modern blue */
+    --primary: 220 90% 56%; /* Bitcoin Blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 280 83% 57%; /* #8763FF - Purple accent */
+    --secondary: 28 100% 55%; /* Bitcoin Orange */
     --secondary-foreground: 0 0% 100%;
 
     --success: 134 61% 41%; /* #39B069 - Green */

@@ -248,6 +248,48 @@ export type Database = {
         }
         Relationships: []
       }
+      challenges: {
+        Row: {
+          badge_reward: string | null
+          challenge_type: string
+          created_at: string | null
+          description: string
+          end_date: string
+          id: string
+          is_active: boolean | null
+          start_date: string
+          target_value: number
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          badge_reward?: string | null
+          challenge_type: string
+          created_at?: string | null
+          description: string
+          end_date: string
+          id?: string
+          is_active?: boolean | null
+          start_date: string
+          target_value: number
+          title: string
+          xp_reward: number
+        }
+        Update: {
+          badge_reward?: string | null
+          challenge_type?: string
+          created_at?: string | null
+          description?: string
+          end_date?: string
+          id?: string
+          is_active?: boolean | null
+          start_date?: string
+          target_value?: number
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       course_modules: {
         Row: {
           course_id: string
@@ -603,6 +645,45 @@ export type Database = {
         }
         Relationships: []
       }
+      leaderboard_entries: {
+        Row: {
+          badge_count: number
+          created_at: string | null
+          id: string
+          last_updated: string | null
+          level: number
+          total_xp: number
+          user_id: string
+          username: string
+          week_start: string
+          weekly_xp: number
+        }
+        Insert: {
+          badge_count?: number
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          level?: number
+          total_xp?: number
+          user_id: string
+          username: string
+          week_start: string
+          weekly_xp?: number
+        }
+        Update: {
+          badge_count?: number
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          level?: number
+          total_xp?: number
+          user_id?: string
+          username?: string
+          week_start?: string
+          weekly_xp?: number
+        }
+        Relationships: []
+      }
       lesson_completions: {
         Row: {
           completed_at: string
@@ -806,6 +887,95 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      paper_trading_portfolios: {
+        Row: {
+          balance_usdt: number
+          created_at: string | null
+          id: string
+          positions_closed: number
+          positions_opened: number
+          total_profit_loss: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_usdt?: number
+          created_at?: string | null
+          id?: string
+          positions_closed?: number
+          positions_opened?: number
+          total_profit_loss?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_usdt?: number
+          created_at?: string | null
+          id?: string
+          positions_closed?: number
+          positions_opened?: number
+          total_profit_loss?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      paper_trading_positions: {
+        Row: {
+          btc_amount: number
+          close_date: string | null
+          close_price: number | null
+          created_at: string | null
+          id: string
+          open_date: string
+          portfolio_id: string
+          position_type: string
+          premium_collected: number
+          profit_loss: number | null
+          status: string
+          strike_price: number
+          user_id: string
+        }
+        Insert: {
+          btc_amount: number
+          close_date?: string | null
+          close_price?: number | null
+          created_at?: string | null
+          id?: string
+          open_date?: string
+          portfolio_id: string
+          position_type: string
+          premium_collected: number
+          profit_loss?: number | null
+          status?: string
+          strike_price: number
+          user_id: string
+        }
+        Update: {
+          btc_amount?: number
+          close_date?: string | null
+          close_price?: number | null
+          created_at?: string | null
+          id?: string
+          open_date?: string
+          portfolio_id?: string
+          position_type?: string
+          premium_collected?: number
+          profit_loss?: number | null
+          status?: string
+          strike_price?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_trading_positions_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "paper_trading_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_reminders: {
         Row: {
@@ -1080,6 +1250,80 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_challenges: {
+        Row: {
+          challenge_id: string
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          progress: number
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          progress?: number
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          progress?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenges_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_gamification: {
+        Row: {
+          badges: Json | null
+          created_at: string | null
+          id: string
+          last_activity_date: string | null
+          level: number
+          streak_days: number
+          updated_at: string | null
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          badges?: Json | null
+          created_at?: string | null
+          id?: string
+          last_activity_date?: string | null
+          level?: number
+          streak_days?: number
+          updated_at?: string | null
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          badges?: Json | null
+          created_at?: string | null
+          id?: string
+          last_activity_date?: string | null
+          level?: number
+          streak_days?: number
+          updated_at?: string | null
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
       }
       user_profiles: {
         Row: {
