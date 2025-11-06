@@ -37,11 +37,16 @@ serve(async (req) => {
     console.log("User authenticated:", user.id);
 
     // Get quiz responses from request
-    const { quizResponses, calculatedRiskLevel }: { 
-      quizResponses: QuizAnswer[];
-      calculatedRiskLevel: string;
-    } = await req.json();
+    const body = await req.json();
+    const quizResponses: QuizAnswer[] = body.quizResponses || [];
+    const calculatedRiskLevel: string = body.calculatedRiskLevel || "conservative";
+    
     console.log("Quiz responses received:", JSON.stringify(quizResponses, null, 2));
+    
+    // Validate input
+    if (!Array.isArray(quizResponses) || quizResponses.length === 0) {
+      throw new Error("Invalid quiz responses: expected non-empty array");
+    }
 
     // Call Lovable AI for risk assessment
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
