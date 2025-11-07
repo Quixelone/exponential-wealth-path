@@ -38,7 +38,13 @@ serve(async (req) => {
     );
     
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user?.email) throw new Error("User not authenticated");
+    if (userError || !user?.email) {
+      logStep("User not authenticated, returning unsubscribed state");
+      return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
