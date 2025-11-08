@@ -399,71 +399,85 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
         </CardHeader>
         <CardContent className={isMobile ? "p-3" : "p-0 sm:p-6"}>
           {isMobile ? (
-            // Mobile Card Layout
+            // Mobile Layout with Sticky Current Day
             <>
-              <div className="space-y-3">
-                {paginatedData.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground text-sm">
-                    <Calendar className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                    <p>Nessun dato da visualizzare</p>
-                  </div>
-                ) : (
-                  paginatedData.map((item, index) => (
-                    <div
-                      key={item.day}
-                      style={{ animationDelay: `${index * 50}ms` }}
-                      className="animate-fade-in"
-                    >
-                      <MobileReportCard
-                        item={item}
-                        currency={currency}
-                        isCurrentDay={isCurrentDay(item.day)}
-                        onEdit={() => handleEditRow(item)}
-                        onTrade={() => handleTradeRecord(item)}
-                        actualTrade={getTradeForDay(item.day)}
-                        formatDate={formatDate}
-                        readOnly={readOnly}
-                      />
-                    </div>
-                  ))
-                )}
-              </div>
+              {(() => {
+                // Find current day item
+                const currentDayItem = filteredData.find(item => item.day === currentInvestmentDay);
+                // Get all other days (previous and future)
+                const otherDays = filteredData.filter(item => item.day !== currentInvestmentDay);
+                
+                return (
+                  <div className="mobile-report-container">
+                    {/* Sticky Current Day Card */}
+                    {currentDayItem && (
+                      <div className="sticky-current-day">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="default" className="animate-pulse">
+                            OGGI
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            Scorri per vedere gli altri giorni
+                          </span>
+                        </div>
+                        <MobileReportCard
+                          item={currentDayItem}
+                          currency={currency}
+                          isCurrentDay={true}
+                          onEdit={() => handleEditRow(currentDayItem)}
+                          onTrade={() => handleTradeRecord(currentDayItem)}
+                          actualTrade={getTradeForDay(currentDayItem.day)}
+                          formatDate={formatDate}
+                          readOnly={readOnly}
+                        />
+                      </div>
+                    )}
 
-              {totalPages > 1 && (
-                <div className="mt-6 space-y-3">
-                  <div className="text-xs text-muted-foreground text-center">
-                    {paginatedData.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + itemsPerPage, filteredData.length)} di {filteredData.length} giorni
-                  </div>
-                  
-                  <div className="flex items-center justify-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handlePrevPage}
-                      disabled={currentPage === 1}
-                      className="flex-1 min-h-[44px]"
-                    >
-                      <ChevronLeft className="h-4 w-4 mr-1" />
-                      Prec
-                    </Button>
-                    
-                    <div className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap min-w-[60px] text-center">
-                      {currentPage} / {totalPages}
+                    {/* Scrollable Container for All Other Days */}
+                    <div className="scrollable-days-container">
+                      {otherDays.length > 0 ? (
+                        <div className="space-y-3">
+                          {/* Show indicator for previous days */}
+                          {otherDays.some(d => d.day < (currentInvestmentDay || 0)) && (
+                            <div className="text-center py-2">
+                              <span className="text-xs text-muted-foreground font-medium">
+                                ← Giorni Precedenti
+                              </span>
+                            </div>
+                          )}
+                          
+                          {otherDays.map((item) => (
+                            <MobileReportCard
+                              key={item.day}
+                              item={item}
+                              currency={currency}
+                              isCurrentDay={false}
+                              onEdit={() => handleEditRow(item)}
+                              onTrade={() => handleTradeRecord(item)}
+                              actualTrade={getTradeForDay(item.day)}
+                              formatDate={formatDate}
+                              readOnly={readOnly}
+                            />
+                          ))}
+                          
+                          {/* Show indicator for future days */}
+                          {otherDays.some(d => d.day > (currentInvestmentDay || 0)) && (
+                            <div className="text-center py-2">
+                              <span className="text-xs text-muted-foreground font-medium">
+                                Giorni Futuri →
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground text-sm">
+                          Nessun altro giorno disponibile
+                        </div>
+                      )}
                     </div>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleNextPage}
-                      disabled={currentPage === totalPages}
-                      className="flex-1 min-h-[44px]"
-                    >
-                      Succ
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </>
           ) : useVirtualScroll ? (
             // Virtual scrolling mode for large datasets (desktop only)
