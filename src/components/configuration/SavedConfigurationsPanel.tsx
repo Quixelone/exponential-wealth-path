@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Save, FileText, Crown, RefreshCw, Plus } from 'lucide-react';
+import { Save, FileText, Crown, RefreshCw, Plus, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import ResponsiveConfigCards from './ResponsiveConfigCards';
@@ -12,6 +12,8 @@ import { SavedConfiguration } from '@/types/database';
 import { toast } from 'sonner';
 import { SkeletonLoader } from '@/components/ui/skeleton-loader';
 import { EnhancedEmptyState } from '@/components/ui/enhanced-empty-state';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { cn } from '@/lib/utils';
 
 interface SavedConfigurationsPanelProps {
   savedConfigs: SavedConfiguration[];
@@ -122,6 +124,17 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
     }
   };
 
+  // Pull to refresh for mobile
+  const { pullState, handlers: pullHandlers } = usePullToRefresh({
+    onRefresh: async () => {
+      if (onForceReload) {
+        await handleForceReload();
+      }
+    },
+    threshold: 80,
+    disabled: !onForceReload || loading || isReloading,
+  });
+
   return (
     <Card className="animate-fade-in">
       <CardHeader>
@@ -173,7 +186,36 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent 
+        className="relative overflow-hidden"
+        {...pullHandlers}
+      >
+        {/* Pull to refresh indicator */}
+        {(pullState.isPulling || pullState.isRefreshing) && (
+          <div
+            className={cn(
+              'absolute top-0 left-0 right-0 flex items-center justify-center bg-primary/5 transition-all duration-200 z-10',
+              pullState.isRefreshing && 'py-3'
+            )}
+            style={{
+              height: pullState.isPulling ? `${pullState.pullDistance}px` : '48px',
+            }}
+          >
+            <div className="flex items-center gap-2 text-primary">
+              {pullState.isRefreshing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm font-medium">Aggiornamento...</span>
+                </>
+              ) : (
+                <span className="text-sm font-medium">
+                  {pullState.pullDistance > 60 ? 'Rilascia per aggiornare' : 'Trascina per aggiornare'}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {currentConfigId && (
           <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex gap-2 items-center">
             <Save className="h-4 w-4" />

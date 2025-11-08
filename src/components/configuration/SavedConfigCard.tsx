@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,8 @@ import { SavedConfiguration } from '@/types/database';
 import { formatCurrencyWhole } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { cn } from '@/lib/utils';
 
 interface SavedConfigCardProps {
   savedConfig: SavedConfiguration;
@@ -41,6 +43,14 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
 }) => {
   const [isInsured, setIsInsured] = React.useState(savedConfig.is_insured || false);
   const [updatingInsurance, setUpdatingInsurance] = React.useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Swipe gesture for mobile
+  const { swipeState, handlers } = useSwipeGesture({
+    onSwipeLeft: () => setShowDeleteConfirm(true),
+    onSwipeRight: () => onEdit(),
+    threshold: 80,
+  });
 
   const handleInsuranceToggle = async (checked: boolean) => {
     setUpdatingInsurance(true);
@@ -67,10 +77,45 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
   };
 
   return (
-    <AnimatedCard 
-      hoverEffect="lift" 
-      className="border border-border hover:border-primary/50 transition-all duration-300 h-full flex flex-col"
-    >
+    <div className="relative overflow-hidden">
+      {/* Swipe action indicators */}
+      {swipeState.isSwiping && (
+        <>
+          <div
+            className={cn(
+              'absolute inset-y-0 left-0 flex items-center justify-start px-6 transition-opacity',
+              swipeState.swipeDirection === 'right' ? 'opacity-100' : 'opacity-0'
+            )}
+            style={{ width: `${Math.min(swipeState.swipeDistance, 100)}px` }}
+          >
+            <Edit className="h-5 w-5 text-primary" />
+          </div>
+          <div
+            className={cn(
+              'absolute inset-y-0 right-0 flex items-center justify-end px-6 bg-destructive/10 transition-opacity',
+              swipeState.swipeDirection === 'left' ? 'opacity-100' : 'opacity-0'
+            )}
+            style={{ width: `${Math.min(swipeState.swipeDistance, 100)}px` }}
+          >
+            <Trash2 className="h-5 w-5 text-destructive" />
+          </div>
+        </>
+      )}
+
+      <AnimatedCard 
+        hoverEffect="lift" 
+        className={cn(
+          'border border-border hover:border-primary/50 transition-all duration-300 h-full flex flex-col touch-feedback',
+          swipeState.isSwiping && 'shadow-lg'
+        )}
+        style={{
+          transform: swipeState.isSwiping 
+            ? `translateX(${swipeState.swipeDirection === 'left' ? -swipeState.swipeDistance : swipeState.swipeDistance}px)` 
+            : 'translateX(0)',
+          transition: swipeState.isSwiping ? 'none' : 'transform 0.3s ease-out',
+        }}
+        {...handlers}
+      >
       <CardContent className="p-4 flex flex-col h-full">
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
@@ -147,7 +192,7 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
                 variant="outline"
                 onClick={onLoad}
                 disabled={loading}
-                className="h-8 px-3 text-xs"
+                className="h-11 px-4 text-xs touch-target"
               >
                 Carica
               </Button>
@@ -156,45 +201,47 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
                 variant="outline"
                 onClick={onEdit}
                 disabled={loading}
-                className="h-8 w-8 p-0"
+                className="h-11 w-11 p-0 touch-target"
               >
-                <Edit className="h-3 w-3" />
+                <Edit className="h-4 w-4" />
               </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                    disabled={loading}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Elimina Configurazione</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Sei sicuro di voler eliminare la configurazione "{savedConfig.name}"? 
-                      Questa azione non può essere annullata.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Annulla</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={onDelete}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
-                      Elimina
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-11 w-11 p-0 text-red-600 hover:text-red-700 touch-target"
+                disabled={loading}
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
       </CardContent>
     </AnimatedCard>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Elimina Configurazione</AlertDialogTitle>
+            <AlertDialogDescription>
+              Sei sicuro di voler eliminare la configurazione "{savedConfig.name}"? 
+              Questa azione non può essere annullata.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="touch-target">Annulla</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onDelete}
+              className="bg-red-600 hover:bg-red-700 touch-target"
+            >
+              Elimina
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 };
 

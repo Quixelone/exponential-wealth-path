@@ -638,11 +638,17 @@
 .touch-target {
   min-height: 44px;
   min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .touch-target-lg {
   min-height: 56px;
   min-width: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Mobile-first responsive spacing */

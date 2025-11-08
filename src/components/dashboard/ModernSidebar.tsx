@@ -14,7 +14,8 @@ import {
   BookOpen,
   Palette,
   Zap,
-  Sparkles
+  Sparkles,
+  Smartphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -86,6 +87,12 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       label: 'UI Demo',
       path: '/ui-demo',
       description: 'Button & Toast Demo'
+    },
+    {
+      icon: Smartphone,
+      label: 'Mobile Demo',
+      path: '/mobile-demo',
+      description: 'Swipe & Pull-to-refresh'
     },
     {
       icon: Settings,
