@@ -126,7 +126,7 @@ const Index = () => {
         />
         
         {/* Strategy Header */}
-        <Card className="p-4 border-l-4 border-l-primary">
+        <Card variant="glass" className="p-4 border-l-4 border-l-primary">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary/10 rounded-lg">
@@ -142,7 +142,7 @@ const Index = () => {
               </div>
             </div>
             {hasUnsavedChanges && (
-              <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
+              <Badge variant="warning" pulse>
                 Modifiche non salvate
               </Badge>
             )}
@@ -168,22 +168,24 @@ const Index = () => {
 
         {/* Edit Strategy and Reload Buttons */}
         <div className="flex justify-center gap-3">
-          <Button 
+          <Button
             onClick={() => navigate('/strategies')}
-            variant="outline"
+            variant="gradient"
             size="lg"
-            className="flex items-center gap-2 bg-card hover:bg-accent"
+            className="flex items-center gap-2"
           >
             <Settings className="h-5 w-5" />
             Modifica Configurazione
           </Button>
-          
-          <Button 
+
+          <Button
             onClick={forceReloadFromDatabase}
-            variant="outline"
+            variant="info"
             size="lg"
-            className="flex items-center gap-2 bg-primary/5 hover:bg-primary/10 border-primary/20"
+            className="flex items-center gap-2"
             disabled={supabaseLoading}
+            loading={supabaseLoading}
+            loadingText="Caricamento..."
           >
             <RefreshCw className={`h-5 w-5 ${supabaseLoading ? 'animate-spin' : ''}`} />
             Ricarica dal Database

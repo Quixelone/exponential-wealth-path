@@ -388,6 +388,163 @@
       -webkit-overflow-scrolling: touch;
     }
   }
+
+  /* Skeleton Loading Animations */
+  .skeleton {
+    @apply animate-shimmer bg-gradient-to-r from-muted via-muted/50 to-muted;
+    background-size: 1000px 100%;
+  }
+
+  .skeleton-text {
+    @apply skeleton rounded-md h-4 w-full;
+  }
+
+  .skeleton-title {
+    @apply skeleton rounded-md h-6 w-3/4;
+  }
+
+  .skeleton-circle {
+    @apply skeleton rounded-full;
+  }
+
+  .skeleton-card {
+    @apply skeleton rounded-xl h-32;
+  }
+
+  /* Loading Spinner Variants */
+  .spinner {
+    @apply border-2 border-t-transparent rounded-full animate-spin;
+  }
+
+  .spinner-primary {
+    @apply spinner border-primary;
+  }
+
+  .spinner-sm {
+    @apply w-4 h-4;
+  }
+
+  .spinner-md {
+    @apply w-8 h-8;
+  }
+
+  .spinner-lg {
+    @apply w-12 h-12;
+  }
+
+  /* Card Hover Effects */
+  .card-interactive {
+    @apply transition-all duration-300 hover:shadow-modern-lg hover:-translate-y-1 cursor-pointer;
+  }
+
+  .card-glow-primary:hover {
+    @apply shadow-glow-primary;
+  }
+
+  .card-glow-success:hover {
+    @apply shadow-glow-success;
+  }
+
+  /* Stagger Animation Delays */
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+
+  /* Glassmorphism Variants */
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/30 dark:bg-black/20 border border-white/20 dark:border-white/10 shadow-modern-lg;
+  }
+
+  .glass-navbar {
+    @apply backdrop-blur-md bg-white/80 dark:bg-black/60 border-b border-white/20 dark:border-white/10;
+  }
+
+  /* Modern Badge Styles */
+  .badge-modern {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm;
+  }
+
+  .badge-success {
+    @apply badge-modern bg-success/10 text-success border border-success/20;
+  }
+
+  .badge-warning {
+    @apply badge-modern bg-warning/10 text-warning border border-warning/20;
+  }
+
+  .badge-danger {
+    @apply badge-modern bg-danger/10 text-danger border border-danger/20;
+  }
+
+  .badge-info {
+    @apply badge-modern bg-info/10 text-info border border-info/20;
+  }
+
+  /* Chart Container Improvements */
+  .chart-container {
+    @apply relative rounded-xl bg-card border border-border p-6 shadow-modern;
+  }
+
+  .chart-container-glass {
+    @apply glass-card p-6;
+  }
+
+  /* Smooth Scroll */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-muted/30 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full hover:bg-muted-foreground/50 transition-colors;
+  }
+
+  /* Pulse Effect for Important Elements */
+  .pulse-ring {
+    @apply relative;
+  }
+
+  .pulse-ring::before {
+    content: '';
+    @apply absolute inset-0 rounded-full border-2 border-primary/30 animate-ping;
+  }
+
+  /* Shimmer Text Effect */
+  .shimmer-text {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--foreground)) 0%,
+      hsl(var(--primary)) 50%,
+      hsl(var(--foreground)) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    @apply animate-shimmer;
+  }
+
+  /* Tooltip Improvements */
+  .tooltip-modern {
+    @apply absolute z-50 px-3 py-1.5 text-xs font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg shadow-modern-lg;
+    @apply opacity-0 invisible transition-all duration-200;
+  }
+
+  .tooltip-modern.show {
+    @apply opacity-100 visible;
+  }
 }
 
 /* Ottimizzazione dialog per risoluzioni medie (1280x800, 1366x768) */
