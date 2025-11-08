@@ -65,6 +65,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }, ref) => {
     const Comp = asChild ? Slot : "button"
 
+    // When asChild is true, Slot component expects only a single child
+    // So we render children directly without any wrappers or extra elements
+    if (asChild) {
+      return (
+        <Comp
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref}
+          disabled={disabled}
+          {...props}
+        >
+          {children}
+        </Comp>
+      )
+    }
+
+    // Normal button rendering with loading, icons, etc.
     return (
       <Comp
         className={cn(
