@@ -40,7 +40,7 @@ interface ConfigurationPanelProps {
   canRedo?: boolean;
 }
 
-const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
+const ConfigurationPanel: React.FC<ConfigurationPanelProps> = React.memo(({
   config,
   onConfigChange,
   customReturns,
@@ -195,6 +195,17 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
       )}
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo
+  return (
+    prevProps.config === nextProps.config &&
+    prevProps.hasUnsavedChanges === nextProps.hasUnsavedChanges &&
+    prevProps.currentConfigId === nextProps.currentConfigId &&
+    prevProps.canUndo === nextProps.canUndo &&
+    prevProps.canRedo === nextProps.canRedo
+  );
+});
+
+ConfigurationPanel.displayName = 'ConfigurationPanel';
 
 export default ConfigurationPanel;

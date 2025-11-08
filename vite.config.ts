@@ -12,13 +12,15 @@ export default defineConfig(({ mode }) => {
   
   if (mode === 'development') {
     plugins.push(componentTagger());
-    plugins.push(visualizer({
-      open: false,
-      filename: 'dist/stats.html',
-      gzipSize: true,
-      brotliSize: true,
-    }));
   }
+  
+  // Always include visualizer for bundle analysis
+  plugins.push(visualizer({
+    open: false,
+    filename: 'dist/stats.html',
+    gzipSize: true,
+    brotliSize: true,
+  }));
   
   plugins.push(VitePWA({
     registerType: 'autoUpdate',
@@ -77,6 +79,35 @@ export default defineConfig(({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "./src"),
       },
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Vendor splitting for better caching
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
+            'chart-vendor': ['recharts'],
+            'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
+            'supabase-vendor': ['@supabase/supabase-js'],
+            'query-vendor': ['@tanstack/react-query'],
+          },
+        },
+      },
+      // Optimize chunk size
+      chunkSizeWarningLimit: 1000,
+      // Enable source maps for production debugging
+      sourcemap: mode === 'production' ? false : true,
+    },
+    // Performance optimizations
+    optimizeDeps: {
+      include: [
+        'react',
+        'react-dom',
+        'react-router-dom',
+        '@supabase/supabase-js',
+        '@tanstack/react-query',
+      ],
     },
   };
 });

@@ -27,7 +27,7 @@ interface ReportTableProps {
   readOnly?: boolean;
 }
 
-const ReportTable: React.FC<ReportTableProps> = ({
+const ReportTable: React.FC<ReportTableProps> = React.memo(({
   data,
   currency,
   onExportCSV,
@@ -472,6 +472,17 @@ const ReportTable: React.FC<ReportTableProps> = ({
       )}
     </ModernTooltipProvider>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo - prevent unnecessary re-renders
+  return (
+    prevProps.data === nextProps.data &&
+    prevProps.currency === nextProps.currency &&
+    prevProps.defaultPACAmount === nextProps.defaultPACAmount &&
+    prevProps.currentConfigId === nextProps.currentConfigId &&
+    prevProps.readOnly === nextProps.readOnly
+  );
+});
+
+ReportTable.displayName = 'ReportTable';
 
 export default ReportTable;

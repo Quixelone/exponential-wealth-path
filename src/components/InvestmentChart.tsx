@@ -28,7 +28,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const InvestmentChart: React.FC<InvestmentChartProps> = ({ 
+const InvestmentChart: React.FC<InvestmentChartProps> = React.memo(({ 
   data, 
   currency,
   showProjections = false,
@@ -183,6 +183,16 @@ const InvestmentChart: React.FC<InvestmentChartProps> = ({
       </CardContent>
     </Card>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo
+  return (
+    prevProps.data === nextProps.data &&
+    prevProps.currency === nextProps.currency &&
+    prevProps.showProjections === nextProps.showProjections &&
+    prevProps.currentDay === nextProps.currentDay
+  );
+});
+
+InvestmentChart.displayName = 'InvestmentChart';
 
 export default InvestmentChart;

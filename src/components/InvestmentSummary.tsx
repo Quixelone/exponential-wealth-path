@@ -21,7 +21,7 @@ interface InvestmentSummaryProps {
   currency: Currency;
 }
 
-const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary, currency }) => {
+const InvestmentSummary: React.FC<InvestmentSummaryProps> = React.memo(({ summary, currency }) => {
   // Removed debug currency log to prevent unnecessary re-renders
   const formatPercentage = (value: number) => {
     return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
@@ -166,6 +166,17 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = ({ summary, currency
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo
+  return (
+    prevProps.summary.current.day === nextProps.summary.current.day &&
+    prevProps.summary.final.day === nextProps.summary.final.day &&
+    prevProps.summary.current.finalCapital === nextProps.summary.current.finalCapital &&
+    prevProps.summary.final.finalCapital === nextProps.summary.final.finalCapital &&
+    prevProps.currency === nextProps.currency
+  );
+});
+
+InvestmentSummary.displayName = 'InvestmentSummary';
 
 export default InvestmentSummary;
