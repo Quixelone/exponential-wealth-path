@@ -5,12 +5,15 @@ import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3, Calendar, DollarSign, TrendingDown } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3, Calendar, DollarSign, TrendingDown, Zap } from 'lucide-react';
 import { ModernTooltipProvider, ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/ModernTooltip';
 import { Currency, formatCurrency } from '@/lib/utils';
 import RowEditDialog from './RowEditDialog';
 import { TradeRecordDialog } from './TradeRecordDialog';
 import { useActualTrades } from '@/hooks/useActualTrades';
+import VirtualizedReportTable from './VirtualizedReportTable';
 
 interface ReportTableProps {
   data: InvestmentData[];
@@ -43,16 +46,19 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // Rimuovo log di debug inutile
-  // React.useEffect(() => {
-  //   console.log('📋 ReportTable currency updated:', currency);
-  // }, [currency]);
+  const [useVirtualScroll, setUseVirtualScroll] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [tradeDialogOpen, setTradeDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InvestmentData | null>(null);
   const hasManuallyNavigated = useRef(false);
   const itemsPerPage = 20;
+
+  // Auto-enable virtual scrolling for large datasets
+  useEffect(() => {
+    if (data.length > 100 && !useVirtualScroll) {
+      setUseVirtualScroll(true);
+    }
+  }, [data.length]);
 
   // Load actual trades
   const { trades, loadTrades, getTradeForDay } = useActualTrades({ 
@@ -166,6 +172,19 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                   <span>Giorno corrente: {currentInvestmentDay}</span>
                 </div>
               )}
+              {data.length > 50 && (
+                <div className="flex items-center gap-2 ml-auto">
+                  <Zap className="h-4 w-4 text-yellow-500" />
+                  <Label htmlFor="virtual-scroll" className="text-xs cursor-pointer">
+                    Virtual Scroll
+                  </Label>
+                  <Switch
+                    id="virtual-scroll"
+                    checked={useVirtualScroll}
+                    onCheckedChange={setUseVirtualScroll}
+                  />
+                </div>
+              )}
             </CardTitle>
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <div className="relative w-full sm:w-auto">
@@ -197,6 +216,21 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
           </div>
         </CardHeader>
         <CardContent className="p-0 sm:p-6">
+          {useVirtualScroll ? (
+            // Virtual scrolling mode for large datasets
+            <VirtualizedReportTable
+              data={filteredData}
+              currency={currency}
+              currentInvestmentDay={currentInvestmentDay}
+              formatDate={formatDate}
+              handleEditRow={handleEditRow}
+              handleTradeRecord={handleTradeRecord}
+              getTradeForDay={getTradeForDay}
+              readOnly={readOnly}
+            />
+          ) : (
+            // Standard pagination mode
+            <>
           <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
@@ -443,6 +477,8 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                 </div>
               </div>
             </div>
+          )}
+            </>
           )}
         </CardContent>
       </Card>
