@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Save, FileText, Crown, RefreshCw } from 'lucide-react';
+import { Save, FileText, Crown, RefreshCw, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import ResponsiveConfigCards from './ResponsiveConfigCards';
@@ -10,6 +10,8 @@ import EditConfigDialog from './EditConfigDialog';
 import UnsavedChangesAlert from './UnsavedChangesAlert';
 import { SavedConfiguration } from '@/types/database';
 import { toast } from 'sonner';
+import { SkeletonLoader } from '@/components/ui/skeleton-loader';
+import { EnhancedEmptyState } from '@/components/ui/enhanced-empty-state';
 
 interface SavedConfigurationsPanelProps {
   savedConfigs: SavedConfiguration[];
@@ -185,12 +187,18 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
         )}
 
         <div className="space-y-3">
-          {savedConfigs.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Nessuna configurazione salvata</p>
-              <p className="text-sm">Salva la tua prima configurazione per iniziare</p>
-            </div>
+          {loading ? (
+            <SkeletonLoader type="card" count={3} />
+          ) : savedConfigs.length === 0 ? (
+            <EnhancedEmptyState
+              icon={FileText}
+              title="Nessuna configurazione salvata"
+              description="Salva la tua prima configurazione per iniziare a gestire le tue strategie di investimento in modo efficace."
+              action={{
+                label: "Salva Configurazione",
+                onClick: () => setSaveDialogOpen(true),
+              }}
+            />
           ) : (
             <ResponsiveConfigCards
               savedConfigs={savedConfigs}

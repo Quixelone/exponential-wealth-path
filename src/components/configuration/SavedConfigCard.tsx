@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -66,7 +67,10 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
   };
 
   return (
-    <Card className="border border-gray-200 hover:border-primary/30 transition-colors h-full flex flex-col">
+    <AnimatedCard 
+      hoverEffect="lift" 
+      className="border border-border hover:border-primary/50 transition-all duration-300 h-full flex flex-col"
+    >
       <CardContent className="p-4 flex flex-col h-full">
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
@@ -190,7 +194,7 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
           </div>
         </div>
       </CardContent>
-    </Card>
+    </AnimatedCard>
   );
 };
 
