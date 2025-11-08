@@ -14,6 +14,12 @@ const cardVariants = cva(
         glass: "glass-card hover:shadow-modern-lg",
         gradient: "border-0 bg-gradient-to-br from-primary/10 to-secondary/10 shadow-md hover:shadow-lg",
         interactive: "border bg-card shadow-sm hover:shadow-modern-lg hover:scale-[1.02] cursor-pointer active:scale-[0.98]",
+        premium: "border-0 shadow-modern-lg hover:shadow-modern-xl bg-gradient-to-br from-card via-card to-primary/5 hover:shadow-glow-primary transition-all duration-300",
+        hero: "border-0 shadow-modern-xl bg-gradient-to-br from-primary/5 via-card to-secondary/5 p-8 hover:shadow-glow-primary",
+        soft: "border border-primary/10 bg-primary/5 hover:bg-primary/10 hover:border-primary/20 shadow-sm",
+        "soft-success": "border border-success/10 bg-success/5 hover:bg-success/10 hover:border-success/20 shadow-sm",
+        "soft-warning": "border border-warning/10 bg-warning/5 hover:bg-warning/10 hover:border-warning/20 shadow-sm",
+        "soft-danger": "border border-danger/10 bg-danger/5 hover:bg-danger/10 hover:border-danger/20 shadow-sm",
       },
     },
     defaultVariants: {

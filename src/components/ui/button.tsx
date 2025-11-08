@@ -23,6 +23,12 @@ const buttonVariants = cva(
         warning: "bg-warning text-warning-foreground hover:bg-warning/90 shadow-sm hover:shadow-md",
         info: "bg-info text-info-foreground hover:bg-info/90 shadow-sm hover:shadow-md",
         gradient: "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:shadow-primary/50 transition-all duration-300",
+        soft: "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20",
+        "soft-success": "bg-success/10 text-success hover:bg-success/20 border border-success/20",
+        "soft-warning": "bg-warning/10 text-warning hover:bg-warning/20 border border-warning/20",
+        "soft-danger": "bg-danger/10 text-danger hover:bg-danger/20 border border-danger/20",
+        glass: "backdrop-blur-lg bg-white/10 dark:bg-black/20 border border-white/20 text-foreground hover:bg-white/20 dark:hover:bg-black/30 shadow-modern",
+        premium: "gradient-primary text-white shadow-glow-primary hover:shadow-modern-lg animate-glow",
       },
       size: {
         default: "h-10 px-4 py-2",
