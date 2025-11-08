@@ -79,36 +79,57 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 mb-6">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
-        
+        const staggerClass = `stagger-${(index % 5) + 1}`;
+
         return (
-          <Card key={index} className="modern-card hover-lift overflow-hidden">
+          <Card
+            key={index}
+            className={`modern-card hover-lift overflow-hidden group animate-fade-in-up ${staggerClass} shadow-modern hover:shadow-modern-lg transition-all duration-300`}
+          >
             <CardContent className="p-0">
-              <div className={`${stat.gradient} p-3 sm:p-4 text-white relative`}>
-                {/* Background pattern */}
-                <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 opacity-20">
+              <div className={`${stat.gradient} p-3 sm:p-4 text-white relative overflow-hidden`}>
+                {/* Animated gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                {/* Background pattern with hover animation */}
+                <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 opacity-20 group-hover:opacity-30 transition-all duration-300 group-hover:scale-110">
                   <Icon className="h-12 w-12 sm:h-16 sm:w-16" />
                 </div>
-                
+
+                {/* Subtle border glow effect */}
+                <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-xl transition-all duration-300" />
+
                 {/* Content */}
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-2">
-                    <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
-                    <span className={`text-xs px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full ${
-                      stat.changeType === 'positive' 
-                        ? 'bg-white/20 text-white' 
+                    <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm group-hover:bg-white/20 transition-all duration-300 group-hover:scale-110">
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </div>
+                    <span className={`text-xs px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full backdrop-blur-sm font-medium transition-transform duration-300 group-hover:scale-105 ${
+                      stat.changeType === 'positive'
+                        ? 'bg-white/20 text-white'
                         : 'bg-black/20 text-white'
                     }`}>
                       {stat.change}
                     </span>
                   </div>
-                  
-                  <div className="mb-1">
-                    <h3 className="text-xs sm:text-sm font-medium opacity-90 truncate">{stat.title}</h3>
-                    <p className="text-lg sm:text-2xl font-bold truncate">{stat.value}</p>
+
+                  <div className="mb-1 space-y-1">
+                    <h3 className="text-xs sm:text-sm font-medium opacity-90 truncate group-hover:opacity-100 transition-opacity">
+                      {stat.title}
+                    </h3>
+                    <p className="text-lg sm:text-2xl font-bold truncate group-hover:scale-105 transition-transform duration-300 origin-left">
+                      {stat.value}
+                    </p>
                   </div>
-                  
-                  <p className="text-xs opacity-75 hidden sm:block">{stat.description}</p>
+
+                  <p className="text-xs opacity-75 hidden sm:block group-hover:opacity-90 transition-opacity">
+                    {stat.description}
+                  </p>
                 </div>
+
+                {/* Bottom accent line */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
             </CardContent>
           </Card>
