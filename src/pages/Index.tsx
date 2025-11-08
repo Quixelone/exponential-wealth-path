@@ -211,7 +211,7 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="investments" className={`space-y-${isMobile ? '4' : '6'}`}>
+          <TabsContent value="investments" className={isMobile ? 'space-y-4' : 'space-y-6'}>
             <div className="space-y-6">
               <InvestmentChart 
                 key={`chart-${config.currency}-${currentConfigId}`}

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceInfo } from '@/hooks/use-mobile';
 import { useInvestmentCalculator } from '@/hooks/useInvestmentCalculator';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { ModernTooltipProvider } from '@/components/ui/ModernTooltip';
 import ModernSidebar from '@/components/dashboard/ModernSidebar';
 import ModernHeader from '@/components/dashboard/ModernHeader';
@@ -24,52 +25,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
   const location = useLocation();
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [showNavigationAlert, setShowNavigationAlert] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
-
-  // Redirect to auth if not logged in
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth');
-    }
-  }, [user, authLoading, navigate]);
-
-  // Enhanced unsaved changes warning
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = 'Hai modifiche non salvate. Sei sicuro di voler uscire?';
-        return e.returnValue;
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges]);
-
-  // Navigation guard
-  const guardedNavigate = (path: string) => {
-    if (hasUnsavedChanges && location.pathname !== path) {
-      setPendingNavigation(path);
-      setShowNavigationAlert(true);
-    } else {
-      navigate(path);
-    }
-  };
-
-  const confirmNavigation = () => {
-    if (pendingNavigation) {
-      navigate(pendingNavigation);
-      setPendingNavigation(null);
-      setShowNavigationAlert(false);
-    }
-  };
-
-  const cancelNavigation = () => {
-    setPendingNavigation(null);
-    setShowNavigationAlert(false);
-  };
+  
+  // Use navigation guard hook
+  const { guardedNavigate, showAlert, confirmNavigation, cancelNavigation } = useNavigationGuard({
+    hasUnsavedChanges,
+  });
 
   const handleLogout = async () => {
     if (hasUnsavedChanges) {
@@ -152,7 +112,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
         )}
 
         <UnsavedChangesAlert
-          open={showNavigationAlert}
+          open={showAlert}
           onContinue={confirmNavigation}
           onCancel={cancelNavigation}
         />

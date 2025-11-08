@@ -27,6 +27,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
   const roiPercentage = totalInvested > 0 ? ((totalProfit / totalInvested) * 100) : 0;
   const totalDays = finalData.day || 0;
   
+  // Top 3 most important metrics
   const stats = [
     {
       title: 'Capitale Finale',
@@ -47,15 +48,6 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
       description: 'Guadagno/Perdita totale'
     },
     {
-      title: 'Investimento Totale',
-      value: formatCurrency(totalInvested, currency),
-      change: '+5.4%',
-      changeType: 'positive' as const,
-      icon: PiggyBank,
-      gradient: 'gradient-info',
-      description: 'PAC accumulato'
-    },
-    {
       title: 'ROI Percentuale',
       value: `${roiPercentage.toFixed(2)}%`,
       change: roiPercentage >= 0 ? '+2.1%' : '-2.1%',
@@ -64,22 +56,13 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
       gradient: 'gradient-warning',
       description: 'Rendimento percentuale'
     },
-    {
-      title: 'Giorni Investimento',
-      value: totalDays.toString(),
-      change: '+30',
-      changeType: 'positive' as const,
-      icon: Calendar,
-      gradient: 'gradient-danger',
-      description: 'Giorni totali'
-    }
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
-        const staggerClass = `stagger-${(index % 5) + 1}`;
+        const staggerClass = `stagger-${(index % 3) + 1}`;
 
         return (
           <Card
