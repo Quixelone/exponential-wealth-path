@@ -11,7 +11,8 @@ import {
   Menu,
   Bot,
   MessageCircle,
-  BookOpen
+  BookOpen,
+  Palette
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -65,6 +66,12 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       path: '/strategies',
       description: 'Gestione strategie',
       isButton: true
+    },
+    {
+      icon: Palette,
+      label: 'Design System',
+      path: '/design-system',
+      description: 'Componenti UI'
     },
     {
       icon: Settings,
