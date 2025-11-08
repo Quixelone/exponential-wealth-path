@@ -60,9 +60,9 @@ const App = () => {
           <ThemeProvider defaultTheme="system">
             <TooltipProvider>
               <AuthProvider>
-                <Toaster />
-                <Sonner />
                 <BrowserRouter>
+                  <Toaster />
+                  <Sonner />
                   <ErrorBoundary>
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
