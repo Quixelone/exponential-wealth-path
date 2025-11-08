@@ -31,11 +31,11 @@ const buttonVariants = cva(
         premium: "gradient-primary text-white shadow-glow-primary hover:shadow-modern-lg animate-glow",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3 text-xs",
-        lg: "h-11 rounded-md px-8 text-base",
-        xl: "h-12 rounded-lg px-10 text-lg",
-        icon: "h-10 w-10",
+        default: "h-[var(--size-md)] px-[var(--spacing-md)] py-[var(--spacing-xs)]",
+        sm: "h-[var(--size-sm)] rounded-[var(--radius-md)] px-[var(--spacing-sm)] text-xs",
+        lg: "h-[var(--size-lg)] rounded-[var(--radius-md)] px-[var(--spacing-xl)] text-base",
+        xl: "h-[var(--size-xl)] rounded-[var(--radius-lg)] px-[var(--spacing-2xl)] text-lg",
+        icon: "h-[var(--size-md)] w-[var(--size-md)]",
       },
     },
     defaultVariants: {

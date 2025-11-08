@@ -53,6 +53,21 @@ export default {
 				'safe-bottom': 'env(safe-area-inset-bottom)',
 				'safe-left': 'env(safe-area-inset-left)',
 				'safe-right': 'env(safe-area-inset-right)',
+				// Design Token System
+				'xs': 'var(--spacing-xs)',
+				'sm': 'var(--spacing-sm)',
+				'md': 'var(--spacing-md)',
+				'lg': 'var(--spacing-lg)',
+				'xl': 'var(--spacing-xl)',
+				'2xl': 'var(--spacing-2xl)',
+				'3xl': 'var(--spacing-3xl)',
+			},
+			size: {
+				'xs': 'var(--size-xs)',
+				'sm': 'var(--size-sm)',
+				'md': 'var(--size-md)',
+				'lg': 'var(--size-lg)',
+				'xl': 'var(--size-xl)',
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -108,7 +123,15 @@ export default {
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				// Design Token System
+				'xs': 'var(--radius-xs)',
+				'sm-token': 'var(--radius-sm)',
+				'md-token': 'var(--radius-md)',
+				'lg-token': 'var(--radius-lg)',
+				'xl': 'var(--radius-xl)',
+				'2xl': 'var(--radius-2xl)',
+				'full': 'var(--radius-full)',
 			},
 			keyframes: {
 				'accordion-down': {
