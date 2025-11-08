@@ -17,6 +17,12 @@ const alertVariants = cva(
           "bg-warning/10 border-warning/50 text-warning backdrop-blur-sm [&>svg]:text-warning",
         info:
           "bg-info/10 border-info/50 text-info backdrop-blur-sm [&>svg]:text-info",
+        soft: "bg-primary/5 border-primary/20 text-primary [&>svg]:text-primary",
+        "soft-success": "bg-success/5 border-success/20 text-success [&>svg]:text-success",
+        "soft-warning": "bg-warning/5 border-warning/20 text-warning [&>svg]:text-warning",
+        "soft-danger": "bg-danger/5 border-danger/20 text-danger [&>svg]:text-danger",
+        glass: "backdrop-blur-lg bg-white/10 dark:bg-black/20 border-white/20 text-foreground [&>svg]:text-foreground",
+        premium: "gradient-primary border-0 text-white shadow-glow-primary [&>svg]:text-white",
       },
     },
     defaultVariants: {
