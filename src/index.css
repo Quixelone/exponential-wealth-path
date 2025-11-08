@@ -688,11 +688,24 @@
   }
 
   .mobile-dialog-body {
-    @apply flex-1 overflow-y-auto px-1;
+    @apply flex-1 overflow-y-auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   }
 
   .mobile-dialog-footer {
     @apply flex-shrink-0 border-t border-border pt-4 mt-4;
+  }
+
+  /* Compact dialog for mobile devices */
+  @media (max-height: 700px) {
+    .mobile-dialog-compact {
+      max-height: 95vh !important;
+    }
+    
+    .mobile-dialog-compact .mobile-dialog-body {
+      max-height: calc(95vh - 200px) !important;
+      overflow-y: auto !important;
+    }
   }
 
   /* Dark mode specific improvements */

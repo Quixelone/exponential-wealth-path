@@ -187,9 +187,9 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl sm:max-h-[90vh] md:max-h-[85vh] mobile-dialog-compact flex flex-col overflow-hidden">
-        <div className="mobile-dialog-content">
-          <DialogHeader className="flex-shrink-0">
+      <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[90vh] md:max-h-[85vh] mobile-dialog-compact flex flex-col overflow-hidden p-0">
+        <div className="mobile-dialog-content h-full flex flex-col">
+          <DialogHeader className="flex-shrink-0 px-4 pt-4 sm:px-6 sm:pt-6">
             <DialogTitle className="flex items-center gap-2 text-base sm:text-xl">
               <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               Modifica Giorno {item.day}
@@ -199,7 +199,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 sm:space-y-4 overflow-y-auto flex-1 px-1 mobile-dialog-body">
+          <div className="space-y-3 sm:space-y-4 overflow-y-auto flex-1 px-4 sm:px-6 mobile-dialog-body"  style={{ maxHeight: 'calc(95vh - 220px)' }}>
             {/* Informazioni attuali */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-muted/30 rounded-lg">
               <div>
@@ -342,7 +342,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
           </div>
         
         {/* Sticky footer with actions */}
-        <div className="flex-shrink-0 border-t border-border pt-3 mt-2 bg-background sticky bottom-0 z-10 mobile-dialog-footer shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <div className="flex-shrink-0 border-t border-border pt-3 pb-3 mt-2 bg-background sticky bottom-0 z-10 mobile-dialog-footer shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] px-4 sm:px-6">
           {originalConfigId && originalConfigName && (
             <div className="mb-3 p-2 bg-primary/5 border border-primary/20 rounded-lg">
               <p className="text-sm text-muted-foreground">
