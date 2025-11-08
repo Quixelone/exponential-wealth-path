@@ -1,6 +1,4 @@
-import React from 'react';
-// @ts-ignore - react-window types issue
-import { FixedSizeList as List } from 'react-window';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { InvestmentData } from '@/types/investment';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,7 +6,7 @@ import { Calendar, Edit3, DollarSign, TrendingDown } from 'lucide-react';
 import { ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/ModernTooltip';
 import { Currency, formatCurrency } from '@/lib/utils';
 
-interface RowData {
+interface VirtualizedReportTableProps {
   data: InvestmentData[];
   currency: Currency;
   currentInvestmentDay: number | null;
@@ -19,9 +17,9 @@ interface RowData {
   readOnly: boolean;
 }
 
-interface VirtualizedReportTableProps extends RowData {}
-
 const ROW_HEIGHT = 80; // Height in pixels for each row
+const CONTAINER_HEIGHT = 600; // Max container height
+const OVERSCAN = 3; // Number of items to render above/below visible area
 
 const VirtualizedReportTable: React.FC<VirtualizedReportTableProps> = ({
   data,
@@ -33,13 +31,31 @@ const VirtualizedReportTable: React.FC<VirtualizedReportTableProps> = ({
   getTradeForDay,
   readOnly,
 }) => {
+  const [scrollTop, setScrollTop] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const isCurrentDay = (dayNumber: number) => {
     return currentInvestmentDay === dayNumber;
   };
 
-  // Row renderer for react-window
-  const Row = ({ index, style }: any) => {
-    const item = data[index];
+  // Calculate visible range
+  const visibleStart = Math.floor(scrollTop / ROW_HEIGHT);
+  const visibleEnd = Math.ceil((scrollTop + CONTAINER_HEIGHT) / ROW_HEIGHT);
+  
+  // Add overscan
+  const startIndex = Math.max(0, visibleStart - OVERSCAN);
+  const endIndex = Math.min(data.length, visibleEnd + OVERSCAN);
+  
+  const visibleItems = data.slice(startIndex, endIndex);
+  const totalHeight = data.length * ROW_HEIGHT;
+  const offsetY = startIndex * ROW_HEIGHT;
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    setScrollTop(e.currentTarget.scrollTop);
+  }, []);
+
+  // Row component
+  const renderRow = (item: InvestmentData, index: number) => {
     const dailyGain = item.interestEarnedDaily;
     const isToday = isCurrentDay(item.day);
     const actualTrade = getTradeForDay(item.day);
@@ -53,12 +69,13 @@ const VirtualizedReportTable: React.FC<VirtualizedReportTableProps> = ({
 
     return (
       <div
-        style={style}
+        key={item.day}
         className={`
           grid grid-cols-11 gap-2 border-b border-border px-4 py-2 items-center
           hover:bg-muted/50 text-xs sm:text-sm
           ${isToday ? 'bg-primary/5 border-primary/20 border-2 animate-pulse-gentle' : ''}
         `}
+        style={{ height: ROW_HEIGHT }}
       >
         {/* Giorno */}
         <div className="font-medium text-center relative">
@@ -214,9 +231,6 @@ const VirtualizedReportTable: React.FC<VirtualizedReportTableProps> = ({
     );
   };
 
-  // Calculate list height (max 600px or 10 rows)
-  const listHeight = Math.min(600, ROW_HEIGHT * Math.min(data.length, 10));
-
   return (
     <div className="rounded-md border">
       {/* Fixed Header */}
@@ -234,20 +248,25 @@ const VirtualizedReportTable: React.FC<VirtualizedReportTableProps> = ({
         {!readOnly && <div className="text-center">Azioni</div>}
       </div>
 
-      {/* Virtualized List */}
-      <List
-        height={listHeight}
-        itemCount={data.length}
-        itemSize={ROW_HEIGHT}
-        width="100%"
-        overscanCount={5}
+      {/* Virtualized Scrollable Container */}
+      <div 
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="overflow-y-auto"
+        style={{ height: CONTAINER_HEIGHT, position: 'relative' }}
       >
-        {Row}
-      </List>
+        {/* Spacer for total height */}
+        <div style={{ height: totalHeight, position: 'relative' }}>
+          {/* Visible items with offset */}
+          <div style={{ transform: `translateY(${offsetY}px)` }}>
+            {visibleItems.map((item, idx) => renderRow(item, startIndex + idx))}
+          </div>
+        </div>
+      </div>
 
       {/* Stats Footer */}
       <div className="border-t border-border bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
-        Visualizzati {data.length} giorni • Virtual scrolling attivo per prestazioni ottimali
+        Visualizzati {data.length} giorni • Virtual scrolling attivo (rendering {visibleItems.length} righe)
       </div>
     </div>
   );

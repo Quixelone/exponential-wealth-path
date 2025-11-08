@@ -4,8 +4,9 @@
 Implementato virtual scrolling nella ReportTable per gestire migliaia di righe senza perdita di performance.
 
 ## Tecnologia
-- **Library**: `react-window` (lightweight, 3KB gzipped)
-- **Component**: `FixedSizeList` per righe a dimensione fissa
+- **Implementation**: Custom virtual scrolling con React hooks
+- **Zero dependencies**: Nessuna libreria esterna, solo React nativo
+- **Lightweight**: ~2KB di codice custom vs 30KB+ di librerie esterne
 
 ## Features
 
