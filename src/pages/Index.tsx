@@ -118,7 +118,7 @@ const Index = () => {
 
   const renderMainContent = () => {
     return (
-      <div className="space-y-6">
+      <div className={isMobile ? "space-y-3 pb-20" : "space-y-6"}>
         {/* Statistics Cards */}
         <StatisticsCards 
           key={`stats-${config.currency}`}
@@ -127,24 +127,24 @@ const Index = () => {
         />
         
         {/* Strategy Header */}
-        <Card variant="glass" className="p-4 border-l-4 border-l-primary">
+        <Card variant="glass" className={`border-l-4 border-l-primary ${isMobile ? "p-3" : "p-4"}`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Target className="h-5 w-5 text-primary" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className={`bg-primary/10 rounded-lg ${isMobile ? "p-1.5" : "p-2"}`}>
+                <Target className={isMobile ? "h-4 w-4 text-primary" : "h-5 w-5 text-primary"} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-foreground">
+                <h2 className={`font-semibold text-foreground ${isMobile ? "text-sm" : "text-lg"}`}>
                   {currentConfigName || "Strategia temporanea"}
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className={`text-muted-foreground ${isMobile ? "text-xs" : "text-sm"}`}>
                   {currentConfigId ? "Strategia salvata" : "Non salvata"}
                 </p>
               </div>
             </div>
             {hasUnsavedChanges && (
-              <Badge variant="warning" pulse>
-                Modifiche non salvate
+              <Badge variant="warning" pulse className={isMobile ? "text-[10px] px-1.5 py-0.5" : ""}>
+                {isMobile ? "Non salvate" : "Modifiche non salvate"}
               </Badge>
             )}
           </div>
@@ -168,28 +168,28 @@ const Index = () => {
         />
 
         {/* Edit Strategy and Reload Buttons */}
-        <div className="flex justify-center gap-3">
+        <div className={`flex justify-center ${isMobile ? "flex-col gap-2" : "gap-3"}`}>
           <Button
             onClick={() => navigate('/strategies')}
             variant="gradient"
-            size="lg"
-            className="flex items-center gap-2"
+            size={isMobile ? "default" : "lg"}
+            className={`flex items-center justify-center gap-2 ${isMobile ? "w-full min-h-[44px]" : ""}`}
           >
-            <Settings className="h-5 w-5" />
-            Modifica Configurazione
+            <Settings className={isMobile ? "h-4 w-4" : "h-5 w-5"} />
+            {isMobile ? "Modifica" : "Modifica Configurazione"}
           </Button>
 
           <Button
             onClick={forceReloadFromDatabase}
             variant="info"
-            size="lg"
-            className="flex items-center gap-2"
+            size={isMobile ? "default" : "lg"}
+            className={`flex items-center justify-center gap-2 ${isMobile ? "w-full min-h-[44px]" : ""}`}
             disabled={supabaseLoading}
             loading={supabaseLoading}
-            loadingText="Caricamento..."
+            loadingText={isMobile ? "Caricamento..." : "Caricamento..."}
           >
-            <RefreshCw className={`h-5 w-5 ${supabaseLoading ? 'animate-spin' : ''}`} />
-            Ricarica dal Database
+            <RefreshCw className={`${isMobile ? "h-4 w-4" : "h-5 w-5"} ${supabaseLoading ? 'animate-spin' : ''}`} />
+            {isMobile ? "Ricarica" : "Ricarica dal Database"}
           </Button>
         </div>
 
@@ -217,8 +217,8 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="investments" className={isMobile ? 'space-y-4' : 'space-y-6'}>
-            <div className="space-y-6">
+          <TabsContent value="investments" className={isMobile ? 'space-y-3' : 'space-y-6'}>
+            <div className={isMobile ? "space-y-3" : "space-y-6"}>
               <InvestmentChart 
                 key={`chart-${config.currency}-${currentConfigId}`}
                 data={investmentData} 

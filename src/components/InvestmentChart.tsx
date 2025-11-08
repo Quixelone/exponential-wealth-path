@@ -5,6 +5,7 @@ import { InvestmentData } from '@/types/investment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartConfig, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { formatCurrency, Currency } from '@/lib/utils';
+import { useDeviceInfo } from '@/hooks/use-mobile';
 
 interface InvestmentChartProps {
   data: InvestmentData[];
@@ -34,7 +35,8 @@ const InvestmentChart: React.FC<InvestmentChartProps> = React.memo(({
   showProjections = false,
   currentDay
 }) => {
-  // Removed debug currency log to prevent unnecessary re-renders
+  const { isMobile } = useDeviceInfo();
+  
   const formatTooltip = (value: any, name: string) => {
     if (name === 'finalCapital') {
       return [formatCurrency(value, currency), 'Capitale Totale'];
@@ -49,43 +51,56 @@ const InvestmentChart: React.FC<InvestmentChartProps> = React.memo(({
 
   return (
     <Card className="w-full animate-scale-in">
-      <CardHeader>
-        <CardTitle className="wealth-gradient-text text-2xl font-bold">
+      <CardHeader className={isMobile ? "p-4" : ""}>
+        <CardTitle className={`wealth-gradient-text font-bold ${isMobile ? "text-lg" : "text-2xl"}`}>
           Evoluzione del Capitale
         </CardTitle>
-        <p className="text-muted-foreground">
-          Crescita del tuo investimento nel tempo con interesse composto
+        <p className={`text-muted-foreground ${isMobile ? "text-xs" : "text-sm"}`}>
+          Crescita del tuo investimento nel tempo
         </p>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[500px] w-full">
-          <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+      <CardContent className={isMobile ? "p-2" : "p-6"}>
+        <ChartContainer 
+          config={chartConfig} 
+          className={isMobile ? "h-[280px] w-full" : "h-[500px] w-full"}
+        >
+          <LineChart 
+            data={data} 
+            margin={isMobile 
+              ? { top: 10, right: 5, left: 0, bottom: 30 }
+              : { top: 20, right: 30, left: 20, bottom: 60 }
+            }
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="day"
               stroke="hsl(var(--muted-foreground))"
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: isMobile ? 9 : 12, fill: "hsl(var(--muted-foreground))" }}
               tickLine={{ stroke: "hsl(var(--border))" }}
               axisLine={{ stroke: "hsl(var(--border))" }}
-              label={{ 
+              label={!isMobile ? { 
                 value: 'Giorni', 
                 position: 'insideBottom', 
                 offset: -10,
                 style: { textAnchor: 'middle', fill: "hsl(var(--muted-foreground))" }
-              }}
+              } : undefined}
             />
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: isMobile ? 9 : 12, fill: "hsl(var(--muted-foreground))" }}
               tickLine={{ stroke: "hsl(var(--border))" }}
               axisLine={{ stroke: "hsl(var(--border))" }}
-              tickFormatter={(value) => formatCurrency(value, currency)}
-              label={{ 
+              tickFormatter={(value) => isMobile 
+                ? `${(value / 1000).toFixed(0)}k` 
+                : formatCurrency(value, currency)
+              }
+              width={isMobile ? 40 : 60}
+              label={!isMobile ? { 
                 value: `Capitale (${currency})`, 
                 angle: -90, 
                 position: 'insideLeft',
                 style: { textAnchor: 'middle', fill: "hsl(var(--muted-foreground))" }
-              }}
+              } : undefined}
             />
             <Tooltip 
               formatter={formatTooltip}
@@ -93,14 +108,16 @@ const InvestmentChart: React.FC<InvestmentChartProps> = React.memo(({
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
-                borderRadius: '12px',
+                borderRadius: isMobile ? '8px' : '12px',
                 boxShadow: '0 4px 12px -4px rgba(0, 0, 0, 0.15)',
-                padding: '12px'
+                padding: isMobile ? '8px' : '12px',
+                fontSize: isMobile ? '11px' : '14px'
               }}
               labelStyle={{
                 color: 'hsl(var(--foreground))',
                 fontWeight: 600,
-                marginBottom: '8px'
+                marginBottom: isMobile ? '4px' : '8px',
+                fontSize: isMobile ? '11px' : '14px'
               }}
             />
             
@@ -109,7 +126,7 @@ const InvestmentChart: React.FC<InvestmentChartProps> = React.memo(({
               type="monotone"
               dataKey="finalCapital"
               stroke="var(--color-finalCapital)"
-              strokeWidth={3}
+              strokeWidth={isMobile ? 2 : 3}
               dot={false}
               activeDot={{ 
                 r: 6, 
@@ -127,7 +144,7 @@ const InvestmentChart: React.FC<InvestmentChartProps> = React.memo(({
               type="monotone"
               dataKey="totalPACInvested"
               stroke="var(--color-totalPACInvested)"
-              strokeWidth={2}
+              strokeWidth={isMobile ? 1.5 : 2}
               strokeDasharray="8 4"
               dot={false}
               activeDot={{ 
@@ -172,10 +189,10 @@ const InvestmentChart: React.FC<InvestmentChartProps> = React.memo(({
         </ChartContainer>
         
         {/* Leggenda moderna */}
-        <div className="mt-6">
+        <div className={isMobile ? "mt-3" : "mt-6"}>
           <ChartLegend>
             <ChartLegendContent 
-              className="flex flex-wrap justify-center gap-6"
+              className={`flex flex-wrap justify-center ${isMobile ? "gap-2 text-xs" : "gap-6"}`}
               nameKey="label"
             />
           </ChartLegend>

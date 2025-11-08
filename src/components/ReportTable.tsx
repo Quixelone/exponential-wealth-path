@@ -14,6 +14,7 @@ import RowEditDialog from './RowEditDialog';
 import { TradeRecordDialog } from './TradeRecordDialog';
 import { useActualTrades } from '@/hooks/useActualTrades';
 import VirtualizedReportTable from './VirtualizedReportTable';
+import { useDeviceInfo } from '@/hooks/use-mobile';
 
 interface ReportTableProps {
   data: InvestmentData[];
@@ -44,6 +45,7 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   onSaveToStrategy,
   readOnly = false
 }) => {
+  const { isMobile } = useDeviceInfo();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [useVirtualScroll, setUseVirtualScroll] = useState(false);
@@ -159,20 +161,20 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   return (
     <ModernTooltipProvider>
       <Card className="animate-fade-in">
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-base sm:text-lg">
+        <CardHeader className={isMobile ? "p-3" : ""}>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+            <CardTitle className={`flex flex-col sm:flex-row items-start sm:items-center gap-2 ${isMobile ? "text-sm" : "text-base sm:text-lg"}`}>
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-6 sm:h-6 sm:w-6 text-primary" />
-                <span>Report Giornaliero Dettagliato</span>
+                <TrendingUp className={isMobile ? "h-4 w-4 text-primary" : "h-5 w-6 sm:h-6 sm:w-6 text-primary"} />
+                <span>{isMobile ? "Report Dettagliato" : "Report Giornaliero Dettagliato"}</span>
               </div>
               {currentInvestmentDay && (
-                <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                <div className={`flex items-center gap-1 text-muted-foreground ${isMobile ? "text-[10px]" : "text-xs sm:text-sm"}`}>
+                  <Calendar className={isMobile ? "h-3 w-3" : "h-3 w-3 sm:h-4 sm:w-4"} />
                   <span>Giorno corrente: {currentInvestmentDay}</span>
                 </div>
               )}
-              {data.length > 50 && (
+              {data.length > 50 && !isMobile && (
                 <div className="flex items-center gap-2 ml-auto">
                   <Zap className="h-4 w-4 text-yellow-500" />
                   <Label htmlFor="virtual-scroll" className="text-xs cursor-pointer">
@@ -188,34 +190,39 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
             </CardTitle>
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <div className="relative w-full sm:w-auto">
-                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground ${isMobile ? "h-3 w-3" : "h-4 w-4"}`} />
                 <Input
-                  placeholder="Cerca giorno, data, %..."
+                  placeholder={isMobile ? "Cerca..." : "Cerca giorno, data, %..."}
                   value={searchTerm}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  className="pl-9 w-full sm:w-56 touch-target"
+                  className={`w-full sm:w-56 touch-target ${isMobile ? "pl-8 text-xs h-10" : "pl-9"}`}
                 />
               </div>
               {currentConfigId && currentInvestmentDay && onSaveToStrategy && (
             <Button 
               onClick={onSaveToStrategy}
               variant="default" 
-              size="sm"
-              className="bg-primary hover:bg-primary/90 w-full sm:w-auto touch-target"
+              size={isMobile ? "sm" : "sm"}
+              className={`bg-primary hover:bg-primary/90 w-full sm:w-auto touch-target ${isMobile ? "min-h-[40px] text-xs" : ""}`}
             >
-              <TrendingUp className="h-4 w-4 mr-2" />
+              <TrendingUp className={isMobile ? "h-3 w-3 mr-1" : "h-4 w-4 mr-2"} />
               <span className="hidden sm:inline">Conferma Giorno {currentInvestmentDay}</span>
               <span className="sm:hidden">Conferma G.{currentInvestmentDay}</span>
             </Button>
               )}
-              <Button onClick={onExportCSV} variant="outline" size="sm" className="w-full sm:w-auto touch-target">
-                <Download className="h-4 w-4 mr-2" />
-                Esporta CSV
+              <Button 
+                onClick={onExportCSV} 
+                variant="outline" 
+                size={isMobile ? "sm" : "sm"}
+                className={`w-full sm:w-auto touch-target ${isMobile ? "min-h-[40px] text-xs" : ""}`}
+              >
+                <Download className={isMobile ? "h-3 w-3 mr-1" : "h-4 w-4 mr-2"} />
+                {isMobile ? "CSV" : "Esporta CSV"}
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-0 sm:p-6">
+        <CardContent className={isMobile ? "p-0" : "p-0 sm:p-6"}>
           {useVirtualScroll ? (
             // Virtual scrolling mode for large datasets
             <VirtualizedReportTable
@@ -231,21 +238,21 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
           ) : (
             // Standard pagination mode
             <>
-          <div className="rounded-md border overflow-x-auto">
+          <div className={`rounded-md border overflow-x-auto ${isMobile ? "mobile-table-wrapper" : ""}`}>
             <Table>
               <TableHeader>
-                <TableRow className="text-xs sm:text-sm">
-                  <TableHead className="w-12 sm:w-16 text-center px-2">Giorno</TableHead>
-                  <TableHead className="w-20 sm:w-28 px-2">Data</TableHead>
-                  <TableHead className="text-right px-2 hidden sm:table-cell">Capitale Iniziale</TableHead>
-                  <TableHead className="text-right px-2">PAC</TableHead>
-                  <TableHead className="text-center px-2 hidden md:table-cell">Trade Reale</TableHead>
-                  <TableHead className="text-right px-2">% Ricavo</TableHead>
-                  <TableHead className="text-right px-2 hidden sm:table-cell">Ricavo Giorno</TableHead>
-                  <TableHead className="text-right font-mono px-2">Capitale Finale</TableHead>
-                  <TableHead className="text-right px-2 hidden lg:table-cell">Valore Reale</TableHead>
-                  <TableHead className="text-right px-2 hidden lg:table-cell">Differenza</TableHead>
-                  {!readOnly && <TableHead className="w-20 sm:w-32 text-center px-2">Azioni</TableHead>}
+                <TableRow className={isMobile ? "text-[10px]" : "text-xs sm:text-sm"}>
+                  <TableHead className={`text-center ${isMobile ? "w-10 px-1 sticky left-0 bg-background z-10" : "w-12 sm:w-16 px-2"}`}>Giorno</TableHead>
+                  <TableHead className={isMobile ? "w-16 px-1" : "w-20 sm:w-28 px-2"}>Data</TableHead>
+                  <TableHead className="text-right px-1 sm:px-2 hidden sm:table-cell">Cap. Iniz.</TableHead>
+                  <TableHead className={`text-right ${isMobile ? "px-1" : "px-2"}`}>PAC</TableHead>
+                  <TableHead className="text-center px-1 sm:px-2 hidden md:table-cell">Trade</TableHead>
+                  <TableHead className={`text-right ${isMobile ? "px-1" : "px-2"}`}>% Ric.</TableHead>
+                  <TableHead className="text-right px-1 sm:px-2 hidden sm:table-cell">Ricavo</TableHead>
+                  <TableHead className={`text-right font-mono ${isMobile ? "px-1" : "px-2"}`}>Cap. Fin.</TableHead>
+                  <TableHead className="text-right px-1 sm:px-2 hidden lg:table-cell">Val. Reale</TableHead>
+                  <TableHead className="text-right px-1 sm:px-2 hidden lg:table-cell">Diff.</TableHead>
+                  {!readOnly && <TableHead className={`text-center ${isMobile ? "w-16 px-1" : "w-20 sm:w-32 px-2"}`}>Azioni</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -273,14 +280,15 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                       <TableRow 
                         key={item.day} 
                         className={`
-                          hover:bg-muted/50 text-xs sm:text-sm
+                          hover:bg-muted/50
+                          ${isMobile ? 'text-[10px]' : 'text-xs sm:text-sm'}
                           ${isToday ? 'bg-primary/5 border-primary/20 border-2 animate-pulse-gentle' : ''}
                         `}
                       >
-                        <TableCell className="font-medium text-center relative px-2">
+                        <TableCell className={`font-medium text-center relative sticky left-0 bg-background z-10 ${isMobile ? 'px-1 mobile-table-cell' : 'px-2'}`}>
                           <div className="flex items-center justify-center gap-1">
                             {item.day}
-                            {isToday && (
+                            {isToday && !isMobile && (
                               <ModernTooltip>
                                 <ModernTooltipTrigger asChild>
                                   <Calendar className="h-4 w-4 text-primary animate-pulse" />
@@ -292,11 +300,15 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className={`text-xs sm:text-sm px-2 ${isToday ? 'font-semibold text-primary' : ''}`}>
-                          {formatDate(item.date)}
+                        <TableCell className={`${isMobile ? 'px-1 mobile-table-cell text-[9px]' : 'text-xs sm:text-sm px-2'} ${isToday ? 'font-semibold text-primary' : ''}`}>
+                          {isMobile ? formatDate(item.date).replace(/\//g, '/') : formatDate(item.date)}
                         </TableCell>
-                        <TableCell className="text-right font-mono text-xs sm:text-sm px-2 hidden sm:table-cell">{formatCurrency(item.capitalBeforePAC, currency)}</TableCell>
-                        <TableCell className="text-right font-mono text-xs sm:text-sm px-2">{formatCurrency(item.pacAmount, currency)}</TableCell>
+                        <TableCell className={`text-right font-mono px-2 hidden sm:table-cell ${isMobile ? 'mobile-table-cell' : 'text-xs sm:text-sm'}`}>
+                          {formatCurrency(item.capitalBeforePAC, currency)}
+                        </TableCell>
+                        <TableCell className={`text-right font-mono ${isMobile ? 'px-1 mobile-table-cell text-[9px]' : 'text-xs sm:text-sm px-2'}`}>
+                          {isMobile ? `${(item.pacAmount / 1000).toFixed(1)}k` : formatCurrency(item.pacAmount, currency)}
+                        </TableCell>
                         <TableCell className="text-center px-2 hidden md:table-cell">
                           {actualTrade ? (
                             <div className="space-y-1 sm:space-y-2">
@@ -340,14 +352,14 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                             <span className="text-muted-foreground text-xs sm:text-sm">-</span>
                           )}
                         </TableCell>
-                        <TableCell className={`text-right font-mono text-xs sm:text-sm px-2 ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {item.dailyReturn.toFixed(3)}%
+                        <TableCell className={`text-right font-mono ${isMobile ? 'px-1 mobile-table-cell text-[9px]' : 'text-xs sm:text-sm px-2'} ${item.dailyReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {item.dailyReturn.toFixed(isMobile ? 2 : 3)}%
                         </TableCell>
-                        <TableCell className={`text-right font-mono text-xs sm:text-sm px-2 hidden sm:table-cell ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
+                        <TableCell className={`text-right font-mono px-2 hidden sm:table-cell ${isMobile ? 'mobile-table-cell' : 'text-xs sm:text-sm'} ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
                           {formatCurrency(dailyGain, currency)}
                         </TableCell>
-                        <TableCell className={`text-right font-mono font-semibold text-xs sm:text-sm px-2 ${isToday ? 'text-primary' : ''}`}>
-                          {formatCurrency(item.finalCapital, currency)}
+                        <TableCell className={`text-right font-mono font-semibold ${isMobile ? 'px-1 mobile-table-cell text-[9px]' : 'text-xs sm:text-sm px-2'} ${isToday ? 'text-primary' : ''}`}>
+                          {isMobile ? `${(item.finalCapital / 1000).toFixed(1)}k` : formatCurrency(item.finalCapital, currency)}
                         </TableCell>
                         <TableCell className="text-right font-mono text-xs sm:text-sm px-2 hidden lg:table-cell">
                           {realValue ? (
@@ -375,22 +387,24 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                           )}
                         </TableCell>
                         {!readOnly && (
-                          <TableCell className="text-center px-2">
-                            <div className="flex items-center justify-center gap-0.5 sm:gap-1">
+                          <TableCell className={`text-center ${isMobile ? 'px-1' : 'px-2'}`}>
+                            <div className={`flex items-center justify-center ${isMobile ? 'gap-0.5' : 'gap-0.5 sm:gap-1'}`}>
                               <ModernTooltip>
                                 <ModernTooltipTrigger asChild>
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleEditRow(item)}
-                                    className="h-8 w-8 sm:h-8 sm:w-8 px-0 sm:px-2 text-primary hover:text-primary/80 hover:bg-primary/10 touch-target"
+                                    className={`text-primary hover:text-primary/80 hover:bg-primary/10 touch-target ${isMobile ? 'h-9 w-9 p-0' : 'h-8 w-8 sm:h-8 sm:w-8 px-0 sm:px-2'}`}
                                   >
-                                    <Edit3 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    <Edit3 className={isMobile ? "h-3.5 w-3.5" : "h-3 w-3 sm:h-4 sm:w-4"} />
                                   </Button>
                                 </ModernTooltipTrigger>
-                                <ModernTooltipContent>
-                                  <p>Modifica rendimento e PAC per il giorno {item.day}</p>
-                                </ModernTooltipContent>
+                                {!isMobile && (
+                                  <ModernTooltipContent>
+                                    <p>Modifica rendimento e PAC per il giorno {item.day}</p>
+                                  </ModernTooltipContent>
+                                )}
                               </ModernTooltip>
                               
                               {actualTrade ? (
@@ -400,14 +414,16 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => handleTradeRecord(item)}
-                                      className="h-8 w-8 sm:h-8 sm:w-8 px-0 sm:px-2 text-green-600 hover:text-green-700 hover:bg-green-50 touch-target"
+                                      className={`text-green-600 hover:text-green-700 hover:bg-green-50 touch-target ${isMobile ? 'h-9 w-9 p-0' : 'h-8 w-8 sm:h-8 sm:w-8 px-0 sm:px-2'}`}
                                     >
-                                      <DollarSign className="h-3 w-3 sm:h-4 sm:w-4" />
+                                      <DollarSign className={isMobile ? "h-3.5 w-3.5" : "h-3 w-3 sm:h-4 sm:w-4"} />
                                     </Button>
                                   </ModernTooltipTrigger>
-                                  <ModernTooltipContent>
-                                    <p>Trade registrato - Clicca per modificare</p>
-                                  </ModernTooltipContent>
+                                  {!isMobile && (
+                                    <ModernTooltipContent>
+                                      <p>Trade registrato - Clicca per modificare</p>
+                                    </ModernTooltipContent>
+                                  )}
                                 </ModernTooltip>
                               ) : (
                                 <ModernTooltip>
@@ -416,14 +432,16 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => handleTradeRecord(item)}
-                                      className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                      className={`text-blue-600 hover:text-blue-700 hover:bg-blue-50 ${isMobile ? 'h-9 w-9 p-0' : 'h-8 px-2'}`}
                                     >
-                                      <TrendingDown className="h-4 w-4" />
+                                      <TrendingDown className={isMobile ? "h-3.5 w-3.5" : "h-4 w-4"} />
                                     </Button>
                                   </ModernTooltipTrigger>
-                                  <ModernTooltipContent>
-                                    <p>Registra trade reale per il giorno {item.day}</p>
-                                  </ModernTooltipContent>
+                                  {!isMobile && (
+                                    <ModernTooltipContent>
+                                      <p>Registra trade reale per il giorno {item.day}</p>
+                                    </ModernTooltipContent>
+                                  )}
                                 </ModernTooltip>
                               )}
                             </div>
