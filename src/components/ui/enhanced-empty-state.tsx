@@ -1,10 +1,7 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { fadeInUp, staggerContainer, staggerItem } from '@/utils/animations';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface EnhancedEmptyStateProps {
   icon?: LucideIcon;
@@ -24,7 +21,7 @@ interface EnhancedEmptyStateProps {
 }
 
 /**
- * Enhanced empty state with smooth animations and better visual hierarchy
+ * Enhanced empty state with smooth CSS animations and better visual hierarchy
  * Supports primary and secondary actions
  */
 export function EnhancedEmptyState({
@@ -36,40 +33,29 @@ export function EnhancedEmptyState({
   className,
   illustration,
 }: EnhancedEmptyStateProps) {
-  const prefersReducedMotion = useReducedMotion();
-
-  const containerVariants = prefersReducedMotion ? {} : staggerContainer;
-  const itemVariants = prefersReducedMotion ? {} : staggerItem;
-
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="initial"
-      animate="animate"
+    <div
       className={cn(
-        'flex flex-col items-center justify-center gap-6 py-12 px-4 text-center',
+        'flex flex-col items-center justify-center gap-6 py-12 px-4 text-center animate-fade-in',
         className
       )}
     >
       {/* Icon or Illustration */}
       {illustration ? (
-        <motion.div variants={itemVariants}>
+        <div className="animate-scale-in">
           {illustration}
-        </motion.div>
+        </div>
       ) : Icon ? (
-        <motion.div
-          variants={itemVariants}
-          className="relative"
-        >
+        <div className="relative animate-scale-in">
           <div className="absolute inset-0 bg-primary/10 rounded-full blur-xl" />
           <div className="relative p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full">
             <Icon className="h-12 w-12 text-primary" />
           </div>
-        </motion.div>
+        </div>
       ) : null}
 
       {/* Text Content */}
-      <motion.div variants={itemVariants} className="space-y-3 max-w-md">
+      <div className="space-y-3 max-w-md animate-fade-in" style={{ animationDelay: '0.1s' }}>
         <h3 className="text-xl font-semibold text-foreground">
           {title}
         </h3>
@@ -78,13 +64,13 @@ export function EnhancedEmptyState({
             {description}
           </p>
         )}
-      </motion.div>
+      </div>
 
       {/* Actions */}
       {(action || secondaryAction) && (
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col sm:flex-row items-center gap-3 mt-2"
+        <div
+          className="flex flex-col sm:flex-row items-center gap-3 mt-2 animate-fade-in"
+          style={{ animationDelay: '0.2s' }}
         >
           {action && (
             <Button
@@ -106,8 +92,8 @@ export function EnhancedEmptyState({
               {secondaryAction.label}
             </Button>
           )}
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }

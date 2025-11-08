@@ -1,8 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface SkeletonLoaderProps {
   type: 'card' | 'table' | 'list' | 'stat' | 'chart';
@@ -12,24 +10,9 @@ interface SkeletonLoaderProps {
 
 /**
  * Professional skeleton loaders with shimmer effect
- * Automatically respects prefers-reduced-motion
+ * Uses CSS animations for better performance
  */
 export function SkeletonLoader({ type, count = 1, className }: SkeletonLoaderProps) {
-  const prefersReducedMotion = useReducedMotion();
-
-  const containerVariants = {
-    animate: prefersReducedMotion ? {} : {
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    initial: prefersReducedMotion ? {} : { opacity: 0, y: 10 },
-    animate: prefersReducedMotion ? {} : { opacity: 1, y: 0 },
-  };
-
   const renderSkeleton = () => {
     switch (type) {
       case 'card':
@@ -48,18 +31,17 @@ export function SkeletonLoader({ type, count = 1, className }: SkeletonLoaderPro
   };
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="initial"
-      animate="animate"
-      className={cn('space-y-4', className)}
-    >
+    <div className={cn('space-y-4', className)}>
       {Array.from({ length: count }).map((_, i) => (
-        <motion.div key={i} variants={itemVariants}>
+        <div 
+          key={i} 
+          className="animate-fade-in"
+          style={{ animationDelay: `${i * 0.1}s` }}
+        >
           {renderSkeleton()}
-        </motion.div>
+        </div>
       ))}
-    </motion.div>
+    </div>
   );
 }
 
