@@ -226,12 +226,16 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const hasManuallyNavigated = useRef(false);
   const itemsPerPage = 20;
 
-  // Auto-enable virtual scrolling for large datasets
+  // Auto-enable virtual scrolling for large datasets (but not on mobile)
   useEffect(() => {
-    if (data.length > 100 && !useVirtualScroll) {
+    if (data.length > 100 && !useVirtualScroll && !isMobile) {
       setUseVirtualScroll(true);
     }
-  }, [data.length]);
+    // Disable virtual scroll on mobile
+    if (isMobile && useVirtualScroll) {
+      setUseVirtualScroll(false);
+    }
+  }, [data.length, isMobile]);
 
   // Load actual trades
   const { trades, loadTrades, getTradeForDay } = useActualTrades({ 
@@ -394,19 +398,7 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
           </div>
         </CardHeader>
         <CardContent className={isMobile ? "p-3" : "p-0 sm:p-6"}>
-          {useVirtualScroll ? (
-            // Virtual scrolling mode for large datasets
-            <VirtualizedReportTable
-              data={filteredData}
-              currency={currency}
-              currentInvestmentDay={currentInvestmentDay}
-              formatDate={formatDate}
-              handleEditRow={handleEditRow}
-              handleTradeRecord={handleTradeRecord}
-              getTradeForDay={getTradeForDay}
-              readOnly={readOnly}
-            />
-          ) : isMobile ? (
+          {isMobile ? (
             // Mobile Card Layout
             <>
               <div className="space-y-3">
@@ -473,6 +465,18 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                 </div>
               )}
             </>
+          ) : useVirtualScroll ? (
+            // Virtual scrolling mode for large datasets (desktop only)
+            <VirtualizedReportTable
+              data={filteredData}
+              currency={currency}
+              currentInvestmentDay={currentInvestmentDay}
+              formatDate={formatDate}
+              handleEditRow={handleEditRow}
+              handleTradeRecord={handleTradeRecord}
+              getTradeForDay={getTradeForDay}
+              readOnly={readOnly}
+            />
           ) : (
             // Desktop Table Layout
             <>
