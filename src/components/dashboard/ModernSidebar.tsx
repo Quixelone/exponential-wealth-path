@@ -13,7 +13,8 @@ import {
   MessageCircle,
   BookOpen,
   Palette,
-  Zap
+  Zap,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -78,7 +79,13 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       icon: Zap,
       label: 'Virtual Scroll Test',
       path: '/test-virtual-scroll',
-      description: 'Performance test'
+      description: 'Test performance'
+    },
+    {
+      icon: Sparkles,
+      label: 'UI Demo',
+      path: '/ui-demo',
+      description: 'Button & Toast Demo'
     },
     {
       icon: Settings,

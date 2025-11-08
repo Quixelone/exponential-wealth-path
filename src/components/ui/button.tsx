@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-import { Loader2 } from "lucide-react"
+import { Loader2, Check, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -53,6 +53,7 @@ export interface ButtonProps
   loadingText?: string
   leftIcon?: React.ReactNode
   rightIcon?: React.ReactNode
+  state?: 'idle' | 'loading' | 'success' | 'error'
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -67,6 +68,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     rightIcon,
     children,
     disabled,
+    state = 'idle',
     ...props
   }, ref) => {
     const Comp = asChild ? Slot : "button"
@@ -86,25 +88,47 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       )
     }
 
+    // Determine the current state (legacy support for loading prop)
+    const currentState = loading ? 'loading' : state;
+    const isDisabled = disabled || currentState === 'loading' || currentState === 'success';
+
+    // Get state icon
+    const getStateIcon = () => {
+      switch (currentState) {
+        case 'loading':
+          return <Loader2 className="h-4 w-4 animate-spin" />;
+        case 'success':
+          return <Check className="h-4 w-4 animate-scale-in" />;
+        case 'error':
+          return <X className="h-4 w-4 animate-shake" />;
+        default:
+          return null;
+      }
+    };
+
+    const stateIcon = getStateIcon();
+
     // Normal button rendering with loading, icons, etc.
     return (
       <Comp
         className={cn(
           buttonVariants({ variant, size, className }),
-          loading && "relative"
+          currentState === 'loading' && "relative",
+          currentState === 'success' && "bg-success hover:bg-success text-success-foreground",
+          currentState === 'error' && "animate-shake"
         )}
         ref={ref}
-        disabled={disabled || loading}
+        disabled={isDisabled}
         {...props}
       >
-        {loading && (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        )}
-        {!loading && leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
-        <span className={cn(loading && loadingText && "opacity-0")}>
-          {loading && loadingText ? loadingText : children}
+        {stateIcon || (leftIcon && <span className="flex-shrink-0">{leftIcon}</span>)}
+        <span className={cn(
+          currentState === 'loading' && loadingText && "opacity-0",
+          "transition-opacity duration-200"
+        )}>
+          {currentState === 'loading' && loadingText ? loadingText : children}
         </span>
-        {!loading && rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+        {!stateIcon && rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
       </Comp>
     )
   }
