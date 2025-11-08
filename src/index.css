@@ -704,10 +704,15 @@
     @apply bg-card border-border/50;
   }
 
-  /* Enhanced touch feedback */
-  .touch-feedback {
-    @apply transition-all duration-150 active:scale-95 active:bg-muted/50;
-  }
+/* Enhanced touch feedback */
+.touch-feedback {
+  @apply transition-all duration-150 active:scale-[0.97] active:opacity-80;
+}
+
+/* Safe area support for mobile */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
   /* Pull to refresh indicator */
   .pull-refresh {

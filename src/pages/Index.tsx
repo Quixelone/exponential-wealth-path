@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Bell, Settings, Target, RefreshCw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -25,6 +25,7 @@ const Index = () => {
   const { user, isAdmin } = useAuth();
   const { isMobile } = useDeviceInfo();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('investments');
 
   const {
     config,
@@ -193,7 +194,12 @@ const Index = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="investments" className="w-full">
+        <Tabs 
+          defaultValue="investments" 
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
           <TabsList className={`grid w-full grid-cols-2 ${isMobile ? 'mb-4' : 'mb-6'} bg-card rounded-xl p-1`}>
             <TabsTrigger 
               value="investments" 
@@ -253,7 +259,7 @@ const Index = () => {
   };
 
   return (
-    <AppLayout hasUnsavedChanges={hasUnsavedChanges}>
+    <AppLayout hasUnsavedChanges={hasUnsavedChanges} activeTab={activeTab}>
       {renderMainContent()}
       
       {/* Mobile Quick Save FAB */}

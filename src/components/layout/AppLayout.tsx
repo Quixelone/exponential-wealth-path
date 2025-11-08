@@ -15,9 +15,10 @@ import UnsavedChangesAlert from '@/components/configuration/UnsavedChangesAlert'
 interface AppLayoutProps {
   children: React.ReactNode;
   hasUnsavedChanges?: boolean;
+  activeTab?: string; // For bottom navigation active state
 }
 
-const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = false }) => {
+const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = false, activeTab = 'dashboard' }) => {
   const { user, userProfile, loading: authLoading, signOut, isAdmin } = useAuth();
   const { isMobile, isTablet } = useDeviceInfo();
   const { lastDatabaseSync } = useInvestmentCalculator();
@@ -107,6 +108,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
             <BottomNavigation 
               isAdmin={isAdmin}
               onNavigate={guardedNavigate}
+              activeTab={activeTab}
             />
           </>
         )}

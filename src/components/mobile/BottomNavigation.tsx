@@ -13,9 +13,15 @@ interface BottomNavigationProps {
   isAdmin?: boolean;
   onStrategiesClick?: () => void;
   onNavigate?: (path: string) => void;
+  activeTab?: string; // For controlling which tab is active in dashboard
 }
 
-const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategiesClick, onNavigate }) => {
+const BottomNavigation: React.FC<BottomNavigationProps> = ({ 
+  isAdmin, 
+  onStrategiesClick, 
+  onNavigate,
+  activeTab 
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,19 +30,22 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
       icon: LayoutDashboard,
       label: 'Dashboard',
       path: '/app',
+      id: 'dashboard'
     },
     {
       icon: TrendingUp,
       label: 'Strategie',
       path: '/strategies',
+      id: 'strategies'
     },
     {
       icon: Bell,
       label: 'Notifiche',
-      path: '/app#reminders',
+      path: '/app',
+      id: 'reminders',
       onClick: () => {
         navigate('/app');
-        // Trigger tab change to reminders
+        // Trigger tab change to reminders after navigation
         setTimeout(() => {
           const reminderTab = document.querySelector('[value="reminders"]') as HTMLElement;
           if (reminderTab) reminderTab.click();
@@ -47,6 +56,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
       icon: Settings,
       label: 'Impostazioni',
       path: '/settings',
+      id: 'settings'
     }
   ];
 
@@ -55,6 +65,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
       icon: Users,
       label: 'Utenti',
       path: '/user-management',
+      id: 'users'
     });
   }
 
@@ -68,46 +79,72 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ isAdmin, onStrategi
     }
   };
 
-  const isActivePath = (path: string) => {
-    if (path === '/app') {
-      return location.pathname === '/app';
+  const isActivePath = (item: any) => {
+    // Special case: Notifiche is active only when on /app AND activeTab is 'reminders'
+    if (item.id === 'reminders') {
+      return location.pathname === '/app' && activeTab === 'reminders';
     }
-    if (path.includes('#')) {
-      return location.pathname === '/app' && path.includes('reminders');
+    
+    // Dashboard is active only when on /app AND activeTab is NOT 'reminders'
+    if (item.id === 'dashboard') {
+      return location.pathname === '/app' && activeTab !== 'reminders';
     }
-    return location.pathname === path;
+    
+    // Other paths: simple match
+    return location.pathname === item.path;
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50 safe-area-bottom">
-      <div className="flex items-center justify-around px-2 py-2">
+    <nav 
+      className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border z-50 safe-area-bottom"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
+      <div className="flex items-stretch justify-around max-w-screen-xl mx-auto">
         {mainItems.map((item) => {
           const Icon = item.icon;
-          const isActive = isActivePath(item.path);
+          const isActive = isActivePath(item);
           
           return (
             <button
-              key={item.path}
+              key={item.id}
               onClick={() => handleNavigation(item)}
               className={cn(
-                "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 min-w-0 flex-1 touch-target-lg",
-                isActive 
-                  ? "text-primary bg-primary/10" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                "relative flex flex-col items-center justify-center gap-1 px-3 py-3 transition-all duration-200 flex-1 touch-target group",
+                "hover:bg-muted/50 active:scale-95",
+                isActive && "text-primary"
               )}
             >
-              <Icon className={cn("h-5 w-5 mb-1", isActive && "text-primary")} />
-              <span className={cn("text-xs font-medium truncate", isActive && "text-primary")}>
+              {/* Active indicator bar at top */}
+              {isActive && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-b-full" />
+              )}
+              
+              <div className={cn(
+                "relative transition-transform duration-200",
+                isActive ? "scale-110" : "group-hover:scale-105"
+              )}>
+                <Icon className={cn(
+                  "h-6 w-6 transition-colors",
+                  isActive ? "text-primary" : "text-muted-foreground"
+                )} />
+                
+                {/* Glow effect when active */}
+                {isActive && (
+                  <div className="absolute inset-0 -z-10 blur-lg bg-primary/30 rounded-full" />
+                )}
+              </div>
+              
+              <span className={cn(
+                "text-[11px] font-medium transition-colors truncate max-w-full",
+                isActive ? "text-primary" : "text-muted-foreground"
+              )}>
                 {item.label}
               </span>
-              {isActive && (
-                <div className="w-2 h-0.5 bg-primary rounded-full mt-1" />
-              )}
             </button>
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 };
 
