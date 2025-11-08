@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3, Calendar, DollarSign, TrendingDown, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Download, TrendingUp, Edit3, Calendar, DollarSign, TrendingDown, Zap, BarChart3 } from 'lucide-react';
 import { ModernTooltipProvider, ModernTooltip, ModernTooltipContent, ModernTooltipTrigger } from '@/components/ui/ModernTooltip';
 import { Currency, formatCurrency } from '@/lib/utils';
 import RowEditDialog from './RowEditDialog';
@@ -15,6 +15,177 @@ import { TradeRecordDialog } from './TradeRecordDialog';
 import { useActualTrades } from '@/hooks/useActualTrades';
 import VirtualizedReportTable from './VirtualizedReportTable';
 import { useDeviceInfo } from '@/hooks/use-mobile';
+
+// Mobile Card Component
+interface MobileReportCardProps {
+  item: InvestmentData;
+  currency: Currency;
+  isCurrentDay: boolean;
+  onEdit: () => void;
+  onTrade: () => void;
+  actualTrade: any;
+  formatDate: (date: string) => string;
+  readOnly?: boolean;
+}
+
+const MobileReportCard: React.FC<MobileReportCardProps> = ({ 
+  item, 
+  currency, 
+  isCurrentDay, 
+  onEdit, 
+  onTrade, 
+  actualTrade,
+  formatDate,
+  readOnly 
+}) => {
+  const dailyGain = item.interestEarnedDaily;
+  const isPositiveGain = dailyGain >= 0;
+  const isPositiveReturn = item.dailyReturn >= 0;
+  
+  const realValue = actualTrade 
+    ? (actualTrade.option_status === 'filled' 
+        ? (actualTrade.btc_amount || 0) * (actualTrade.fill_price_usd || 0)
+        : (actualTrade.premium_received_usdt || 0))
+    : null;
+
+  return (
+    <Card 
+      className={`
+        mobile-report-card p-4 space-y-3 
+        ${isCurrentDay ? 'border-primary/50 shadow-lg shadow-primary/10 bg-primary/5' : 'border-border/50'}
+        animate-fade-in
+      `}
+    >
+      {/* Header */}
+      <div className="flex justify-between items-center pb-2 border-b border-border/40">
+        <div className="flex items-center gap-2">
+          <Badge 
+            variant={isCurrentDay ? "default" : "secondary"} 
+            className={`text-xs font-semibold px-2 py-1 ${isCurrentDay ? 'bg-primary animate-pulse' : ''}`}
+          >
+            Giorno {item.day}
+          </Badge>
+          {isCurrentDay && (
+            <Calendar className="h-4 w-4 text-primary" />
+          )}
+        </div>
+        <span className="text-xs text-muted-foreground font-medium">
+          {formatDate(item.date)}
+        </span>
+      </div>
+
+      {/* Main Stats - 3 Column Grid */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-1">
+          <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">PAC</div>
+          <div className="text-sm font-bold font-mono">
+            {item.pacAmount >= 1000 
+              ? `${(item.pacAmount / 1000).toFixed(1)}k` 
+              : formatCurrency(item.pacAmount, currency)}
+          </div>
+        </div>
+        
+        <div className="space-y-1">
+          <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">% Ric.</div>
+          <div className={`text-sm font-bold font-mono ${isPositiveReturn ? 'text-green-600' : 'text-red-600'}`}>
+            {isPositiveReturn ? '+' : ''}{item.dailyReturn.toFixed(2)}%
+          </div>
+        </div>
+        
+        <div className="space-y-1">
+          <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Cap. Fin.</div>
+          <div className={`text-sm font-bold font-mono ${isCurrentDay ? 'text-primary' : ''}`}>
+            {item.finalCapital >= 1000 
+              ? `${(item.finalCapital / 1000).toFixed(1)}k` 
+              : formatCurrency(item.finalCapital, currency)}
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary Stats */}
+      <div className="flex justify-between text-[11px] text-muted-foreground pt-2 border-t border-border/30">
+        <div>
+          <span className="font-medium">Cap. Iniz:</span> {' '}
+          <span className="font-mono">
+            {item.capitalBeforePAC >= 1000 
+              ? `${(item.capitalBeforePAC / 1000).toFixed(1)}k` 
+              : formatCurrency(item.capitalBeforePAC, currency)}
+          </span>
+        </div>
+        <div>
+          <span className="font-medium">Ricavo:</span> {' '}
+          <span className={`font-mono ${isPositiveGain ? 'text-green-600' : 'text-red-600'}`}>
+            {isPositiveGain ? '+' : ''}{dailyGain >= 1000 
+              ? `${(dailyGain / 1000).toFixed(1)}k` 
+              : formatCurrency(dailyGain, currency)}
+          </span>
+        </div>
+      </div>
+
+      {/* Trade Info if present */}
+      {actualTrade && (
+        <div className="p-2 bg-muted/30 rounded-md space-y-1">
+          {actualTrade.option_status === 'filled' ? (
+            <>
+              <Badge variant="default" className="bg-green-600 text-[10px]">
+                Fillata
+              </Badge>
+              <div className="text-xs font-mono">
+                {actualTrade.btc_amount?.toFixed(8)} BTC @ ${actualTrade.fill_price_usd?.toLocaleString()}
+              </div>
+            </>
+          ) : (
+            <>
+              <Badge variant="secondary" className="bg-blue-600 text-[10px]">
+                Scaduta OTM
+              </Badge>
+              <div className="text-xs font-mono text-blue-600">
+                +${actualTrade.premium_received_usdt?.toLocaleString()} USDT
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      {!readOnly && (
+        <div className="flex gap-2 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onEdit}
+            className="flex-1 touch-target min-h-[44px] text-xs"
+          >
+            <Edit3 className="h-3.5 w-3.5 mr-1.5" />
+            Modifica
+          </Button>
+          <Button
+            variant={actualTrade ? "default" : "outline"}
+            size="sm"
+            onClick={onTrade}
+            className={`flex-1 touch-target min-h-[44px] text-xs ${
+              actualTrade 
+                ? 'bg-green-600 hover:bg-green-700' 
+                : 'text-blue-600 hover:bg-blue-50'
+            }`}
+          >
+            {actualTrade ? (
+              <>
+                <BarChart3 className="h-3.5 w-3.5 mr-1.5" />
+                Trade
+              </>
+            ) : (
+              <>
+                <TrendingDown className="h-3.5 w-3.5 mr-1.5" />
+                Registra
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+    </Card>
+  );
+};
 
 interface ReportTableProps {
   data: InvestmentData[];
@@ -222,7 +393,7 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
             </div>
           </div>
         </CardHeader>
-        <CardContent className={isMobile ? "p-0" : "p-0 sm:p-6"}>
+        <CardContent className={isMobile ? "p-3" : "p-0 sm:p-6"}>
           {useVirtualScroll ? (
             // Virtual scrolling mode for large datasets
             <VirtualizedReportTable
@@ -235,8 +406,75 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
               getTradeForDay={getTradeForDay}
               readOnly={readOnly}
             />
+          ) : isMobile ? (
+            // Mobile Card Layout
+            <>
+              <div className="space-y-3">
+                {paginatedData.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground text-sm">
+                    <Calendar className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                    <p>Nessun dato da visualizzare</p>
+                  </div>
+                ) : (
+                  paginatedData.map((item, index) => (
+                    <div
+                      key={item.day}
+                      style={{ animationDelay: `${index * 50}ms` }}
+                      className="animate-fade-in"
+                    >
+                      <MobileReportCard
+                        item={item}
+                        currency={currency}
+                        isCurrentDay={isCurrentDay(item.day)}
+                        onEdit={() => handleEditRow(item)}
+                        onTrade={() => handleTradeRecord(item)}
+                        actualTrade={getTradeForDay(item.day)}
+                        formatDate={formatDate}
+                        readOnly={readOnly}
+                      />
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="mt-6 space-y-3">
+                  <div className="text-xs text-muted-foreground text-center">
+                    {paginatedData.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + itemsPerPage, filteredData.length)} di {filteredData.length} giorni
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePrevPage}
+                      disabled={currentPage === 1}
+                      className="flex-1 min-h-[44px]"
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Prec
+                    </Button>
+                    
+                    <div className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap min-w-[60px] text-center">
+                      {currentPage} / {totalPages}
+                    </div>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                      className="flex-1 min-h-[44px]"
+                    >
+                      Succ
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
-            // Standard pagination mode
+            // Desktop Table Layout
             <>
           <div className={`rounded-md border overflow-x-auto ${isMobile ? "mobile-table-wrapper" : ""}`}>
             <Table>
