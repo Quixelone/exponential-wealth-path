@@ -12,6 +12,20 @@ export const useBTCPrice = (date: string | null) => {
       return;
     }
 
+    // Check if date is today or in the future
+    const requestedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    requestedDate.setHours(0, 0, 0, 0);
+
+    if (requestedDate >= today) {
+      console.log(`Date ${date} is today or in the future. Cannot fetch historical BTC price.`);
+      setPrice(null);
+      setLoading(false);
+      setError(null); // Not an error, just unavailable
+      return;
+    }
+
     const fetchPrice = async () => {
       setLoading(true);
       setError(null);

@@ -21,6 +21,24 @@ serve(async (req) => {
       );
     }
 
+    // Check if date is in the future or today
+    const requestedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    requestedDate.setHours(0, 0, 0, 0);
+
+    if (requestedDate >= today) {
+      console.log(`Date ${date} is today or in the future. Cannot fetch BTC price.`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Cannot fetch BTC price for future dates or today',
+          price: null,
+          date 
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
