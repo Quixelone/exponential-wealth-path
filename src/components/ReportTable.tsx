@@ -224,6 +224,7 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const [tradeDialogOpen, setTradeDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InvestmentData | null>(null);
   const hasManuallyNavigated = useRef(false);
+  const currentDayRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 20;
 
   // Auto-enable virtual scrolling for large datasets (but not on mobile)
@@ -272,6 +273,19 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+
+  // Auto-scroll to current day on mount (mobile only)
+  useEffect(() => {
+    if (isMobile && currentDayRef.current && currentInvestmentDay) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        currentDayRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 300);
+    }
+  }, [isMobile, currentInvestmentDay]);
 
   // Naviga automaticamente alla pagina contenente il giorno corrente SOLO se necessario
   useEffect(() => {
@@ -399,86 +413,40 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
         </CardHeader>
         <CardContent className={isMobile ? "p-3" : "p-0 sm:p-6"}>
           {isMobile ? (
-            // Mobile Layout with Sticky Current Day
-            <>
-              {(() => {
-                // Find current day item
-                const currentDayItem = filteredData.find(item => item.day === currentInvestmentDay);
-                // Get all other days (previous and future)
-                const otherDays = filteredData.filter(item => item.day !== currentInvestmentDay);
-                
+            // Mobile Layout - Simple List with Auto-Scroll
+            <div className="space-y-3">
+              {filteredData.map((item, index) => {
+                const currentDay = isCurrentDay(item.day);
                 return (
-                  <div className="mobile-report-container">
-                    {/* Sticky Current Day Card */}
-                    {currentDayItem && (
-                      <div className="sticky-current-day">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="default" className="animate-pulse">
-                            OGGI
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            Scorri per vedere gli altri giorni
-                          </span>
-                        </div>
-                        <MobileReportCard
-                          item={currentDayItem}
-                          currency={currency}
-                          isCurrentDay={true}
-                          onEdit={() => handleEditRow(currentDayItem)}
-                          onTrade={() => handleTradeRecord(currentDayItem)}
-                          actualTrade={getTradeForDay(currentDayItem.day)}
-                          formatDate={formatDate}
-                          readOnly={readOnly}
-                        />
+                  <div 
+                    key={item.day}
+                    ref={currentDay ? currentDayRef : null}
+                  >
+                    {/* Show "OGGI" indicator above current day card */}
+                    {currentDay && (
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="default" className="animate-pulse">
+                          OGGI
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          Giorno corrente
+                        </span>
                       </div>
                     )}
-
-                    {/* Scrollable Container for All Other Days */}
-                    <div className="scrollable-days-container">
-                      {otherDays.length > 0 ? (
-                        <div className="space-y-3">
-                          {/* Show indicator for previous days */}
-                          {otherDays.some(d => d.day < (currentInvestmentDay || 0)) && (
-                            <div className="text-center py-2">
-                              <span className="text-xs text-muted-foreground font-medium">
-                                ← Giorni Precedenti
-                              </span>
-                            </div>
-                          )}
-                          
-                          {otherDays.map((item) => (
-                            <MobileReportCard
-                              key={item.day}
-                              item={item}
-                              currency={currency}
-                              isCurrentDay={false}
-                              onEdit={() => handleEditRow(item)}
-                              onTrade={() => handleTradeRecord(item)}
-                              actualTrade={getTradeForDay(item.day)}
-                              formatDate={formatDate}
-                              readOnly={readOnly}
-                            />
-                          ))}
-                          
-                          {/* Show indicator for future days */}
-                          {otherDays.some(d => d.day > (currentInvestmentDay || 0)) && (
-                            <div className="text-center py-2">
-                              <span className="text-xs text-muted-foreground font-medium">
-                                Giorni Futuri →
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8 text-muted-foreground text-sm">
-                          Nessun altro giorno disponibile
-                        </div>
-                      )}
-                    </div>
+                    <MobileReportCard
+                      item={item}
+                      currency={currency}
+                      isCurrentDay={currentDay}
+                      onEdit={() => handleEditRow(item)}
+                      onTrade={() => handleTradeRecord(item)}
+                      actualTrade={getTradeForDay(item.day)}
+                      formatDate={formatDate}
+                      readOnly={readOnly}
+                    />
                   </div>
                 );
-              })()}
-            </>
+              })}
+            </div>
           ) : useVirtualScroll ? (
             // Virtual scrolling mode for large datasets (desktop only)
             <VirtualizedReportTable
