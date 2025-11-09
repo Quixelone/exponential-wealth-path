@@ -277,13 +277,15 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   // Auto-scroll to current day on mount (mobile only)
   useEffect(() => {
     if (isMobile && currentDayRef.current && currentInvestmentDay) {
-      // Small delay to ensure DOM is ready
+      // Delay to ensure DOM is fully rendered
       setTimeout(() => {
         currentDayRef.current?.scrollIntoView({ 
           behavior: 'smooth', 
-          block: 'center' 
+          block: 'start' // Position current day at the top of the list
         });
-      }, 300);
+        // Small offset to ensure "OGGI" badge is fully visible
+        window.scrollBy({ top: -20, behavior: 'smooth' });
+      }, 500);
     }
   }, [isMobile, currentInvestmentDay]);
 
