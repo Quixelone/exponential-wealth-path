@@ -126,7 +126,7 @@ verify_jwt = false
 [[edge_runtime.function]]
 name = "check-subscription-status"
 source = "./supabase/functions/check-subscription-status"
-verify_jwt = true
+verify_jwt = false
 
 [[edge_runtime.function]]
 name = "customer-portal"
