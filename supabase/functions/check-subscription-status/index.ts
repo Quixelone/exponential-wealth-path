@@ -24,9 +24,16 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
-    // Get user from JWT (already verified by Supabase)
+    // Get user from JWT if available
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
+    
+    if (!authHeader) {
+      logStep("No authorization header, returning unsubscribed state");
+      return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
     
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
