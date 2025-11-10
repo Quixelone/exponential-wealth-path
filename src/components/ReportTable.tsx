@@ -274,22 +274,38 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
+  // DEBUG: Log filteredData state for diagnostics
+  useEffect(() => {
+    console.log('📊 ReportTable data state:', {
+      dataLength: data.length,
+      filteredDataLength: filteredData.length,
+      currentPage,
+      totalPages,
+      paginatedDataLength: paginatedData.length,
+      isMobile,
+      currentInvestmentDay
+    });
+  }, [data.length, filteredData.length, currentPage, totalPages, paginatedData.length, isMobile, currentInvestmentDay]);
+
   // Auto-scroll to current day on mount (mobile only)
   useEffect(() => {
-    if (isMobile && currentInvestmentDay) {
-      // Wait for DOM to be fully rendered using multiple RAF calls
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (currentDayRef.current) {
-            currentDayRef.current.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'start'
-            });
-          }
-        });
-      });
+    if (isMobile && currentInvestmentDay && filteredData.length > 0) {
+      // Use setTimeout to ensure all elements are fully rendered
+      const timer = setTimeout(() => {
+        if (currentDayRef.current) {
+          console.log('🎯 Auto-scrolling to day:', currentInvestmentDay);
+          currentDayRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start'
+          });
+        } else {
+          console.warn('⚠️ currentDayRef.current is null');
+        }
+      }, 800); // Increased delay to ensure rendering
+      
+      return () => clearTimeout(timer);
     }
-  }, [isMobile, currentInvestmentDay, filteredData.length]);
+  }, [isMobile, currentInvestmentDay]);
 
   // Naviga automaticamente alla pagina contenente il giorno corrente SOLO se necessario
   useEffect(() => {
@@ -416,10 +432,21 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
           </div>
         </CardHeader>
         <CardContent className={isMobile ? "p-3" : "p-0 sm:p-6"}>
-          {isMobile ? (
+          {/* Show loading state if no data */}
+          {data.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+              <p className="text-muted-foreground">Caricamento dati in corso...</p>
+            </div>
+          ) : isMobile ? (
             // Mobile Layout - Simple List with Auto-Scroll
             <div className="space-y-3">
-              {filteredData.map((item, index) => {
+              {filteredData.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  Nessun dato trovato per i filtri applicati.
+                </div>
+              ) : (
+                filteredData.map((item, index) => {
                 const currentDay = isCurrentDay(item.day);
                 return (
                   <div 
@@ -449,7 +476,8 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                     />
                   </div>
                 );
-              })}
+              })
+              )}
             </div>
           ) : useVirtualScroll ? (
             // Virtual scrolling mode for large datasets (desktop only)
