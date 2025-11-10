@@ -225,6 +225,7 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const [selectedItem, setSelectedItem] = useState<InvestmentData | null>(null);
   const hasManuallyNavigated = useRef(false);
   const currentDayRef = useRef<HTMLDivElement>(null);
+  const hasAutoScrolled = useRef(false); // Flag to track if auto-scroll has been executed
   const itemsPerPage = 20;
 
   // Auto-enable virtual scrolling for large datasets (but not on mobile)
@@ -274,23 +275,14 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
-  // DEBUG: Log filteredData state for diagnostics
+  // Auto-scroll to current day on mount (mobile only) - ONCE
   useEffect(() => {
-    console.log('📊 ReportTable data state:', {
-      dataLength: data.length,
-      filteredDataLength: filteredData.length,
-      currentPage,
-      totalPages,
-      paginatedDataLength: paginatedData.length,
-      isMobile,
-      currentInvestmentDay
-    });
-  }, [data.length, filteredData.length, currentPage, totalPages, paginatedData.length, isMobile, currentInvestmentDay]);
-
-  // Auto-scroll to current day on mount (mobile only)
-  useEffect(() => {
-    if (isMobile && currentInvestmentDay && filteredData.length > 0) {
-      // Use setTimeout to ensure all elements are fully rendered
+    // Only execute if:
+    // 1. On mobile
+    // 2. Current day is set
+    // 3. Data is loaded
+    // 4. Haven't scrolled yet
+    if (isMobile && currentInvestmentDay && filteredData.length > 0 && !hasAutoScrolled.current) {
       const timer = setTimeout(() => {
         if (currentDayRef.current) {
           console.log('🎯 Auto-scrolling to day:', currentInvestmentDay);
@@ -298,14 +290,18 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
             behavior: 'smooth', 
             block: 'start'
           });
-        } else {
-          console.warn('⚠️ currentDayRef.current is null');
+          hasAutoScrolled.current = true; // Mark as scrolled to prevent loop
         }
-      }, 800); // Increased delay to ensure rendering
+      }, 800);
       
       return () => clearTimeout(timer);
     }
-  }, [isMobile, currentInvestmentDay]);
+  }, [isMobile, currentInvestmentDay, filteredData.length]);
+
+  // Reset auto-scroll flag when data changes significantly
+  useEffect(() => {
+    hasAutoScrolled.current = false;
+  }, [data.length, currentInvestmentDay]);
 
   // Naviga automaticamente alla pagina contenente il giorno corrente SOLO se necessario
   useEffect(() => {
