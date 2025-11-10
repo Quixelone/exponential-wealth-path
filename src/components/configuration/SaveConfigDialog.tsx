@@ -3,6 +3,8 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 interface SaveConfigDialogProps {
   open: boolean;
@@ -28,7 +30,30 @@ const SaveConfigDialog: React.FC<SaveConfigDialogProps> = ({
   hasUnsavedChanges,
   currentConfigName,
   currentConfigId
-}) => (
+}) => {
+  const { toast } = useToast();
+
+  const handleSave = async () => {
+    // Show progress toast for long operations
+    const progressToast = toast({
+      title: "⏳ Salvataggio in corso...",
+      description: "Configurazioni lunghe possono richiedere 1-2 minuti. Attendere prego.",
+      duration: 120000, // 2 minutes
+    });
+
+    try {
+      await onSave();
+      // Success toast is handled by the save/update hooks
+    } catch (error) {
+      toast({
+        title: "Errore",
+        description: "Errore durante il salvataggio",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
   <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogTrigger asChild>
       <Button size="sm" className="flex items-center gap-2">
@@ -60,20 +85,26 @@ const SaveConfigDialog: React.FC<SaveConfigDialogProps> = ({
             Annulla
           </Button>
           <Button
-            onClick={onSave}
+            onClick={handleSave}
             disabled={!configName.trim() || loading}
             className="w-full sm:w-auto touch-target"
           >
-            {loading
-              ? 'Salvando...'
-              : isUpdate
-                ? (hasUnsavedChanges ? 'Salva modifiche' : 'Aggiorna')
-                : 'Salva'}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : isUpdate ? (
+              hasUnsavedChanges ? 'Salva modifiche' : 'Aggiorna'
+            ) : (
+              'Salva'
+            )}
           </Button>
         </div>
       </div>
     </DialogContent>
   </Dialog>
-);
+  );
+};
 
 export default SaveConfigDialog;

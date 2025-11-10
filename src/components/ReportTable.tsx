@@ -227,6 +227,10 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const currentDayRef = useRef<HTMLDivElement>(null);
   const hasAutoScrolled = useRef(false); // Flag to track if auto-scroll has been executed
   const itemsPerPage = 20;
+  
+  // Mobile pagination state
+  const mobileItemsPerPage = 15;
+  const [currentMobilePage, setCurrentMobilePage] = useState(1);
 
   // Auto-enable virtual scrolling for large datasets (but not on mobile)
   useEffect(() => {
@@ -274,6 +278,11 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+  
+  // Mobile pagination calculations
+  const totalMobilePages = Math.ceil(filteredData.length / mobileItemsPerPage);
+  const startMobileIndex = (currentMobilePage - 1) * mobileItemsPerPage;
+  const paginatedMobileData = filteredData.slice(startMobileIndex, startMobileIndex + mobileItemsPerPage);
 
   // Auto-scroll to current day on mount (mobile only) - ONCE
   useEffect(() => {
@@ -302,6 +311,17 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   useEffect(() => {
     hasAutoScrolled.current = false;
   }, [data.length, currentInvestmentDay]);
+
+  // Auto-calculate mobile page based on current day
+  useEffect(() => {
+    if (isMobile && currentInvestmentDay && filteredData.length > 0) {
+      const currentDayIndex = filteredData.findIndex(item => item.day === currentInvestmentDay);
+      if (currentDayIndex !== -1) {
+        const pageWithCurrentDay = Math.floor(currentDayIndex / mobileItemsPerPage) + 1;
+        setCurrentMobilePage(pageWithCurrentDay);
+      }
+    }
+  }, [isMobile, currentInvestmentDay, filteredData.length, mobileItemsPerPage]);
 
   // Naviga automaticamente alla pagina contenente il giorno corrente SOLO se necessario
   useEffect(() => {
@@ -435,14 +455,14 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
               <p className="text-muted-foreground">Caricamento dati in corso...</p>
             </div>
           ) : isMobile ? (
-            // Mobile Layout - Simple List with Auto-Scroll
+            // Mobile Layout - Paginated List (15 items per page)
             <div className="space-y-3">
-              {filteredData.length === 0 ? (
+              {paginatedMobileData.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground text-sm">
                   Nessun dato trovato per i filtri applicati.
                 </div>
               ) : (
-                filteredData.map((item, index) => {
+                paginatedMobileData.map((item, index) => {
                 const currentDay = isCurrentDay(item.day);
                 return (
                   <div 
@@ -473,6 +493,37 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
                   </div>
                 );
               })
+              )}
+              
+              {/* Mobile Pagination Controls */}
+              {totalMobilePages > 1 && (
+                <div className="flex items-center justify-between pt-4 border-t mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentMobilePage(prev => Math.max(1, prev - 1))}
+                    disabled={currentMobilePage === 1}
+                    className="touch-target"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Indietro
+                  </Button>
+                  
+                  <span className="text-sm text-muted-foreground">
+                    Pagina {currentMobilePage} di {totalMobilePages}
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentMobilePage(prev => Math.min(totalMobilePages, prev + 1))}
+                    disabled={currentMobilePage === totalMobilePages}
+                    className="touch-target"
+                  >
+                    Avanti
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
               )}
             </div>
           ) : useVirtualScroll ? (
