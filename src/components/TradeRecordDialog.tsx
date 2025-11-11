@@ -1,3 +1,31 @@
+/**
+ * Trade Record Dialog Component
+ * 
+ * Dialog per la registrazione dei trade effettivi di opzioni Put su BTC.
+ * Supporta due scenari principali:
+ * 
+ * 1. **FILLED** (Opzione esercitata):
+ *    - Importo BTC acquistato
+ *    - Strike price dell'opzione
+ *    - Prezzo di fill effettivo
+ * 
+ * 2. **EXPIRED OTM** (Opzione scaduta out-of-the-money):
+ *    - Premio ricevuto in USDT
+ *    - L'opzione non viene esercitata
+ * 
+ * Features:
+ * - Auto-fetch del prezzo BTC alla data di scadenza
+ * - Calcolo automatico del valore totale investito
+ * - Gestione duplicati con notifica
+ * - Possibilità di modificare/eliminare trade esistenti
+ * 
+ * @param open - Stato apertura dialog
+ * @param onOpenChange - Callback per cambiare stato apertura
+ * @param item - Dati dell'investimento per il giorno specifico
+ * @param configId - ID della configurazione corrente
+ * @param onTradeRecorded - Callback eseguito dopo registrazione trade
+ * @param data - Array completo dei dati di investimento
+ */
 import React, { useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -72,9 +100,7 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
   useEffect(() => {
     if (open && configId) {
       const fetchExistingTrade = async () => {
-        console.log('🔍 Caricamento trade esistente per:', { configId, day: item.day });
-        
-        // Prima controlla se ci sono duplicati
+        // Controlla se ci sono duplicati
         const { data: allTrades, error: checkError } = await supabase
           .from('actual_trades')
           .select('*')
@@ -83,14 +109,13 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
           .order('created_at', { ascending: false });
         
         if (checkError) {
-          console.error('❌ Errore caricamento trade:', checkError);
           setExistingTrade(null);
           return;
         }
         
         if (allTrades && allTrades.length > 0) {
+          // Notifica duplicati se presenti
           if (allTrades.length > 1) {
-            console.warn('⚠️ Trovati duplicati! Trade multipli per lo stesso giorno:', allTrades.length);
             toast({
               title: "⚠️ Duplicati rilevati",
               description: `Trovati ${allTrades.length} trade per questo giorno. Mostro il più recente.`,
@@ -100,7 +125,6 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
           
           // Prende il più recente (primo dopo l'ordinamento)
           const tradeData = allTrades[0];
-          console.log('✅ Trade esistente trovato:', tradeData);
           setExistingTrade(tradeData as ActualTrade);
           
           // Pre-fill form with existing data
@@ -117,13 +141,10 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
             notes: tradeData.notes || ''
           });
         } else {
-          console.log('ℹ️ Nessun trade esistente trovato');
           setExistingTrade(null);
         }
       };
       fetchExistingTrade();
-    } else {
-      console.log('⚠️ Dialog aperto ma configId mancante:', { open, configId });
     }
   }, [open, configId, item.day]);
 
@@ -288,7 +309,6 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
         notes: ''
       });
     } catch (error) {
-      console.error('Error recording trade:', error);
       toast({
         title: "Errore",
         description: "Impossibile registrare il trade",
@@ -692,7 +712,6 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
                           onTradeRecorded();
                           onOpenChange(false);
                         } catch (error) {
-                          console.error('Error deleting trade:', error);
                           toast({
                             title: "Errore",
                             description: "Impossibile eliminare il trade",

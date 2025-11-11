@@ -1,3 +1,14 @@
+/**
+ * Configuration Updater Hook
+ * 
+ * Gestisce l'aggiornamento delle configurazioni di investimento esistenti.
+ * Utilizza una strategia di delete-insert per i dati dipendenti:
+ * 1. Aggiorna la configurazione principale
+ * 2. Elimina vecchi rendimenti e PAC override
+ * 3. Inserisce i nuovi dati
+ * 
+ * @module hooks/supabase/configUpdater
+ */
 
 import { supabase } from '@/integrations/supabase/client';
 import { InvestmentConfig } from '@/types/investment';
@@ -8,6 +19,16 @@ export const useConfigUpdater = () => {
   const { toast } = useToast();
   const { validateUser } = useAuthValidation();
 
+  /**
+   * Aggiorna una configurazione esistente
+   * 
+   * @param configId - ID della configurazione da aggiornare
+   * @param name - Nuovo nome della configurazione
+   * @param config - Nuova configurazione investimento
+   * @param dailyReturns - Nuovi rendimenti giornalieri
+   * @param dailyPACOverrides - Nuovi override PAC giornalieri
+   * @returns true se l'aggiornamento ha successo, false altrimenti
+   */
   const updateConfiguration = async (
     configId: string,
     name: string,
@@ -16,17 +37,10 @@ export const useConfigUpdater = () => {
     dailyPACOverrides: { [day: number]: number } = {}
   ): Promise<boolean> => {
     try {
-      console.log('🔄 Inizio aggiornamento configurazione:', { configId, name, dailyPACOverrides });
-      
       const user = await validateUser();
-      if (!user) {
-        console.error('❌ Utente non validato per aggiornamento');
-        return false;
-      }
+      if (!user) return false;
       
-      console.log('✅ Utente validato per aggiornamento:', user.id);
-      
-      // Update main configuration
+      // Aggiorna la configurazione principale
       const { error: configError } = await supabase
         .from('investment_configs')
         .update({
@@ -42,41 +56,26 @@ export const useConfigUpdater = () => {
         .eq('id', configId)
         .eq('user_id', user.id);
 
-      if (configError) {
-        console.error('❌ Errore aggiornando la configurazione:', configError);
-        throw configError;
-      }
-      console.log('✅ Configurazione principale aggiornata');
+      if (configError) throw configError;
 
-      // Remove old daily returns
-      console.log('🗑️ Rimozione vecchi daily returns...');
+      // Rimuovi vecchi rendimenti giornalieri
       const { error: deleteReturnsError } = await supabase
         .from('daily_returns')
         .delete()
         .eq('config_id', configId);
 
-      if (deleteReturnsError) {
-        console.error('❌ Errore eliminando i vecchi rendimenti:', deleteReturnsError);
-        throw deleteReturnsError;
-      }
-      console.log('✅ Vecchi daily returns rimossi');
+      if (deleteReturnsError) throw deleteReturnsError;
 
-      // Remove old PAC overrides
-      console.log('🗑️ Rimozione vecchi PAC overrides...');
+      // Rimuovi vecchi override PAC
       const { error: deletePACError } = await supabase
         .from('daily_pac_overrides')
         .delete()
         .eq('config_id', configId);
 
-      if (deletePACError) {
-        console.error('❌ Errore eliminando le vecchie modifiche PAC:', deletePACError);
-        throw deletePACError;
-      }
-      console.log('✅ Vecchi PAC overrides rimossi');
+      if (deletePACError) throw deletePACError;
 
-      // Insert new daily returns
+      // Inserisci nuovi rendimenti giornalieri
       if (Object.keys(dailyReturns).length > 0) {
-        console.log('💾 Inserimento nuovi daily returns:', Object.keys(dailyReturns).length, 'elementi');
         const dailyReturnsData = Object.entries(dailyReturns).map(([day, returnRate]) => ({
           config_id: configId,
           day: parseInt(day),
@@ -87,40 +86,22 @@ export const useConfigUpdater = () => {
           .from('daily_returns')
           .insert(dailyReturnsData);
 
-        if (returnsError) {
-          console.error('❌ Errore inserendo i nuovi rendimenti:', returnsError);
-          throw returnsError;
-        }
-        console.log('✅ Nuovi daily returns inseriti');
+        if (returnsError) throw returnsError;
       }
 
-      // Insert new PAC overrides - LOGGING DETTAGLIATO
+      // Inserisci nuovi override PAC
       if (Object.keys(dailyPACOverrides).length > 0) {
-        console.log('💾 Inserimento nuovi PAC overrides:', Object.keys(dailyPACOverrides).length, 'elementi');
-        console.log('📊 Dati PAC da aggiornare:', dailyPACOverrides);
-        
         const dailyPACOverridesData = Object.entries(dailyPACOverrides).map(([day, pacAmount]) => ({
           config_id: configId,
           day: parseInt(day),
           pac_amount: pacAmount
         }));
 
-        console.log('📝 Dati preparati per aggiornamento:', dailyPACOverridesData);
-
-        const { data: insertedData, error: pacOverridesError } = await supabase
+        const { error: pacOverridesError } = await supabase
           .from('daily_pac_overrides')
-          .insert(dailyPACOverridesData)
-          .select();
+          .insert(dailyPACOverridesData);
 
-        if (pacOverridesError) {
-          console.error('❌ Errore inserendo le nuove modifiche PAC:', pacOverridesError);
-          console.error('❌ Dettagli errore PAC:', JSON.stringify(pacOverridesError, null, 2));
-          throw pacOverridesError;
-        }
-        
-        console.log('✅ Nuovi PAC overrides inseriti con successo:', insertedData);
-      } else {
-        console.log('ℹ️ Nessun nuovo PAC override da inserire');
+        if (pacOverridesError) throw pacOverridesError;
       }
 
       toast({
@@ -128,11 +109,8 @@ export const useConfigUpdater = () => {
         description: `"${name}" è stata aggiornata con successo`,
       });
 
-      console.log('🎉 Aggiornamento completato con successo per config ID:', configId);
       return true;
     } catch (error: any) {
-      console.error('💥 Errore generale nell\'aggiornare la configurazione:', error);
-      console.error('💥 Stack trace:', error.stack);
       toast({
         title: "Errore",
         description: error.message || "Impossibile aggiornare la configurazione",

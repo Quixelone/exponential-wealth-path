@@ -10,7 +10,6 @@ import { Lock, Mail, User, Phone, Eye, EyeOff, ArrowLeft, KeyRound } from 'lucid
 import { useToast } from '@/hooks/use-toast';
 import Logo from '@/components/brand/Logo';
 import Claim from '@/components/brand/Claim';
-import { logRegistrationAttempt, validateRegistrationForm, testSupabaseConnection } from '@/utils/registrationTestUtils';
 
 const AuthForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -43,14 +42,12 @@ const AuthForm: React.FC = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user && session) {
-      console.log('User authenticated, redirecting to home...');
       navigate('/', { replace: true });
     }
   }, [user, session, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('🔐 Login attempt for:', email);
     
     if (!email || !password) {
       toast({
@@ -63,14 +60,8 @@ const AuthForm: React.FC = () => {
     
     setLoading(true);
     try {
-      const result = await signIn(email, password);
-      if (!result.error) {
-        console.log('✅ Login successful, waiting for redirect...');
-      } else {
-        console.error('❌ Login failed:', result.error);
-      }
+      await signIn(email, password);
     } catch (error) {
-      console.error('💥 Unexpected login error:', error);
       toast({
         title: "Errore di connessione",
         description: "Problema di rete. Riprova tra qualche momento.",
@@ -83,46 +74,40 @@ const AuthForm: React.FC = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('📝 Registrazione con verifica email...');
-    
     setLoading(true);
     
-    // Log registration attempt for debugging
-    logRegistrationAttempt(email, {
-      firstName,
-      lastName,
-      phone,
-      hasPassword: !!password,
-      passwordLength: password.length
-    });
-    
     // Validate form data
-    const validation = validateRegistrationForm({
-      email,
-      password,
-      confirmPassword,
-      firstName,
-      lastName
-    });
+    const errors: string[] = [];
+    if (!email || !email.includes('@')) {
+      errors.push('Email non valida');
+    }
+    if (!password || password.length < 6) {
+      errors.push('Password deve essere di almeno 6 caratteri');
+    }
+    if (password !== confirmPassword) {
+      errors.push('Le password non coincidono');
+    }
+    if (!firstName?.trim()) {
+      errors.push('Nome obbligatorio');
+    }
+    if (!lastName?.trim()) {
+      errors.push('Cognome obbligatorio');
+    }
     
-    if (!validation.isValid) {
+    if (errors.length > 0) {
       toast({
         title: "Errore di validazione",
-        description: validation.errors.join(', '),
+        description: errors.join(', '),
         variant: "destructive"
       });
       setLoading(false);
       return;
     }
     
-    console.log('✅ Validation passed, attempting registration with email verification...');
-    
     try {
-      // Use Supabase Auth with email confirmation
       const result = await signUp(email, password, firstName, lastName, phone);
       
       if (!result.error) {
-        console.log('🎉 Registration successful - Email confirmation sent');
         setRegistrationEmail(email);
         setEmailConfirmationSent(true);
         
@@ -139,7 +124,6 @@ const AuthForm: React.FC = () => {
         setLastName('');
         setPhone('');
       } else {
-        console.error('❌ Registration failed:', result.error);
         toast({
           title: "Errore nella registrazione",
           description: result.error.message || "Si è verificato un errore durante la registrazione",
@@ -147,7 +131,6 @@ const AuthForm: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('💥 Unexpected error during signup:', error);
       toast({
         title: "Errore imprevisto",
         description: "Si è verificato un errore. Riprova tra qualche momento.",
@@ -159,17 +142,10 @@ const AuthForm: React.FC = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    console.log('🔍 Google sign in attempt...');
     setLoading(true);
     try {
-      const result = await signInWithGoogle();
-      if (!result.error) {
-        console.log('✅ Google sign in initiated');
-      } else {
-        console.error('❌ Google sign in failed:', result.error);
-      }
+      await signInWithGoogle();
     } catch (error) {
-      console.error('💥 Google sign in error:', error);
       toast({
         title: "Errore login Google",
         description: "Problema di connessione con Google. Riprova tra qualche momento.",
@@ -181,17 +157,10 @@ const AuthForm: React.FC = () => {
   };
   
   const handleFacebookSignIn = async () => {
-    console.log('📘 Facebook sign in attempt...');
     setLoading(true);
     try {
-      const result = await signInWithFacebook!();
-      if (!result.error) {
-        console.log('✅ Facebook sign in initiated');
-      } else {
-        console.error('❌ Facebook sign in failed:', result.error);
-      }
+      await signInWithFacebook!();
     } catch (error) {
-      console.error('💥 Facebook sign in error:', error);
       toast({
         title: "Errore login Facebook",
         description: "Problema di connessione con Facebook. Riprova tra qualche momento.",
@@ -203,17 +172,10 @@ const AuthForm: React.FC = () => {
   };
   
   const handleTwitterSignIn = async () => {
-    console.log('🐦 Twitter sign in attempt...');
     setLoading(true);
     try {
-      const result = await signInWithTwitter!();
-      if (!result.error) {
-        console.log('✅ Twitter sign in initiated');
-      } else {
-        console.error('❌ Twitter sign in failed:', result.error);
-      }
+      await signInWithTwitter!();
     } catch (error) {
-      console.error('💥 Twitter sign in error:', error);
       toast({
         title: "Errore login Twitter",
         description: "Problema di connessione con Twitter. Riprova tra qualche momento.",
@@ -235,8 +197,6 @@ const AuthForm: React.FC = () => {
       });
       setResetMode(false);
       setResetEmail('');
-    } catch (error) {
-      console.error('Password reset error:', error);
     } finally {
       setLoading(false);
     }

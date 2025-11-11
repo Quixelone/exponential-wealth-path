@@ -29,6 +29,22 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+/**
+ * Componente grafico per la visualizzazione dei dati di investimento
+ * 
+ * Visualizza l'andamento del capitale nel tempo con:
+ * - Linea del capitale totale
+ * - Linea del PAC investito cumulativo
+ * - Marker sui giorni di versamento PAC
+ * - Linea di riferimento per il giorno corrente (se fornito)
+ * 
+ * Il componente è ottimizzato con React.memo per evitare re-render non necessari.
+ * 
+ * @param data - Array di dati di investimento giorno per giorno
+ * @param currency - Valuta da utilizzare per la formattazione
+ * @param showProjections - Se mostrare le proiezioni future (default: false)
+ * @param currentDay - Giorno corrente da evidenziare con linea verticale
+ */
 const InvestmentChart: React.FC<InvestmentChartProps> = React.memo(({ 
   data, 
   currency,
@@ -47,7 +63,10 @@ const InvestmentChart: React.FC<InvestmentChartProps> = React.memo(({
     return [value, name];
   };
 
-  const pacDays = data.filter(d => d.pacAmount > 0);
+  // Memoizza i giorni di versamento PAC per evitare ricalcoli ad ogni render
+  const pacDays = React.useMemo(() => {
+    return data.filter(d => d.pacAmount > 0);
+  }, [data]);
 
   return (
     <Card className="w-full animate-scale-in">

@@ -1,3 +1,14 @@
+/**
+ * Configuration Saver Hook
+ * 
+ * Gestisce il salvataggio delle configurazioni di investimento nel database Supabase.
+ * Include il salvataggio di:
+ * - Configurazione principale (capitale iniziale, orizzonte temporale, tasso di rendimento)
+ * - Rendimenti giornalieri personalizzati
+ * - Override PAC giornalieri
+ * 
+ * @module hooks/supabase/configSaver
+ */
 
 import { supabase } from '@/integrations/supabase/client';
 import { InvestmentConfig } from '@/types/investment';
@@ -8,6 +19,15 @@ export const useConfigSaver = () => {
   const { toast } = useToast();
   const { validateUser } = useAuthValidation();
 
+  /**
+   * Salva una nuova configurazione di investimento nel database
+   * 
+   * @param name - Nome della configurazione
+   * @param config - Oggetto configurazione investimento
+   * @param dailyReturns - Mappa dei rendimenti giornalieri personalizzati
+   * @param dailyPACOverrides - Mappa degli override PAC giornalieri
+   * @returns ID della configurazione salvata o null in caso di errore
+   */
   const saveConfiguration = async (
     name: string,
     config: InvestmentConfig,
@@ -15,30 +35,21 @@ export const useConfigSaver = () => {
     dailyPACOverrides: { [day: number]: number } = {}
   ): Promise<string | null> => {
     try {
-      console.log('🔄 [configSaver] Inizio salvataggio configurazione:', { 
-        name, 
-        config: {
-          initialCapital: config.initialCapital,
-          timeHorizon: config.timeHorizon,
-          dailyReturnRate: config.dailyReturnRate,
-          currency: config.currency,
-          pacAmount: config.pacConfig.amount,
-          pacFrequency: config.pacConfig.frequency
-        },
-        dailyReturnsCount: Object.keys(dailyReturns).length,
-        dailyPACOverridesCount: Object.keys(dailyPACOverrides).length,
-        dailyPACOverrides 
-      });
-      
       const user = await validateUser();
-      if (!user) {
-        console.error('❌ Utente non validato');
-        return null;
-      }
+      if (!user) return null;
       
-      console.log('✅ Utente validato:', user.id);
+      // Prepara la data di inizio PAC nel formato corretto
+      const pacStartDate = (() => {
+        if (typeof config.pacConfig.startDate === 'string') {
+          return config.pacConfig.startDate;
+        }
+        if (config.pacConfig.startDate instanceof Date) {
+          return config.pacConfig.startDate.toISOString().split('T')[0];
+        }
+        return new Date().toISOString().split('T')[0];
+      })();
       
-      // Save main configuration
+      // Salva la configurazione principale
       const { data: configData, error: configError } = await supabase
         .from('investment_configs')
         .insert({
@@ -50,31 +61,18 @@ export const useConfigSaver = () => {
           pac_amount: config.pacConfig.amount,
           pac_frequency: config.pacConfig.frequency,
           pac_custom_days: config.pacConfig.customDays,
-          pac_start_date: (() => {
-            if (typeof config.pacConfig.startDate === 'string') {
-              return config.pacConfig.startDate;
-            }
-            if (config.pacConfig.startDate instanceof Date) {
-              return config.pacConfig.startDate.toISOString().split('T')[0];
-            }
-            return new Date().toISOString().split('T')[0];
-          })(),
+          pac_start_date: pacStartDate,
           currency: config.currency || 'EUR'
         })
         .select()
         .single();
 
-      if (configError) {
-        console.error('❌ Errore salvando la configurazione:', configError);
-        throw configError;
-      }
+      if (configError) throw configError;
 
       const configId = configData.id;
-      console.log('✅ Configurazione salvata con ID:', configId);
 
-      // Save daily returns
+      // Salva i rendimenti giornalieri personalizzati
       if (Object.keys(dailyReturns).length > 0) {
-        console.log('💾 Salvataggio daily returns:', Object.keys(dailyReturns).length, 'elementi');
         const dailyReturnsData = Object.entries(dailyReturns).map(([day, returnRate]) => ({
           config_id: configId,
           day: parseInt(day),
@@ -85,40 +83,22 @@ export const useConfigSaver = () => {
           .from('daily_returns')
           .insert(dailyReturnsData);
 
-        if (returnsError) {
-          console.error('❌ Errore salvando i rendimenti:', returnsError);
-          throw returnsError;
-        }
-        console.log('✅ Daily returns salvati con successo');
+        if (returnsError) throw returnsError;
       }
 
-      // Save daily PAC overrides - LOGGING DETTAGLIATO
+      // Salva gli override PAC giornalieri
       if (Object.keys(dailyPACOverrides).length > 0) {
-        console.log('💾 Salvataggio daily PAC overrides:', Object.keys(dailyPACOverrides).length, 'elementi');
-        console.log('📊 Dati PAC da salvare:', dailyPACOverrides);
-        
         const dailyPACOverridesData = Object.entries(dailyPACOverrides).map(([day, pacAmount]) => ({
           config_id: configId,
           day: parseInt(day),
           pac_amount: pacAmount
         }));
 
-        console.log('📝 Dati preparati per inserimento:', dailyPACOverridesData);
-
-        const { data: insertedData, error: pacOverridesError } = await supabase
+        const { error: pacOverridesError } = await supabase
           .from('daily_pac_overrides')
-          .insert(dailyPACOverridesData)
-          .select();
+          .insert(dailyPACOverridesData);
 
-        if (pacOverridesError) {
-          console.error('❌ Errore salvando le modifiche PAC:', pacOverridesError);
-          console.error('❌ Dettagli errore:', JSON.stringify(pacOverridesError, null, 2));
-          throw pacOverridesError;
-        }
-        
-        console.log('✅ Daily PAC overrides salvati con successo:', insertedData);
-      } else {
-        console.log('ℹ️ Nessun PAC override da salvare');
+        if (pacOverridesError) throw pacOverridesError;
       }
 
       toast({
@@ -126,11 +106,8 @@ export const useConfigSaver = () => {
         description: `"${name}" è stata salvata con successo`,
       });
 
-      console.log('🎉 Salvataggio completato con successo per config ID:', configId);
       return configId;
     } catch (error: any) {
-      console.error('💥 Errore generale nel salvare la configurazione:', error);
-      console.error('💥 Stack trace:', error.stack);
       toast({
         title: "Errore",
         description: error.message || "Impossibile salvare la configurazione",

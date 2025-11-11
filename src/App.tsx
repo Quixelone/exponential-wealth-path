@@ -18,18 +18,12 @@ const Strategies = lazy(() => import("./pages/Strategies"));
 const UserManagement = lazy(() => import("./pages/UserManagement"));
 const Settings = lazy(() => import("./pages/Settings"));
 const AISignals = lazy(() => import("./pages/AISignals"));
-const AITest = lazy(() => import("./pages/AITest"));
-const FinanzaPointsDemo = lazy(() => import("./pages/FinanzaPointsDemo"));
 const CoachAI = lazy(() => import("./pages/CoachAI"));
 const Education = lazy(() => import("./pages/Education"));
 const EducationDashboard = lazy(() => import("./pages/EducationDashboard"));
 const EducationLeaderboard = lazy(() => import("./pages/EducationLeaderboard"));
 const TradingSimulator = lazy(() => import("./pages/TradingSimulator"));
 const CourseViewer = lazy(() => import("./pages/CourseViewer"));
-const DesignSystem = lazy(() => import("./pages/DesignSystem"));
-const VirtualScrollTest = lazy(() => import("./pages/VirtualScrollTest"));
-const UIDemo = lazy(() => import("./pages/UIDemo"));
-const MobileDemo = lazy(() => import("./pages/MobileDemo"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading component for Suspense fallback
@@ -55,8 +49,6 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  console.log('App component rendering...');
-
   return (
     <ErrorBoundary>
       <HelmetProvider>
@@ -84,12 +76,6 @@ const App = () => {
                         <Route path="/education/leaderboard" element={<EducationLeaderboard />} />
                         <Route path="/education/simulation" element={<TradingSimulator />} />
                         <Route path="/education/course/:courseId" element={<CourseViewer />} />
-                        <Route path="/design-system" element={<DesignSystem />} />
-                        <Route path="/test-virtual-scroll" element={<VirtualScrollTest />} />
-                        <Route path="/ui-demo" element={<UIDemo />} />
-                        <Route path="/mobile-demo" element={<MobileDemo />} />
-                        <Route path="/test" element={<AITest />} />
-                        <Route path="/finanza-points-demo" element={<FinanzaPointsDemo />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
