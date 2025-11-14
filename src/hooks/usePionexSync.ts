@@ -1,26 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-interface DailyOptionsEntry {
-  id: string;
-  option_date: string;
-  option_type: string;
-  premium_earned: number;
-  premium_in_eur: number;
-  btc_locked_current: number;
-  api_sync_status: string;
-  recorded_at: string;
-}
-
-interface BalanceSnapshot {
-  btc_free: number;
-  btc_locked: number;
-  usdt_free: number;
-  usdt_locked: number;
-  total_value_usd: number;
-  check_timestamp: string;
-}
+import { DailyOptionsEntry, BalanceSnapshot, PionexSyncResult } from '@/types/pionex';
 
 /**
  * Hook for Pionex balance synchronization and options tracking
@@ -42,7 +23,8 @@ export function usePionexSync(userId: string | undefined) {
     if (!userId) return;
 
     try {
-      const { data: options, error: optionsError } = await supabase
+      // Cast to any to bypass TypeScript errors with new tables
+      const { data: options, error: optionsError } = await (supabase as any)
         .from('daily_options_log')
         .select('*')
         .eq('user_id', userId)
@@ -51,13 +33,13 @@ export function usePionexSync(userId: string | undefined) {
 
       if (optionsError) throw optionsError;
 
-      setRecentEntries(options || []);
+      setRecentEntries((options || []) as DailyOptionsEntry[]);
 
       const today = new Date().toISOString().split('T')[0];
-      const todayOption = options?.find(o => o.option_date === today);
-      setTodayEntry(todayOption || null);
+      const todayOption = (options || []).find((o: any) => o.option_date === today);
+      setTodayEntry((todayOption as DailyOptionsEntry) || null);
 
-      const { data: balance, error: balanceError } = await supabase
+      const { data: balance, error: balanceError } = await (supabase as any)
         .from('balance_history')
         .select('*')
         .eq('user_id', userId)
@@ -67,10 +49,10 @@ export function usePionexSync(userId: string | undefined) {
 
       if (balanceError) throw balanceError;
 
-      setCurrentBalance(balance);
+      setCurrentBalance((balance || null) as BalanceSnapshot | null);
 
       if (balance) {
-        setLastSync(new Date(balance.check_timestamp));
+        setLastSync(new Date((balance as any).check_timestamp));
       }
 
     } catch (err: any) {
