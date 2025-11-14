@@ -19,6 +19,7 @@ import CurrentStrategyProgress from '@/components/dashboard/CurrentStrategyProgr
 import AppLayout from '@/components/layout/AppLayout';
 import FloatingActionButton from '@/components/mobile/FloatingActionButton';
 import { useToast } from '@/hooks/use-toast';
+import { OptionsTracker } from '@/components/OptionsTracker';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -166,6 +167,9 @@ const Index = () => {
           actualTrades={actualTrades}
           currency={config.currency || 'EUR'}
         />
+
+        {/* Pionex Options Tracker */}
+        <OptionsTracker />
 
         {/* Edit Strategy and Reload Buttons */}
         <div className={`flex justify-center ${isMobile ? "flex-col gap-2" : "gap-3"}`}>
