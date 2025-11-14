@@ -45,7 +45,8 @@ export function OptionsTracker() {
     }
   };
 
-  const formatOptionType = (type: string) => {
+  const formatOptionType = (type: string | null) => {
+    if (!type) return 'N/A';
     const labels: Record<string, string> = {
       'SELL_PUT': 'Sell Put',
       'COVERED_CALL': 'Covered Call',
@@ -54,6 +55,11 @@ export function OptionsTracker() {
       'NO_OPTION': 'Nessuna Opzione'
     };
     return labels[type] || type;
+  };
+
+  const formatNumber = (value: number | null | undefined, decimals: number = 2): string => {
+    if (value === null || value === undefined) return '0.' + '0'.repeat(decimals);
+    return value.toFixed(decimals);
   };
 
   return (
@@ -97,22 +103,22 @@ export function OptionsTracker() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">BTC Libero</p>
-                <p className="text-2xl font-bold">{currentBalance.btc_free.toFixed(8)}</p>
+                <p className="text-2xl font-bold">{formatNumber(currentBalance.btc_free, 8)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">BTC Locked</p>
                 <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                  {currentBalance.btc_locked.toFixed(8)}
+                  {formatNumber(currentBalance.btc_locked, 8)}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">USDT Libero</p>
-                <p className="text-2xl font-bold">{currentBalance.usdt_free.toFixed(2)}</p>
+                <p className="text-2xl font-bold">{formatNumber(currentBalance.usdt_free, 2)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Valore Totale</p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  ${currentBalance.total_value_usd.toFixed(2)}
+                  ${formatNumber(currentBalance.total_value_usd, 2)}
                 </p>
               </div>
             </div>
@@ -127,17 +133,17 @@ export function OptionsTracker() {
       )}
 
       {todayEntry && (
-        <Card className={`border-2 ${todayEntry.premium_earned >= 0 ? 'border-green-500/20' : 'border-destructive/20'}`}>
+        <Card className={`border-2 ${(todayEntry.premium_earned ?? 0) >= 0 ? 'border-green-500/20' : 'border-destructive/20'}`}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              {getOptionTypeIcon(todayEntry.option_type)}
+              {getOptionTypeIcon(todayEntry.option_type ?? '')}
               Opzione di Oggi
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <Badge className={getOptionTypeColor(todayEntry.option_type)}>
+                <Badge className={getOptionTypeColor(todayEntry.option_type ?? '')}>
                   {formatOptionType(todayEntry.option_type)}
                 </Badge>
                 <p className="text-sm text-muted-foreground mt-2">
@@ -151,14 +157,14 @@ export function OptionsTracker() {
               </div>
               <div className="text-right">
                 <p className={`text-4xl font-bold ${
-                  todayEntry.premium_earned >= 0 
+                  (todayEntry.premium_earned ?? 0) >= 0 
                     ? 'text-green-600 dark:text-green-400' 
                     : 'text-destructive'
                 }`}>
-                  {todayEntry.premium_earned >= 0 ? '+' : ''}{todayEntry.premium_in_eur.toFixed(2)} €
+                  {(todayEntry.premium_earned ?? 0) >= 0 ? '+' : ''}{formatNumber(todayEntry.premium_in_eur, 2)} €
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {todayEntry.premium_earned >= 0 ? '+' : ''}{todayEntry.premium_earned.toFixed(2)} USD
+                  {(todayEntry.premium_earned ?? 0) >= 0 ? '+' : ''}{formatNumber(todayEntry.premium_earned, 2)} USD
                 </p>
               </div>
             </div>
@@ -195,22 +201,22 @@ export function OptionsTracker() {
                         {new Date(entry.option_date).toLocaleDateString('it-IT')}
                       </td>
                       <td className="py-2 px-4">
-                        <Badge className={getOptionTypeColor(entry.option_type)} variant="outline">
+                        <Badge className={getOptionTypeColor(entry.option_type ?? '')} variant="outline">
                           {formatOptionType(entry.option_type)}
                         </Badge>
                       </td>
                       <td className={`py-2 px-4 text-right font-semibold text-sm ${
-                        entry.premium_in_eur >= 0 
+                        (entry.premium_in_eur ?? 0) >= 0 
                           ? 'text-green-600 dark:text-green-400' 
                           : 'text-destructive'
                       }`}>
-                        {entry.premium_in_eur >= 0 ? '+' : ''}{entry.premium_in_eur.toFixed(2)} €
+                        {(entry.premium_in_eur ?? 0) >= 0 ? '+' : ''}{formatNumber(entry.premium_in_eur, 2)} €
                       </td>
                       <td className="py-2 px-4 text-right text-muted-foreground text-sm">
-                        {entry.premium_earned >= 0 ? '+' : ''}{entry.premium_earned.toFixed(2)} USD
+                        {(entry.premium_earned ?? 0) >= 0 ? '+' : ''}{formatNumber(entry.premium_earned, 2)} USD
                       </td>
                       <td className="py-2 px-4 text-right text-sm">
-                        {entry.btc_locked_current.toFixed(6)} BTC
+                        {formatNumber(entry.btc_locked_current, 6)} BTC
                       </td>
                       <td className="py-2 px-4 text-center">
                         {entry.api_sync_status === 'SUCCESS' ? (
