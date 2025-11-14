@@ -221,6 +221,48 @@ export type Database = {
         }
         Relationships: []
       }
+      balance_history: {
+        Row: {
+          api_response_raw: Json | null
+          api_response_time_ms: number | null
+          btc_free: number | null
+          btc_locked: number | null
+          check_timestamp: string | null
+          created_at: string | null
+          id: string
+          total_value_usd: number | null
+          usdt_free: number | null
+          usdt_locked: number | null
+          user_id: string
+        }
+        Insert: {
+          api_response_raw?: Json | null
+          api_response_time_ms?: number | null
+          btc_free?: number | null
+          btc_locked?: number | null
+          check_timestamp?: string | null
+          created_at?: string | null
+          id?: string
+          total_value_usd?: number | null
+          usdt_free?: number | null
+          usdt_locked?: number | null
+          user_id: string
+        }
+        Update: {
+          api_response_raw?: Json | null
+          api_response_time_ms?: number | null
+          btc_free?: number | null
+          btc_locked?: number | null
+          check_timestamp?: string | null
+          created_at?: string | null
+          id?: string
+          total_value_usd?: number | null
+          usdt_free?: number | null
+          usdt_locked?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       btc_prices: {
         Row: {
           created_at: string
@@ -324,6 +366,83 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "educational_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_options_log: {
+        Row: {
+          api_sync_status: string | null
+          balance_current_day: number | null
+          balance_previous_day: number | null
+          btc_current_day: number | null
+          btc_locked_current: number | null
+          btc_locked_previous: number | null
+          btc_previous_day: number | null
+          btc_price_at_settlement: number | null
+          config_id: string | null
+          created_at: string | null
+          id: string
+          option_date: string
+          option_type: string | null
+          premium_earned: number | null
+          premium_in_eur: number | null
+          premium_in_usd: number | null
+          recorded_at: string | null
+          sync_error_message: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          api_sync_status?: string | null
+          balance_current_day?: number | null
+          balance_previous_day?: number | null
+          btc_current_day?: number | null
+          btc_locked_current?: number | null
+          btc_locked_previous?: number | null
+          btc_previous_day?: number | null
+          btc_price_at_settlement?: number | null
+          config_id?: string | null
+          created_at?: string | null
+          id?: string
+          option_date: string
+          option_type?: string | null
+          premium_earned?: number | null
+          premium_in_eur?: number | null
+          premium_in_usd?: number | null
+          recorded_at?: string | null
+          sync_error_message?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          api_sync_status?: string | null
+          balance_current_day?: number | null
+          balance_previous_day?: number | null
+          btc_current_day?: number | null
+          btc_locked_current?: number | null
+          btc_locked_previous?: number | null
+          btc_previous_day?: number | null
+          btc_price_at_settlement?: number | null
+          config_id?: string | null
+          created_at?: string | null
+          id?: string
+          option_date?: string
+          option_type?: string | null
+          premium_earned?: number | null
+          premium_in_eur?: number | null
+          premium_in_usd?: number | null
+          recorded_at?: string | null
+          sync_error_message?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_options_log_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "investment_configs"
             referencedColumns: ["id"]
           },
         ]
