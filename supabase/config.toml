@@ -157,3 +157,8 @@ verify_jwt = true
 name = "sync-pionex-balance"
 source = "./supabase/functions/sync-pionex-balance"
 verify_jwt = false
+
+[[edge_runtime.function]]
+name = "investor-inquiry"
+source = "./supabase/functions/investor-inquiry"
+verify_jwt = false

@@ -749,6 +749,45 @@ export type Database = {
           },
         ]
       }
+      investor_inquiries: {
+        Row: {
+          assigned_to: string | null
+          created_at: string | null
+          data: Json | null
+          email: string
+          id: string
+          investor_type: string
+          name: string
+          notes: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string | null
+          data?: Json | null
+          email: string
+          id?: string
+          investor_type: string
+          name: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string | null
+          data?: Json | null
+          email?: string
+          id?: string
+          investor_type?: string
+          name?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       kv_store_7c0f82ca: {
         Row: {
           key: string
