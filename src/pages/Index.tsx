@@ -119,17 +119,6 @@ const Index = () => {
 
 
   const renderMainContent = () => {
-    // Debug logging
-    console.log('📊 Dashboard Debug:', {
-      currentDayIndex,
-      currentFinalCapital: summary?.current?.finalCapital,
-      currentTotalInvested: summary?.current?.totalInvested,
-      currentTotalInterest: summary?.current?.totalInterest,
-      investmentDataLength: investmentData?.length,
-      firstDayData: investmentData?.[0],
-      currentDayData: investmentData?.[currentDayIndex]
-    });
-
     return (
       <div className={isMobile ? "space-y-3 pb-20" : "space-y-6"}>
         {/* Portfolio Overview - New Design */}

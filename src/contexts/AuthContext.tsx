@@ -163,22 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     try {
       console.log('🔍 Checking subscription status...');
-      
-      // Refresh session to ensure we have a valid token
-      const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.getSession();
-      
-      if (refreshError || !refreshedSession) {
-        console.log('ℹ️ No valid session, skipping subscription check');
-        setSubscriptionStatus({ subscribed: false, subscription_end: null });
-        setIsCheckingSubscription(false);
-        return;
-      }
-      
-      const { data, error } = await supabase.functions.invoke('check-subscription-status', {
-        headers: {
-          Authorization: `Bearer ${refreshedSession.access_token}`
-        }
-      });
+      const { data, error } = await supabase.functions.invoke('check-subscription-status');
       
       if (error) {
         // Silently handle 401 errors (user not authenticated or token expired)
