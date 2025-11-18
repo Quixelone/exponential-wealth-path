@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceInfo } from '@/hooks/use-mobile';
 import StatisticsCards from '@/components/dashboard/StatisticsCards';
 import CurrentStrategyProgress from '@/components/dashboard/CurrentStrategyProgress';
+import MetricCardsGrid from '@/components/dashboard/MetricCardsGrid';
 import AppLayout from '@/components/layout/AppLayout';
 import FloatingActionButton from '@/components/mobile/FloatingActionButton';
 import { useToast } from '@/hooks/use-toast';
@@ -120,11 +121,12 @@ const Index = () => {
   const renderMainContent = () => {
     return (
       <div className={isMobile ? "space-y-3 pb-20" : "space-y-6"}>
-        {/* Statistics Cards */}
-        <StatisticsCards 
-          key={`stats-${config.currency}`}
-          summary={summary} 
-          currency={config.currency} 
+        {/* Portfolio Overview - New Design */}
+        <MetricCardsGrid 
+          totalCapital={summary.current.totalInvested}
+          totalProfit={summary.current.totalInterest}
+          activeStrategies={savedConfigs?.length || 0}
+          currency={config.currency}
         />
         
         {/* Strategy Header */}
