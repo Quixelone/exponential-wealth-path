@@ -26,45 +26,38 @@ const MetricCard: React.FC<MetricCardProps> = ({
   iconBgClass = 'icon-container-primary',
 }) => {
   return (
-    <Card className="group relative overflow-hidden bg-card/50 backdrop-blur-xl border border-border/50 hover:border-border transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1">
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      
-      {/* Content */}
-      <div className="relative">
-        {/* Header with icon and trend */}
-        <div className="flex items-start justify-between mb-6">
-          {/* Icon */}
-          <div className={cn('flex items-center justify-center w-12 h-12 rounded-2xl transition-transform duration-300 group-hover:scale-110', iconBgClass)}>
-            <Icon className="h-6 w-6" />
+    <Card className="p-6 hover:-translate-y-1 transition-all duration-300 hover:shadow-lg">
+      <div className="flex items-start justify-between mb-4">
+        {/* Icon Container - Left */}
+        <div className={cn('icon-container', iconBgClass)}>
+          <Icon className="h-5 w-5" />
+        </div>
+        
+        {/* Small Trend Indicator - Right */}
+        {trend && (
+          <div
+            className={cn(
+              'flex items-center justify-center rounded-full text-[10px] font-semibold w-10 h-10',
+              trend.type === 'positive' && 'bg-success/10 text-success',
+              trend.type === 'negative' && 'bg-destructive/10 text-destructive',
+              trend.type === 'neutral' && 'bg-muted/50 text-muted-foreground'
+            )}
+          >
+            {trend.value}
           </div>
-
-          {/* Small trend indicator - top right */}
-          {trend && (
-            <div
-              className={cn(
-                'flex items-center justify-center rounded-full text-[10px] font-bold w-12 h-12 shadow-md',
-                trend.type === 'positive' && 'bg-success/15 text-success',
-                trend.type === 'negative' && 'bg-destructive/15 text-destructive',
-                trend.type === 'neutral' && 'bg-muted/30 text-muted-foreground'
-              )}
-            >
-              {trend.value}
-            </div>
-          )}
-        </div>
-
-        {/* Title and subtitle */}
-        <div className="mb-3">
-          <p className="text-sm text-muted-foreground/80 font-medium mb-1">{title}</p>
-          {subtitle && (
-            <p className="text-xs text-muted-foreground/60">{subtitle}</p>
-          )}
-        </div>
-
-        {/* Large value */}
-        <h2 className="text-3xl font-bold text-foreground tracking-tight">{value}</h2>
+        )}
       </div>
+
+      {/* Title and Subtitle */}
+      <div className="mb-2">
+        <p className="text-sm text-muted-foreground font-medium">{title}</p>
+        {subtitle && (
+          <p className="text-xs text-muted-foreground/70">{subtitle}</p>
+        )}
+      </div>
+
+      {/* Large Value */}
+      <h2 className="text-3xl font-bold text-foreground">{value}</h2>
     </Card>
   );
 };
