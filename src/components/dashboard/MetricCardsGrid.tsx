@@ -41,8 +41,11 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
   summary,
   investmentDataLength = 0,
 }) => {
-  const today = new Date().toISOString().split('T')[0];
-  const { price: btcPrice } = useBTCPrice(today);
+  // Use yesterday's date to get actual BTC price (today's might not be available yet)
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayDate = yesterday.toISOString().split('T')[0];
+  const { price: btcPrice } = useBTCPrice(yesterdayDate);
 
   // Calculate dynamic trends based on real data
   const trends = useMemo(() => {
