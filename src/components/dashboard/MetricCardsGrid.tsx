@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Wallet, TrendingUp, Target, Bitcoin } from 'lucide-react';
-import MetricCard from './MetricCard';
+import { MetricCard } from './MetricCard';
 import { formatCurrency, Currency } from '@/lib/utils';
 import { useBTCPrice } from '@/hooks/useBTCPrice';
 import { LoadingState } from '@/components/ui/loading-state';
