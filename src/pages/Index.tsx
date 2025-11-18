@@ -123,10 +123,11 @@ const Index = () => {
       <div className={isMobile ? "space-y-3 pb-20" : "space-y-6"}>
         {/* Portfolio Overview - New Design */}
         <MetricCardsGrid 
-          totalCapital={summary.current.totalInvested}
-          totalProfit={summary.current.totalInterest}
+          totalCapital={summary?.current?.totalInvested || 0}
+          totalProfit={summary?.current?.totalInterest || 0}
           activeStrategies={savedConfigs?.length || 0}
-          currency={config.currency}
+          currency={config?.currency || 'EUR'}
+          isLoading={false}
         />
         
         {/* Strategy Header */}
