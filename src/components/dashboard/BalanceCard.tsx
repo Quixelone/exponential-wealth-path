@@ -40,15 +40,16 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
   const isPositive = totalProfit >= 0;
 
   return (
-    <Card className={cn(
-      "relative overflow-hidden p-6 md:p-8 border-none",
-      "bg-gradient-to-br from-purple-600 via-purple-500 to-cyan-500",
-      "text-white shadow-xl",
+    <div className={cn(
+      "relative overflow-hidden rounded-xl p-6 md:p-8",
+      "mesh-gradient glass-card border border-white/10",
+      "text-white shadow-xl tilt-card",
       className
     )}>
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-grid-pattern" />
+      {/* Animated Mesh Background */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
+        <div className="absolute top-0 left-0 w-full h-full shimmer" />
       </div>
 
       <div className="relative z-10 space-y-6">
@@ -109,7 +110,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
               onClick={onAddPAC}
               variant="secondary"
               size="sm"
-              className="flex-1 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm transition-colors"
+              className="flex-1 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 ripple"
             >
               <Plus className="h-4 w-4 mr-2" />
               Aggiungi PAC
@@ -120,7 +121,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
               onClick={onEditStrategy}
               variant="secondary"
               size="sm"
-              className="flex-1 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm transition-colors"
+              className="flex-1 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 ripple"
             >
               <Edit3 className="h-4 w-4 mr-2" />
               Modifica Strategia
@@ -128,6 +129,10 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
           )}
         </div>
       </div>
-    </Card>
+      
+      {/* Glow Effect */}
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/30 rounded-full blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/30 rounded-full blur-3xl" />
+    </div>
   );
 };
