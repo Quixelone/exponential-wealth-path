@@ -89,14 +89,14 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
   const btcDate = yesterday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 animate-fade-in">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 animate-fade-in">
       <MetricCard
         title="Total Capital"
         value={formatCurrency(totalCapital, currency)}
         subtitle="Current Portfolio Value"
         trend={trends.capital}
         icon={Wallet}
-        iconBgClass="icon-container-primary"
+        variant="capital"
         tooltipText="Total value of all your investments including returns"
         isLoading={isLoading}
       />
@@ -106,7 +106,7 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
         subtitle="Accumulated Returns"
         trend={trends.profit}
         icon={TrendingUp}
-        iconBgClass="icon-container-success"
+        variant="profit"
         tooltipText="Total earnings from all your investment strategies"
         isLoading={isLoading}
       />
@@ -116,7 +116,7 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
         subtitle="Investment Plans"
         trend={trends.strategy}
         icon={Target}
-        iconBgClass="icon-container-secondary"
+        variant="strategy"
         tooltipText="Number of investment strategies currently running"
         isLoading={isLoading}
       />
@@ -126,7 +126,7 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
         subtitle={`As of ${btcDate}`}
         trend={trends.btc}
         icon={Bitcoin}
-        iconBgClass="icon-container-primary"
+        variant="btc"
         tooltipText="Current Bitcoin market price in USD"
         isLoading={!btcPrice}
       />
