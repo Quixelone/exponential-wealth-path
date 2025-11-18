@@ -44,29 +44,35 @@
 
 @layer base {
   :root {
-    /* Modern MatDash inspired palette */
-    --background: 220 20% 97%; /* #F5F6FA - Light gray background */
-    --foreground: 210 11% 15%; /* #212529 - Dark text */
+    /* Hybrid Design System - Bitcoin First */
+    --background: 240 30% 97%; /* Light purple-tinted */
+    --foreground: 222 47% 11%; /* Dark text */
 
-    --card: 0 0% 100%; /* #FFFFFF - Pure white cards */
-    --card-foreground: 210 11% 15%; /* #212529 */
+    --card: 0 0% 100%; /* Pure white cards */
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 11% 15%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 220 90% 56%; /* Bitcoin Blue */
+    --primary: 217 91% 60%; /* Bitcoin Blue (more saturated) */
+    --primary-hover: 217 91% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 28 100% 55%; /* Bitcoin Orange */
+    --secondary: 25 95% 53%; /* Bitcoin Orange */
     --secondary-foreground: 0 0% 100%;
+    
+    /* Accent Purple for gauge charts */
+    --accent-purple: 258 90% 66%;
+    --accent-purple-dark: 258 90% 50%;
+    --accent-purple-light: 258 90% 95%;
 
-    --success: 134 61% 41%; /* #39B069 - Green */
+    --success: 142 76% 36%; /* Accent success */
     --success-foreground: 0 0% 100%;
 
-    --warning: 45 93% 58%; /* #FFAE1F - Orange */
+    --warning: 45 93% 47%; /* Yellow warning */
     --warning-foreground: 0 0% 100%;
 
-    --danger: 0 72% 51%; /* #FA896B - Red */
+    --danger: 0 84% 60%; /* Accent danger */
     --danger-foreground: 0 0% 100%;
 
     --info: 195 85% 55%; /* #39B8E5 - Cyan */
@@ -112,12 +118,26 @@
     --radius-2xl: 1.5rem;    /* 24px */
     --radius-full: 9999px;   /* Full rounded */
 
+    /* Shadows System - More pronounced */
+    --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.18);
+    --shadow-gauge: 0 20px 60px rgba(139, 92, 246, 0.3);
+    
+    /* Card Padding Tokens */
+    --card-padding-sm: 1rem;
+    --card-padding-md: 1.5rem;
+    --card-padding-lg: 2rem;
+    
+    /* Grid Gaps */
+    --grid-gap-sm: 1rem;
+    --grid-gap-md: 1.5rem;
+    --grid-gap-lg: 2rem;
+
     /* Gradient colors for various elements */
-    --gradient-primary: linear-gradient(135deg, #5D87FF 0%, #8763FF 100%);
-    --gradient-success: linear-gradient(135deg, #39B069 0%, #49DA6C 100%);
-    --gradient-warning: linear-gradient(135deg, #FFAE1F 0%, #FFC107 100%);
-    --gradient-danger: linear-gradient(135deg, #FA896B 0%, #FF5722 100%);
-    --gradient-info: linear-gradient(135deg, #39B8E5 0%, #03A9F4 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(258 90% 66%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 76% 46%) 100%);
+    --gradient-purple: linear-gradient(135deg, hsl(258 90% 66%) 0%, hsl(258 90% 50%) 100%);
+    --gradient-background: linear-gradient(135deg, #F7FAFC 0%, #EEF2FF 100%);
   }
 
   .dark {
@@ -240,6 +260,76 @@
   .stat-card-info {
     @apply rounded-xl p-6 text-white relative overflow-hidden;
     background: var(--gradient-info);
+  }
+
+  /* Modern Dashboard Hybrid Utilities */
+  .metric-card {
+    @apply bg-card rounded-xl p-6 border border-border/50 transition-all duration-200;
+    box-shadow: var(--shadow-card);
+  }
+
+  .metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .metric-number {
+    @apply text-4xl font-bold text-foreground;
+  }
+
+  .trend-positive {
+    @apply text-success text-sm font-semibold;
+  }
+
+  .trend-negative {
+    @apply text-danger text-sm font-semibold;
+  }
+
+  .trend-neutral {
+    @apply text-primary text-sm font-semibold;
+  }
+
+  .icon-container {
+    @apply w-10 h-10 rounded-lg flex items-center justify-center;
+  }
+
+  .icon-container-primary {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .icon-container-success {
+    @apply bg-success/10 text-success;
+  }
+
+  .icon-container-secondary {
+    @apply bg-secondary/10 text-secondary;
+  }
+
+  .icon-container-purple {
+    @apply text-white;
+    background: hsl(var(--accent-purple));
+  }
+
+  .trend-indicator-circle {
+    @apply w-12 h-12 rounded-full flex items-center justify-center text-xs font-semibold;
+  }
+
+  .trend-indicator-positive {
+    @apply bg-success/10 text-success;
+  }
+
+  .trend-indicator-negative {
+    @apply bg-danger/10 text-danger;
+  }
+
+  .trend-indicator-neutral {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .gauge-card {
+    @apply p-8 rounded-2xl text-white;
+    background: linear-gradient(135deg, hsl(var(--accent-purple)) 0%, hsl(var(--accent-purple-dark)) 100%);
+    box-shadow: var(--shadow-gauge);
   }
 
   /* Modern sidebar */
