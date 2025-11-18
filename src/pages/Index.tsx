@@ -128,6 +128,8 @@ const Index = () => {
           activeStrategies={savedConfigs?.length || 0}
           currency={config?.currency || 'EUR'}
           isLoading={false}
+          summary={summary}
+          investmentDataLength={investmentData?.length || 0}
         />
         
         {/* Strategy Header */}
