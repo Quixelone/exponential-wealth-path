@@ -97,18 +97,18 @@ const MetricCard: React.FC<MetricCardProps> = ({
     >
       <div className="relative">
         {/* Header */}
-        <div className="flex items-start justify-between mb-5">
-          {/* Icon Container */}
+        <div className="flex items-start justify-between mb-6">
+          {/* Icon Container - Larger */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="relative cursor-help">
                   <div className={cn(
-                    'flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200',
+                    'flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-200',
                     variantStyles[variant].bg,
                     variantStyles[variant].ring
                   )}>
-                    <Icon className={cn("h-6 w-6", variantStyles[variant].text)} />
+                    <Icon className={cn("h-7 w-7", variantStyles[variant].text)} />
                   </div>
                 </div>
               </TooltipTrigger>
@@ -118,17 +118,17 @@ const MetricCard: React.FC<MetricCardProps> = ({
             </Tooltip>
           </TooltipProvider>
 
-          {/* Trend Badge */}
+          {/* Trend Badge - More Prominent */}
           {trend && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className={cn(
-                    'flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-help',
+                    'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 cursor-help',
                     trendVariants[trend.type]
                   )}>
-                    <TrendIcon className="h-3 w-3" strokeWidth={2} />
-                    <span>{trend.value}</span>
+                    <TrendIcon className="h-4 w-4" strokeWidth={2} />
+                    <span className="text-base">{trend.value}</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
@@ -141,15 +141,17 @@ const MetricCard: React.FC<MetricCardProps> = ({
           )}
         </div>
 
-        {/* Typography */}
-        <div className="space-y-0.5 mb-4">
-          <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
+        {/* Content - More Spacing */}
+        <div className="space-y-2 mb-5">
+          <h3 className="text-base font-semibold text-muted-foreground leading-tight">
+            {title}
+          </h3>
           {subtitle && (
-            <p className="text-xs text-muted-foreground/80">{subtitle}</p>
+            <p className="text-sm text-muted-foreground/80">{subtitle}</p>
           )}
         </div>
 
-        {/* Value */}
+        {/* Value - Larger */}
         <div className="overflow-hidden">
           {!isNaN(numericValue) ? (
             <AnimatedCounter
@@ -158,10 +160,10 @@ const MetricCard: React.FC<MetricCardProps> = ({
               suffix={suffix}
               decimals={decimals}
               duration={1.5}
-              className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground"
+              className="text-4xl font-bold tracking-tight text-foreground"
             />
           ) : (
-            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground">{value}</h2>
+            <h2 className="text-4xl font-bold tracking-tight text-foreground">{value}</h2>
           )}
         </div>
       </div>
