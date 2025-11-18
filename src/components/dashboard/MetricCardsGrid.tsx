@@ -86,42 +86,50 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
     return <LoadingState message="Caricamento dashboard..." />;
   }
 
+  const btcDate = yesterday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-        <MetricCard
-          title="Total Capital"
-          value={formatCurrency(totalCapital, currency)}
-          subtitle="Invested"
-          trend={trends.capital}
-          icon={Wallet}
-          iconBgClass="icon-container-primary"
-        />
-
-        <MetricCard
-          title="Total Profit"
-          value={formatCurrency(totalProfit, currency)}
-          subtitle="YTD"
-          trend={trends.profit}
-          icon={TrendingUp}
-          iconBgClass="icon-container-success"
-        />
-
-        <MetricCard
-          title="Active Strategies"
-          value={activeStrategies}
-          subtitle="Running"
-          trend={trends.strategy}
-          icon={Target}
-          iconBgClass="icon-container-secondary"
-        />
-
-        <MetricCard
-          title="BTC Price"
-          value={btcPrice ? `$${btcPrice.toLocaleString()}` : 'Loading...'}
-          trend={trends.btc}
-          icon={Bitcoin}
-          iconBgClass="icon-container-primary"
-        />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 animate-fade-in">
+      <MetricCard
+        title="Total Capital"
+        value={formatCurrency(totalCapital, currency)}
+        subtitle="Current Portfolio Value"
+        trend={trends.capital}
+        icon={Wallet}
+        iconBgClass="icon-container-primary"
+        tooltipText="Total value of all your investments including returns"
+        isLoading={isLoading}
+      />
+      <MetricCard
+        title="Total Profit"
+        value={formatCurrency(totalProfit, currency)}
+        subtitle="Accumulated Returns"
+        trend={trends.profit}
+        icon={TrendingUp}
+        iconBgClass="icon-container-success"
+        tooltipText="Total earnings from all your investment strategies"
+        isLoading={isLoading}
+      />
+      <MetricCard
+        title="Active Strategies"
+        value={activeStrategies.toString()}
+        subtitle="Investment Plans"
+        trend={trends.strategy}
+        icon={Target}
+        iconBgClass="icon-container-secondary"
+        tooltipText="Number of investment strategies currently running"
+        isLoading={isLoading}
+      />
+      <MetricCard
+        title="BTC Price"
+        value={btcPrice ? `$${btcPrice.toLocaleString()}` : 'Loading...'}
+        subtitle={`As of ${btcDate}`}
+        trend={trends.btc}
+        icon={Bitcoin}
+        iconBgClass="icon-container-primary"
+        tooltipText="Current Bitcoin market price in USD"
+        isLoading={!btcPrice}
+      />
     </div>
   );
 };
