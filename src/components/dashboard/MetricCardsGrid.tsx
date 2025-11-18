@@ -89,7 +89,7 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
   const btcDate = yesterday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 animate-fade-in">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 animate-fade-in">
       <MetricCard
         title="Total Capital"
         value={formatCurrency(totalCapital, currency)}
