@@ -30,6 +30,7 @@ interface MetricCardsGridProps {
   isLoading?: boolean;
   summary?: SummaryData;
   investmentDataLength?: number;
+  isConfigurationReady?: boolean;
 }
 
 const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
@@ -40,6 +41,7 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
   isLoading = false,
   summary,
   investmentDataLength = 0,
+  isConfigurationReady = true,
 }) => {
   // Use yesterday's date to get actual BTC price (today's might not be available yet)
   const yesterday = new Date();
@@ -82,8 +84,9 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
     };
   }, [summary]);
 
-  if (isLoading) {
-    return <LoadingState message="Caricamento dashboard..." />;
+  // Mostra loading se la configurazione non è ancora pronta
+  if (!isConfigurationReady || isLoading) {
+    return <LoadingState message="Caricamento configurazione..." />;
   }
 
   const btcDate = yesterday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
