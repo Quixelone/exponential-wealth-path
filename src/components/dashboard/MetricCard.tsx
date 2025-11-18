@@ -1,12 +1,10 @@
 import React from 'react';
 import { LucideIcon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { AnimatedCard } from '@/components/ui/animated-card';
 import { AnimatedCounter } from '@/components/investor-pitch/shared/AnimatedCounter';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 interface TrendData {
-  value: string;
+  value: number;
   type: 'positive' | 'negative' | 'neutral';
 }
 
@@ -19,25 +17,30 @@ interface MetricCardProps {
   variant: 'capital' | 'profit' | 'strategy' | 'btc';
   tooltipText?: string;
   isLoading?: boolean;
+  className?: string;
 }
 
 const variantStyles = {
   capital: {
+    card: 'default',
     bg: 'bg-blue-500/10 dark:bg-blue-500/15',
     text: 'text-blue-600 dark:text-blue-400',
     ring: 'ring-1 ring-blue-500/20 dark:ring-blue-400/20',
   },
   profit: {
+    card: 'default',
     bg: 'bg-emerald-500/10 dark:bg-emerald-500/15',
     text: 'text-emerald-600 dark:text-emerald-400',
     ring: 'ring-1 ring-emerald-500/20 dark:ring-emerald-400/20',
   },
   strategy: {
+    card: 'default',
     bg: 'bg-violet-500/10 dark:bg-violet-500/15',
     text: 'text-violet-600 dark:text-violet-400',
     ring: 'ring-1 ring-violet-500/20 dark:ring-violet-400/20',
   },
   btc: {
+    card: 'default',
     bg: 'bg-amber-500/10 dark:bg-amber-500/15',
     text: 'text-amber-600 dark:text-amber-400',
     ring: 'ring-1 ring-amber-500/20 dark:ring-amber-400/20',
@@ -45,20 +48,30 @@ const variantStyles = {
 };
 
 const trendVariants = {
-  positive: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  negative: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  neutral: 'bg-muted/20 text-muted-foreground',
+  positive: {
+    bg: 'bg-emerald-500/10',
+    text: 'text-emerald-600 dark:text-emerald-400',
+  },
+  negative: {
+    bg: 'bg-red-500/10',
+    text: 'text-red-600 dark:text-red-400',
+  },
+  neutral: {
+    bg: 'bg-muted/20',
+    text: 'text-muted-foreground',
+  },
 };
 
-const MetricCard: React.FC<MetricCardProps> = ({
+export const MetricCard: React.FC<MetricCardProps> = ({
   title,
   value,
   subtitle,
   trend,
   icon: Icon,
   variant,
-  tooltipText,
+  tooltipText = '',
   isLoading = false,
+  className
 }) => {
   // Extract numeric value for animation
   const numericValue = typeof value === 'string' 

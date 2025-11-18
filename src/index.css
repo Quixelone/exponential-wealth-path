@@ -3,6 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './styles/animations.css';
+
 /* Web Landing Animations */
 @keyframes float {
   0%, 100% {
@@ -70,6 +72,12 @@
     --gradient-purple-start: 262 83% 58%; /* #6366F1 purple-600 */
     --gradient-purple-mid: 258 90% 66%; /* purple-500 */
     --gradient-cyan-end: 189 94% 43%; /* #06B6D4 cyan-500 */
+    
+    /* Mesh Gradient Colors */
+    --mesh-1: 262 83% 58%;
+    --mesh-2: 280 70% 60%;
+    --mesh-3: 189 94% 43%;
+    --mesh-4: 210 100% 60%;
 
     --success: 142 76% 36%; /* Accent success */
     --success-foreground: 0 0% 100%;

@@ -1,0 +1,226 @@
+/* Advanced Animations for Wealth Compass 3.0 */
+
+/* 3D Transform Utilities */
+.perspective-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease-out;
+}
+
+.tilt-card:hover {
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(1.02);
+}
+
+/* Glassmorphism Effects */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient Border Animation */
+@keyframes gradient-border {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-border {
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--primary)),
+    hsl(var(--accent)),
+    hsl(var(--primary))
+  );
+  background-size: 200% 200%;
+  animation: gradient-border 3s ease infinite;
+  padding: 2px;
+  border-radius: inherit;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: hsl(var(--background));
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* Glow Effects */
+.glow {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+.glow-hover {
+  transition: box-shadow 0.3s ease;
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.5),
+              0 0 60px rgba(99, 102, 241, 0.3);
+}
+
+/* Ripple Effect */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Stagger Animation */
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-item {
+  animation: stagger-in 0.5s ease-out backwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.05s; }
+.stagger-item:nth-child(2) { animation-delay: 0.1s; }
+.stagger-item:nth-child(3) { animation-delay: 0.15s; }
+.stagger-item:nth-child(4) { animation-delay: 0.2s; }
+.stagger-item:nth-child(5) { animation-delay: 0.25s; }
+.stagger-item:nth-child(6) { animation-delay: 0.3s; }
+
+/* Mesh Gradient Background */
+@keyframes mesh-gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.mesh-gradient {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--gradient-purple-start)),
+    hsl(var(--gradient-purple-mid)),
+    hsl(var(--gradient-cyan-end)),
+    hsl(var(--gradient-purple-start))
+  );
+  background-size: 400% 400%;
+  animation: mesh-gradient 15s ease infinite;
+}
+
+/* Floating Animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse Glow */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Reduce motion support */
+@media (prefers-reduced-motion: reduce) {
+  .tilt-card:hover,
+  .float,
+  .pulse-glow,
+  .shimmer,
+  .mesh-gradient,
+  .gradient-border {
+    animation: none;
+    transform: none;
+  }
+  
+  .stagger-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
