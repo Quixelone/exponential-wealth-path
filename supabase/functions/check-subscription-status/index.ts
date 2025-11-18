@@ -44,8 +44,26 @@ serve(async (req) => {
       }
     );
     
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user?.email) {
+    let user;
+    try {
+      const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+      if (userError) {
+        logStep("JWT validation failed", { error: userError.message });
+        return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      user = userData.user;
+    } catch (jwtError) {
+      logStep("Invalid JWT token", { error: jwtError instanceof Error ? jwtError.message : String(jwtError) });
+      return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+    
+    if (!user?.email) {
       logStep("User not authenticated, returning unsubscribed state");
       return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
