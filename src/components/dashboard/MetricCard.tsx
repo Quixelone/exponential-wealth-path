@@ -23,35 +23,31 @@ interface MetricCardProps {
 
 const variantStyles = {
   capital: {
-    bg: 'bg-blue-500/20 dark:bg-blue-400/20',
+    bg: 'bg-blue-500/10 dark:bg-blue-500/15',
     text: 'text-blue-600 dark:text-blue-400',
-    ring: 'ring-2 ring-blue-500/30 dark:ring-blue-400/30',
-    glow: 'shadow-lg shadow-blue-500/20 dark:shadow-blue-400/20',
+    ring: 'ring-1 ring-blue-500/20 dark:ring-blue-400/20',
   },
   profit: {
-    bg: 'bg-emerald-500/20 dark:bg-emerald-400/20',
+    bg: 'bg-emerald-500/10 dark:bg-emerald-500/15',
     text: 'text-emerald-600 dark:text-emerald-400',
-    ring: 'ring-2 ring-emerald-500/30 dark:ring-emerald-400/30',
-    glow: 'shadow-lg shadow-emerald-500/20 dark:shadow-emerald-400/20',
+    ring: 'ring-1 ring-emerald-500/20 dark:ring-emerald-400/20',
   },
   strategy: {
-    bg: 'bg-violet-500/20 dark:bg-violet-400/20',
+    bg: 'bg-violet-500/10 dark:bg-violet-500/15',
     text: 'text-violet-600 dark:text-violet-400',
-    ring: 'ring-2 ring-violet-500/30 dark:ring-violet-400/30',
-    glow: 'shadow-lg shadow-violet-500/20 dark:shadow-violet-400/20',
+    ring: 'ring-1 ring-violet-500/20 dark:ring-violet-400/20',
   },
   btc: {
-    bg: 'bg-amber-500/20 dark:bg-amber-400/20',
+    bg: 'bg-amber-500/10 dark:bg-amber-500/15',
     text: 'text-amber-600 dark:text-amber-400',
-    ring: 'ring-2 ring-amber-500/30 dark:ring-amber-400/30',
-    glow: 'shadow-lg shadow-amber-500/20 dark:shadow-amber-400/20',
+    ring: 'ring-1 ring-amber-500/20 dark:ring-amber-400/20',
   },
 };
 
 const trendVariants = {
-  positive: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/40 shadow-sm shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40',
-  negative: 'bg-red-500/15 text-red-600 dark:text-red-400 ring-1 ring-red-500/40 shadow-sm shadow-red-500/30 hover:shadow-lg hover:shadow-red-500/40',
-  neutral: 'bg-muted/30 text-muted-foreground ring-1 ring-muted/50 shadow-sm hover:shadow-md',
+  positive: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  negative: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  neutral: 'bg-muted/20 text-muted-foreground',
 };
 
 const MetricCard: React.FC<MetricCardProps> = ({
@@ -79,16 +75,16 @@ const MetricCard: React.FC<MetricCardProps> = ({
 
   if (isLoading) {
     return (
-      <AnimatedCard variant="default" className="p-8 animate-pulse bg-card/95 backdrop-blur-sm border border-border/50">
-        <div className="flex items-start justify-between mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-muted/50" />
-          <div className="w-20 h-8 rounded-full bg-muted/30" />
+      <AnimatedCard variant="default" className="p-6 animate-pulse">
+        <div className="flex items-start justify-between mb-6">
+          <div className="w-12 h-12 rounded-xl bg-muted/30" />
+          <div className="w-16 h-6 rounded-full bg-muted/20" />
         </div>
-        <div className="space-y-1 mb-6">
-          <div className="h-4 w-28 bg-muted/50 rounded" />
-          <div className="h-3 w-20 bg-muted/30 rounded" />
+        <div className="space-y-1 mb-4">
+          <div className="h-4 w-24 bg-muted/30 rounded" />
+          <div className="h-3 w-20 bg-muted/20 rounded" />
         </div>
-        <div className="h-12 w-40 bg-muted/50 rounded" />
+        <div className="h-10 w-32 bg-muted/30 rounded" />
       </AnimatedCard>
     );
   }
@@ -97,29 +93,22 @@ const MetricCard: React.FC<MetricCardProps> = ({
     <AnimatedCard 
       variant="default" 
       hoverEffect="lift" 
-      className="group relative p-8 bg-card/95 backdrop-blur-sm border border-border/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
+      className="group relative p-6 transition-all duration-200"
     >
-      {/* Colored glow effect on hover */}
-      <div className={cn(
-        "absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none",
-        variantStyles[variant].glow
-      )} />
-      
       <div className="relative">
-        {/* Header with generous spacing */}
-        <div className="flex items-start justify-between mb-8">
-          {/* GIANT Icon Container */}
+        {/* Header */}
+        <div className="flex items-start justify-between mb-5">
+          {/* Icon Container */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="relative group/icon cursor-help">
+                <div className="relative cursor-help">
                   <div className={cn(
-                    'flex items-center justify-center w-16 h-16 rounded-2xl transition-all duration-300 group-hover/icon:rotate-12 group-hover/icon:scale-110',
+                    'flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200',
                     variantStyles[variant].bg,
-                    variantStyles[variant].ring,
-                    variantStyles[variant].glow
+                    variantStyles[variant].ring
                   )}>
-                    <Icon className={cn("h-8 w-8", variantStyles[variant].text)} />
+                    <Icon className={cn("h-6 w-6", variantStyles[variant].text)} />
                   </div>
                 </div>
               </TooltipTrigger>
@@ -129,17 +118,16 @@ const MetricCard: React.FC<MetricCardProps> = ({
             </Tooltip>
           </TooltipProvider>
 
-          {/* READABLE Trend Badge */}
+          {/* Trend Badge */}
           {trend && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className={cn(
-                    'flex items-center gap-1.5 px-3 h-8 rounded-full font-bold text-sm transition-all duration-300 cursor-help',
-                    trendVariants[trend.type],
-                    trend.type === 'positive' && 'animate-pulse'
+                    'flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-help',
+                    trendVariants[trend.type]
                   )}>
-                    <TrendIcon className="h-3.5 w-3.5" strokeWidth={2.5} />
+                    <TrendIcon className="h-3 w-3" strokeWidth={2} />
                     <span>{trend.value}</span>
                   </div>
                 </TooltipTrigger>
@@ -153,15 +141,15 @@ const MetricCard: React.FC<MetricCardProps> = ({
           )}
         </div>
 
-        {/* Typography Section */}
-        <div className="space-y-1 mb-6">
-          <h3 className="text-base font-semibold text-foreground tracking-tight">{title}</h3>
+        {/* Typography */}
+        <div className="space-y-0.5 mb-4">
+          <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
           {subtitle && (
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
+            <p className="text-xs text-muted-foreground/80">{subtitle}</p>
           )}
         </div>
 
-        {/* DOMINANT Animated Number */}
+        {/* Value */}
         <div className="overflow-hidden">
           {!isNaN(numericValue) ? (
             <AnimatedCounter
@@ -170,10 +158,10 @@ const MetricCard: React.FC<MetricCardProps> = ({
               suffix={suffix}
               decimals={decimals}
               duration={1.5}
-              className="text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground"
+              className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground"
             />
           ) : (
-            <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground">{value}</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground">{value}</h2>
           )}
         </div>
       </div>
