@@ -26,42 +26,44 @@ const MetricCard: React.FC<MetricCardProps> = ({
   iconBgClass = 'icon-container-primary',
 }) => {
   return (
-    <Card className="metric-card hover-scale transition-all duration-300 hover:shadow-xl bg-gradient-to-br from-card to-card/80 border-l-4 border-l-primary/20 hover:border-l-primary/60">
-      {/* Header Row */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className={cn('icon-container animate-pulse', iconBgClass)}>
-            <Icon className="h-5 w-5" />
+    <Card className="group relative overflow-hidden bg-card/50 backdrop-blur-xl border border-border/50 hover:border-border transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1">
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      {/* Content */}
+      <div className="relative">
+        {/* Header with icon and trend */}
+        <div className="flex items-start justify-between mb-6">
+          {/* Icon */}
+          <div className={cn('flex items-center justify-center w-12 h-12 rounded-2xl transition-transform duration-300 group-hover:scale-110', iconBgClass)}>
+            <Icon className="h-6 w-6" />
           </div>
-          <div>
-            <p className="text-sm text-muted-foreground font-medium">{title}</p>
-            {subtitle && (
-              <p className="text-xs text-muted-foreground/70">{subtitle}</p>
-            )}
-          </div>
+
+          {/* Small trend indicator - top right */}
+          {trend && (
+            <div
+              className={cn(
+                'flex items-center justify-center rounded-full text-[10px] font-bold w-12 h-12 shadow-md',
+                trend.type === 'positive' && 'bg-success/15 text-success',
+                trend.type === 'negative' && 'bg-destructive/15 text-destructive',
+                trend.type === 'neutral' && 'bg-muted/30 text-muted-foreground'
+              )}
+            >
+              {trend.value}
+            </div>
+          )}
         </div>
 
-        {/* Trend Indicator Circle - LARGER */}
-        {trend && (
-          <div
-            className={cn(
-              'flex items-center justify-center rounded-full text-xs font-bold transition-all duration-300 w-16 h-16 shadow-lg',
-              trend.type === 'positive' && 'bg-success/20 text-success border-2 border-success/40',
-              trend.type === 'negative' && 'bg-destructive/20 text-destructive border-2 border-destructive/40',
-              trend.type === 'neutral' && 'bg-muted text-muted-foreground border-2 border-muted-foreground/40'
-            )}
-          >
-            {trend.value}
-          </div>
-        )}
-      </div>
+        {/* Title and subtitle */}
+        <div className="mb-3">
+          <p className="text-sm text-muted-foreground/80 font-medium mb-1">{title}</p>
+          {subtitle && (
+            <p className="text-xs text-muted-foreground/60">{subtitle}</p>
+          )}
+        </div>
 
-      {/* Separator */}
-      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-4" />
-
-      {/* Value */}
-      <div className="flex items-baseline gap-2">
-        <h2 className="metric-number">{value}</h2>
+        {/* Large value */}
+        <h2 className="text-3xl font-bold text-foreground tracking-tight">{value}</h2>
       </div>
     </Card>
   );
