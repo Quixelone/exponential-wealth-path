@@ -163,9 +163,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     try {
       console.log('🔍 Checking subscription status...');
+      
+      // Refresh session to ensure we have a valid token
+      const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.getSession();
+      
+      if (refreshError || !refreshedSession) {
+        console.log('ℹ️ No valid session, skipping subscription check');
+        setSubscriptionStatus({ subscribed: false, subscription_end: null });
+        setIsCheckingSubscription(false);
+        return;
+      }
+      
       const { data, error } = await supabase.functions.invoke('check-subscription-status', {
         headers: {
-          Authorization: `Bearer ${session.access_token}`
+          Authorization: `Bearer ${refreshedSession.access_token}`
         }
       });
       
@@ -306,9 +317,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       try {
         console.log('🔄 Auto-refreshing subscription status...');
+        
+        // Get fresh session to ensure valid token
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        
+        if (!currentSession) {
+          console.log('ℹ️ No session, skipping auto-refresh');
+          setIsCheckingSubscription(false);
+          return;
+        }
+        
         const { data, error } = await supabase.functions.invoke('check-subscription-status', {
           headers: {
-            Authorization: `Bearer ${session.access_token}`
+            Authorization: `Bearer ${currentSession.access_token}`
           }
         });
         
