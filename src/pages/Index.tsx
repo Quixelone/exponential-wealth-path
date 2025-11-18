@@ -56,7 +56,8 @@ const Index = () => {
     canUndo,
     canRedo,
     forceReloadFromDatabase,
-    lastDatabaseSync
+    lastDatabaseSync,
+    isConfigurationReady
   } = useInvestmentCalculator();
 
   // Load actual trades for the current configuration
@@ -119,20 +120,6 @@ const Index = () => {
 
 
   const renderMainContent = () => {
-    // Debug: Mostra i valori calcolati
-    console.log('📊 Dashboard Valori:', {
-      configName: currentConfigName,
-      giornoCorrente: currentDayIndex,
-      giorniTotali: investmentData?.length,
-      capitaleTotale: summary?.current?.finalCapital,
-      capitaleInvestito: summary?.current?.totalInvested,
-      profittoTotale: summary?.current?.totalInterest,
-      ritornoPercentuale: summary?.current?.totalReturn,
-      strategieAttive: savedConfigs?.length,
-      pacStartDate: config?.pacConfig?.startDate,
-      today: new Date().toISOString().split('T')[0]
-    });
-
     return (
       <div className={isMobile ? "space-y-3 pb-20" : "space-y-6"}>
         {/* Portfolio Overview - New Design */}
@@ -144,6 +131,7 @@ const Index = () => {
           isLoading={false}
           summary={summary}
           investmentDataLength={investmentData?.length || 0}
+          isConfigurationReady={isConfigurationReady}
         />
         
         {/* Strategy Header */}
