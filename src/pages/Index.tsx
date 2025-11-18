@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import InvestmentChart from '@/components/InvestmentChart';
+import InvestmentSummary from '@/components/InvestmentSummary';
 import ReportTable from '@/components/ReportTable';
 import PaymentReminders from '@/components/PaymentReminders';
 import PerformanceVsPlan from '@/components/PerformanceVsPlan';
@@ -167,6 +168,14 @@ const Index = () => {
           dailyReturns={dailyReturns}
           originalDailyReturnRate={config.dailyReturnRate}
         />
+
+        {/* Investment Summary - Situazione Attuale + Proiezione Finale */}
+        {summary && (
+          <InvestmentSummary 
+            summary={summary} 
+            currency={config.currency} 
+          />
+        )}
 
         {/* Real vs Theoretical Performance */}
         <RealVsTheoreticalSummary
