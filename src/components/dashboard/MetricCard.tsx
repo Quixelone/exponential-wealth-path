@@ -26,7 +26,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
   iconBgClass = 'icon-container-primary',
 }) => {
   return (
-    <Card className="metric-card">
+    <Card className="metric-card hover-scale transition-all duration-300 hover:shadow-lg">
       {/* Header Row */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
