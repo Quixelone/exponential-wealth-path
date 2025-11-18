@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import InvestmentChart from '@/components/InvestmentChart';
 import InvestmentSummary from '@/components/InvestmentSummary';
 import ReportTable from '@/components/ReportTable';
+import { BalanceCard } from '@/components/dashboard/BalanceCard';
 import PaymentReminders from '@/components/PaymentReminders';
 import PerformanceVsPlan from '@/components/PerformanceVsPlan';
 import { RealVsTheoreticalSummary } from '@/components/RealVsTheoreticalSummary';
@@ -123,7 +124,16 @@ const Index = () => {
   const renderMainContent = () => {
     return (
       <div className={isMobile ? "space-y-3 pb-20" : "space-y-6"}>
-        {/* Portfolio Overview - New Design */}
+        {/* Balance Card - Premium Hero Section */}
+        <BalanceCard
+          currentCapital={summary?.current?.finalCapital || 0}
+          currency={config.currency}
+          totalProfit={(summary?.current?.finalCapital || 0) - (config.initialCapital || 0)}
+          profitPercentage={((summary?.current?.finalCapital || 0) - (config.initialCapital || 0)) / (config.initialCapital || 1) * 100}
+          onEditStrategy={() => navigate('/strategies')}
+        />
+
+        {/* Metric Cards Grid */}
         <MetricCardsGrid 
           totalCapital={summary?.current?.finalCapital || 0}
           totalProfit={summary?.current?.totalInterest || 0}

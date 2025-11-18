@@ -61,10 +61,15 @@
     --secondary: 25 95% 53%; /* Bitcoin Orange */
     --secondary-foreground: 0 0% 100%;
     
-    /* Accent Purple for gauge charts */
+    /* Accent Purple for gauge charts & premium components */
     --accent-purple: 258 90% 66%;
     --accent-purple-dark: 258 90% 50%;
     --accent-purple-light: 258 90% 95%;
+    
+    /* Premium Gradient Colors */
+    --gradient-purple-start: 262 83% 58%; /* #6366F1 purple-600 */
+    --gradient-purple-mid: 258 90% 66%; /* purple-500 */
+    --gradient-cyan-end: 189 94% 43%; /* #06B6D4 cyan-500 */
 
     --success: 142 76% 36%; /* Accent success */
     --success-foreground: 0 0% 100%;
@@ -122,6 +127,7 @@
     --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.12);
     --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.18);
     --shadow-gauge: 0 20px 60px rgba(139, 92, 246, 0.3);
+    --shadow-premium: 0 20px 60px rgba(99, 102, 241, 0.4);
     
     /* Card Padding Tokens */
     --card-padding-sm: 1rem;
