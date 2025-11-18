@@ -87,12 +87,7 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-foreground">Portfolio Overview</h2>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
         <MetricCard
           title="Total Capital"
           value={formatCurrency(totalCapital, currency)}
@@ -127,7 +122,6 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
           icon={Bitcoin}
           iconBgClass="icon-container-primary"
         />
-      </div>
     </div>
   );
 };
