@@ -46,26 +46,26 @@
 
 @layer base {
   :root {
-    /* Hybrid Design System - Bitcoin First */
-    --background: 240 20% 96%; /* Soft lavender-gray */
-    --foreground: 222 47% 11%; /* Dark text */
+    /* Dark Modern Dashboard */
+    --background: 220 15% 10%; /* #1A1D29 */
+    --foreground: 210 20% 98%;
 
-    --card: 0 0% 100%; /* Pure white cards */
-    --card-foreground: 222 47% 11%;
+    --card: 220 15% 15%; /* #252932 */
+    --card-foreground: 210 20% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 220 15% 15%;
+    --popover-foreground: 210 20% 98%;
 
-    --primary: 245 90% 66%; /* Royal Blue #5B5FF9 */
-    --primary-hover: 245 90% 60%;
+    --primary: 217 91% 60%; /* Blue #5B8DEF */
+    --primary-hover: 217 91% 55%;
     --primary-foreground: 0 0% 100%;
 
     --violet: 258 90% 66%; /* #6C5DD3 */
     --violet-foreground: 0 0% 100%;
     --violet-light: 258 90% 75%;
 
-    --secondary: 25 95% 53%; /* Bitcoin Orange */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 15% 20%; /* Darker card */
+    --secondary-foreground: 210 20% 98%;
     
     /* Accent Purple for gauge charts & premium components */
     --accent-purple: 258 90% 66%;
@@ -159,11 +159,11 @@
   }
 
   .dark {
-    --background: 240 20% 96%; /* Same as light mode - force lavender-gray */
-    --foreground: 222 47% 11%; /* Same as light mode */
+    --background: 220 15% 10%; /* Dark mode enabled */
+    --foreground: 210 20% 98%;
 
-    --card: 0 0% 100%; /* Force white cards in dark mode too */
-    --card-foreground: 222 47% 11%;
+    --card: 220 15% 15%;
+    --card-foreground: 210 20% 98%;
 
     --popover: 210 11% 8%;
     --popover-foreground: 220 20% 95%;
