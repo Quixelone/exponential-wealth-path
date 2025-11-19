@@ -24,7 +24,6 @@ const EducationDashboard = lazy(() => import("./pages/EducationDashboard"));
 const EducationLeaderboard = lazy(() => import("./pages/EducationLeaderboard"));
 const TradingSimulator = lazy(() => import("./pages/TradingSimulator"));
 const CourseViewer = lazy(() => import("./pages/CourseViewer"));
-const Analytics = lazy(() => import("./pages/Analytics"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading component for Suspense fallback
@@ -77,7 +76,6 @@ const App = () => {
                         <Route path="/education/leaderboard" element={<EducationLeaderboard />} />
                         <Route path="/education/simulation" element={<TradingSimulator />} />
                         <Route path="/education/course/:courseId" element={<CourseViewer />} />
-                        <Route path="/analytics" element={<Analytics />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>

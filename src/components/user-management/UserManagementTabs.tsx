@@ -1,9 +1,8 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, TrendingUp, Shield, ShieldAlert } from 'lucide-react';
+import { Users, Shield, ShieldAlert } from 'lucide-react';
 import UserStatsCards from './UserStatsCards';
 import UsersTable from './UsersTable';
-import PortfolioOverview from './PortfolioOverview';
 import SecurityDashboard from '@/components/security/SecurityDashboard';
 import AdminRoleManager from '@/components/security/AdminRoleManager';
 
@@ -31,14 +30,10 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
   return (
     <div className="w-full">
       <Tabs defaultValue="users" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Gestione Utenti
-          </TabsTrigger>
-          <TabsTrigger value="portfolio" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Portfolio Overview
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
@@ -53,10 +48,6 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
         <TabsContent value="users" className="space-y-8 mt-6">
           <UserStatsCards users={users} />
           <UsersTable users={users} onUpdateUserRole={onUpdateUserRole} onDeleteUser={onDeleteUser} />
-        </TabsContent>
-        
-        <TabsContent value="portfolio" className="mt-6">
-          <PortfolioOverview />
         </TabsContent>
 
         <TabsContent value="security" className="mt-6">

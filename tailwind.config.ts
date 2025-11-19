@@ -118,15 +118,6 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
-				},
-				analytics: {
-					bg: 'hsl(220, 20%, 97%)',
-					cyan: 'hsl(174, 100%, 42%)',
-					purple: 'hsl(262, 83%, 58%)',
-					mint: 'hsl(152, 69%, 54%)',
-					pink: 'hsl(330, 81%, 70%)',
-					'trend-up': 'hsl(152, 69%, 54%)',
-					'trend-down': 'hsl(0, 84%, 60%)',
 				}
 			},
 			'.dark': {
