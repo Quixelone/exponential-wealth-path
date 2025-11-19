@@ -118,16 +118,6 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
-				},
-				modernDash: {
-					teal: 'hsl(174, 100%, 42%)',
-					'teal-dark': 'hsl(174, 62%, 25%)',
-					pink: 'hsl(340, 82%, 60%)',
-					yellow: 'hsl(45, 93%, 58%)',
-					blue: 'hsl(220, 90%, 56%)',
-					purple: 'hsl(280, 65%, 60%)',
-					'bg-light': 'hsl(220, 20%, 97%)',
-					'bg-dark': 'hsl(210, 11%, 4%)',
 				}
 			},
 			borderRadius: {

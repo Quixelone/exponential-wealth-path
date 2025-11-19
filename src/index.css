@@ -3,32 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Modern Dashboard Styles */
-.modern-card {
-  @apply bg-card rounded-3xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-border/50;
-}
-
-.modern-card-gradient {
-  background: linear-gradient(135deg, hsl(340, 82%, 60%) 0%, hsl(220, 90%, 56%) 100%);
-  @apply rounded-3xl shadow-lg p-6 text-white;
-}
-
-.dark .modern-card-gradient {
-  background: linear-gradient(135deg, hsl(280, 65%, 40%) 0%, hsl(220, 70%, 35%) 100%);
-}
-
-.modern-icon-badge {
-  @apply w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 hover:rotate-6;
-}
-
-.modern-bg-light {
-  background: linear-gradient(180deg, hsl(280, 65%, 92%) 0%, hsl(220, 20%, 97%) 100%);
-}
-
-.modern-bg-dark {
-  background: linear-gradient(180deg, hsl(210, 11%, 8%) 0%, hsl(210, 11%, 4%) 100%);
-}
-
 /* Web Landing Animations */
 @keyframes float {
   0%, 100% {
