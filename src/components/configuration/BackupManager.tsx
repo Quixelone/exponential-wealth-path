@@ -77,7 +77,6 @@ export function BackupManager() {
 
       setBackups((data || []) as unknown as Backup[]);
     } catch (error: any) {
-      console.error('Error loading backups:', error);
       toast({
         title: 'Errore',
         description: 'Impossibile caricare i backup',
@@ -97,7 +96,7 @@ export function BackupManager() {
       if (error) throw error;
       setStats(data as unknown as BackupStats);
     } catch (error: any) {
-      console.error('Error loading backup stats:', error);
+      // Stats are optional, silently fail
     }
   };
 
@@ -125,11 +124,9 @@ export function BackupManager() {
       setShowRestoreDialog(false);
       setSelectedBackup(null);
 
-      // Reload page to show restored data
       setTimeout(() => window.location.reload(), 1000);
 
     } catch (error: any) {
-      console.error('Error restoring backup:', error);
       toast({
         title: 'Errore',
         description: error.message || 'Impossibile ripristinare il backup',

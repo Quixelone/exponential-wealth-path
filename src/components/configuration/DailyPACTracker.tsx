@@ -31,9 +31,7 @@ const DailyPACTracker: React.FC<DailyPACTrackerProps> = ({
 
   const handleAddPACOverride = () => {
     if (selectedDay >= 1 && selectedDay <= timeHorizon && pacAmount >= 0) {
-      console.log('🔄 Aggiunta PAC override:', { selectedDay, pacAmount });
       onUpdatePACForDay(selectedDay, pacAmount);
-      // Non resetto pacAmount per permettere inserimenti rapidi dello stesso importo
     }
   };
 
@@ -133,10 +131,9 @@ const DailyPACTracker: React.FC<DailyPACTrackerProps> = ({
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => {
-                                    console.log('🗑️ Rimozione PAC override per giorno:', day);
-                                    onRemovePACOverride(day);
-                                  }}
+                                    onClick={() => {
+                                      onRemovePACOverride(day);
+                                    }}
                                   className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
                                 >
                                   <Trash2 className="h-4 w-4" />

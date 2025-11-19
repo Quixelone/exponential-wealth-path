@@ -162,7 +162,6 @@ const RiskAssessmentQuiz = ({ onComplete, onSkip }: RiskAssessmentQuizProps) => 
       toast.success('Profilo di rischio salvato!');
       onComplete();
     } catch (error) {
-      console.error('Error submitting assessment:', error);
       toast.error('Errore nel salvataggio del profilo');
     } finally {
       setLoading(false);

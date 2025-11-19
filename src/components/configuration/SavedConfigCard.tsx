@@ -65,7 +65,6 @@ const SavedConfigCard: React.FC<SavedConfigCardProps> = ({
       setIsInsured(checked);
       toast.success(checked ? "✅ Strategia assicurata" : "Assicurazione rimossa");
     } catch (error: any) {
-      console.error("Error updating insurance:", error);
       if (error.message?.includes('unique')) {
         toast.error("Puoi assicurare solo una strategia alla volta");
       } else {
