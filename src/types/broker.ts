@@ -25,7 +25,7 @@ export interface BrokerInfo {
   name: BrokerName;
   displayName: string;
   description: string;
-  icon: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
   requiresPassphrase: boolean;
   rateLimit: number;
   apiDocsUrl: string;
@@ -46,12 +46,14 @@ export interface TestConnectionResult {
   error?: string;
 }
 
+import { PionexLogo, BybitLogo, BinanceLogo, BitgetLogo, KucoinLogo, BingxLogo } from '@/components/settings/BrokerLogos';
+
 export const BROKER_INFO: Record<BrokerName, BrokerInfo> = {
   pionex: {
     name: 'pionex',
     displayName: 'Pionex',
     description: 'Leading crypto derivatives exchange',
-    icon: '🔷',
+    icon: PionexLogo,
     requiresPassphrase: false,
     rateLimit: 100,
     apiDocsUrl: 'https://pionex-doc.gitbook.io/apidocs/',
@@ -60,7 +62,7 @@ export const BROKER_INFO: Record<BrokerName, BrokerInfo> = {
     name: 'bybit',
     displayName: 'Bybit',
     description: 'Advanced crypto trading platform',
-    icon: '🟡',
+    icon: BybitLogo,
     requiresPassphrase: false,
     rateLimit: 120,
     apiDocsUrl: 'https://bybit-exchange.github.io/docs/',
@@ -69,7 +71,7 @@ export const BROKER_INFO: Record<BrokerName, BrokerInfo> = {
     name: 'binance',
     displayName: 'Binance',
     description: 'World\'s leading crypto exchange',
-    icon: '🟨',
+    icon: BinanceLogo,
     requiresPassphrase: false,
     rateLimit: 1200,
     apiDocsUrl: 'https://binance-docs.github.io/apidocs/',
@@ -78,7 +80,7 @@ export const BROKER_INFO: Record<BrokerName, BrokerInfo> = {
     name: 'bitget',
     displayName: 'Bitget',
     description: 'Global crypto trading platform',
-    icon: '🔵',
+    icon: BitgetLogo,
     requiresPassphrase: false,
     rateLimit: 20,
     apiDocsUrl: 'https://bitgetlimited.github.io/apidoc/',
@@ -87,7 +89,7 @@ export const BROKER_INFO: Record<BrokerName, BrokerInfo> = {
     name: 'kucoin',
     displayName: 'KuCoin',
     description: 'People\'s Exchange',
-    icon: '🟢',
+    icon: KucoinLogo,
     requiresPassphrase: true,
     rateLimit: 100,
     apiDocsUrl: 'https://docs.kucoin.com/',
@@ -96,7 +98,7 @@ export const BROKER_INFO: Record<BrokerName, BrokerInfo> = {
     name: 'bingx',
     displayName: 'BingX',
     description: 'Crypto derivatives platform',
-    icon: '🔴',
+    icon: BingxLogo,
     requiresPassphrase: false,
     rateLimit: 10,
     apiDocsUrl: 'https://bingx-api.github.io/docs/',
