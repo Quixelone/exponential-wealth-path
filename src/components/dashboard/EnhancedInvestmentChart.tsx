@@ -46,7 +46,13 @@ export const EnhancedInvestmentChart: React.FC<EnhancedInvestmentChartProps> = (
   };
 
   return (
-    <div className="relative w-full h-full min-h-[400px] bg-card rounded-3xl p-6 shadow-card">
+    <div 
+      className="relative w-full h-full min-h-[400px] rounded-3xl p-6"
+      style={{
+        background: '#FFFFFF',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)'
+      }}
+    >
       {/* Header */}
       <div className="mb-6 space-y-2">
         <div className="flex items-center gap-2">

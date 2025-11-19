@@ -53,12 +53,14 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <div
       className={cn(
-        "relative p-6 space-y-4 rounded-3xl",
-        "bg-card border-0",
-        "shadow-card",
+        "relative p-6 space-y-4 rounded-3xl border-0",
         "transition-all duration-300 hover:shadow-card-lg hover:-translate-y-1",
         className
       )}
+      style={{
+        background: '#FFFFFF',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)'
+      }}
       title={tooltipText}
     >
       {isLoading ? (
