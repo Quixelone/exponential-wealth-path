@@ -323,13 +323,15 @@ export const usePortfolioAnalytics = () => {
     console.log('📊 Portfolio Analytics: Initial fetch');
     fetchPortfolioData();
 
-    // Setup real-time subscriptions
+    // Setup real-time subscriptions with unique channel names
+    const timestamp = Date.now();
+    
     const configsChannel = supabase
-      .channel('portfolio_configs_changes')
+      .channel(`portfolio_configs_${timestamp}`)
       .on(
         'postgres_changes',
         {
-          event: '*', // INSERT, UPDATE, DELETE
+          event: '*',
           schema: 'public',
           table: 'investment_configs'
         },
@@ -341,7 +343,7 @@ export const usePortfolioAnalytics = () => {
       .subscribe();
 
     const returnsChannel = supabase
-      .channel('portfolio_returns_changes')
+      .channel(`portfolio_returns_${timestamp}`)
       .on(
         'postgres_changes',
         {
@@ -357,7 +359,7 @@ export const usePortfolioAnalytics = () => {
       .subscribe();
 
     const pacChannel = supabase
-      .channel('portfolio_pac_changes')
+      .channel(`portfolio_pac_${timestamp}`)
       .on(
         'postgres_changes',
         {
@@ -372,48 +374,48 @@ export const usePortfolioAnalytics = () => {
       )
       .subscribe();
 
-      const tradesChannel = supabase
-        .channel('portfolio_trades_changes')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'actual_trades'
-          },
-          () => {
-            console.log('Actual trades changed');
-            debouncedFetch();
-          }
-        )
-        .subscribe();
+    const tradesChannel = supabase
+      .channel(`portfolio_trades_${timestamp}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'actual_trades'
+        },
+        () => {
+          console.log('Actual trades changed');
+          debouncedFetch();
+        }
+      )
+      .subscribe();
 
-      const paymentsChannel = supabase
-        .channel('portfolio_payments_changes')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'pac_payments'
-          },
-          () => {
-            console.log('PAC payments changed');
-            debouncedFetch();
-          }
-        )
-        .subscribe();
+    const paymentsChannel = supabase
+      .channel(`portfolio_payments_${timestamp}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pac_payments'
+        },
+        () => {
+          console.log('PAC payments changed');
+          debouncedFetch();
+        }
+      )
+      .subscribe();
 
     // Cleanup subscriptions
     return () => {
       console.log('🧹 Portfolio Analytics: Cleaning up subscriptions');
-      supabase.removeChannel(configsChannel);
-      supabase.removeChannel(returnsChannel);
-      supabase.removeChannel(pacChannel);
-      supabase.removeChannel(tradesChannel);
-      supabase.removeChannel(paymentsChannel);
+      configsChannel.unsubscribe();
+      returnsChannel.unsubscribe();
+      pacChannel.unsubscribe();
+      tradesChannel.unsubscribe();
+      paymentsChannel.unsubscribe();
     };
-  }, []);
+  }, [debouncedFetch]);
 
   return {
     strategies,
