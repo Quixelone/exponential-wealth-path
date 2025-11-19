@@ -148,7 +148,7 @@ export const BrokerConnectionDialog: React.FC<BrokerConnectionDialogProps> = ({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <span className="text-2xl">{brokerInfo.icon}</span>
+            {React.createElement(brokerInfo.icon, { size: 24 })}
             Collega {brokerInfo.displayName}
           </DialogTitle>
           <DialogDescription>{brokerInfo.description}</DialogDescription>
