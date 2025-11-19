@@ -263,6 +263,65 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_connections: {
+        Row: {
+          api_key: string
+          api_passphrase: string | null
+          api_secret: string
+          auto_sync_enabled: boolean | null
+          broker_name: string
+          connection_status: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_error_message: string | null
+          last_sync_date: string | null
+          sync_frequency: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          api_key: string
+          api_passphrase?: string | null
+          api_secret: string
+          auto_sync_enabled?: boolean | null
+          broker_name: string
+          connection_status?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_error_message?: string | null
+          last_sync_date?: string | null
+          sync_frequency?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          api_key?: string
+          api_passphrase?: string | null
+          api_secret?: string
+          auto_sync_enabled?: boolean | null
+          broker_name?: string
+          connection_status?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_error_message?: string | null
+          last_sync_date?: string | null
+          sync_frequency?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_connections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       btc_prices: {
         Row: {
           created_at: string
@@ -375,6 +434,8 @@ export type Database = {
           api_sync_status: string | null
           balance_current_day: number | null
           balance_previous_day: number | null
+          broker_source: string | null
+          broker_transaction_id: string | null
           btc_current_day: number | null
           btc_locked_current: number | null
           btc_locked_previous: number | null
@@ -390,6 +451,8 @@ export type Database = {
           premium_in_usd: number | null
           recorded_at: string | null
           sync_error_message: string | null
+          sync_method: string | null
+          synced_at: string | null
           updated_at: string | null
           user_id: string
         }
@@ -397,6 +460,8 @@ export type Database = {
           api_sync_status?: string | null
           balance_current_day?: number | null
           balance_previous_day?: number | null
+          broker_source?: string | null
+          broker_transaction_id?: string | null
           btc_current_day?: number | null
           btc_locked_current?: number | null
           btc_locked_previous?: number | null
@@ -412,6 +477,8 @@ export type Database = {
           premium_in_usd?: number | null
           recorded_at?: string | null
           sync_error_message?: string | null
+          sync_method?: string | null
+          synced_at?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -419,6 +486,8 @@ export type Database = {
           api_sync_status?: string | null
           balance_current_day?: number | null
           balance_previous_day?: number | null
+          broker_source?: string | null
+          broker_transaction_id?: string | null
           btc_current_day?: number | null
           btc_locked_current?: number | null
           btc_locked_previous?: number | null
@@ -434,6 +503,8 @@ export type Database = {
           premium_in_usd?: number | null
           recorded_at?: string | null
           sync_error_message?: string | null
+          sync_method?: string | null
+          synced_at?: string | null
           updated_at?: string | null
           user_id?: string
         }
