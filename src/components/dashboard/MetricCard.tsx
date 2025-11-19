@@ -22,20 +22,20 @@ interface MetricCardProps {
 
 const variantStyles = {
   capital: {
-    iconBg: 'bg-blue-100 dark:bg-blue-950',
-    iconColor: 'text-blue-600 dark:text-blue-400',
+    iconBg: 'bg-blue-500/10',
+    iconColor: 'text-blue-400',
   },
   profit: {
-    iconBg: 'bg-emerald-100 dark:bg-emerald-950',
-    iconColor: 'text-emerald-600 dark:text-emerald-400',
+    iconBg: 'bg-emerald-500/10',
+    iconColor: 'text-emerald-400',
   },
   strategy: {
-    iconBg: 'bg-violet-100 dark:bg-violet-950',
-    iconColor: 'text-violet-600 dark:text-violet-400',
+    iconBg: 'bg-violet-500/10',
+    iconColor: 'text-violet-400',
   },
   btc: {
-    iconBg: 'bg-amber-100 dark:bg-amber-950',
-    iconColor: 'text-amber-600 dark:text-amber-400',
+    iconBg: 'bg-amber-500/10',
+    iconColor: 'text-amber-400',
   },
 };
 
@@ -53,41 +53,35 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <div
       className={cn(
-        "relative p-6 space-y-4 rounded-3xl border-0",
-        "transition-all duration-300 hover:shadow-card-lg hover:-translate-y-1",
+        "relative p-6 rounded-2xl bg-card border border-border/50",
+        "transition-all duration-200 hover:-translate-y-0.5",
         className
       )}
-      style={{
-        background: '#FFFFFF',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)'
-      }}
       title={tooltipText}
     >
       {isLoading ? (
         <div className="animate-pulse">
-          <div className="h-12 bg-muted rounded-md mb-4" />
-          <div className="h-8 bg-muted rounded-md w-3/4" />
+          <div className="h-10 bg-muted/20 rounded mb-4" />
+          <div className="h-6 bg-muted/20 rounded w-3/4" />
         </div>
       ) : (
         <>
-          <div className="flex items-start justify-between">
-            <div className="space-y-2 flex-1">
-              <p className="text-sm font-medium text-muted-foreground">{title}</p>
-              {subtitle && <p className="text-xs text-muted-foreground/70">{subtitle}</p>}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <p className="text-sm text-muted-foreground mb-1">{title}</p>
+              {subtitle && <p className="text-xs text-muted-foreground/60">{subtitle}</p>}
             </div>
             
-            {/* Circular Icon */}
             <div className={cn(
-              "flex items-center justify-center h-12 w-12 rounded-full",
+              "flex items-center justify-center w-10 h-10 rounded-xl",
               variantStyles[variant].iconBg
             )}>
-              <Icon className={cn("h-6 w-6", variantStyles[variant].iconColor)} />
+              <Icon className={cn("h-5 w-5", variantStyles[variant].iconColor)} />
             </div>
           </div>
 
-          <div className="space-y-3">
-            {/* Large Value */}
-            <div className="text-4xl font-bold tracking-tight text-foreground">
+          <div className="flex items-baseline gap-2">
+            <div className="text-3xl font-bold text-foreground">
               {(() => {
                 const match = String(value).match(/^([^\d]*)([0-9.,\s]+)(.*)/);
                 if (match) {
@@ -100,7 +94,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
                         prefix={prefix}
                         suffix={suffix}
                         decimals={number.includes('.') ? 2 : 0}
-                        duration={1.5}
+                        duration={1.2}
                       />
                     );
                   }
@@ -109,14 +103,13 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               })()}
             </div>
 
-            {/* Trend Badge */}
             {trend && (
               <div
                 className={cn(
-                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold",
-                  trend.type === 'positive' && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-                  trend.type === 'negative' && "bg-red-500/10 text-red-600 dark:text-red-400",
-                  trend.type === 'neutral' && "bg-muted/50 text-muted-foreground"
+                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold",
+                  trend.type === 'positive' && "bg-emerald-500/10 text-emerald-400",
+                  trend.type === 'negative' && "bg-red-500/10 text-red-400",
+                  trend.type === 'neutral' && "bg-muted/20 text-muted-foreground"
                 )}
               >
                 {trend.type === 'positive' && <TrendingUp className="h-3 w-3" />}

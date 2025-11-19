@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight, ArrowDownRight, Plus, Edit3 } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Plus, Edit3, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatedCounter } from '@/components/investor-pitch/shared/AnimatedCounter';
 import { cn, formatCurrency, Currency } from '@/lib/utils';
@@ -41,88 +41,87 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
   return (
     <div 
       className={cn(
-        "relative overflow-hidden rounded-[2rem] p-8",
-        "transition-all duration-300 hover:shadow-card-lg hover:-translate-y-1",
+        "relative overflow-hidden rounded-2xl p-6 bg-card border border-border/50",
+        "transition-all duration-200 hover:-translate-y-0.5",
         className
       )}
-      style={{
-        background: 'linear-gradient(135deg, #6C5DD3 0%, #8B7FE8 50%, #A594F9 100%)',
-        boxShadow: '0 20px 40px rgba(108, 93, 211, 0.3)'
-      }}
     >
-      {/* Decorative circles */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-
-      {/* Content */}
-      <div className="relative z-10 space-y-6">
-        {/* Header with Strategy Selector */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-3">
-              Capitale Totale
-            </p>
-            <div className="flex items-baseline gap-2">
-              <AnimatedCounter
-                end={currentCapital}
-                prefix={currency === 'EUR' ? '€' : '$'}
-                decimals={2}
-                className="text-5xl md:text-6xl font-bold text-white tracking-tight"
-                duration={2}
-              />
-            </div>
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+            <Wallet className="h-6 w-6 text-primary" />
           </div>
-
-          {/* Currency Toggle Pills */}
-          {strategies && strategies.length > 0 && onStrategyChange && (
-            <Select value={currentStrategy} onValueChange={onStrategyChange}>
-              <SelectTrigger className="w-auto bg-white/20 border-white/30 text-white backdrop-blur-sm rounded-full px-4 h-10">
-                <SelectValue placeholder="Strategia" />
-              </SelectTrigger>
-              <SelectContent>
-                {strategies.map((strategy) => (
-                  <SelectItem key={strategy.id} value={strategy.id}>
-                    {strategy.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          <div>
+            <p className="text-sm text-muted-foreground">Capitale Totale</p>
+            <p className="text-xs text-muted-foreground/60">Current Portfolio Value</p>
+          </div>
         </div>
+        
+        {strategies && strategies.length > 0 && onStrategyChange && (
+          <Select value={currentStrategy} onValueChange={onStrategyChange}>
+            <SelectTrigger className="w-32 h-8 bg-secondary border-border/50">
+              <SelectValue placeholder="Strategy" />
+            </SelectTrigger>
+            <SelectContent>
+              {strategies.map((strategy) => (
+                <SelectItem key={strategy.id} value={strategy.id}>
+                  {strategy.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
 
-        {/* Profit Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
-          {isPositive ? (
-            <ArrowUpRight className="h-4 w-4 text-white" />
-          ) : (
-            <ArrowDownRight className="h-4 w-4 text-white" />
-          )}
-          <span className="text-sm font-semibold text-white">
+      <div className="space-y-3">
+        <div className="flex items-baseline gap-2">
+          <AnimatedCounter
+            end={currentCapital}
+            prefix={currency === 'EUR' ? '€' : '$'}
+            decimals={2}
+            className="text-3xl font-bold text-foreground"
+            duration={1.5}
+          />
+          <div
+            className={cn(
+              "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold",
+              isPositive
+                ? "bg-emerald-500/10 text-emerald-400"
+                : "bg-red-500/10 text-red-400"
+            )}
+          >
+            {isPositive ? (
+              <ArrowUpRight className="h-3 w-3" />
+            ) : (
+              <ArrowDownRight className="h-3 w-3" />
+            )}
             {isPositive ? '+' : ''}{profitPercentage.toFixed(2)}%
-          </span>
-          <span className="text-white/70 text-sm">
-            {formatCurrency(totalProfit, currency)}
-          </span>
+          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-3">
+        <p className="text-sm text-muted-foreground">
+          {isPositive ? '+' : ''}{formatCurrency(totalProfit, currency)} this month
+        </p>
+
+        <div className="flex gap-2 pt-2">
           {onAddPAC && (
             <Button
               onClick={onAddPAC}
-              className="bg-black text-white hover:bg-black/90 rounded-full px-6 h-11 font-semibold shadow-lg"
+              size="sm"
+              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground h-9"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 mr-1" />
               Aggiungi PAC
             </Button>
           )}
           {onEditStrategy && (
             <Button
               onClick={onEditStrategy}
-              variant="ghost"
-              className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm rounded-full px-6 h-11 border border-white/30"
+              size="sm"
+              variant="outline"
+              className="flex-1 border-border/50 h-9"
             >
-              <Edit3 className="h-4 w-4" />
+              <Edit3 className="h-4 w-4 mr-1" />
               Modifica
             </Button>
           )}
