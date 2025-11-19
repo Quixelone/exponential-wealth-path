@@ -22,20 +22,20 @@ interface MetricCardProps {
 
 const variantStyles = {
   capital: {
-    iconBg: 'bg-blue-500/10',
-    iconColor: 'text-blue-400',
+    iconClass: 'icon-circle-blue',
+    gradientClass: 'from-primary/10 to-transparent',
   },
   profit: {
-    iconBg: 'bg-emerald-500/10',
-    iconColor: 'text-emerald-400',
+    iconClass: 'icon-circle-green',
+    gradientClass: 'from-success/10 to-transparent',
   },
   strategy: {
-    iconBg: 'bg-violet-500/10',
-    iconColor: 'text-violet-400',
+    iconClass: 'icon-circle-violet',
+    gradientClass: 'from-violet/10 to-transparent',
   },
   btc: {
-    iconBg: 'bg-amber-500/10',
-    iconColor: 'text-amber-400',
+    iconClass: 'icon-circle-orange',
+    gradientClass: 'from-warning/10 to-transparent',
   },
 };
 
@@ -50,38 +50,62 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   isLoading = false,
   className
 }) => {
+  const styles = variantStyles[variant];
+
   return (
     <div
       className={cn(
-        "relative p-6 rounded-2xl bg-card border border-border/50",
-        "transition-all duration-200 hover:-translate-y-0.5",
+        "relative overflow-hidden rounded-2xl p-5 bg-card border border-white/5",
+        "hover:border-white/10 transition-all card-interactive",
         className
       )}
       title={tooltipText}
     >
+      {/* Background decorativo */}
+      <div className={cn(
+        "absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl bg-gradient-to-br",
+        styles.gradientClass
+      )} />
+      
       {isLoading ? (
-        <div className="animate-pulse">
+        <div className="animate-pulse relative">
           <div className="h-10 bg-muted/20 rounded mb-4" />
           <div className="h-6 bg-muted/20 rounded w-3/4" />
         </div>
       ) : (
-        <>
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <p className="text-sm text-muted-foreground mb-1">{title}</p>
-              {subtitle && <p className="text-xs text-muted-foreground/60">{subtitle}</p>}
+        <div className="relative">
+          {/* Header con icon e badge */}
+          <div className="flex items-center justify-between mb-4">
+            {/* Icon circle colorato */}
+            <div className={cn(
+              "w-12 h-12 rounded-xl flex items-center justify-center",
+              styles.iconClass
+            )}>
+              <Icon className="h-6 w-6" />
             </div>
             
-            <div className={cn(
-              "flex items-center justify-center w-10 h-10 rounded-xl",
-              variantStyles[variant].iconBg
-            )}>
-              <Icon className={cn("h-5 w-5", variantStyles[variant].iconColor)} />
-            </div>
+            {/* Trend badge */}
+            {trend && (
+              <span className={cn(
+                "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold",
+                trend.type === 'positive' && "badge-success",
+                trend.type === 'negative' && "badge-danger",
+                trend.type === 'neutral' && "bg-muted/20 text-muted-foreground"
+              )}>
+                {trend.type === 'positive' && <TrendingUp className="h-3 w-3" />}
+                {trend.type === 'negative' && <TrendingDown className="h-3 w-3" />}
+                {trend.type === 'neutral' && <Minus className="h-3 w-3" />}
+                <span>
+                  {trend.value > 0 ? '+' : ''}{trend.value.toFixed(2)}%
+                </span>
+              </span>
+            )}
           </div>
 
-          <div className="flex items-baseline gap-2">
-            <div className="text-3xl font-bold text-foreground">
+          {/* Content */}
+          <div className="space-y-1">
+            <p className="text-sm text-gray-400">{title}</p>
+            <div className="text-3xl font-bold text-white">
               {(() => {
                 const match = String(value).match(/^([^\d]*)([0-9.,\s]+)(.*)/);
                 if (match) {
@@ -102,26 +126,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({
                 return <span>{value}</span>;
               })()}
             </div>
-
-            {trend && (
-              <div
-                className={cn(
-                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold",
-                  trend.type === 'positive' && "bg-emerald-500/10 text-emerald-400",
-                  trend.type === 'negative' && "bg-red-500/10 text-red-400",
-                  trend.type === 'neutral' && "bg-muted/20 text-muted-foreground"
-                )}
-              >
-                {trend.type === 'positive' && <TrendingUp className="h-3 w-3" />}
-                {trend.type === 'negative' && <TrendingDown className="h-3 w-3" />}
-                {trend.type === 'neutral' && <Minus className="h-3 w-3" />}
-                <span>
-                  {trend.value > 0 ? '+' : ''}{trend.value.toFixed(2)}%
-                </span>
-              </div>
-            )}
+            {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

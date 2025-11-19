@@ -1,15 +1,15 @@
 import React from 'react';
-import { ArrowUpRight, ArrowDownRight, Plus, Edit3, Wallet } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Wallet, Plus, Edit3, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { AnimatedCounter } from '@/components/investor-pitch/shared/AnimatedCounter';
-import { cn, formatCurrency, Currency } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
+import { formatCurrency, Currency, cn } from '@/lib/utils';
 
 interface BalanceCardProps {
   currentCapital: number;
@@ -39,91 +39,95 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
   const isPositive = totalProfit >= 0;
 
   return (
-    <div 
-      className={cn(
-        "relative overflow-hidden rounded-2xl p-6 bg-card border border-border/50",
-        "transition-all duration-200 hover:-translate-y-0.5",
-        className
-      )}
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-            <Wallet className="h-6 w-6 text-primary" />
+    <div className={cn(
+      "relative overflow-hidden rounded-2xl p-6 bg-card border border-white/5",
+      className
+    )}>
+      {/* Decorative gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-violet/5 to-transparent pointer-events-none" />
+      
+      <div className="relative">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            {/* Icon circle with gradient */}
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-violet flex items-center justify-center">
+              <Wallet className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">Capitale Totale</p>
+              <p className="text-xs text-gray-500">Current Portfolio Value</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Capitale Totale</p>
-            <p className="text-xs text-muted-foreground/60">Current Portfolio Value</p>
-          </div>
+          
+          {/* Strategy selector */}
+          {strategies.length > 0 && onStrategyChange && (
+            <Select value={currentStrategy} onValueChange={onStrategyChange}>
+              <SelectTrigger className="w-36 h-9 bg-white/5 border-white/10 text-white">
+                <SelectValue placeholder="Seleziona strategia" />
+              </SelectTrigger>
+              <SelectContent>
+                {strategies.map((strategy) => (
+                  <SelectItem key={strategy.id} value={strategy.id}>
+                    {strategy.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
         
-        {strategies && strategies.length > 0 && onStrategyChange && (
-          <Select value={currentStrategy} onValueChange={onStrategyChange}>
-            <SelectTrigger className="w-32 h-8 bg-secondary border-border/50">
-              <SelectValue placeholder="Strategy" />
-            </SelectTrigger>
-            <SelectContent>
-              {strategies.map((strategy) => (
-                <SelectItem key={strategy.id} value={strategy.id}>
-                  {strategy.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-baseline gap-2">
-          <AnimatedCounter
-            end={currentCapital}
-            prefix={currency === 'EUR' ? '€' : '$'}
-            decimals={2}
-            className="text-3xl font-bold text-foreground"
-            duration={1.5}
-          />
-          <div
-            className={cn(
-              "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold",
-              isPositive
-                ? "bg-emerald-500/10 text-emerald-400"
-                : "bg-red-500/10 text-red-400"
-            )}
-          >
-            {isPositive ? (
-              <ArrowUpRight className="h-3 w-3" />
-            ) : (
-              <ArrowDownRight className="h-3 w-3" />
-            )}
-            {isPositive ? '+' : ''}{profitPercentage.toFixed(2)}%
+        {/* Main value */}
+        <div className="space-y-3">
+          <div className="flex items-baseline gap-2">
+            <div className="text-4xl font-bold text-white">
+              <AnimatedCounter
+                end={currentCapital}
+                prefix={currency === 'EUR' ? '€' : '$'}
+                decimals={2}
+                duration={1.2}
+              />
+            </div>
+            
+            {/* Pill badge colorato */}
+            <span className={cn(
+              "inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold",
+              isPositive ? "badge-success" : "badge-danger"
+            )}>
+              {isPositive ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+              {profitPercentage.toFixed(2)}%
+            </span>
           </div>
-        </div>
-
-        <p className="text-sm text-muted-foreground">
-          {isPositive ? '+' : ''}{formatCurrency(totalProfit, currency)} this month
-        </p>
-
-        <div className="flex gap-2 pt-2">
-          {onAddPAC && (
-            <Button
-              onClick={onAddPAC}
-              size="sm"
-              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground h-9"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Aggiungi PAC
-            </Button>
-          )}
-          {onEditStrategy && (
-            <Button
-              onClick={onEditStrategy}
-              size="sm"
-              variant="outline"
-              className="flex-1 border-border/50 h-9"
-            >
-              <Edit3 className="h-4 w-4 mr-1" />
-              Modifica
-            </Button>
+          
+          <p className="text-sm text-gray-400">
+            {isPositive ? '+' : ''}{formatCurrency(totalProfit, currency)} this month
+          </p>
+          
+          {/* Buttons moderni */}
+          {(onAddPAC || onEditStrategy) && (
+            <div className="flex gap-2 pt-3">
+              {onAddPAC && (
+                <Button 
+                  onClick={onAddPAC} 
+                  size="sm" 
+                  className="flex-1 bg-primary hover:bg-primary/90 h-10"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Aggiungi PAC
+                </Button>
+              )}
+              {onEditStrategy && (
+                <Button 
+                  onClick={onEditStrategy} 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1 border-white/10 h-10"
+                >
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Modifica
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </div>

@@ -4,6 +4,7 @@ import { InvestmentData } from '@/types/investment';
 import { formatCurrency, Currency } from '@/lib/utils';
 import { useDeviceInfo } from '@/hooks/use-mobile';
 import { TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface EnhancedInvestmentChartProps {
   data: InvestmentData[];
@@ -21,11 +22,11 @@ export const EnhancedInvestmentChart: React.FC<EnhancedInvestmentChartProps> = (
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-card border border-border/50 p-3 rounded-lg shadow-lg">
-          <p className="text-xs font-semibold mb-2 text-foreground">Giorno {label}</p>
+        <div className="bg-card border border-white/10 p-3 rounded-lg shadow-lg">
+          <p className="text-xs font-semibold mb-2 text-white">Giorno {label}</p>
           <div className="space-y-1">
             <p className="text-xs flex items-center justify-between gap-3">
-              <span className="text-muted-foreground">Capitale:</span>
+              <span className="text-gray-400">Capitale:</span>
               <span className="font-bold text-primary">
                 {formatCurrency(payload[0].value, currency)}
               </span>
@@ -38,19 +39,24 @@ export const EnhancedInvestmentChart: React.FC<EnhancedInvestmentChartProps> = (
   };
 
   return (
-    <div className="relative w-full h-full min-h-[400px] rounded-2xl p-6 bg-card border border-border/50">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="rounded-2xl p-6 bg-card border border-white/5">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp className="h-5 w-5 text-primary" />
-            <h3 className="text-xl font-bold text-foreground">
-              Revenue
+            <h3 className="text-lg font-semibold text-white">
+              Investment Growth
             </h3>
           </div>
-          <p className="text-sm text-muted-foreground">
-            This month vs last
+          <p className="text-sm text-gray-400">
+            Capital progression over time
           </p>
         </div>
+        {currentDay && (
+          <Badge className="bg-primary/10 text-primary border-0">
+            Day {currentDay}
+          </Badge>
+        )}
       </div>
 
       <ResponsiveContainer width="100%" height={isMobile ? 280 : 340}>
@@ -63,29 +69,28 @@ export const EnhancedInvestmentChart: React.FC<EnhancedInvestmentChartProps> = (
         >
           <defs>
             <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="hsl(217, 91%, 60%)" stopOpacity={1}/>
-              <stop offset="100%" stopColor="hsl(217, 91%, 60%)" stopOpacity={0.6}/>
+              <stop offset="0%" stopColor="#5B8DEF" stopOpacity={0.8}/>
+              <stop offset="100%" stopColor="#7B6FDD" stopOpacity={0.4}/>
             </linearGradient>
           </defs>
           
           <CartesianGrid 
             strokeDasharray="3 3" 
-            stroke="hsl(var(--border))" 
-            opacity={0.1}
+            stroke="#ffffff08"
             vertical={false}
           />
           
           <XAxis 
             dataKey="day"
-            stroke="hsl(var(--muted-foreground))"
-            tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+            stroke="#6B7280"
+            tick={{ fontSize: 12, fill: '#9CA3AF' }}
             tickLine={false}
             axisLine={false}
           />
           
           <YAxis 
-            stroke="hsl(var(--muted-foreground))"
-            tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+            stroke="#6B7280"
+            tick={{ fontSize: 12, fill: '#9CA3AF' }}
             tickLine={false}
             axisLine={false}
             tickFormatter={(value) => {
@@ -95,7 +100,10 @@ export const EnhancedInvestmentChart: React.FC<EnhancedInvestmentChartProps> = (
             }}
           />
           
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--primary) / 0.1)' }} />
+          <Tooltip 
+            content={<CustomTooltip />} 
+            cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }} 
+          />
           
           <Bar
             dataKey="finalCapital"
