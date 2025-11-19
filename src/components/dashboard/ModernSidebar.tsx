@@ -11,11 +11,7 @@ import {
   Menu,
   Bot,
   MessageCircle,
-  BookOpen,
-  Palette,
-  Zap,
-  Sparkles,
-  Smartphone
+  BookOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -69,30 +65,6 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       path: '/strategies',
       description: 'Gestione strategie',
       isButton: true
-    },
-    {
-      icon: Palette,
-      label: 'Design System',
-      path: '/design-system',
-      description: 'Componenti UI'
-    },
-    {
-      icon: Zap,
-      label: 'Virtual Scroll Test',
-      path: '/test-virtual-scroll',
-      description: 'Test performance'
-    },
-    {
-      icon: Sparkles,
-      label: 'UI Demo',
-      path: '/ui-demo',
-      description: 'Button & Toast Demo'
-    },
-    {
-      icon: Smartphone,
-      label: 'Mobile Demo',
-      path: '/mobile-demo',
-      description: 'Swipe & Pull-to-refresh'
     },
     {
       icon: Settings,
