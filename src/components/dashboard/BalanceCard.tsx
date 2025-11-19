@@ -42,11 +42,13 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
     <div 
       className={cn(
         "relative overflow-hidden rounded-[2rem] p-8",
-        "bg-gradient-to-br from-violet via-violet-light to-[#8B7FE8]",
-        "shadow-violet",
         "transition-all duration-300 hover:shadow-card-lg hover:-translate-y-1",
         className
       )}
+      style={{
+        background: 'linear-gradient(135deg, #6C5DD3 0%, #8B7FE8 50%, #A594F9 100%)',
+        boxShadow: '0 20px 40px rgba(108, 93, 211, 0.3)'
+      }}
     >
       {/* Decorative circles */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />

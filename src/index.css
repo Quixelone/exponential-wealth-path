@@ -159,11 +159,11 @@
   }
 
   .dark {
-    --background: 240 10% 8%; /* Darker background */
-    --foreground: 0 0% 98%;
+    --background: 240 20% 96%; /* Same as light mode - force lavender-gray */
+    --foreground: 222 47% 11%; /* Same as light mode */
 
-    --card: 210 11% 8%; /* #1A1E2E - Dark card */
-    --card-foreground: 220 20% 95%;
+    --card: 0 0% 100%; /* Force white cards in dark mode too */
+    --card-foreground: 222 47% 11%;
 
     --popover: 210 11% 8%;
     --popover-foreground: 220 20% 95%;
