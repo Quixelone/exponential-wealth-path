@@ -3,11 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { format, addDays, addWeeks, addMonths, isBefore, isToday, parseISO } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { InvestmentConfig } from '@/types/investment';
-import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { usePACPayments } from '@/hooks/usePACPayments';
+import { cn } from '@/lib/utils';
 
 interface PACPayment {
   id: string;
@@ -34,6 +36,7 @@ export const PACPaymentTracker: React.FC<PACPaymentTrackerProps> = ({
   onMarkPaymentComplete
 }) => {
   const [completedPayments, setCompletedPayments] = useState<Set<number>>(new Set());
+  const [showAll, setShowAll] = useState(false);
   const { createOrUpdatePACPayment } = usePACPayments();
 
   // Initialize completed payments from dailyPACOverrides (use 0 amount as completed marker)
@@ -202,66 +205,104 @@ export const PACPaymentTracker: React.FC<PACPaymentTrackerProps> = ({
       {/* Payment Tracker */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Tracking Versamenti PAC</CardTitle>
-            <div className="flex gap-2">
-              <Badge variant="outline">{stats.completed}/{stats.total} effettuati</Badge>
-              <Badge variant="secondary">€{stats.totalAmount.toFixed(2)} versati</Badge>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <CardTitle className="text-lg flex items-center gap-2">
+              📋 Tracking Versamenti PAC
+            </CardTitle>
+            <div className="flex gap-2 flex-wrap">
+              <Badge variant="outline" className="gap-1">
+                <CheckCircle className="h-3 w-3" />
+                {stats.completed}/{stats.total} effettuati
+              </Badge>
+              <Badge variant="secondary" className="gap-1">
+                💰 €{stats.totalAmount.toFixed(2)} versati
+              </Badge>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
-            {payments.slice(0, 20).map((payment) => (
+          <div className="space-y-2">
+            {(showAll ? payments : payments.slice(0, 5)).map((payment) => (
               <div
                 key={payment.id}
-                className={`flex items-center justify-between p-3 rounded-lg border ${
-                  payment.isCompleted 
-                    ? 'bg-success/10 border-success/20' 
-                    : payment.isOverdue 
-                    ? 'bg-destructive/10 border-destructive/20' 
-                    : payment.isToday
-                    ? 'bg-warning/10 border-warning/20'
-                    : 'bg-muted/50'
-                }`}
+                className={cn(
+                  "flex items-center justify-between p-3 rounded-lg border transition-all hover:shadow-sm",
+                  payment.isCompleted && "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800",
+                  payment.isOverdue && !payment.isCompleted && "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800",
+                  payment.isToday && !payment.isCompleted && "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800",
+                  !payment.isCompleted && !payment.isOverdue && !payment.isToday && "bg-muted/30 border-border"
+                )}
               >
                 <div className="flex items-center gap-3">
                   <Checkbox
                     checked={payment.isCompleted}
                     onCheckedChange={() => togglePaymentCompletion(payment.id)}
+                    className="h-5 w-5"
                   />
-                  <div>
-                    <div className="font-medium">
+                  <div className="flex flex-col gap-1">
+                    <span className={cn(
+                      "font-medium text-sm",
+                      payment.isCompleted && "text-green-700 dark:text-green-400",
+                      payment.isOverdue && !payment.isCompleted && "text-red-700 dark:text-red-400",
+                      payment.isToday && !payment.isCompleted && "text-yellow-700 dark:text-yellow-400"
+                    )}>
                       {format(payment.date, 'dd/MM/yyyy', { locale: it })}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      €{payment.amount.toFixed(2)}
-                    </div>
+                    </span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      {payment.isCompleted && (
+                        <>
+                          <CheckCircle className="h-3 w-3 text-green-600" />
+                          Completato
+                        </>
+                      )}
+                      {payment.isOverdue && !payment.isCompleted && (
+                        <>
+                          <AlertTriangle className="h-3 w-3 text-red-600" />
+                          In ritardo
+                        </>
+                      )}
+                      {payment.isToday && !payment.isCompleted && (
+                        <>
+                          <Clock className="h-3 w-3 text-yellow-600" />
+                          Oggi
+                        </>
+                      )}
+                      {!payment.isCompleted && !payment.isOverdue && !payment.isToday && (
+                        <>
+                          <span className="h-2 w-2 rounded-full bg-gray-400" />
+                          Programmato
+                        </>
+                      )}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {payment.isCompleted && (
-                    <Badge variant="default" className="bg-success text-success-foreground">
-                      Effettuato
-                    </Badge>
-                  )}
-                  {payment.isOverdue && !payment.isCompleted && (
-                    <Badge variant="destructive">In ritardo</Badge>
-                  )}
-                  {payment.isToday && !payment.isCompleted && (
-                    <Badge variant="secondary" className="bg-warning text-warning-foreground">
-                      Oggi
-                    </Badge>
-                  )}
+                  <span className="font-semibold text-sm">€{payment.amount.toFixed(2)}</span>
                 </div>
               </div>
             ))}
+
+            {payments.length > 5 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAll(!showAll)}
+                className="w-full mt-2 gap-2 hover:bg-primary/10"
+              >
+                {showAll ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Mostra meno
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Mostra tutti ({payments.length - 5} altri)
+                  </>
+                )}
+              </Button>
+            )}
           </div>
-          {payments.length > 20 && (
-            <div className="text-center text-sm text-muted-foreground mt-4">
-              Mostrando i primi 20 versamenti di {payments.length}
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>
