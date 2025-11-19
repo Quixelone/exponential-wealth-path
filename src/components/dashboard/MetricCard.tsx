@@ -22,39 +22,20 @@ interface MetricCardProps {
 
 const variantStyles = {
   capital: {
-    bg: 'bg-blue-500/10 dark:bg-blue-500/15',
-    text: 'text-blue-600 dark:text-blue-400',
-    ring: 'ring-1 ring-blue-500/20 dark:ring-blue-400/20',
+    iconBg: 'bg-blue-100 dark:bg-blue-950',
+    iconColor: 'text-blue-600 dark:text-blue-400',
   },
   profit: {
-    bg: 'bg-emerald-500/10 dark:bg-emerald-500/15',
-    text: 'text-emerald-600 dark:text-emerald-400',
-    ring: 'ring-1 ring-emerald-500/20 dark:ring-emerald-400/20',
+    iconBg: 'bg-emerald-100 dark:bg-emerald-950',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
   },
   strategy: {
-    bg: 'bg-violet-500/10 dark:bg-violet-500/15',
-    text: 'text-violet-600 dark:text-violet-400',
-    ring: 'ring-1 ring-violet-500/20 dark:ring-violet-400/20',
+    iconBg: 'bg-violet-100 dark:bg-violet-950',
+    iconColor: 'text-violet-600 dark:text-violet-400',
   },
   btc: {
-    bg: 'bg-amber-500/10 dark:bg-amber-500/15',
-    text: 'text-amber-600 dark:text-amber-400',
-    ring: 'ring-1 ring-amber-500/20 dark:ring-amber-400/20',
-  },
-};
-
-const trendVariants = {
-  positive: {
-    bg: 'bg-emerald-500/10',
-    text: 'text-emerald-600 dark:text-emerald-400',
-  },
-  negative: {
-    bg: 'bg-red-500/10',
-    text: 'text-red-600 dark:text-red-400',
-  },
-  neutral: {
-    bg: 'bg-muted/20',
-    text: 'text-muted-foreground',
+    iconBg: 'bg-amber-100 dark:bg-amber-950',
+    iconColor: 'text-amber-600 dark:text-amber-400',
   },
 };
 
@@ -72,11 +53,10 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <div
       className={cn(
-        "group relative p-6 space-y-4 rounded-xl",
-        "glass-card border border-border/50",
-        "tilt-card glow-hover transition-all duration-300",
-        "hover:border-primary/30",
-        variantStyles[variant].ring,
+        "relative p-6 space-y-4 rounded-3xl",
+        "bg-card border-0",
+        "shadow-card",
+        "transition-all duration-300 hover:shadow-card-lg hover:-translate-y-1",
         className
       )}
       title={tooltipText}
@@ -89,21 +69,23 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       ) : (
         <>
           <div className="flex items-start justify-between">
-            <div className="space-y-1 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-muted-foreground">{title}</p>
-                {Icon && (
-                  <div className="relative">
-                    <Icon className={cn("h-7 w-7 transition-all duration-300 hover:scale-110", variantStyles[variant].text)} />
-                  </div>
-                )}
-              </div>
+            <div className="space-y-2 flex-1">
+              <p className="text-sm font-medium text-muted-foreground">{title}</p>
               {subtitle && <p className="text-xs text-muted-foreground/70">{subtitle}</p>}
+            </div>
+            
+            {/* Circular Icon */}
+            <div className={cn(
+              "flex items-center justify-center h-12 w-12 rounded-full",
+              variantStyles[variant].iconBg
+            )}>
+              <Icon className={cn("h-6 w-6", variantStyles[variant].iconColor)} />
             </div>
           </div>
 
           <div className="space-y-3">
-            <div className="text-4xl font-bold tracking-tight">
+            {/* Large Value */}
+            <div className="text-4xl font-bold tracking-tight text-foreground">
               {(() => {
                 const match = String(value).match(/^([^\d]*)([0-9.,\s]+)(.*)/);
                 if (match) {
@@ -125,27 +107,25 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               })()}
             </div>
 
+            {/* Trend Badge */}
             {trend && (
               <div
-                title={`Variazione: ${trend.value > 0 ? '+' : ''}${trend.value.toFixed(2)}%`}
                 className={cn(
-                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-base font-semibold",
-                  "transform transition-all duration-300 hover:scale-105",
-                  trendVariants[trend.type].bg,
-                  trendVariants[trend.type].text
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold",
+                  trend.type === 'positive' && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+                  trend.type === 'negative' && "bg-red-500/10 text-red-600 dark:text-red-400",
+                  trend.type === 'neutral' && "bg-muted/50 text-muted-foreground"
                 )}
               >
-                {trend.type === 'positive' && <TrendingUp className="h-4 w-4" />}
-                {trend.type === 'negative' && <TrendingDown className="h-4 w-4" />}
-                {trend.type === 'neutral' && <Minus className="h-4 w-4" />}
-                <span className="tabular-nums">
+                {trend.type === 'positive' && <TrendingUp className="h-3 w-3" />}
+                {trend.type === 'negative' && <TrendingDown className="h-3 w-3" />}
+                {trend.type === 'neutral' && <Minus className="h-3 w-3" />}
+                <span>
                   {trend.value > 0 ? '+' : ''}{trend.value.toFixed(2)}%
                 </span>
               </div>
             )}
           </div>
-          
-          <div className="absolute -inset-px bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         </>
       )}
     </div>

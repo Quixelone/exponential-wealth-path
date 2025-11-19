@@ -47,7 +47,7 @@
 @layer base {
   :root {
     /* Hybrid Design System - Bitcoin First */
-    --background: 240 30% 97%; /* Light purple-tinted */
+    --background: 240 20% 96%; /* Soft lavender-gray */
     --foreground: 222 47% 11%; /* Dark text */
 
     --card: 0 0% 100%; /* Pure white cards */
@@ -56,9 +56,13 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 217 91% 60%; /* Bitcoin Blue (more saturated) */
-    --primary-hover: 217 91% 55%;
+    --primary: 245 90% 66%; /* Royal Blue #5B5FF9 */
+    --primary-hover: 245 90% 60%;
     --primary-foreground: 0 0% 100%;
+
+    --violet: 258 90% 66%; /* #6C5DD3 */
+    --violet-foreground: 0 0% 100%;
+    --violet-light: 258 90% 75%;
 
     --secondary: 25 95% 53%; /* Bitcoin Orange */
     --secondary-foreground: 0 0% 100%;
@@ -104,7 +108,7 @@
     --input: 220 13% 91%; /* #E6EBF1 */
     --ring: 235 85% 60%; /* #5D87FF */
 
-    --radius: 0.75rem; /* Larger radius for modern look */
+    --radius: 1.5rem; /* 24px - Larger radius for modern look */
 
     /* Design Tokens - Spacing System */
     --spacing-xs: 0.5rem;    /* 8px */
@@ -155,8 +159,8 @@
   }
 
   .dark {
-    --background: 210 11% 4%; /* #0A0E1A - Very dark background */
-    --foreground: 220 20% 95%; /* #F5F6FA */
+    --background: 240 10% 8%; /* Darker background */
+    --foreground: 0 0% 98%;
 
     --card: 210 11% 8%; /* #1A1E2E - Dark card */
     --card-foreground: 220 20% 95%;
