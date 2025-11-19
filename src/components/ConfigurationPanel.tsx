@@ -13,6 +13,7 @@ import CurrencyConfiguration from './configuration/CurrencyConfiguration';
 import ExportSection from './configuration/ExportSection';
 import UndoRedoControls from './configuration/UndoRedoControls';
 import SaveConfigDialog from './configuration/SaveConfigDialog';
+import ProjectedResults from './configuration/ProjectedResults';
 
 import { Badge } from '@/components/ui/badge';
 
@@ -80,6 +81,13 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = React.memo(({
 
   return (
     <div className="space-y-6 h-fit">
+      {/* Proiezione Finale in Tempo Reale */}
+      <ProjectedResults
+        config={config}
+        dailyReturns={customReturns}
+        dailyPACOverrides={dailyPACOverrides}
+      />
+
       {/* Enhanced Header con titolo configurazione */}
       <Card className="animate-fade-in border-primary/20">
         <CardHeader className="pb-3">
