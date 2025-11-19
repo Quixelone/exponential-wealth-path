@@ -29,6 +29,8 @@ const buttonVariants = cva(
         "soft-danger": "bg-danger/10 text-danger hover:bg-danger/20 border border-danger/20",
         glass: "backdrop-blur-lg bg-white/10 dark:bg-black/20 border border-white/20 text-foreground hover:bg-white/20 dark:hover:bg-black/30 shadow-modern",
         premium: "gradient-primary text-white shadow-glow-primary hover:shadow-modern-lg animate-glow",
+        black: "bg-black text-white hover:bg-gray-900 shadow-lg hover:shadow-xl transition-all duration-200",
+        violet: "bg-violet text-violet-foreground hover:bg-violet/90 shadow-lg hover:shadow-violet/50 transition-all duration-200",
       },
       size: {
         default: "h-[var(--size-md)] px-[var(--spacing-md)] py-[var(--spacing-xs)]",

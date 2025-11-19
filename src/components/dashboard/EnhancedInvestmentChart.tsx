@@ -21,19 +21,19 @@ export const EnhancedInvestmentChart: React.FC<EnhancedInvestmentChartProps> = (
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="glass-card p-4 rounded-lg border border-border/50 shadow-xl">
+        <div className="bg-gray-900 text-white p-4 rounded-xl shadow-modern border-0">
           <p className="text-sm font-semibold mb-2">Giorno {label}</p>
           <div className="space-y-1">
             <p className="text-xs flex items-center justify-between gap-4">
-              <span className="text-muted-foreground">Capitale:</span>
-              <span className="font-bold text-primary">
+              <span className="text-gray-300">Capitale:</span>
+              <span className="font-bold text-white">
                 {formatCurrency(payload[0].value, currency)}
               </span>
             </p>
             {payload[1] && (
               <p className="text-xs flex items-center justify-between gap-4">
-                <span className="text-muted-foreground">PAC Investito:</span>
-                <span className="font-semibold text-accent">
+                <span className="text-gray-300">PAC Investito:</span>
+                <span className="font-semibold text-gray-100">
                   {formatCurrency(payload[1].value, currency)}
                 </span>
               </p>
@@ -46,12 +46,12 @@ export const EnhancedInvestmentChart: React.FC<EnhancedInvestmentChartProps> = (
   };
 
   return (
-    <div className="relative w-full h-full min-h-[400px]">
+    <div className="relative w-full h-full min-h-[400px] bg-card rounded-3xl p-6 shadow-card">
       {/* Header */}
       <div className="mb-6 space-y-2">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-6 w-6 text-primary" />
-          <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <h3 className="text-2xl font-bold text-foreground">
             Evoluzione Capitale
           </h3>
         </div>
@@ -70,23 +70,23 @@ export const EnhancedInvestmentChart: React.FC<EnhancedInvestmentChartProps> = (
           }
         >
           <defs>
-            {/* Primary Gradient for Capital */}
+            {/* Royal Blue Gradient */}
             <linearGradient id="colorCapital" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.05}/>
+              <stop offset="5%" stopColor="hsl(245, 90%, 66%)" stopOpacity={0.3}/>
+              <stop offset="95%" stopColor="hsl(245, 90%, 66%)" stopOpacity={0.05}/>
             </linearGradient>
             
-            {/* Secondary Gradient for PAC */}
+            {/* Gray Ghost Line */}
             <linearGradient id="colorPAC" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.2}/>
-              <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0.05}/>
+              <stop offset="5%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.1}/>
+              <stop offset="95%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.05}/>
             </linearGradient>
           </defs>
           
           <CartesianGrid 
             strokeDasharray="3 3" 
             stroke="hsl(var(--border))" 
-            opacity={0.2}
+            opacity={0.1}
             vertical={false}
           />
           
@@ -95,57 +95,68 @@ export const EnhancedInvestmentChart: React.FC<EnhancedInvestmentChartProps> = (
             stroke="hsl(var(--muted-foreground))"
             tick={{ fontSize: isMobile ? 10 : 12, fill: "hsl(var(--muted-foreground))" }}
             tickLine={false}
-            axisLine={{ stroke: "hsl(var(--border))" }}
+            axisLine={{ stroke: "hsl(var(--border))", strokeWidth: 0.5 }}
           />
           
           <YAxis 
             stroke="hsl(var(--muted-foreground))"
             tick={{ fontSize: isMobile ? 10 : 12, fill: "hsl(var(--muted-foreground))" }}
             tickLine={false}
-            axisLine={{ stroke: "hsl(var(--border))" }}
-            tickFormatter={(value) => formatCurrency(value, currency, { decimals: 0 })}
+            axisLine={{ stroke: "hsl(var(--border))", strokeWidth: 0.5 }}
+            tickFormatter={(value) => {
+              if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+              if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
+              return value.toString();
+            }}
           />
           
           <Tooltip content={<CustomTooltip />} />
           
-          {/* Current Day Reference Line */}
-          {currentDay && (
-            <ReferenceLine 
-              x={currentDay} 
-              stroke="hsl(var(--primary))" 
+          {/* PAC Invested - Ghost Line */}
+          <Area
+            type="monotone"
+            dataKey="totalPACInvested"
+            stroke="hsl(var(--muted-foreground))"
+            strokeWidth={1.5}
+            fill="url(#colorPAC)"
+            name="PAC Investito"
+            dot={false}
+            activeDot={false}
+          />
+          
+          {/* Total Capital - Bold Royal Blue Line */}
+          <Area
+            type="monotone"
+            dataKey="finalCapital"
+            stroke="hsl(245, 90%, 66%)"
+            strokeWidth={3}
+            fill="url(#colorCapital)"
+            name="Capitale Totale"
+            dot={false}
+            activeDot={{ 
+              r: 6, 
+              fill: "hsl(245, 90%, 66%)",
+              stroke: "white",
+              strokeWidth: 2
+            }}
+          />
+
+          {/* Current Day Marker */}
+          {currentDay !== undefined && (
+            <ReferenceLine
+              x={currentDay}
+              stroke="hsl(var(--primary))"
               strokeWidth={2}
               strokeDasharray="5 5"
-              label={{ 
-                value: 'Oggi', 
+              label={{
+                value: 'Oggi',
                 position: 'top',
-                fill: "hsl(var(--primary))",
+                fill: 'hsl(var(--primary))',
                 fontSize: 12,
                 fontWeight: 600
               }}
             />
           )}
-          
-          {/* PAC Invested Area */}
-          <Area 
-            type="monotone"
-            dataKey="totalPACInvested"
-            stroke="hsl(var(--accent))"
-            strokeWidth={2}
-            fill="url(#colorPAC)"
-            name="PAC Investito"
-            animationDuration={1500}
-          />
-          
-          {/* Final Capital Area */}
-          <Area 
-            type="monotone"
-            dataKey="finalCapital"
-            stroke="hsl(var(--primary))"
-            strokeWidth={3}
-            fill="url(#colorCapital)"
-            name="Capitale Totale"
-            animationDuration={2000}
-          />
         </AreaChart>
       </ResponsiveContainer>
     </div>
