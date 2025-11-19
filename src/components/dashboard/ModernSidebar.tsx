@@ -42,6 +42,13 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       description: 'Dashboard principale'
     },
     {
+      icon: TrendingUp,
+      label: 'Strategie',
+      path: '/strategies',
+      description: 'Gestione strategie',
+      isButton: true
+    },
+    {
       icon: Bot,
       label: 'AI Signals',
       path: '/ai-signals',
@@ -58,13 +65,6 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       label: 'Educazione',
       path: '/education',
       description: 'Corsi e formazione'
-    },
-    {
-      icon: TrendingUp,
-      label: 'Strategie',
-      path: '/strategies',
-      description: 'Gestione strategie',
-      isButton: true
     },
     {
       icon: Settings,
