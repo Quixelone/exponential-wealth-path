@@ -3,6 +3,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Analytics Dashboard Styles */
+.analytics-card {
+  @apply bg-card rounded-2xl shadow-sm border border-border/50 transition-all duration-200;
+}
+
 /* Web Landing Animations */
 @keyframes float {
   0%, 100% {
