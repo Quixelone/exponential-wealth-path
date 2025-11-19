@@ -61,6 +61,10 @@ export const PortfolioDistribution = () => {
                 outerRadius={80}
                 paddingAngle={2}
                 dataKey="value"
+                isAnimationActive={true}
+                animationBegin={0}
+                animationDuration={800}
+                animationEasing="ease-out"
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
