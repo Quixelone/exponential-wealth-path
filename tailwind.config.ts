@@ -77,13 +77,7 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))',
-					hover: 'hsl(var(--primary-hover))',
-				},
-				violet: {
-					DEFAULT: 'hsl(var(--violet))',
-					foreground: 'hsl(var(--violet-foreground))',
-					light: 'hsl(var(--violet-light))',
+					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -104,11 +98,6 @@ export default {
 				info: {
 					DEFAULT: 'hsl(var(--info))',
 					foreground: 'hsl(var(--info-foreground))'
-				},
-				purple: {
-					DEFAULT: 'hsl(var(--accent-purple))',
-					dark: 'hsl(var(--accent-purple-dark))',
-					light: 'hsl(var(--accent-purple-light))',
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -141,9 +130,7 @@ export default {
 				'md-token': 'var(--radius-md)',
 				'lg-token': 'var(--radius-lg)',
 				'xl': 'var(--radius-xl)',
-				'2xl': '1rem',
-				'3xl': '1.5rem',
-				'4xl': '2rem',
+				'2xl': 'var(--radius-2xl)',
 				'full': 'var(--radius-full)',
 			},
 			keyframes: {
@@ -216,14 +203,11 @@ export default {
 				'glow': 'glow 2s ease-in-out infinite'
 			},
 			boxShadow: {
-				'modern': '0 4px 24px -2px rgba(0, 0, 0, 0.08), 0 2px 8px -2px rgba(0, 0, 0, 0.04)',
-				'modern-lg': '0 20px 40px -12px rgba(0, 0, 0, 0.12), 0 8px 16px -8px rgba(0, 0, 0, 0.08)',
-				'modern-xl': '0 32px 64px -12px rgba(0, 0, 0, 0.14), 0 12px 24px -8px rgba(0, 0, 0, 0.10)',
-				'glow-primary': '0 0 30px -5px rgba(91, 95, 249, 0.5)',
-				'glow-success': '0 0 30px -5px rgba(16, 185, 129, 0.5)',
-				'card': '0 8px 32px rgba(0, 0, 0, 0.06)',
-				'card-lg': '0 20px 40px rgba(0, 0, 0, 0.12)',
-				'violet': '0 20px 40px rgba(108, 93, 211, 0.3)',
+				'modern': '0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 4px 12px -3px rgba(0, 0, 0, 0.1)',
+				'modern-lg': '0 4px 16px -4px rgba(0, 0, 0, 0.1), 0 8px 24px -6px rgba(0, 0, 0, 0.15)',
+				'modern-xl': '0 8px 32px -8px rgba(0, 0, 0, 0.15), 0 16px 48px -12px rgba(0, 0, 0, 0.2)',
+				'glow-primary': '0 0 20px rgba(93, 135, 255, 0.3)',
+				'glow-success': '0 0 20px rgba(57, 176, 105, 0.3)',
 				'inner-modern': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
 			},
 			backdropBlur: {

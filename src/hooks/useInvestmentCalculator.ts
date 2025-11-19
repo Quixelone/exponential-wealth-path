@@ -142,27 +142,6 @@ export const useInvestmentCalculator = () => {
   });
 
   /**
-   * Configuration ready state - diventa true solo quando la configurazione è stata caricata
-   * Previene la visualizzazione di valori temporanei durante il caricamento asincrono
-   */
-  const [isConfigurationReady, setIsConfigurationReady] = useState(false);
-  
-  React.useEffect(() => {
-    // Segna come ready quando persistedConfigLoadAttempted è true
-    if (persistedConfigLoadAttempted) {
-      setIsConfigurationReady(true);
-      return;
-    }
-    
-    // Timeout di sicurezza: dopo 3 secondi mostra comunque i dati
-    const timeoutId = setTimeout(() => {
-      setIsConfigurationReady(true);
-    }, 3000);
-    
-    return () => clearTimeout(timeoutId);
-  }, [persistedConfigLoadAttempted]);
-
-  /**
    * Logging dello stato corrente per debugging e monitoraggio
    * Solo quando i dati sono completamente caricati
    */
@@ -326,7 +305,6 @@ export const useInvestmentCalculator = () => {
     // Stati di caricamento e modifiche
     supabaseLoading,
     hasUnsavedChanges,
-    isConfigurationReady,
     
     // Operazioni di cronologia (undo/redo)
     undoConfiguration,
@@ -355,7 +333,6 @@ export const useInvestmentCalculator = () => {
     savedConfigs,
     supabaseLoading,
     hasUnsavedChanges,
-    isConfigurationReady,
     canUndo,
     canRedo,
     lastDatabaseSync,

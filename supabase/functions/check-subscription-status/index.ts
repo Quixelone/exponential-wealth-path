@@ -24,7 +24,7 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
-    // Get user from JWT - handle invalid tokens gracefully
+    // Get user from JWT if available
     const authHeader = req.headers.get("Authorization");
     
     if (!authHeader) {
@@ -35,42 +35,17 @@ serve(async (req) => {
       });
     }
     
-    // Try to validate the user with error handling for all JWT issues
-    let user;
-    try {
-      const supabaseClient = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-        {
-          global: { headers: { Authorization: authHeader } },
-          auth: { persistSession: false }
-        }
-      );
-      
-      const { data: userData, error: userError } = await supabaseClient.auth.getUser();
-      
-      if (userError) {
-        logStep("JWT validation failed", { error: userError.message });
-        return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 200,
-        });
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: { headers: { Authorization: authHeader } },
+        auth: { persistSession: false }
       }
-      
-      user = userData.user;
-    } catch (jwtError: any) {
-      logStep("Invalid JWT token - caught exception", { 
-        error: jwtError?.message || String(jwtError),
-        code: jwtError?.code,
-        status: jwtError?.status
-      });
-      return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    }
+    );
     
-    if (!user?.email) {
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !user?.email) {
       logStep("User not authenticated, returning unsubscribed state");
       return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

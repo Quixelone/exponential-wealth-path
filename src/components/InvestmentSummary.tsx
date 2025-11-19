@@ -36,29 +36,29 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = React.memo(({ summar
       title: 'Capitale',
       value: formatCurrencyWhole(data.finalCapital, currency),
       icon: Target,
-      iconClass: 'icon-circle-blue',
-      gradientClass: 'from-primary/10 to-transparent'
+      color: 'text-primary',
+      bgColor: 'bg-primary/10'
     },
     {
       title: 'Investito',
       value: formatCurrencyWhole(data.totalInvested, currency),
       icon: PiggyBank,
-      iconClass: 'icon-circle-violet',
-      gradientClass: 'from-violet/10 to-transparent'
+      color: 'text-secondary',
+      bgColor: 'bg-secondary/10'
     },
     {
       title: 'Interessi',
       value: formatCurrencyWhole(data.totalInterest, currency),
       icon: TrendingUp,
-      iconClass: 'icon-circle-green',
-      gradientClass: 'from-success/10 to-transparent'
+      color: 'text-accent',
+      bgColor: 'bg-accent/10'
     },
     {
       title: 'Rendimento',
       value: formatPercentage(data.totalReturn),
       icon: Percent,
-      iconClass: data.totalReturn >= 0 ? 'icon-circle-green' : 'icon-circle-orange',
-      gradientClass: data.totalReturn >= 0 ? 'from-success/10 to-transparent' : 'from-warning/10 to-transparent'
+      color: data.totalReturn >= 0 ? 'text-green-600' : 'text-red-600',
+      bgColor: data.totalReturn >= 0 ? 'bg-green-100' : 'bg-red-100'
     }
   ];
 
@@ -81,22 +81,19 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = React.memo(({ summar
           {currentCards.map((card, index) => (
             <Card 
               key={`current-${card.title}`}
-              className="group relative overflow-hidden rounded-2xl bg-card border border-white/5 hover:border-white/10 card-interactive"
+              className="animate-scale-in hover:shadow-lg transition-shadow duration-300"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              {/* Gradient decorativo */}
-              <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br ${card.gradientClass}`} />
-              
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   {card.title}
                 </CardTitle>
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.iconClass}`}>
-                  <card.icon className="h-5 w-5" />
+                <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                  <card.icon className={`h-4 w-4 ${card.color}`} />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">
+                <div className={`text-2xl font-bold ${card.color}`}>
                   {card.value}
                 </div>
               </CardContent>
@@ -141,8 +138,8 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = React.memo(({ summar
                     {card.title}
                   </CardTitle>
                   <div className="flex items-center gap-1">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.iconClass}`}>
-                      <card.icon className="h-5 w-5" />
+                    <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                      <card.icon className={`h-4 w-4 ${card.color}`} />
                     </div>
                     <DifferenceIcon 
                       className={`h-3 w-3 ${isPositiveTrend ? 'text-green-500' : 'text-gray-400'}`} 
@@ -150,7 +147,7 @@ const InvestmentSummary: React.FC<InvestmentSummaryProps> = React.memo(({ summar
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-white">
+                  <div className={`text-2xl font-bold ${card.color}`}>
                     {card.value}
                   </div>
                   {summary.current.day > 0 && (

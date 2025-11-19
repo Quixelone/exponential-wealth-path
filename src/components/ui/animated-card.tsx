@@ -17,11 +17,11 @@ export const AnimatedCard = React.forwardRef<HTMLDivElement, AnimatedCardProps>(
     const getHoverClass = () => {
       switch (hoverEffect) {
         case 'lift':
-          return 'hover:-translate-y-0.5 hover:shadow-md';
+          return 'hover:-translate-y-1';
         case 'scale':
-          return 'hover:scale-[1.01]';
+          return 'hover:scale-[1.02]';
         case 'glow':
-          return 'hover:shadow-[0_8px_30px_-8px_hsl(var(--primary)_/_0.3)]';
+          return 'hover:shadow-[0_10px_40px_-10px_hsl(var(--primary)_/_0.4)]';
         default:
           return '';
       }

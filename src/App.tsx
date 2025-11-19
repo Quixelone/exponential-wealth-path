@@ -14,8 +14,6 @@ const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 const WebLanding = lazy(() => import("./pages/WebLanding"));
-const BusinessAngelPitch = lazy(() => import("./pages/BusinessAngelPitch"));
-const VentureCapitalPitch = lazy(() => import("./pages/VentureCapitalPitch"));
 const Strategies = lazy(() => import("./pages/Strategies"));
 const UserManagement = lazy(() => import("./pages/UserManagement"));
 const Settings = lazy(() => import("./pages/Settings"));
@@ -68,8 +66,6 @@ const App = () => {
                         <Route path="/app" element={<Index />} />
                         <Route path="/auth" element={<Auth />} />
                         <Route path="/auth/callback" element={<AuthCallback />} />
-                        <Route path="/pitch/business-angel" element={<BusinessAngelPitch />} />
-                        <Route path="/pitch/venture-capital" element={<VentureCapitalPitch />} />
                         <Route path="/strategies" element={<Strategies />} />
                         <Route path="/user-management" element={<UserManagement />} />
                         <Route path="/settings" element={<Settings />} />

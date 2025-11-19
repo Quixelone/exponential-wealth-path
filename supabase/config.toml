@@ -152,13 +152,3 @@ verify_jwt = false
 name = "restore-strategy-backup"
 source = "./supabase/functions/restore-strategy-backup"
 verify_jwt = true
-
-[[edge_runtime.function]]
-name = "sync-pionex-balance"
-source = "./supabase/functions/sync-pionex-balance"
-verify_jwt = false
-
-[[edge_runtime.function]]
-name = "investor-inquiry"
-source = "./supabase/functions/investor-inquiry"
-verify_jwt = false

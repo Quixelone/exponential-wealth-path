@@ -3,8 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './styles/animations.css';
-
 /* Web Landing Animations */
 @keyframes float {
   0%, 100% {
@@ -46,128 +44,88 @@
 
 @layer base {
   :root {
-    /* Fintech Color System */
-    --background: 222 47% 11%; /* #1A1D29 */
-    --foreground: 213 31% 91%;
+    /* Modern MatDash inspired palette */
+    --background: 220 20% 97%; /* #F5F6FA - Light gray background */
+    --foreground: 210 11% 15%; /* #212529 - Dark text */
 
-    --card: 220 27% 18%; /* #252932 */
-    --card-foreground: 213 31% 91%;
-    --card-hover: 220 27% 20%;
+    --card: 0 0% 100%; /* #FFFFFF - Pure white cards */
+    --card-foreground: 210 11% 15%; /* #212529 */
 
-    --popover: 220 27% 18%;
-    --popover-foreground: 215 20.2% 65.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 11% 15%;
 
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-
-    /* Brand Colors */
-    --primary: 220 90% 60%; /* Royal Blue #5B8DEF */
+    --primary: 220 90% 56%; /* Bitcoin Blue */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 220 90% 55%;
-    
-    --violet: 258 85% 65%; /* Purple #7B6FDD */
-    --violet-foreground: 0 0% 100%;
-    
-    --success: 145 63% 49%; /* Green #3ECF8E */
+
+    --secondary: 28 100% 55%; /* Bitcoin Orange */
+    --secondary-foreground: 0 0% 100%;
+
+    --success: 134 61% 41%; /* #39B069 - Green */
     --success-foreground: 0 0% 100%;
-    
-    --warning: 38 92% 50%; /* Orange #F59E0B */
+
+    --warning: 45 93% 58%; /* #FFAE1F - Orange */
     --warning-foreground: 0 0% 100%;
-    
-    --danger: 0 84% 60%; /* Red #F43F5E */
+
+    --danger: 0 72% 51%; /* #FA896B - Red */
     --danger-foreground: 0 0% 100%;
 
-    --secondary: 220 27% 20%;
-    --secondary-foreground: 210 40% 98%;
-
-    --accent: 258 85% 65%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
-
-    --info: 195 85% 55%;
+    --info: 195 85% 55%; /* #39B8E5 - Cyan */
     --info-foreground: 0 0% 100%;
 
-    --ring: 217 91% 60%;
+    --muted: 220 13% 91%; /* #E6EBF1 - Light muted */
+    --muted-foreground: 215 16% 47%; /* #64748B - Dark muted */
 
-    --radius: 0.5rem;
+    --accent: 220 20% 96%; /* #F1F5F9 - Very light accent */
+    --accent-foreground: 210 11% 15%;
 
-    --chart-1: 220 90% 60%;
-    --chart-2: 145 63% 49%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 258 85% 65%;
-    --chart-5: 0 84% 60%;
+    --destructive: 0 72% 51%; /* #FA896B */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%; /* #E6EBF1 */
+    --input: 220 13% 91%; /* #E6EBF1 */
+    --ring: 235 85% 60%; /* #5D87FF */
+
+    --radius: 0.75rem; /* Larger radius for modern look */
+
+    /* Design Tokens - Spacing System */
+    --spacing-xs: 0.5rem;    /* 8px */
+    --spacing-sm: 0.75rem;   /* 12px */
+    --spacing-md: 1rem;      /* 16px */
+    --spacing-lg: 1.5rem;    /* 24px */
+    --spacing-xl: 2rem;      /* 32px */
+    --spacing-2xl: 3rem;     /* 48px */
+    --spacing-3xl: 4rem;     /* 64px */
+
+    /* Design Tokens - Sizing System */
+    --size-xs: 1.5rem;       /* 24px */
+    --size-sm: 2rem;         /* 32px */
+    --size-md: 2.5rem;       /* 40px */
+    --size-lg: 3rem;         /* 48px */
+    --size-xl: 4rem;         /* 64px */
+
+    /* Design Tokens - Radius System */
+    --radius-xs: 0.25rem;    /* 4px */
+    --radius-sm: 0.375rem;   /* 6px */
+    --radius-md: 0.5rem;     /* 8px */
+    --radius-lg: 0.75rem;    /* 12px */
+    --radius-xl: 1rem;       /* 16px */
+    --radius-2xl: 1.5rem;    /* 24px */
+    --radius-full: 9999px;   /* Full rounded */
+
+    /* Gradient colors for various elements */
+    --gradient-primary: linear-gradient(135deg, #5D87FF 0%, #8763FF 100%);
+    --gradient-success: linear-gradient(135deg, #39B069 0%, #49DA6C 100%);
+    --gradient-warning: linear-gradient(135deg, #FFAE1F 0%, #FFC107 100%);
+    --gradient-danger: linear-gradient(135deg, #FA896B 0%, #FF5722 100%);
+    --gradient-info: linear-gradient(135deg, #39B8E5 0%, #03A9F4 100%);
   }
-}
-
-/* Colored Icon Circles */
-.icon-circle-blue {
-  background: rgba(91, 141, 239, 0.15);
-  color: hsl(220, 90%, 60%);
-}
-
-.icon-circle-green {
-  background: rgba(62, 207, 142, 0.15);
-  color: hsl(145, 63%, 49%);
-}
-
-.icon-circle-violet {
-  background: rgba(123, 111, 221, 0.15);
-  color: hsl(258, 85%, 65%);
-}
-
-.icon-circle-orange {
-  background: rgba(245, 158, 11, 0.15);
-  color: hsl(38, 92%, 50%);
-}
-
-/* Pill Badges */
-.badge-success {
-  background: rgba(62, 207, 142, 0.15);
-  color: hsl(145, 63%, 49%);
-  border-radius: 999px;
-}
-
-.badge-danger {
-  background: rgba(244, 63, 94, 0.15);
-  color: hsl(0, 84%, 60%);
-  border-radius: 999px;
-}
-
-.badge-warning {
-  background: rgba(245, 158, 11, 0.15);
-  color: hsl(38, 92%, 50%);
-  border-radius: 999px;
-}
-
-/* Hover Effects */
-.hover-lift {
-  transition: all 0.2s ease-out;
-}
-
-.hover-lift:hover {
-  transform: translateY(-2px);
-}
-
-.card-interactive {
-  transition: all 0.2s ease-out;
-}
-
-.card-interactive:hover {
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
 
   .dark {
-    --background: 220 15% 10%; /* Dark mode enabled */
-    --foreground: 210 20% 98%;
+    --background: 210 11% 4%; /* #0A0E1A - Very dark background */
+    --foreground: 220 20% 95%; /* #F5F6FA */
 
-    --card: 220 15% 15%;
-    --card-foreground: 210 20% 98%;
+    --card: 210 11% 8%; /* #1A1E2E - Dark card */
+    --card-foreground: 220 20% 95%;
 
     --popover: 210 11% 8%;
     --popover-foreground: 220 20% 95%;
@@ -209,6 +167,7 @@
     --gradient-danger: linear-gradient(135deg, #FA896B 0%, #FF5722 100%);
     --gradient-info: linear-gradient(135deg, #39B8E5 0%, #03A9F4 100%);
   }
+}
 
 @layer base {
   * {
@@ -281,76 +240,6 @@
   .stat-card-info {
     @apply rounded-xl p-6 text-white relative overflow-hidden;
     background: var(--gradient-info);
-  }
-
-  /* Modern Dashboard Hybrid Utilities */
-  .metric-card {
-    @apply bg-card rounded-xl p-6 border border-border/50 transition-all duration-200;
-    box-shadow: var(--shadow-card);
-  }
-
-  .metric-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  .metric-number {
-    @apply text-4xl font-bold text-foreground;
-  }
-
-  .trend-positive {
-    @apply text-success text-sm font-semibold;
-  }
-
-  .trend-negative {
-    @apply text-danger text-sm font-semibold;
-  }
-
-  .trend-neutral {
-    @apply text-primary text-sm font-semibold;
-  }
-
-  .icon-container {
-    @apply w-10 h-10 rounded-lg flex items-center justify-center;
-  }
-
-  .icon-container-primary {
-    @apply bg-primary/10 text-primary;
-  }
-
-  .icon-container-success {
-    @apply bg-success/10 text-success;
-  }
-
-  .icon-container-secondary {
-    @apply bg-secondary/10 text-secondary;
-  }
-
-  .icon-container-purple {
-    @apply text-white;
-    background: hsl(var(--accent-purple));
-  }
-
-  .trend-indicator-circle {
-    @apply w-12 h-12 rounded-full flex items-center justify-center text-xs font-semibold;
-  }
-
-  .trend-indicator-positive {
-    @apply bg-success/10 text-success;
-  }
-
-  .trend-indicator-negative {
-    @apply bg-danger/10 text-danger;
-  }
-
-  .trend-indicator-neutral {
-    @apply bg-primary/10 text-primary;
-  }
-
-  .gauge-card {
-    @apply p-8 rounded-2xl text-white;
-    background: linear-gradient(135deg, hsl(var(--accent-purple)) 0%, hsl(var(--accent-purple-dark)) 100%);
-    box-shadow: var(--shadow-gauge);
   }
 
   /* Modern sidebar */
