@@ -50,17 +50,13 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
   const handleCreateNewConfiguration = async (name: string, copyFromCurrent: boolean) => {
     if (copyFromCurrent) {
       try {
-        // Salva la configurazione corrente con il nuovo nome
-        console.log('🔄 Tentativo di salvare nuova strategia:', name);
         const configId = await saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
         if (configId) {
-          console.log('✅ Strategia salvata con successo, ID:', configId);
           toast({
             title: "Strategia creata",
             description: `La strategia "${name}" è stata creata copiando la configurazione corrente.`,
           });
         } else {
-          console.error('❌ Salvataggio fallito - nessun ID restituito');
           toast({
             title: "Errore",
             description: "Non è stato possibile salvare la strategia",
@@ -68,7 +64,6 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
           });
         }
       } catch (error) {
-        console.error('❌ Errore durante il salvataggio:', error);
         toast({
           title: "Errore",
           description: "Non è stato possibile salvare la strategia",
@@ -104,16 +99,13 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
 
   const handleSaveConfiguration = async (name: string) => {
     try {
-      console.log('🔄 Tentativo di salvare strategia esistente:', name);
       const configId = await saveConfiguration(name, config, dailyReturns, dailyPACOverrides);
       if (configId) {
-        console.log('✅ Strategia salvata con successo, ID:', configId);
         toast({
           title: "Strategia salvata",
           description: `La strategia "${name}" è stata salvata.`,
         });
       } else {
-        console.error('❌ Salvataggio fallito - nessun ID restituito');
         toast({
           title: "Errore",
           description: "Non è stato possibile salvare la strategia",
@@ -121,7 +113,6 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
         });
       }
     } catch (error) {
-      console.error('❌ Errore durante il salvataggio:', error);
       toast({
         title: "Errore",
         description: "Non è stato possibile salvare la strategia",
@@ -132,16 +123,13 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
 
   const handleUpdateConfiguration = async (configId: string, name: string) => {
     try {
-      console.log('🔄 Tentativo di aggiornare strategia:', name, configId);
       const success = await updateConfiguration(configId, name, config, dailyReturns, dailyPACOverrides);
       if (success) {
-        console.log('✅ Strategia aggiornata con successo');
         toast({
           title: "Strategia aggiornata",
           description: `La strategia "${name}" è stata aggiornata.`,
         });
       } else {
-        console.error('❌ Aggiornamento fallito');
         toast({
           title: "Errore",
           description: "Non è stato possibile aggiornare la strategia",
@@ -149,7 +137,6 @@ const StrategiesDrawer: React.FC<StrategiesDrawerProps> = ({ isOpen, onClose }) 
         });
       }
     } catch (error) {
-      console.error('❌ Errore durante l\'aggiornamento:', error);
       toast({
         title: "Errore",
         description: "Non è stato possibile aggiornare la strategia",

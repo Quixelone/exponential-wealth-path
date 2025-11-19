@@ -175,7 +175,7 @@ const PACConfiguration: React.FC<PACConfigurationProps> = ({
           dailyPACOverrides={dailyPACOverrides}
           onUpdatePACForDay={onUpdatePACForDay}
           onMarkPaymentComplete={(day, isComplete) => {
-            console.log(`Marcatura versamento giorno ${day}: ${isComplete ? 'completato' : 'non completato'}`);
+            // Payment completion handled
           }}
         />
       )}

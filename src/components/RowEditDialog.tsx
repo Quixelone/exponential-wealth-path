@@ -68,19 +68,12 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     const hasPacChange = Math.abs(pacAmount - item.pacAmount) > 0.01;
     
     if (hasReturnChange || hasPacChange) {
-      console.log('🔄 RowEditDialog: Applicando modifiche in memoria per il giorno', item.day, {
-        hasReturnChange,
-        hasPacChange
-      });
-      
       if (hasReturnChange) {
         stableOnUpdateDailyReturn(item.day, returnRate);
       }
       if (hasPacChange) {
         stableOnUpdatePAC(item.day, pacAmount);
       }
-      
-      console.log('✅ Modifiche applicate in memoria (no salvataggio automatico)');
     }
   }, [item, returnRate, pacAmount, stableOnUpdateDailyReturn, stableOnUpdatePAC]);
 
@@ -94,12 +87,10 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     }
   }, [item]);
 
-  // Store original config info when dialog opens - usa configData memorizzato
   useEffect(() => {
     if (open) {
       setOriginalConfigId(configData.currentConfigId);
       setOriginalConfigName(configData.currentConfigName);
-      console.log('🔄 RowEditDialog: Memorizzato ID strategia originale:', configData.currentConfigId);
     }
   }, [open, configData.currentConfigId, configData.currentConfigName]);
 

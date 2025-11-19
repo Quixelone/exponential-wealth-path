@@ -294,12 +294,11 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
     if (isMobile && currentInvestmentDay && filteredData.length > 0 && !hasAutoScrolled.current) {
       const timer = setTimeout(() => {
         if (currentDayRef.current) {
-          console.log('🎯 Auto-scrolling to day:', currentInvestmentDay);
           currentDayRef.current.scrollIntoView({ 
             behavior: 'smooth', 
             block: 'start'
           });
-          hasAutoScrolled.current = true; // Mark as scrolled to prevent loop
+          hasAutoScrolled.current = true;
         }
       }, 800);
       
@@ -373,7 +372,7 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   };
 
   // Rimuovo i log di debug che causano re-render inutili
-  // console.log('📊 ReportTable pagination state:', {
+  
   //   currentPage,
   //   totalPages, 
   //   filteredDataLength: filteredData.length,
