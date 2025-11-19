@@ -59,22 +59,26 @@ export const useSupabaseConfig = () => {
       console.log('✅ useSupabaseConfig: Update successful', { result });
       
       if (result) {
-        // Aggiorna lo stato locale senza ricaricare dal database
-        // Questo evita re-render ma mantiene il confronto aggiornato
+        // Aggiorna lo stato locale con nuovi riferimenti per forzare re-render
         console.log('🔄 useSupabaseConfig: Updating local state after successful update');
-        setSavedConfigs(prev => prev.map(savedConfig => {
-          if (savedConfig.id === configId) {
-            return {
-              ...savedConfig,
-              name,
-              config,
-              dailyReturns,
-              dailyPACOverrides
-            };
-          }
-          return savedConfig;
-        }));
-        console.log('✅ useSupabaseConfig: Local state updated');
+        setSavedConfigs(prev => {
+          const newConfigs = prev.map(savedConfig => {
+            if (savedConfig.id === configId) {
+              // Crea NUOVI oggetti per forzare il re-render dei useMemo dipendenti
+              return {
+                ...savedConfig,
+                name,
+                config: { ...config }, // Clone per nuovo riferimento
+                dailyReturns: { ...dailyReturns }, // Clone per nuovo riferimento
+                dailyPACOverrides: { ...dailyPACOverrides } // Clone per nuovo riferimento
+              };
+            }
+            return savedConfig;
+          });
+          
+          console.log('✅ useSupabaseConfig: Local state updated atomically, configs:', newConfigs.length);
+          return newConfigs;
+        });
       }
       
       return result;

@@ -3,9 +3,71 @@ import React, { useCallback, useMemo } from 'react';
 import { useSupabaseConfig } from '@/hooks/useSupabaseConfig';
 import { useInvestmentConfigState } from './investmentConfigState';
 
-// funzione di deep compare (shallow per oggetti semplici)
+/**
+ * Deep comparison function that handles:
+ * - null/undefined normalization
+ * - Key ordering in objects
+ * - Nested objects and arrays
+ * - Floating point numbers
+ */
 const deepEqual = (a: any, b: any): boolean => {
-  return JSON.stringify(a) === JSON.stringify(b);
+  // Handle null/undefined
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (typeof a !== typeof b) return false;
+  
+  // Handle primitives
+  if (typeof a !== 'object') return a === b;
+  
+  // Handle arrays
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    return a.every((val, idx) => deepEqual(val, b[idx]));
+  }
+  
+  // Handle objects
+  const keysA = Object.keys(a).sort();
+  const keysB = Object.keys(b).sort();
+  
+  if (keysA.length !== keysB.length) return false;
+  if (!keysA.every((key, idx) => key === keysB[idx])) return false;
+  
+  return keysA.every(key => deepEqual(a[key], b[key]));
+};
+
+/**
+ * Normalizes configuration data for comparison
+ * - Converts null/undefined dailyPACOverrides to {}
+ * - Normalizes pacConfig.startDate to string format
+ * - Ensures consistent data structure
+ */
+const normalizeConfigForComparison = (
+  config: any, 
+  dailyReturns: { [day: number]: number }, 
+  dailyPACOverrides: { [day: number]: number } | null | undefined
+) => {
+  // Normalize dailyPACOverrides: null/undefined → {}
+  const normalizedPACOverrides = dailyPACOverrides || {};
+  
+  // Normalize dailyReturns: ensure consistent structure
+  const normalizedDailyReturns = { ...dailyReturns };
+  
+  // Normalize pacConfig.startDate to string format
+  const normalizedConfig = {
+    ...config,
+    pacConfig: {
+      ...config.pacConfig,
+      startDate: (typeof config.pacConfig.startDate === "string"
+        ? config.pacConfig.startDate
+        : config.pacConfig.startDate.toISOString().split('T')[0])
+    },
+  };
+  
+  return {
+    config: normalizedConfig,
+    dailyReturns: normalizedDailyReturns,
+    dailyPACOverrides: normalizedPACOverrides,
+  };
 };
 
 export const useConfigurationManager = () => {
@@ -64,12 +126,12 @@ export const useConfigurationManager = () => {
     [savedConfigs, configState.currentConfigId]
   );
 
-  // Enhanced unsaved changes detection
+  // Enhanced unsaved changes detection with normalization
   const hasUnsavedChanges = React.useMemo(() => {
     if (!savedConfig) {
       // Se non c'è una configurazione salvata corrente, controlla se ci sono dati personalizzati
       const hasCustomReturns = Object.keys(configState.dailyReturns).length > 0;
-      const hasCustomPAC = Object.keys(configState.dailyPACOverrides).length > 0;
+      const hasCustomPAC = Object.keys(configState.dailyPACOverrides || {}).length > 0;
       const hasNonDefaultConfig = 
         configState.config.initialCapital !== 1000 ||
         configState.config.timeHorizon !== 365 ||
@@ -79,33 +141,37 @@ export const useConfigurationManager = () => {
       return hasCustomReturns || hasCustomPAC || hasNonDefaultConfig;
     }
     
-    const stateToCompare = {
-      config: {
-        ...configState.config,
-        pacConfig: {
-          ...configState.config.pacConfig,
-          startDate: (typeof configState.config.pacConfig.startDate === "string"
-            ? configState.config.pacConfig.startDate
-            : configState.config.pacConfig.startDate.toISOString().split('T')[0])
-        },
-      },
-      dailyReturns: configState.dailyReturns,
-      dailyPACOverrides: configState.dailyPACOverrides,
-    };
-    const savedToCompare = {
-      config: {
-        ...savedConfig.config,
-        pacConfig: {
-          ...savedConfig.config.pacConfig,
-          startDate: (typeof savedConfig.config.pacConfig.startDate === "string"
-            ? savedConfig.config.pacConfig.startDate
-            : savedConfig.config.pacConfig.startDate.toISOString().split('T')[0])
-        },
-      },
-      dailyReturns: savedConfig.dailyReturns,
-      dailyPACOverrides: savedConfig.dailyPACOverrides || {},
-    };
-    return !deepEqual(stateToCompare, savedToCompare);
+    // Normalize BOTH states before comparison
+    const stateToCompare = normalizeConfigForComparison(
+      configState.config,
+      configState.dailyReturns,
+      configState.dailyPACOverrides
+    );
+    
+    const savedToCompare = normalizeConfigForComparison(
+      savedConfig.config,
+      savedConfig.dailyReturns,
+      savedConfig.dailyPACOverrides
+    );
+    
+    const isEqual = deepEqual(stateToCompare, savedToCompare);
+    
+    // TEMPORARY DEBUG LOGGING (rimuovere dopo verifica)
+    if (!isEqual) {
+      console.log('🔍 hasUnsavedChanges: States differ', {
+        configEqual: deepEqual(stateToCompare.config, savedToCompare.config),
+        returnsEqual: deepEqual(stateToCompare.dailyReturns, savedToCompare.dailyReturns),
+        pacEqual: deepEqual(stateToCompare.dailyPACOverrides, savedToCompare.dailyPACOverrides),
+        stateReturnKeys: Object.keys(stateToCompare.dailyReturns).length,
+        savedReturnKeys: Object.keys(savedToCompare.dailyReturns).length,
+        statePACKeys: Object.keys(stateToCompare.dailyPACOverrides).length,
+        savedPACKeys: Object.keys(savedToCompare.dailyPACOverrides).length,
+      });
+    } else {
+      console.log('✅ hasUnsavedChanges: States are equal');
+    }
+    
+    return !isEqual;
   }, [configState.config, configState.dailyReturns, configState.dailyPACOverrides, savedConfig]);
 
   const saveCurrentConfiguration = useCallback(async (name: string) => {
