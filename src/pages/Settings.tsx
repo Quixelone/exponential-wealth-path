@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NotificationTester from '@/components/NotificationTester';
 import SettingsHeader from '@/components/settings/SettingsHeader';
 import { BackupManager } from '@/components/configuration/BackupManager';
+import { BrokerAPIManager } from '@/components/settings/BrokerAPIManager';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -268,24 +269,32 @@ const Settings = () => {
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
               Test Notifiche WhatsApp
-            </TabsTrigger>
-            <TabsTrigger value="insurance" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Assicurazione
-            </TabsTrigger>
-            <TabsTrigger value="backup" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Backup Strategie
-            </TabsTrigger>
-            <TabsTrigger value="preferences" className="flex items-center gap-2">
-              <SettingsIcon className="h-4 w-4" />
-              Preferenze
-            </TabsTrigger>
-          </TabsList>
+          </TabsTrigger>
+          <TabsTrigger value="api-brokers" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            🔌 API Broker
+          </TabsTrigger>
+          <TabsTrigger value="insurance" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Assicurazione
+          </TabsTrigger>
+          <TabsTrigger value="backup" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Backup Strategie
+          </TabsTrigger>
+          <TabsTrigger value="preferences" className="flex items-center gap-2">
+            <SettingsIcon className="h-4 w-4" />
+            Preferenze
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="notifications">
-            <NotificationTester />
-          </TabsContent>
+        <TabsContent value="notifications">
+          <NotificationTester />
+        </TabsContent>
+
+        <TabsContent value="api-brokers">
+          <BrokerAPIManager />
+        </TabsContent>
 
           <TabsContent value="insurance" className="space-y-6">
             {/* DEMO: Sistema Finanza Points™ */}
