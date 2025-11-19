@@ -64,12 +64,18 @@ export const TradesDistribution = () => {
                 outerRadius={80}
                 paddingAngle={2}
                 dataKey="value"
+                isAnimationActive={true}
+                animationBegin={0}
+                animationDuration={800}
+                animationEasing="ease-out"
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip
+                formatter={(value: number) => `${value.toFixed(2)}%`}
+              />
             </PieChart>
           </ResponsiveContainer>
           <div className="space-y-2 flex-1">

@@ -93,7 +93,13 @@ export const StrategyPerformance = () => {
                 borderRadius: "8px",
               }}
             />
-            <Bar dataKey="performance" radius={[8, 8, 0, 0]}>
+            <Bar 
+              dataKey="performance" 
+              radius={[8, 8, 0, 0]}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
+            >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}

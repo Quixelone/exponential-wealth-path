@@ -5,7 +5,24 @@
 
 /* Analytics Dashboard Styles */
 .analytics-card {
-  @apply bg-card rounded-2xl shadow-sm border border-border/50 transition-all duration-200;
+  @apply bg-card rounded-2xl shadow-sm border border-border/50 transition-all duration-300;
+  animation: fade-in 0.5s ease-out;
+}
+
+.analytics-card:hover {
+  @apply shadow-lg;
+  transform: translateY(-2px);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Web Landing Animations */

@@ -106,6 +106,9 @@ export const PerformanceTrend = () => {
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#colorValue)"
+              isAnimationActive={true}
+              animationDuration={1000}
+              animationEasing="ease-in-out"
             />
           </AreaChart>
         </ResponsiveContainer>
