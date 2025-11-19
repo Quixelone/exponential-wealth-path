@@ -44,9 +44,19 @@ serve(async (req) => {
       }
     );
     
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user?.email) {
-      logStep("User not authenticated, returning unsubscribed state");
+    let user;
+    try {
+      const { data: { user: authUser }, error: userError } = await supabaseClient.auth.getUser();
+      if (userError || !authUser?.email) {
+        logStep("User authentication failed or no email", { error: userError?.message });
+        return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      user = authUser;
+    } catch (error) {
+      logStep("Exception during auth verification", { error: error instanceof Error ? error.message : String(error) });
       return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
