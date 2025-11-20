@@ -11,7 +11,8 @@ import {
   Menu,
   Bot,
   MessageCircle,
-  BookOpen
+  BookOpen,
+  Target
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -47,6 +48,12 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       path: '/strategies',
       description: 'Gestione strategie',
       isButton: true
+    },
+    {
+      icon: Target,
+      label: 'Wheel Strategy',
+      path: '/wheel-strategy',
+      description: 'Analisi quantitativa'
     },
     {
       icon: Bot,
