@@ -58,6 +58,8 @@ export default function TelegramSetup() {
           telegram_chat_id: chatId.trim(),
           notifications_enabled: enabled,
           preferred_method: 'telegram'
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
