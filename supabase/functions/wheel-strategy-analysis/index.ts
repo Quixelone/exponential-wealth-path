@@ -142,7 +142,7 @@ serve(async (req) => {
 
     // Save analysis to database
     const now = new Date();
-    const { error: insertError } = await supabaseClient
+    const { data: insertedSignal, error: insertError } = await supabaseClient
       .from('ai_trading_signals')
       .insert({
         user_id: user.id,
@@ -162,10 +162,69 @@ serve(async (req) => {
         recommended_premium_pct: strikes[0].premium,
         confidence_score: (technical.score + onchain.score) / 2,
         reasoning: `Technical Score: ${technical.score}/100, On-Chain Score: ${onchain.score}/100`
-      });
+      })
+      .select()
+      .single();
 
     if (insertError) {
       console.error('Error saving analysis:', insertError);
+    }
+
+    // Auto-send Telegram notification if conditions are met
+    if (insertedSignal && strikes[0].premium >= 0.20 && strikes[0].score > 80) {
+      console.log('Strike conditions met, checking Telegram settings...');
+      
+      // Get user's Telegram settings
+      const { data: notificationSettings } = await supabaseClient
+        .from('notification_settings')
+        .select('telegram_chat_id, notifications_enabled')
+        .eq('user_id', user.id)
+        .single();
+
+      if (notificationSettings?.notifications_enabled && notificationSettings?.telegram_chat_id) {
+        console.log('Sending auto Telegram notification...');
+        
+        try {
+          // Format Telegram message
+          const message = formatWheelStrategyMessage(insertedSignal, strikes[0]);
+          
+          // Send to Telegram
+          const telegramToken = Deno.env.get('TELEGRAM_BOT_TOKEN');
+          const telegramResponse = await fetch(
+            `https://api.telegram.org/bot${telegramToken}/sendMessage`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: notificationSettings.telegram_chat_id,
+                text: message,
+                disable_web_page_preview: true
+              })
+            }
+          );
+
+          const telegramData = await telegramResponse.json();
+
+          if (telegramData.ok) {
+            // Update signal as sent
+            await supabaseClient
+              .from('ai_trading_signals')
+              .update({
+                telegram_sent: true,
+                telegram_sent_at: new Date().toISOString()
+              })
+              .eq('id', insertedSignal.id);
+            
+            console.log('Auto Telegram notification sent successfully');
+          } else {
+            console.error('Telegram API error:', telegramData.description);
+          }
+        } catch (telegramError) {
+          console.error('Error sending auto Telegram notification:', telegramError);
+        }
+      } else {
+        console.log('Telegram not configured or notifications disabled');
+      }
     }
 
     return new Response(
@@ -323,6 +382,39 @@ function getBollingerPosition(position: number): string {
   if (position > 0.8) return 'overbought';
   if (position < 0.2) return 'oversold';
   return 'neutral';
+}
+
+function formatWheelStrategyMessage(signal: any, strike: StrikeOption): string {
+  const action = signal.recommended_action === 'SELL_PUT' ? '🔴 SELL PUT' : 
+                 signal.recommended_action === 'SELL_CALL' ? '🟢 SELL CALL' : '⏸️ HOLD';
+  
+  const sentiment = signal.macd_signal === 'bullish' ? '📈 Rialzista' : '📉 Ribassista';
+  
+  let message = `🎯 WHEEL STRATEGY ALERT - OPPORTUNITÀ RILEVATA!\n\n`;
+  message += `✅ SEGNALE AUTOMATICO\n`;
+  message += `Premium: ${strike.premium.toFixed(2)}% (>= 0.20%)\n`;
+  message += `Score: ${strike.score}/100 (> 80)\n\n`;
+  
+  message += `📊 RACCOMANDAZIONE\n`;
+  message += `Azione: ${action}\n`;
+  message += `Strike Price: $${signal.recommended_strike_price || 0}\n`;
+  message += `Premium Atteso: ${signal.recommended_premium_pct?.toFixed(2) || 0}%\n`;
+  message += `Distanza: ${(strike.distance * 100).toFixed(2)}%\n`;
+  message += `Delta: ${strike.delta.toFixed(2)}\n\n`;
+  
+  message += `📈 Analisi Tecnica\n`;
+  message += `• Prezzo BTC: $${signal.btc_price_usd || 0}\n`;
+  message += `• RSI (14): ${signal.rsi_14?.toFixed(2) || 0}\n`;
+  message += `• MACD: ${sentiment}\n`;
+  message += `• Bollinger: ${signal.bollinger_position || 'N/A'}\n`;
+  message += `• Volatilità 24h: ${signal.volatility_24h?.toFixed(2) || 0}%\n`;
+  message += `• Support: $${signal.support_level || 0}\n`;
+  message += `• Resistance: $${signal.resistance_level || 0}\n\n`;
+  
+  message += `🎲 Confidence Score: ${signal.confidence_score?.toFixed(0) || 0}/100\n\n`;
+  message += `⏰ ${new Date(signal.created_at).toLocaleString('it-IT')}`;
+
+  return message;
 }
 
 function calculateOptimalStrikes(
