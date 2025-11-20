@@ -58,7 +58,11 @@ serve(async (req) => {
 
     if (!latestSignal) {
       return new Response(
-        JSON.stringify({ success: false, error: 'No analysis available' }),
+        JSON.stringify({ 
+          success: false, 
+          error: 'Nessuna analisi recente disponibile',
+          message: 'Clicca prima su "Aggiorna" per generare una nuova analisi, poi potrai inviarla su Telegram'
+        }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
