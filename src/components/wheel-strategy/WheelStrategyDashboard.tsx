@@ -80,10 +80,11 @@ export default function WheelStrategyDashboard() {
       const { data: settings } = await supabase
         .from('notification_settings')
         .select('telegram_chat_id, notifications_enabled')
-        .single();
+        .maybeSingle();
       
       setHasTelegram(!!settings?.telegram_chat_id && settings?.notifications_enabled);
     } catch (error) {
+      console.error('Error checking Telegram config:', error);
       setHasTelegram(false);
     }
   };
