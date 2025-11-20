@@ -77,7 +77,7 @@ export type Database = {
           btc_price_source: string | null
           btc_price_usd: number
           confidence_score: number | null
-          config_id: string
+          config_id: string | null
           created_at: string
           current_expiration: string | null
           current_position_type: string | null
@@ -109,7 +109,7 @@ export type Database = {
           btc_price_source?: string | null
           btc_price_usd: number
           confidence_score?: number | null
-          config_id: string
+          config_id?: string | null
           created_at?: string
           current_expiration?: string | null
           current_position_type?: string | null
@@ -141,7 +141,7 @@ export type Database = {
           btc_price_source?: string | null
           btc_price_usd?: number
           confidence_score?: number | null
-          config_id?: string
+          config_id?: string | null
           created_at?: string
           current_expiration?: string | null
           current_position_type?: string | null
