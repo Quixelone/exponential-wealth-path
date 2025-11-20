@@ -333,48 +333,72 @@ function calculateOptimalStrikes(
   const strikes: StrikeOption[] = [];
   const TARGET_DAILY_PREMIUM = 0.20; // Target 0.20% daily premium
 
-  // Generate strike options from -15% to -2% below current price
-  for (let distancePct = 0.02; distancePct <= 0.15; distancePct += 0.005) {
-    const strike = Math.round(currentPrice * (1 - distancePct) / 100) * 100;
+  // Helper function to round strike to realistic exchange values
+  const roundStrike = (price: number): number => {
+    if (price > 100000) return Math.round(price / 1000) * 1000; // Round to 1000
+    if (price > 50000) return Math.round(price / 500) * 500;   // Round to 500
+    if (price > 10000) return Math.round(price / 100) * 100;   // Round to 100
+    return Math.round(price / 50) * 50;                        // Round to 50
+  };
+
+  // Generate realistic strike options from -12% to -2% below current price
+  // Using smaller steps but rounding to exchange-realistic values
+  const generatedStrikes = new Set<number>();
+  
+  for (let distancePct = 0.02; distancePct <= 0.12; distancePct += 0.003) {
+    const rawStrike = currentPrice * (1 - distancePct);
+    const strike = roundStrike(rawStrike);
+    
+    // Avoid duplicates
+    if (generatedStrikes.has(strike)) continue;
+    generatedStrikes.add(strike);
+    
     const distance = (currentPrice - strike) / currentPrice;
     
     // Estimate delta (simplified for 1-day options)
-    const delta = Math.max(0.1, 0.5 - (distance * 3));
+    const delta = Math.max(0.05, 0.5 - (distance * 3.5));
     
-    // Calculate premium for 1-day option (simplified Black-Scholes)
-    // Premium = intrinsic value + time value
-    // For daily options, time decay is significant
-    const dailyVolatility = technical.volatility / Math.sqrt(365); // Annualized to daily
-    const timeValue = (distance * 100) * dailyVolatility * 0.4;
-    const premium = Math.max(0.05, timeValue);
+    // Calculate premium for 1-day option (improved estimation)
+    // For daily options at Pionex, premium depends heavily on distance and volatility
+    const dailyVolatility = technical.volatility / Math.sqrt(365);
+    const distanceBonus = distance * 100 * 0.8; // Distance contributes to premium
+    const volatilityFactor = dailyVolatility * 1.5; // Volatility impact
+    const timeValue = distanceBonus + volatilityFactor;
+    const premium = Math.max(0.05, Math.min(0.50, timeValue));
 
     // Calculate score based on proximity to 0.20% target
     let score = 50;
     
     // Premium proximity to target (highest priority)
     const premiumDiff = Math.abs(premium - TARGET_DAILY_PREMIUM);
-    if (premiumDiff < 0.05) score += 30; // Very close to target
-    else if (premiumDiff < 0.10) score += 20;
-    else if (premiumDiff < 0.15) score += 10;
+    if (premiumDiff < 0.03) score += 35; // Very close to target
+    else if (premiumDiff < 0.05) score += 25;
+    else if (premiumDiff < 0.08) score += 15;
+    else if (premiumDiff < 0.12) score += 5;
     else score -= 10;
 
     // Technical factors
-    if (strike > technical.support * 0.98) score += 15; // Strike above support
-    if (technical.trend === 'bullish' && distance > 0.04) score += 10;
-    if (technical.rsi < 55) score += 10; // Not overbought
+    if (strike > technical.support * 0.97) score += 15; // Strike well above support
+    if (technical.trend === 'bullish' && distance > 0.03) score += 12;
+    if (technical.rsi < 60) score += 10; // Not overbought
 
     // On-chain factors
-    if (onchain.sentiment === 'fear' || onchain.sentiment === 'extreme_fear') score += 10;
-    score += onchain.score * 0.15;
+    if (onchain.sentiment === 'fear' || onchain.sentiment === 'extreme_fear') score += 12;
+    score += onchain.score * 0.2;
 
-    // Distance scoring (prefer 3-8% OTM for daily options)
-    if (distance > 0.03 && distance < 0.08) score += 10;
+    // Distance scoring (prefer 3-8% OTM for daily options - Flying Wheel sweet spot)
+    if (distance >= 0.03 && distance <= 0.08) score += 15;
+    else if (distance >= 0.02 && distance < 0.03) score += 8;
+    else if (distance > 0.08 && distance <= 0.10) score += 5;
 
-    // Delta scoring (prefer 0.15-0.30 delta for daily puts)
-    if (delta > 0.15 && delta < 0.30) score += 5;
+    // Delta scoring (prefer 0.10-0.25 delta for daily puts)
+    if (delta >= 0.10 && delta <= 0.25) score += 8;
 
-    // Bonus for premiums at or above target
-    if (premium >= TARGET_DAILY_PREMIUM && premium <= TARGET_DAILY_PREMIUM * 1.3) score += 15;
+    // Bonus for premiums at or slightly above target
+    if (premium >= TARGET_DAILY_PREMIUM && premium <= TARGET_DAILY_PREMIUM * 1.4) score += 18;
+    
+    // Penalty for too high premiums (means strike too close = risky)
+    if (premium > TARGET_DAILY_PREMIUM * 2) score -= 15;
 
     const recommendation = score > 75 ? 'SELL_PUT' : score > 60 ? 'CONSIDER' : 'HOLD';
 
@@ -382,7 +406,7 @@ function calculateOptimalStrikes(
   }
 
   // Sort by score first, then by proximity to target premium
-  return strikes.sort((a, b) => {
+  const sortedStrikes = strikes.sort((a, b) => {
     const scoreDiff = b.score - a.score;
     if (Math.abs(scoreDiff) < 5) {
       // If scores are close, prefer the one closer to target premium
@@ -392,4 +416,7 @@ function calculateOptimalStrikes(
     }
     return scoreDiff;
   });
+
+  // Return only top 8 most relevant strikes
+  return sortedStrikes.slice(0, 8);
 }
