@@ -12,6 +12,7 @@ import NotificationTester from '@/components/NotificationTester';
 import SettingsHeader from '@/components/settings/SettingsHeader';
 import { BackupManager } from '@/components/configuration/BackupManager';
 import { BrokerAPIManager } from '@/components/settings/BrokerAPIManager';
+import TelegramSetup from '@/components/settings/TelegramSetup';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -264,8 +265,12 @@ const Settings = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="notifications" className="w-full">
-          <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-6">
+        <Tabs defaultValue="telegram" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6">
+            <TabsTrigger value="telegram" className="flex items-center gap-2">
+              <SettingsIcon className="h-4 w-4" />
+              📱 Telegram
+            </TabsTrigger>
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
               Test Notifiche WhatsApp
@@ -287,6 +292,10 @@ const Settings = () => {
             Preferenze
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="telegram">
+          <TelegramSetup />
+        </TabsContent>
 
         <TabsContent value="notifications">
           <NotificationTester />
