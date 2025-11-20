@@ -56,16 +56,58 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    // Fetch current BTC price from Pionex (using Binance as fallback)
-    const priceResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-    const priceData = await priceResponse.json();
-    const currentPrice = parseFloat(priceData.price);
+    // Fetch current BTC price from Pionex API
+    const pionexApiKey = Deno.env.get('PIONEX_API_KEY');
+    
+    let currentPrice: number;
+    let priceSource = 'pionex';
+    
+    try {
+      // Try Pionex first
+      const pionexResponse = await fetch('https://api.pionex.com/api/v1/market/ticker?symbol=BTC_USDT');
+      const pionexData = await pionexResponse.json();
+      
+      if (pionexData.result && pionexData.data?.tickers?.[0]?.close) {
+        currentPrice = parseFloat(pionexData.data.tickers[0].close);
+        console.log('Using Pionex price:', currentPrice);
+      } else {
+        throw new Error('Invalid Pionex response');
+      }
+    } catch (error) {
+      // Fallback to Binance
+      console.log('Pionex failed, using Binance fallback:', error);
+      priceSource = 'binance';
+      const binanceResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+      const binanceData = await binanceResponse.json();
+      currentPrice = parseFloat(binanceData.price);
+    }
 
     // Fetch klines for technical analysis (1h, last 100 candles)
-    const klinesResponse = await fetch(
-      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=100'
-    );
-    const klines = await klinesResponse.json();
+    let klines: any[];
+    
+    try {
+      // Try Pionex klines first
+      const pionexKlinesResponse = await fetch(
+        'https://api.pionex.com/api/v1/market/klines?symbol=BTC_USDT&interval=1h&limit=100'
+      );
+      const pionexKlinesData = await pionexKlinesResponse.json();
+      
+      if (pionexKlinesData.result && pionexKlinesData.data?.klines) {
+        klines = pionexKlinesData.data.klines.map((k: any) => [
+          k.time, k.open, k.high, k.low, k.close, k.volume
+        ]);
+        console.log('Using Pionex klines data');
+      } else {
+        throw new Error('Invalid Pionex klines response');
+      }
+    } catch (error) {
+      // Fallback to Binance
+      console.log('Pionex klines failed, using Binance fallback:', error);
+      const binanceKlinesResponse = await fetch(
+        'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=100'
+      );
+      klines = await binanceKlinesResponse.json();
+    }
 
     // Calculate Technical Indicators
     const closes = klines.map((k: any) => parseFloat(k[4]));
@@ -108,7 +150,7 @@ serve(async (req) => {
         signal_date: now.toISOString().split('T')[0],
         signal_time: now.toISOString(),
         btc_price_usd: currentPrice,
-        btc_price_source: 'binance',
+        btc_price_source: priceSource,
         rsi_14: technical.rsi,
         macd_signal: technical.macd.histogram > 0 ? 'bullish' : 'bearish',
         bollinger_position: getBollingerPosition(technical.bollinger.position),
