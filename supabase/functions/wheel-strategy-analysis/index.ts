@@ -289,41 +289,65 @@ function calculateOptimalStrikes(
   onchain: OnChainMetrics
 ): StrikeOption[] {
   const strikes: StrikeOption[] = [];
+  const TARGET_DAILY_PREMIUM = 0.20; // Target 0.20% daily premium
 
-  // Generate strike options from -15% to -3% below current price
-  for (let distancePct = 0.03; distancePct <= 0.15; distancePct += 0.01) {
+  // Generate strike options from -15% to -2% below current price
+  for (let distancePct = 0.02; distancePct <= 0.15; distancePct += 0.005) {
     const strike = Math.round(currentPrice * (1 - distancePct) / 100) * 100;
     const distance = (currentPrice - strike) / currentPrice;
     
-    // Estimate delta (simplified Black-Scholes approximation)
-    const delta = 0.5 - (distance * 2);
+    // Estimate delta (simplified for 1-day options)
+    const delta = Math.max(0.1, 0.5 - (distance * 3));
     
-    // Estimate premium (based on distance and volatility)
-    const premium = (distance * 100) * (1 + technical.volatility / 100) * 0.8;
+    // Calculate premium for 1-day option (simplified Black-Scholes)
+    // Premium = intrinsic value + time value
+    // For daily options, time decay is significant
+    const dailyVolatility = technical.volatility / Math.sqrt(365); // Annualized to daily
+    const timeValue = (distance * 100) * dailyVolatility * 0.4;
+    const premium = Math.max(0.05, timeValue);
 
-    // Calculate score
+    // Calculate score based on proximity to 0.20% target
     let score = 50;
+    
+    // Premium proximity to target (highest priority)
+    const premiumDiff = Math.abs(premium - TARGET_DAILY_PREMIUM);
+    if (premiumDiff < 0.05) score += 30; // Very close to target
+    else if (premiumDiff < 0.10) score += 20;
+    else if (premiumDiff < 0.15) score += 10;
+    else score -= 10;
 
     // Technical factors
-    if (strike > technical.support) score += 15;
-    if (technical.trend === 'bullish' && distance > 0.05) score += 10;
-    if (technical.rsi < 50) score += 10;
+    if (strike > technical.support * 0.98) score += 15; // Strike above support
+    if (technical.trend === 'bullish' && distance > 0.04) score += 10;
+    if (technical.rsi < 55) score += 10; // Not overbought
 
     // On-chain factors
-    if (onchain.sentiment === 'fear' || onchain.sentiment === 'extreme_fear') score += 15;
-    score += onchain.score * 0.2;
+    if (onchain.sentiment === 'fear' || onchain.sentiment === 'extreme_fear') score += 10;
+    score += onchain.score * 0.15;
 
-    // Distance scoring
-    if (distance > 0.05 && distance < 0.10) score += 15;
-    if (premium > 0.3) score += 10;
+    // Distance scoring (prefer 3-8% OTM for daily options)
+    if (distance > 0.03 && distance < 0.08) score += 10;
 
-    // Delta scoring
-    if (delta > 0.2 && delta < 0.35) score += 10;
+    // Delta scoring (prefer 0.15-0.30 delta for daily puts)
+    if (delta > 0.15 && delta < 0.30) score += 5;
+
+    // Bonus for premiums at or above target
+    if (premium >= TARGET_DAILY_PREMIUM && premium <= TARGET_DAILY_PREMIUM * 1.3) score += 15;
 
     const recommendation = score > 75 ? 'SELL_PUT' : score > 60 ? 'CONSIDER' : 'HOLD';
 
     strikes.push({ strike, distance, delta, premium, score: Math.min(100, score), recommendation });
   }
 
-  return strikes.sort((a, b) => b.score - a.score);
+  // Sort by score first, then by proximity to target premium
+  return strikes.sort((a, b) => {
+    const scoreDiff = b.score - a.score;
+    if (Math.abs(scoreDiff) < 5) {
+      // If scores are close, prefer the one closer to target premium
+      const aDiff = Math.abs(a.premium - TARGET_DAILY_PREMIUM);
+      const bDiff = Math.abs(b.premium - TARGET_DAILY_PREMIUM);
+      return aDiff - bDiff;
+    }
+    return scoreDiff;
+  });
 }
