@@ -77,9 +77,16 @@ export default function WheelStrategyDashboard() {
 
   const checkTelegramConfig = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setHasTelegram(false);
+        return;
+      }
+
       const { data: settings } = await supabase
         .from('notification_settings')
         .select('telegram_chat_id, notifications_enabled')
+        .eq('user_id', user.id)
         .maybeSingle();
       
       setHasTelegram(!!settings?.telegram_chat_id && settings?.notifications_enabled);

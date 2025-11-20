@@ -72,7 +72,6 @@ serve(async (req) => {
         body: JSON.stringify({
           chat_id: notificationSettings.telegram_chat_id,
           text: message,
-          parse_mode: 'Markdown',
           disable_web_page_preview: true
         })
       }
@@ -117,22 +116,22 @@ function formatWheelStrategyMessage(signal: any): string {
   
   const sentiment = signal.macd_signal === 'bullish' ? '📈 Rialzista' : '📉 Ribassista';
   
-  let message = `🎯 *WHEEL STRATEGY SIGNAL*\n\n`;
-  message += `*Azione Raccomandata:* ${action}\n`;
-  message += `*Strike Price:* $${signal.recommended_strike_price?.toLocaleString()}\n`;
-  message += `*Premium Atteso:* ${signal.recommended_premium_pct?.toFixed(2)}%\n\n`;
+  let message = `🎯 WHEEL STRATEGY SIGNAL\n\n`;
+  message += `Azione Raccomandata: ${action}\n`;
+  message += `Strike Price: $${signal.recommended_strike_price || 0}\n`;
+  message += `Premium Atteso: ${signal.recommended_premium_pct?.toFixed(2) || 0}%\n\n`;
   
-  message += `📊 *Analisi Tecnica*\n`;
-  message += `• Prezzo BTC: $${signal.btc_price_usd?.toLocaleString()}\n`;
-  message += `• RSI (14): ${signal.rsi_14?.toFixed(2)}\n`;
+  message += `📊 Analisi Tecnica\n`;
+  message += `• Prezzo BTC: $${signal.btc_price_usd || 0}\n`;
+  message += `• RSI (14): ${signal.rsi_14?.toFixed(2) || 0}\n`;
   message += `• MACD: ${sentiment}\n`;
-  message += `• Bollinger: ${signal.bollinger_position}\n`;
-  message += `• Volatilità 24h: ${signal.volatility_24h?.toFixed(2)}%\n`;
-  message += `• Support: $${signal.support_level?.toLocaleString()}\n`;
-  message += `• Resistance: $${signal.resistance_level?.toLocaleString()}\n\n`;
+  message += `• Bollinger: ${signal.bollinger_position || 'N/A'}\n`;
+  message += `• Volatilità 24h: ${signal.volatility_24h?.toFixed(2) || 0}%\n`;
+  message += `• Support: $${signal.support_level || 0}\n`;
+  message += `• Resistance: $${signal.resistance_level || 0}\n\n`;
   
-  message += `🎲 *Confidence Score:* ${signal.confidence_score?.toFixed(0)}/100\n\n`;
-  message += `💡 *Reasoning:*\n${signal.reasoning}\n\n`;
+  message += `🎲 Confidence Score: ${signal.confidence_score?.toFixed(0) || 0}/100\n\n`;
+  message += `💡 Reasoning:\n${signal.reasoning || 'N/A'}\n\n`;
   message += `⏰ ${new Date(signal.created_at).toLocaleString('it-IT')}`;
 
   return message;
