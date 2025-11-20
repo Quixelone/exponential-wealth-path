@@ -69,7 +69,7 @@ const NewConfigurationDialog: React.FC<NewConfigurationDialogProps> = ({
           Nuova Configurazione
         </Button>
       </DialogTrigger>
-      <DialogContent className="mobile-dialog sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="mobile-dialog sm:max-w-md max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
             <Plus className="h-5 w-5 text-primary" />

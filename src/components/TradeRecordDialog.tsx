@@ -321,9 +321,9 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl sm:max-h-[90vh] mobile-dialog">
-        <div className="mobile-dialog-content">
-          <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[92vh] sm:max-h-[90vh] mobile-dialog overflow-hidden flex flex-col">
+        <div className="mobile-dialog-content flex flex-col h-full">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-base sm:text-xl font-bold flex flex-col sm:flex-row items-start sm:items-center gap-2">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-primary" />
@@ -337,6 +337,7 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
             </DialogTitle>
           </DialogHeader>
 
+          <div className="overflow-y-auto flex-1">
           <form onSubmit={handleSubmit} className="mobile-dialog-body space-y-4 sm:space-y-6">
             {/* Timeline Opzione */}
             <div className="bg-primary/5 p-3 sm:p-4 rounded-lg border-2 border-primary/20">
@@ -748,6 +749,7 @@ export const TradeRecordDialog: React.FC<TradeRecordDialogProps> = ({
             </div>
           </DialogFooter>
         </form>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

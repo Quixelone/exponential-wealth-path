@@ -745,6 +745,39 @@
   @apply transition-all duration-150 active:scale-[0.97] active:opacity-80;
 }
 
+/* Mobile Dialog Optimizations - CRITICAL FIX */
+.mobile-dialog {
+  @apply touch-manipulation;
+}
+
+@media (max-width: 640px) {
+  .mobile-dialog {
+    @apply m-2 rounded-lg;
+    max-width: calc(100vw - 1rem) !important;
+    width: calc(100vw - 1rem) !important;
+  }
+  
+  .mobile-dialog-compact {
+    @apply p-0;
+  }
+  
+  .mobile-dialog-body {
+    @apply overscroll-contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-dialog-footer {
+    @apply flex-col gap-2;
+  }
+}
+
+/* Fix per iOS Safari viewport height */
+@supports (-webkit-touch-callout: none) {
+  .mobile-dialog {
+    max-height: -webkit-fill-available !important;
+  }
+}
+
 /* Safe area support for mobile */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom);

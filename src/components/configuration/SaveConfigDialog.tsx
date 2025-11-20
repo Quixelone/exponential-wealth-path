@@ -62,7 +62,7 @@ const SaveConfigDialog: React.FC<SaveConfigDialogProps> = ({
           : "Salva"}
       </Button>
     </DialogTrigger>
-    <DialogContent className="mobile-dialog max-h-[90vh] overflow-y-auto">
+    <DialogContent className="mobile-dialog max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle className="text-base sm:text-lg">
           {isUpdate

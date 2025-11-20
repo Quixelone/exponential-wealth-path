@@ -178,7 +178,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] sm:max-h-[85vh] md:max-h-[80vh] mobile-dialog-compact flex flex-col overflow-hidden p-0">
+      <DialogContent className="max-w-2xl max-h-[92vh] sm:max-h-[85vh] md:max-h-[80vh] mobile-dialog-compact flex flex-col p-0">
         <div className="mobile-dialog-content h-full flex flex-col">
           <DialogHeader className="flex-shrink-0 px-4 pt-4 sm:px-6 sm:pt-6">
             <DialogTitle className="flex items-center gap-2 text-base sm:text-xl">
@@ -190,7 +190,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 sm:space-y-4 overflow-y-auto flex-1 px-4 sm:px-6 mobile-dialog-body"  style={{ maxHeight: 'calc(95vh - 220px)' }}>
+          <div className="space-y-3 sm:space-y-4 overflow-y-auto flex-1 px-4 sm:px-6 mobile-dialog-body"  style={{ maxHeight: 'calc(85vh - 180px)' }}>
             {/* Informazioni attuali */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-muted/30 rounded-lg">
               <div>
