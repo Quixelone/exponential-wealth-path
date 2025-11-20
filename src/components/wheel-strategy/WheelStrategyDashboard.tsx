@@ -53,6 +53,7 @@ export default function WheelStrategyDashboard() {
   const [data, setData] = useState<AnalysisData | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [hasTelegram, setHasTelegram] = useState(false);
+  const [hasRecentAnalysis, setHasRecentAnalysis] = useState(false);
 
   const fetchAnalysis = async () => {
     try {
@@ -64,12 +65,14 @@ export default function WheelStrategyDashboard() {
       if (analysisData.success) {
         setData(analysisData);
         setLastUpdate(new Date());
+        setHasRecentAnalysis(true);
       } else {
         throw new Error(analysisData.error);
       }
     } catch (error: any) {
       console.error('Error fetching analysis:', error);
       toast.error('Errore nel caricamento analisi');
+      setHasRecentAnalysis(false);
     } finally {
       setLoading(false);
     }
@@ -171,7 +174,11 @@ export default function WheelStrategyDashboard() {
             Aggiorna
           </Button>
           {hasTelegram ? (
-            <Button onClick={sendTelegramSignal} disabled={sending}>
+            <Button 
+              onClick={sendTelegramSignal} 
+              disabled={sending || !hasRecentAnalysis}
+              title={!hasRecentAnalysis ? 'Clicca prima su Aggiorna per generare una nuova analisi' : ''}
+            >
               <Send className="h-4 w-4 mr-2" />
               {sending ? 'Invio...' : 'Invia Telegram'}
             </Button>
