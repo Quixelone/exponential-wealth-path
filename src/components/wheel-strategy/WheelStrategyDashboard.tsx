@@ -52,6 +52,7 @@ export default function WheelStrategyDashboard() {
   const [sending, setSending] = useState(false);
   const [data, setData] = useState<AnalysisData | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [hasTelegram, setHasTelegram] = useState(false);
 
   const fetchAnalysis = async () => {
     try {
@@ -71,6 +72,19 @@ export default function WheelStrategyDashboard() {
       toast.error('Errore nel caricamento analisi');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkTelegramConfig = async () => {
+    try {
+      const { data: settings } = await supabase
+        .from('notification_settings')
+        .select('telegram_chat_id, notifications_enabled')
+        .single();
+      
+      setHasTelegram(!!settings?.telegram_chat_id && settings?.notifications_enabled);
+    } catch (error) {
+      setHasTelegram(false);
     }
   };
 
@@ -97,6 +111,7 @@ export default function WheelStrategyDashboard() {
 
   useEffect(() => {
     fetchAnalysis();
+    checkTelegramConfig();
     const interval = setInterval(fetchAnalysis, 300000); // 5 minuti
     return () => clearInterval(interval);
   }, []);
@@ -147,10 +162,17 @@ export default function WheelStrategyDashboard() {
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Aggiorna
           </Button>
-          <Button onClick={sendTelegramSignal} disabled={sending}>
-            <Send className="h-4 w-4 mr-2" />
-            {sending ? 'Invio...' : 'Invia Telegram'}
-          </Button>
+          {hasTelegram ? (
+            <Button onClick={sendTelegramSignal} disabled={sending}>
+              <Send className="h-4 w-4 mr-2" />
+              {sending ? 'Invio...' : 'Invia Telegram'}
+            </Button>
+          ) : (
+            <Button variant="outline" disabled>
+              <Send className="h-4 w-4 mr-2" />
+              Telegram non configurato
+            </Button>
+          )}
         </div>
       </div>
 
