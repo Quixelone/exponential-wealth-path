@@ -84,11 +84,12 @@ export default function WheelStrategyDashboard() {
       if (result.success) {
         toast.success('Segnale inviato su Telegram!');
       } else {
-        throw new Error(result.error);
+        // Show user-friendly message from backend
+        toast.error(result.message || result.error || 'Errore invio segnale');
       }
     } catch (error: any) {
       console.error('Error sending signal:', error);
-      toast.error(error.message || 'Errore invio segnale');
+      toast.error('Errore nella comunicazione con il server');
     } finally {
       setSending(false);
     }

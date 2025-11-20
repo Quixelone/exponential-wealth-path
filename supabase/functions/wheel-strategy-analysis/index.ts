@@ -99,13 +99,14 @@ serve(async (req) => {
     const strikes = calculateOptimalStrikes(currentPrice, technical, onchain);
 
     // Save analysis to database
+    const now = new Date();
     const { error: insertError } = await supabaseClient
       .from('ai_trading_signals')
       .insert({
         user_id: user.id,
         config_id: null, // Will be linked later
-        signal_date: new Date().toISOString().split('T')[0],
-        signal_time: new Date().toISOString().split('T')[1].split('.')[0],
+        signal_date: now.toISOString().split('T')[0],
+        signal_time: now.toISOString(),
         btc_price_usd: currentPrice,
         btc_price_source: 'binance',
         rsi_14: technical.rsi,

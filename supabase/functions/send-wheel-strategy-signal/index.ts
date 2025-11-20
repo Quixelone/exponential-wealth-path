@@ -34,7 +34,11 @@ serve(async (req) => {
 
     if (!notificationSettings?.notifications_enabled || !notificationSettings?.telegram_chat_id) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Telegram notifications not configured' }),
+        JSON.stringify({ 
+          success: false, 
+          error: 'Telegram non configurato',
+          message: 'Configura il tuo Telegram chat ID in Impostazioni per ricevere notifiche'
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
