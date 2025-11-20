@@ -109,12 +109,19 @@ export default function WheelStrategyDashboard() {
       if (result.success) {
         toast.success('Segnale inviato su Telegram!');
       } else {
-        // Show user-friendly message from backend
-        toast.error(result.message || result.error || 'Errore invio segnale');
+        // Show the specific message from backend (e.g., "no recent analysis")
+        if (result.message) {
+          toast.info(result.message);
+        } else {
+          toast.error(result.error || 'Errore invio segnale');
+        }
       }
     } catch (error: any) {
       console.error('Error sending signal:', error);
-      toast.error('Errore nella comunicazione con il server');
+      // Only show generic error for actual network/server errors
+      if (error.message && !error.message.includes('analisi')) {
+        toast.error('Errore nella comunicazione con il server');
+      }
     } finally {
       setSending(false);
     }
