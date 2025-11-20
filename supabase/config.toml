@@ -1,6 +1,12 @@
 
 project_id = "rsmvjsokqolxgczclqjv"
 
+[functions.wheel-strategy-analysis]
+verify_jwt = true
+
+[functions.send-wheel-strategy-signal]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321
