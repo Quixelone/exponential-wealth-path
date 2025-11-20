@@ -43,11 +43,15 @@ serve(async (req) => {
       );
     }
 
-    // Get latest analysis
+    // Get latest analysis (last 2 days only)
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    
     const { data: latestSignal } = await supabaseClient
       .from('ai_trading_signals')
       .select('*')
       .eq('user_id', user.id)
+      .gte('created_at', twoDaysAgo.toISOString())
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
