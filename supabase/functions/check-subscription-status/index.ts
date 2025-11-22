@@ -37,16 +37,15 @@ serve(async (req) => {
     
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      {
-        global: { headers: { Authorization: authHeader } },
-        auth: { persistSession: false }
-      }
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
     );
+    
+    const token = authHeader.replace("Bearer ", "");
     
     let user;
     try {
-      const { data: { user: authUser }, error: userError } = await supabaseClient.auth.getUser();
+      const { data: { user: authUser }, error: userError } = await supabaseClient.auth.getUser(token);
       if (userError || !authUser?.email) {
         logStep("User authentication failed or no email", { error: userError?.message });
         return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
