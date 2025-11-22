@@ -33,10 +33,31 @@ const VirtualizedReportTable: React.FC<VirtualizedReportTableProps> = ({
 }) => {
   const [scrollTop, setScrollTop] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasAutoScrolled = useRef(false);
 
   const isCurrentDay = (dayNumber: number) => {
     return currentInvestmentDay === dayNumber;
   };
+
+  // Auto-scroll to current day on mount
+  useEffect(() => {
+    if (currentInvestmentDay && data.length > 0 && containerRef.current && !hasAutoScrolled.current) {
+      const currentDayIndex = data.findIndex(item => item.day === currentInvestmentDay);
+      if (currentDayIndex !== -1) {
+        const scrollPosition = currentDayIndex * ROW_HEIGHT - (CONTAINER_HEIGHT / 2) + (ROW_HEIGHT / 2);
+        
+        setTimeout(() => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: Math.max(0, scrollPosition),
+              behavior: 'smooth'
+            });
+            hasAutoScrolled.current = true;
+          }
+        }, 300);
+      }
+    }
+  }, [currentInvestmentDay, data.length]);
 
   // Calculate visible range
   const visibleStart = Math.floor(scrollTop / ROW_HEIGHT);

@@ -224,7 +224,7 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const [tradeDialogOpen, setTradeDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InvestmentData | null>(null);
   const hasManuallyNavigated = useRef(false);
-  const currentDayRef = useRef<HTMLDivElement>(null);
+  const currentDayRef = useRef<HTMLTableRowElement>(null);
   const hasAutoScrolled = useRef(false); // Flag to track if auto-scroll has been executed
   const itemsPerPage = 20;
   
@@ -278,19 +278,9 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
       );
     }
     
-    // Reorder: Current day first, then future days, then past days
-    if (currentInvestmentDay) {
-      const currentDayItem = filtered.find(item => item.day === currentInvestmentDay);
-      const futureDays = filtered.filter(item => item.day > currentInvestmentDay).sort((a, b) => a.day - b.day);
-      const pastDays = filtered.filter(item => item.day < currentInvestmentDay).sort((a, b) => a.day - b.day);
-      
-      return currentDayItem 
-        ? [currentDayItem, ...futureDays, ...pastDays]
-        : filtered;
-    }
-    
+    // Mantieni ordine cronologico naturale
     return filtered;
-  }, [data, searchTerm, currentInvestmentDay]);
+  }, [data, searchTerm]);
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -301,27 +291,22 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   const startMobileIndex = (currentMobilePage - 1) * mobileItemsPerPage;
   const paginatedMobileData = filteredData.slice(startMobileIndex, startMobileIndex + mobileItemsPerPage);
 
-  // Auto-scroll to current day on mount (mobile only) - ONCE
+  // Auto-scroll to current day on mount - ONCE
   useEffect(() => {
-    // Only execute if:
-    // 1. On mobile
-    // 2. Current day is set
-    // 3. Data is loaded
-    // 4. Haven't scrolled yet
-    if (isMobile && currentInvestmentDay && filteredData.length > 0 && !hasAutoScrolled.current) {
+    if (currentInvestmentDay && filteredData.length > 0 && !hasAutoScrolled.current && currentDayRef.current) {
       const timer = setTimeout(() => {
         if (currentDayRef.current) {
           currentDayRef.current.scrollIntoView({ 
             behavior: 'smooth', 
-            block: 'start'
+            block: 'center' // Centra nella viewport
           });
           hasAutoScrolled.current = true;
         }
-      }, 800);
+      }, 500);
       
       return () => clearTimeout(timer);
     }
-  }, [isMobile, currentInvestmentDay, filteredData.length]);
+  }, [currentInvestmentDay, filteredData.length]);
 
   // Reset auto-scroll flag when data changes significantly
   useEffect(() => {
@@ -338,20 +323,6 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
       }
     }
   }, [isMobile, currentInvestmentDay, filteredData.length, mobileItemsPerPage]);
-
-  // Naviga automaticamente alla pagina contenente il giorno corrente SOLO se necessario
-  useEffect(() => {
-    if (currentInvestmentDay && !searchTerm && !hasManuallyNavigated.current && data.length > 0) {
-      const currentDayItem = data.find(item => item.day === currentInvestmentDay);
-      if (currentDayItem) {
-        const currentDayIndex = data.indexOf(currentDayItem);
-        const pageWithCurrentDay = Math.floor(currentDayIndex / itemsPerPage) + 1;
-        if (pageWithCurrentDay !== currentPage) {
-          setCurrentPage(pageWithCurrentDay);
-        }
-      }
-    }
-  }, [currentInvestmentDay, searchTerm, itemsPerPage]); // Rimosso data.length per evitare re-render continui
 
   const handleEditRow = (item: InvestmentData) => {
     setSelectedItem(item);
@@ -597,6 +568,7 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
 
                     return (
                       <TableRow 
+                        ref={isToday ? currentDayRef : null}
                         key={item.day} 
                         className={`
                           hover:bg-muted/50
