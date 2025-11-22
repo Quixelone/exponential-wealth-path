@@ -267,13 +267,30 @@ const ReportTable: React.FC<ReportTableProps> = React.memo(({
   }, [investmentStartDate]);
 
   const filteredData = useMemo(() => {
-    if (!searchTerm) return data;
-    return data.filter(item => 
-      item.day.toString().includes(searchTerm) ||
-      formatDate(item.date).includes(searchTerm) ||
-      item.dailyReturn.toString().includes(searchTerm)
-    );
-  }, [data, searchTerm]);
+    let filtered = data;
+    
+    // Apply search filter
+    if (searchTerm) {
+      filtered = data.filter(item => 
+        item.day.toString().includes(searchTerm) ||
+        formatDate(item.date).includes(searchTerm) ||
+        item.dailyReturn.toString().includes(searchTerm)
+      );
+    }
+    
+    // Reorder: Current day first, then future days, then past days
+    if (currentInvestmentDay) {
+      const currentDayItem = filtered.find(item => item.day === currentInvestmentDay);
+      const futureDays = filtered.filter(item => item.day > currentInvestmentDay).sort((a, b) => a.day - b.day);
+      const pastDays = filtered.filter(item => item.day < currentInvestmentDay).sort((a, b) => a.day - b.day);
+      
+      return currentDayItem 
+        ? [currentDayItem, ...futureDays, ...pastDays]
+        : filtered;
+    }
+    
+    return filtered;
+  }, [data, searchTerm, currentInvestmentDay]);
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
