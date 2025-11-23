@@ -80,17 +80,36 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
   };
 
   const isActivePath = (item: any) => {
+    // Normalize activeTab: 'investments' maps to 'dashboard'
+    const normalizedTab = activeTab === 'investments' ? 'dashboard' : activeTab;
+    
     // Special case: Notifiche is active only when on /app AND activeTab is 'reminders'
     if (item.id === 'reminders') {
-      return location.pathname === '/app' && activeTab === 'reminders';
+      return location.pathname === '/app' && normalizedTab === 'reminders';
     }
     
-    // Dashboard is active only when on /app AND activeTab is NOT 'reminders'
+    // Dashboard is active when on /app AND normalizedTab is 'dashboard' (or undefined/empty as default)
     if (item.id === 'dashboard') {
-      return location.pathname === '/app' && activeTab !== 'reminders';
+      return location.pathname === '/app' && 
+             (normalizedTab === 'dashboard' || !normalizedTab);
     }
     
-    // Other paths: simple match
+    // Strategies is active when on /strategies path
+    if (item.id === 'strategies') {
+      return location.pathname === '/strategies';
+    }
+    
+    // Settings is active when on /settings path
+    if (item.id === 'settings') {
+      return location.pathname === '/settings';
+    }
+    
+    // Users (admin only) is active when on /user-management path
+    if (item.id === 'users') {
+      return location.pathname === '/user-management';
+    }
+    
+    // Fallback: simple path match
     return location.pathname === item.path;
   };
 
