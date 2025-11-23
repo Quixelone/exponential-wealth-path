@@ -146,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [user?.email]);
 
   const checkSubscriptionStatus = useCallback(async () => {
-    if (!session?.access_token || isCheckingSubscription) return;
+    if (!session || isCheckingSubscription) return;
     
     // Throttle: evita chiamate più frequenti di 3 minuti
     const now = Date.now();
@@ -163,11 +163,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     try {
       console.log('🔍 Checking subscription status...');
-      const { data, error } = await supabase.functions.invoke('check-subscription-status', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
+      // Il client Supabase gestisce automaticamente il token refresh
+      const { data, error } = await supabase.functions.invoke('check-subscription-status');
       
       if (error) {
         // Silently handle 401 errors (user not authenticated or token expired)
@@ -193,7 +190,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsCheckingSubscription(false);
     }
-  }, [session?.access_token, isCheckingSubscription, lastSubscriptionCheck]);
+  }, [session, isCheckingSubscription, lastSubscriptionCheck]);
 
   const updateUserLogin = useCallback(async (userId: string) => {
     try {
@@ -286,11 +283,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Auto-refresh subscription status every 15 minutes
   useEffect(() => {
-    if (!session?.access_token) return;
+    if (!session) return;
     
     // Crea una funzione locale per evitare dipendenze circolari
     const refreshSubscription = async () => {
-      if (!session?.access_token || isCheckingSubscription) return;
+      if (!session || isCheckingSubscription) return;
       
       const now = Date.now();
       const timeSinceLastCheck = now - lastSubscriptionCheck;
@@ -306,11 +303,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       try {
         console.log('🔄 Auto-refreshing subscription status...');
-        const { data, error } = await supabase.functions.invoke('check-subscription-status', {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`
-          }
-        });
+        // Il client Supabase gestisce automaticamente il token refresh
+        const { data, error } = await supabase.functions.invoke('check-subscription-status');
         
         if (!error && data) {
           console.log('✅ Subscription auto-refreshed:', data);
@@ -326,7 +320,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const interval = setInterval(refreshSubscription, 15 * 60 * 1000); // 15 minuti
 
     return () => clearInterval(interval);
-  }, [session?.access_token, isCheckingSubscription, lastSubscriptionCheck]);
+  }, [session, isCheckingSubscription, lastSubscriptionCheck]);
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => {
     try {
