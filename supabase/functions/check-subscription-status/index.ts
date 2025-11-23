@@ -35,17 +35,20 @@ serve(async (req) => {
       });
     }
     
+    // Create client with ANON key to validate user JWT
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { 
+        global: { headers: { Authorization: authHeader } },
+        auth: { persistSession: false }
+      }
     );
-    
-    const token = authHeader.replace("Bearer ", "");
     
     let user;
     try {
-      const { data: { user: authUser }, error: userError } = await supabaseClient.auth.getUser(token);
+      // getUser() will automatically use the Authorization header
+      const { data: { user: authUser }, error: userError } = await supabaseClient.auth.getUser();
       if (userError || !authUser?.email) {
         logStep("User authentication failed or no email", { error: userError?.message });
         return new Response(JSON.stringify({ subscribed: false, subscription_end: null }), {
