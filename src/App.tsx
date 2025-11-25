@@ -22,6 +22,7 @@ const CoachAI = lazy(() => import("./pages/CoachAI"));
 const Education = lazy(() => import("./pages/Education"));
 const EducationDashboard = lazy(() => import("./pages/EducationDashboard"));
 const EducationLeaderboard = lazy(() => import("./pages/EducationLeaderboard"));
+const EducationalLanding = lazy(() => import("./pages/EducationalLanding"));
 const TradingSimulator = lazy(() => import("./pages/TradingSimulator"));
 const CourseViewer = lazy(() => import("./pages/CourseViewer"));
 const WheelStrategy = lazy(() => import("./pages/WheelStrategy"));
@@ -64,6 +65,7 @@ const App = () => {
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
                         <Route path="/" element={<WebLanding />} />
+                        <Route path="/educational" element={<EducationalLanding />} />
                         <Route path="/app" element={<Index />} />
                         <Route path="/auth" element={<Auth />} />
                         <Route path="/auth/callback" element={<AuthCallback />} />
