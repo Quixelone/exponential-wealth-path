@@ -59,6 +59,55 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase (Backend & Authentication)
+- Motion (Framer Motion) - Animations
+- React GA4 - Google Analytics tracking
+
+## Project Structure
+
+### Landing Pages
+- **`/`** - Main platform landing page (WebLanding.tsx)
+- **`/educational`** - Course marketing landing page (EducationalLanding.tsx) - **NEW!**
+  - Optimized for educational marketing campaigns
+  - UTM parameter tracking for campaign attribution
+  - Google Analytics integration
+  - AI mascot "Prof Satoshi"
+
+### Application Pages
+- **`/app`** - Main dashboard (authenticated users)
+- **`/education`** - Education hub with course list
+- **`/education/dashboard`** - Student progress dashboard
+- **`/education/leaderboard`** - Global leaderboard
+- **`/education/simulation`** - Paper trading simulator
+- **`/education/course/:id`** - Course viewer
+- **`/strategies`** - Investment strategies management
+- **`/settings`** - User settings & broker connections
+- **`/ai-signals`** - AI trading signals
+- **`/wheel-strategy`** - Wheel strategy dashboard
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+# Required - Supabase
+VITE_SUPABASE_PROJECT_ID=your_project_id
+VITE_SUPABASE_PUBLISHABLE_KEY=your_key
+VITE_SUPABASE_URL=your_url
+
+# Optional - Google Analytics
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+## Marketing Campaigns
+
+Use UTM parameters to track campaign performance:
+
+```
+https://finanzacreativa.live/educational?utm_source=facebook&utm_campaign=corso_btc&utm_medium=ads
+```
+
+UTM data is automatically captured and saved for post-signup attribution.
 
 ## How can I deploy this project?
 
