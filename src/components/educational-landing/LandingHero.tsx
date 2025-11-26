@@ -3,14 +3,39 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { Sparkles, TrendingUp, Shield, Zap } from 'lucide-react';
 import { FloatingOrb } from './FloatingOrb';
 import profSatoshiExcited from '@/assets/educational-landing/prof-satoshi-excited.png';
+import { useParallax } from '@/hooks/useParallax';
 
 export const LandingHero = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  
+  // Parallax setup
+  const { scrollY } = useScroll();
+  
+  // Multi-layer parallax with different speeds
+  const orb1Y = useTransform(scrollY, [0, 1000], [0, -150]);
+  const orb1Scale = useTransform(scrollY, [0, 500], [1, 1.3]);
+  
+  const orb2Y = useTransform(scrollY, [0, 1000], [0, -100]);
+  const orb2X = useTransform(scrollY, [0, 1000], [0, 50]);
+  
+  const orb3Y = useTransform(scrollY, [0, 1000], [0, -80]);
+  const orb3Rotate = useTransform(scrollY, [0, 1000], [0, 15]);
+  
+  // Mascot parallax (inverse - floats up)
+  const mascotY = useTransform(scrollY, [0, 500], [0, -40]);
+  const mascotRotate = useTransform(scrollY, [0, 500], [0, -3]);
+  
+  // Feature cards parallax
+  const card1Y = useTransform(scrollY, [0, 500], [0, 60]);
+  const card1Rotate = useTransform(scrollY, [0, 500], [0, -2]);
+  
+  const card2Y = useTransform(scrollY, [0, 500], [0, 50]);
+  const card2Rotate = useTransform(scrollY, [0, 500], [0, 3]);
 
   const handleGetStarted = () => {
     if (user) {
@@ -22,11 +47,17 @@ export const LandingHero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Animated Background */}
+      {/* Parallax Background */}
       <div className="absolute inset-0 -z-10">
-        <FloatingOrb size={400} color="hsl(var(--primary))" delay={0} className="top-20 left-10" />
-        <FloatingOrb size={300} color="hsl(var(--purple-600))" delay={2} className="bottom-20 right-10" />
-        <FloatingOrb size={350} color="hsl(var(--orange-500))" delay={4} className="top-1/2 left-1/2" />
+        <motion.div style={{ y: orb1Y, scale: orb1Scale }} className="absolute top-20 left-10">
+          <FloatingOrb size={400} color="hsl(var(--primary))" delay={0} />
+        </motion.div>
+        <motion.div style={{ y: orb2Y, x: orb2X }} className="absolute bottom-20 right-10">
+          <FloatingOrb size={300} color="hsl(var(--purple-600))" delay={2} />
+        </motion.div>
+        <motion.div style={{ y: orb3Y, rotate: orb3Rotate }} className="absolute top-1/2 left-1/2">
+          <FloatingOrb size={350} color="hsl(var(--orange-500))" delay={4} />
+        </motion.div>
       </div>
 
       <div className="container mx-auto px-4 py-20">
@@ -99,8 +130,11 @@ export const LandingHero = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative"
           >
-            {/* Mascot */}
-            <div className="relative mx-auto w-full max-w-md">
+            {/* Mascot with parallax */}
+            <motion.div 
+              style={{ y: mascotY, rotate: mascotRotate }}
+              className="relative mx-auto w-full max-w-md"
+            >
               <Card className="p-8 bg-gradient-to-br from-primary/5 to-purple-600/5 border-primary/20 overflow-hidden">
                 <div className="text-center space-y-4">
                   <motion.img 
@@ -122,8 +156,9 @@ export const LandingHero = () => {
                 </div>
               </Card>
 
-              {/* Floating Feature Cards */}
+              {/* Floating Feature Cards with parallax */}
               <motion.div
+                style={{ y: card1Y, rotate: card1Rotate }}
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
                 className="absolute -top-4 -right-4"
@@ -137,6 +172,7 @@ export const LandingHero = () => {
               </motion.div>
 
               <motion.div
+                style={{ y: card2Y, rotate: card2Rotate }}
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 3, repeat: Infinity, delay: 1 }}
                 className="absolute -bottom-4 -left-4"
@@ -148,7 +184,7 @@ export const LandingHero = () => {
                   </div>
                 </Card>
               </motion.div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>

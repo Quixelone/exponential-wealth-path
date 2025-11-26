@@ -4,9 +4,11 @@ import { motion } from 'motion/react';
 import { MessageSquare, Lightbulb, TrendingUp, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import profSatoshiHappy from '@/assets/educational-landing/prof-satoshi-happy.png';
+import { useParallax } from '@/hooks/useParallax';
 
 export const LandingProfSatoshi = () => {
   const navigate = useNavigate();
+  const { ref: mascotRef, y: mascotY } = useParallax({ speed: 0.3, direction: 'up' });
 
   const aiFeatures = [
     {
@@ -35,8 +37,10 @@ export const LandingProfSatoshi = () => {
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left - Mascot */}
+          {/* Left - Mascot with parallax */}
           <motion.div
+            ref={mascotRef}
+            style={{ y: mascotY }}
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}

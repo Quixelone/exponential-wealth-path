@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { motion } from 'motion/react';
 import { Brain, LineChart, Shield, Gamepad2, Award, Rocket } from 'lucide-react';
+import { useParallax } from '@/hooks/useParallax';
 
 export const LandingFeatures = () => {
   const features = [
@@ -69,15 +70,23 @@ export const LandingFeatures = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -5 }}
-            >
+          {features.map((feature, index) => {
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const direction = index % 2 === 0 ? 'right' : 'left';
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const { ref, x, y } = useParallax({ speed: 0.15, direction, scale: true });
+            
+            return (
+              <motion.div
+                ref={ref}
+                key={feature.title}
+                style={{ x, y }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+              >
               <Card className="p-6 h-full hover:shadow-xl transition-all duration-300 border-border/50">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4`}>
                   <feature.icon className="w-6 h-6 text-white" />
@@ -86,7 +95,8 @@ export const LandingFeatures = () => {
                 <p className="text-muted-foreground">{feature.description}</p>
               </Card>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
