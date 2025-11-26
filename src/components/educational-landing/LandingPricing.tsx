@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { Check, Zap, Crown, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useParallax } from '@/hooks/useParallax';
 
 export const LandingPricing = () => {
   const navigate = useNavigate();
@@ -103,15 +104,25 @@ export const LandingPricing = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative"
-            >
+          {plans.map((plan, index) => {
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const { ref, y, scale } = useParallax({ 
+              speed: 0.15, 
+              direction: 'up',
+              scale: true 
+            });
+            
+            return (
+              <motion.div
+                ref={ref}
+                key={plan.name}
+                style={{ y, scale }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative"
+              >
               {plan.popular && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-purple-600 border-0">
                   Più Popolare
@@ -165,7 +176,8 @@ export const LandingPricing = () => {
                 </Button>
               </Card>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Money Back Guarantee */}

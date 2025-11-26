@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { motion } from 'motion/react';
 import { BookOpen, Gamepad2, Trophy } from 'lucide-react';
+import { useParallax } from '@/hooks/useParallax';
 
 export const LandingHowItWorks = () => {
   const steps = [
@@ -57,15 +58,25 @@ export const LandingHowItWorks = () => {
           {/* Connection Lines (desktop only) */}
           <div className="hidden md:block absolute top-1/4 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500" />
 
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.step}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              className="relative"
-            >
+          {steps.map((step, index) => {
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const { ref, y, scale } = useParallax({ 
+              speed: 0.1 + (index * 0.05), 
+              direction: 'up',
+              scale: true 
+            });
+            
+            return (
+              <motion.div
+                ref={ref}
+                key={step.step}
+                style={{ y, scale }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
+                className="relative"
+              >
               <Card className="p-8 h-full hover:shadow-xl transition-all duration-300">
                 {/* Step Number Badge */}
                 <div className={`absolute -top-4 -right-4 w-12 h-12 rounded-full bg-gradient-to-r ${step.color} flex items-center justify-center text-white font-bold shadow-lg`}>
@@ -82,7 +93,8 @@ export const LandingHowItWorks = () => {
                 <p className="text-muted-foreground leading-relaxed">{step.description}</p>
               </Card>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

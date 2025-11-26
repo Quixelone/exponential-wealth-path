@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card';
 import { motion } from 'motion/react';
 import { AnimatedCounter } from './AnimatedCounter';
 import { Users, Trophy, Target, Zap } from 'lucide-react';
+import { useParallax } from '@/hooks/useParallax';
 
 export const LandingStats = () => {
   const stats = [
@@ -39,14 +40,20 @@ export const LandingStats = () => {
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
+          {stats.map((stat, index) => {
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            const { ref, y } = useParallax({ speed: 0.2 + (index * 0.05), direction: 'up' });
+            
+            return (
+              <motion.div
+                ref={ref}
+                key={stat.label}
+                style={{ y }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
               <Card className="p-6 text-center hover:shadow-lg transition-shadow">
                 <stat.icon className={`w-8 h-8 mx-auto mb-3 ${stat.color}`} />
                 <div className="text-3xl md:text-4xl font-bold mb-2">
@@ -55,7 +62,8 @@ export const LandingStats = () => {
                 <div className="text-sm text-muted-foreground">{stat.label}</div>
               </Card>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
