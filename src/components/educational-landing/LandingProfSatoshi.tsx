@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'motion/react';
 import { MessageSquare, Lightbulb, TrendingUp, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import profSatoshiHappy from '@/assets/educational-landing/prof-satoshi-happy.png';
 
 export const LandingProfSatoshi = () => {
   const navigate = useNavigate();
@@ -41,9 +42,21 @@ export const LandingProfSatoshi = () => {
             viewport={{ once: true }}
             className="relative"
           >
-            <Card className="p-12 bg-gradient-to-br from-primary/10 to-purple-600/10 border-primary/20">
+            <Card className="p-12 bg-gradient-to-br from-primary/10 to-purple-600/10 border-primary/20 overflow-hidden">
               <div className="text-center">
-                <div className="text-9xl mb-6">🎓₿</div>
+                <motion.img 
+                  src={profSatoshiHappy} 
+                  alt="Prof Satoshi - AI Bitcoin Trading Assistant" 
+                  className="w-80 h-80 mx-auto object-contain mb-6"
+                  animate={{ 
+                    scale: [1, 1.05, 1],
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
                 <h3 className="text-3xl font-bold mb-4">Prof Satoshi</h3>
                 <p className="text-lg text-muted-foreground mb-6">
                   Ciao! Sono il tuo assistente AI personale. Sono qui per guidarti nel mondo del trading Bitcoin 
