@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Sparkles, TrendingUp, Shield, Zap } from 'lucide-react';
 import { FloatingOrb } from './FloatingOrb';
+import profSatoshiExcited from '@/assets/educational-landing/prof-satoshi-excited.png';
 
 export const LandingHero = () => {
   const { user } = useAuth();
@@ -98,11 +99,24 @@ export const LandingHero = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative"
           >
-            {/* Mascot Placeholder */}
+            {/* Mascot */}
             <div className="relative mx-auto w-full max-w-md">
-              <Card className="p-8 bg-gradient-to-br from-primary/5 to-purple-600/5 border-primary/20">
+              <Card className="p-8 bg-gradient-to-br from-primary/5 to-purple-600/5 border-primary/20 overflow-hidden">
                 <div className="text-center space-y-4">
-                  <div className="text-8xl mx-auto">🎓₿</div>
+                  <motion.img 
+                    src={profSatoshiExcited} 
+                    alt="Prof Satoshi - Your AI Bitcoin Trading Tutor" 
+                    className="w-64 h-64 mx-auto object-contain"
+                    animate={{ 
+                      y: [0, -15, 0],
+                      rotate: [0, 5, -5, 0]
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
                   <h3 className="text-2xl font-bold">Prof Satoshi</h3>
                   <p className="text-muted-foreground">Il tuo tutor AI personale ti guida passo dopo passo</p>
                 </div>
