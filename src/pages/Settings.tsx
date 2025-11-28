@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Settings as SettingsIcon, CreditCard, Shield, ExternalLink, CheckCircle2, TrendingUp, AlertTriangle, XCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Settings as SettingsIcon, CreditCard, Shield, ExternalLink, CheckCircle2, TrendingUp, AlertTriangle, XCircle, Zap, Check } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NotificationTester from '@/components/NotificationTester';
 import SettingsHeader from '@/components/settings/SettingsHeader';
@@ -17,7 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const Settings = () => {
-  const { user, userProfile, loading: authLoading, subscriptionStatus, checkSubscriptionStatus } = useAuth();
+  const { user, userProfile, loading: authLoading, subscriptionStatus, subscriptionProductId, checkSubscriptionStatus } = useAuth();
   const navigate = useNavigate();
   const [insuranceStatus, setInsuranceStatus] = React.useState<{
     hasInsuredStrategy: boolean;
@@ -266,10 +267,14 @@ const Settings = () => {
         </div>
 
         <Tabs defaultValue="telegram" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 mb-6">
             <TabsTrigger value="telegram" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
               📱 Telegram
+            </TabsTrigger>
+            <TabsTrigger value="subscription" className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              Subscription
             </TabsTrigger>
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
@@ -295,6 +300,157 @@ const Settings = () => {
 
         <TabsContent value="telegram">
           <TelegramSetup />
+        </TabsContent>
+
+        <TabsContent value="subscription">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Gestione Subscription
+              </CardTitle>
+              <CardDescription>
+                Gestisci il tuo piano e le preferenze di pagamento
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Current Plan */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Piano Attuale</h3>
+                
+                {!subscriptionStatus?.subscribed ? (
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Piano Free</AlertTitle>
+                    <AlertDescription>
+                      Stai usando il piano gratuito. Passa a Pro per sbloccare tutte le funzionalità.
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Alert className="border-primary bg-primary/5">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    <AlertTitle>Piano Attivo</AlertTitle>
+                    <AlertDescription>
+                      La tua subscription è attiva
+                      {subscriptionStatus?.subscription_end && (
+                        <span className="block mt-1 text-sm">
+                          Rinnovo: {new Date(subscriptionStatus.subscription_end).toLocaleDateString('it-IT')}
+                        </span>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+
+              <Separator />
+
+              {/* Features by Plan */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Confronta i Piani</h3>
+                
+                <div className="grid md:grid-cols-3 gap-4">
+                  {/* Free */}
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Zap className="h-5 w-5" />
+                      <h4 className="font-semibold">Free</h4>
+                    </div>
+                    <p className="text-2xl font-bold mb-2">0€</p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex gap-2"><Check className="h-4 w-4" />Corsi base</li>
+                      <li className="flex gap-2"><Check className="h-4 w-4" />3 simulazioni/giorno</li>
+                      <li className="flex gap-2"><Check className="h-4 w-4" />Community</li>
+                    </ul>
+                  </Card>
+
+                  {/* Pro */}
+                  <Card className={`p-4 ${subscriptionStatus?.subscribed && subscriptionProductId === 'prod_TVWGTAfnyka83R' ? 'border-2 border-primary' : ''}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Shield className="h-5 w-5 text-primary" />
+                      <h4 className="font-semibold">Pro</h4>
+                      {subscriptionStatus?.subscribed && subscriptionProductId === 'prod_TVWGTAfnyka83R' && (
+                        <Badge variant="secondary" className="ml-auto">Attuale</Badge>
+                      )}
+                    </div>
+                    <p className="text-2xl font-bold mb-2">29€<span className="text-sm font-normal text-muted-foreground">/mese</span></p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex gap-2"><Check className="h-4 w-4 text-primary" />Tutti i corsi</li>
+                      <li className="flex gap-2"><Check className="h-4 w-4 text-primary" />Simulazioni illimitate</li>
+                      <li className="flex gap-2"><Check className="h-4 w-4 text-primary" />AI Coach</li>
+                      <li className="flex gap-2"><Check className="h-4 w-4 text-primary" />Supporto prioritario</li>
+                    </ul>
+                  </Card>
+
+                  {/* Enterprise */}
+                  <Card className={`p-4 ${subscriptionStatus?.subscribed && subscriptionProductId === 'prod_TVWkIBXmcKVgqn' ? 'border-2 border-primary' : ''}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <TrendingUp className="h-5 w-5 text-secondary" />
+                      <h4 className="font-semibold">Enterprise</h4>
+                      {subscriptionStatus?.subscribed && subscriptionProductId === 'prod_TVWkIBXmcKVgqn' && (
+                        <Badge variant="secondary" className="ml-auto">Attuale</Badge>
+                      )}
+                    </div>
+                    <p className="text-2xl font-bold mb-2">99€<span className="text-sm font-normal text-muted-foreground">/mese</span></p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex gap-2"><Check className="h-4 w-4 text-secondary" />Tutto di Pro +</li>
+                      <li className="flex gap-2"><Check className="h-4 w-4 text-secondary" />Consulenza 1-on-1</li>
+                      <li className="flex gap-2"><Check className="h-4 w-4 text-secondary" />API personalizzate</li>
+                      <li className="flex gap-2"><Check className="h-4 w-4 text-secondary" />Supporto 24/7</li>
+                    </ul>
+                  </Card>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Actions */}
+              <div className="space-y-3">
+                {subscriptionStatus?.subscribed ? (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={async () => {
+                        setOpeningPortal(true);
+                        try {
+                          const { data, error } = await supabase.functions.invoke('customer-portal');
+                          if (error) throw error;
+                          if (data?.url) {
+                            window.open(data.url, '_blank');
+                          }
+                        } catch (error) {
+                          console.error('Portal error:', error);
+                          toast.error('Impossibile aprire il portale clienti');
+                        } finally {
+                          setOpeningPortal(false);
+                        }
+                      }}
+                      disabled={openingPortal}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      {openingPortal ? 'Caricamento...' : 'Gestisci Subscription'}
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Modifica metodo di pagamento, cambia piano o cancella
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      className="w-full"
+                      onClick={() => navigate('/educational#pricing')}
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Scopri i Piani Pro
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Sblocca corsi avanzati, simulazioni illimitate e AI Coach
+                    </p>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="notifications">

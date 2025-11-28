@@ -1,39 +1,53 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Trophy, Flame, Star, TrendingUp, Award } from "lucide-react";
+import { BookOpen, Trophy, Flame, Star, TrendingUp, Award, Lock } from "lucide-react";
 import { useGamification } from "@/hooks/useGamification";
 import { useEducation } from "@/hooks/useEducation";
 import { Mascot } from "./Mascot";
+import { useSubscriptionGate } from "@/hooks/useSubscriptionGate";
+import { UpgradePrompt } from "@/components/subscription/UpgradePrompt";
+import { useToast } from "@/hooks/use-toast";
 
 export const EducationHomePage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
   const { gamificationData, loading: gamificationLoading, updateStreak } = useGamification();
   const { courses, userProgress, loading: coursesLoading } = useEducation();
+  const { hasAccess, currentTier } = useSubscriptionGate('advanced_courses');
 
   useEffect(() => {
     updateStreak();
-  }, []);
+    
+    // Show success toast if redirected from checkout
+    if (searchParams.get('success') === 'true') {
+      toast({
+        title: "Subscription attivata! 🎉",
+        description: "Benvenuto nel piano Pro. Tutte le funzionalità sono ora sbloccate.",
+      });
+    }
+  }, [searchParams]);
 
   const lessons = [
-    { id: 1, title: "Introduction to Bitcoin", status: "completed", xp: 100 },
-    { id: 2, title: "Wheel Strategy Basics", status: "completed", xp: 150 },
-    { id: 3, title: "Put Options Explained", status: "current", xp: 200 },
-    { id: 4, title: "Call Options Explained", status: "locked", xp: 200 },
-    { id: 5, title: "Premium Collection", status: "locked", xp: 250 },
-    { id: 6, title: "Strike Price Selection", status: "locked", xp: 250 },
-    { id: 7, title: "Risk Management", status: "locked", xp: 300 },
-    { id: 8, title: "Market Analysis", status: "locked", xp: 300 },
-    { id: 9, title: "Position Sizing", status: "locked", xp: 350 },
-    { id: 10, title: "Exit Strategies", status: "locked", xp: 350 },
-    { id: 11, title: "Portfolio Management", status: "locked", xp: 400 },
-    { id: 12, title: "Tax Implications", status: "locked", xp: 400 },
-    { id: 13, title: "Advanced Techniques", status: "locked", xp: 500 },
-    { id: 14, title: "Paper Trading Practice", status: "locked", xp: 500 },
-    { id: 15, title: "Real Trading Preparation", status: "locked", xp: 1000 },
+    { id: 1, title: "Introduction to Bitcoin", status: "completed", xp: 100, tier: 'free' },
+    { id: 2, title: "Wheel Strategy Basics", status: "completed", xp: 150, tier: 'free' },
+    { id: 3, title: "Put Options Explained", status: "current", xp: 200, tier: 'free' },
+    { id: 4, title: "Call Options Explained", status: "locked", xp: 200, tier: 'pro' },
+    { id: 5, title: "Premium Collection", status: "locked", xp: 250, tier: 'pro' },
+    { id: 6, title: "Strike Price Selection", status: "locked", xp: 250, tier: 'pro' },
+    { id: 7, title: "Risk Management", status: "locked", xp: 300, tier: 'pro' },
+    { id: 8, title: "Market Analysis", status: "locked", xp: 300, tier: 'pro' },
+    { id: 9, title: "Position Sizing", status: "locked", xp: 350, tier: 'pro' },
+    { id: 10, title: "Exit Strategies", status: "locked", xp: 350, tier: 'pro' },
+    { id: 11, title: "Portfolio Management", status: "locked", xp: 400, tier: 'pro' },
+    { id: 12, title: "Tax Implications", status: "locked", xp: 400, tier: 'pro' },
+    { id: 13, title: "Advanced Techniques", status: "locked", xp: 500, tier: 'enterprise' },
+    { id: 14, title: "Paper Trading Practice", status: "locked", xp: 500, tier: 'enterprise' },
+    { id: 15, title: "Real Trading Preparation", status: "locked", xp: 1000, tier: 'enterprise' },
   ];
 
   const getStatusColor = (status: string) => {
@@ -47,7 +61,10 @@ export const EducationHomePage = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string, tier: string) => {
+    const isLocked = !hasAccess && (tier === 'pro' || tier === 'enterprise');
+    if (isLocked) return "🔒";
+    
     switch (status) {
       case "completed":
         return "✓";
@@ -128,6 +145,15 @@ export const EducationHomePage = () => {
 
       {/* Learning Path */}
       <div className="max-w-7xl mx-auto p-6">
+        {!hasAccess && currentTier === 'free' && (
+          <div className="mb-6">
+            <UpgradePrompt 
+              tier="pro" 
+              message="Sblocca tutti i corsi avanzati e accelera il tuo apprendimento"
+            />
+          </div>
+        )}
+
         <Card className="p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Progressione Corso</h2>
@@ -140,29 +166,43 @@ export const EducationHomePage = () => {
 
         {/* Lessons Path */}
         <div className="space-y-4">
-          {lessons.map((lesson, index) => (
+          {lessons.map((lesson, index) => {
+            const isLockedByTier = !hasAccess && (lesson.tier === 'pro' || lesson.tier === 'enterprise');
+            const isActuallyLocked = lesson.status === "locked" || isLockedByTier;
+            
+            return (
             <Card
               key={lesson.id}
               className={`p-6 transition-all duration-300 ${
                 lesson.status === "current" 
                   ? "border-2 border-primary shadow-lg scale-105" 
-                  : lesson.status === "locked"
+                  : isActuallyLocked
                   ? "opacity-60"
                   : ""
-              } ${lesson.status !== "locked" ? "cursor-pointer hover:shadow-xl hover:scale-102" : "cursor-not-allowed"}`}
+              } ${!isActuallyLocked ? "cursor-pointer hover:shadow-xl hover:scale-102" : "cursor-not-allowed"}`}
               onClick={() => {
-                if (lesson.status !== "locked") {
+                if (!isActuallyLocked) {
                   navigate(`/education/lesson/${lesson.id}`);
+                } else if (isLockedByTier) {
+                  navigate('/settings?tab=subscription');
                 }
               }}
             >
               <div className="flex items-center gap-4">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${getStatusColor(lesson.status)}`}>
-                  {getStatusIcon(lesson.status)}
+                  {getStatusIcon(lesson.status, lesson.tier)}
                 </div>
                 
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold mb-1">{lesson.title}</h3>
+                  <h3 className="text-xl font-semibold mb-1 flex items-center gap-2">
+                    {lesson.title}
+                    {isLockedByTier && (
+                      <Badge variant="outline" className="gap-1">
+                        <Lock className="h-3 w-3" />
+                        {lesson.tier === 'pro' ? 'Pro' : 'Enterprise'}
+                      </Badge>
+                    )}
+                  </h3>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Star className="w-4 h-4" />
                     <span>{lesson.xp} XP</span>
@@ -175,14 +215,23 @@ export const EducationHomePage = () => {
                   </div>
                 </div>
 
-                {lesson.status !== "locked" && (
+                {!isActuallyLocked && (
                   <Button>
                     {lesson.status === "completed" ? "Rivedi" : "Inizia"}
                   </Button>
                 )}
+                {isLockedByTier && (
+                  <Button variant="outline" onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/settings?tab=subscription');
+                  }}>
+                    Sblocca
+                  </Button>
+                )}
               </div>
             </Card>
-          ))}
+            );
+          })}
         </div>
 
         {/* Quick Actions */}

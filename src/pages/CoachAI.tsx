@@ -6,6 +6,9 @@ import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/components/layout/AppLayout';
+import { useSubscriptionGate } from '@/hooks/useSubscriptionGate';
+import { FeatureLockedCard } from '@/components/subscription/FeatureLockedCard';
+import { UpgradePrompt } from '@/components/subscription/UpgradePrompt';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -19,6 +22,7 @@ const CoachAI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { hasAccess, upgradeTier } = useSubscriptionGate('ai_coach');
 
   useEffect(() => {
     // Load conversation from localStorage
@@ -204,6 +208,28 @@ const CoachAI = () => {
       setIsLoading(false);
     }
   };
+
+  if (!hasAccess) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background p-4 md:p-8">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <FeatureLockedCard 
+              feature="AI Coach FinGenius"
+              description="Accedi all'assistente AI per domande personalizzate su trading e strategie"
+              requiredTier={upgradeTier!}
+            />
+            {upgradeTier && (
+              <UpgradePrompt 
+                tier={upgradeTier} 
+                message="Sblocca conversazioni illimitate con il coach AI"
+              />
+            )}
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
