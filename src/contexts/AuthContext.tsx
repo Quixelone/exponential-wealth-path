@@ -28,6 +28,8 @@ interface AuthContextType {
     subscribed: boolean;
     subscription_end: string | null;
   } | null;
+  subscriptionProductId: string | null;
+  isSubscribed: boolean;
   checkSubscriptionStatus: () => Promise<void>;
   signUp: (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
@@ -61,6 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     subscribed: boolean;
     subscription_end: string | null;
   } | null>(null);
+  const [subscriptionProductId, setSubscriptionProductId] = useState<string | null>(null);
   const [isCheckingSubscription, setIsCheckingSubscription] = useState(false);
   const [lastSubscriptionCheck, setLastSubscriptionCheck] = useState<number>(0);
   const { toast } = useToast();
@@ -179,6 +182,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (data) {
         console.log('✅ Subscription status:', data);
         setSubscriptionStatus(data);
+        setSubscriptionProductId(data.product_id || null);
       }
     } catch (error: any) {
       // Silently handle authentication errors
@@ -237,6 +241,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           console.log('🚪 User signed out, clearing profile');
           setUserProfile(null);
           setSubscriptionStatus(null);
+          setSubscriptionProductId(null);
         }
         
         setLoading(false);
@@ -575,6 +580,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading: loading || rolesLoading,
     isAdmin,
     subscriptionStatus,
+    subscriptionProductId,
+    isSubscribed: subscriptionStatus?.subscribed || false,
     checkSubscriptionStatus,
     signUp,
     signIn,
