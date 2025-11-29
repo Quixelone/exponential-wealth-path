@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Shield, ShieldAlert } from 'lucide-react';
+import { Users, Shield, ShieldAlert, LineChart } from 'lucide-react';
 import UserStatsCards from './UserStatsCards';
 import UsersTable from './UsersTable';
 import SecurityDashboard from '@/components/security/SecurityDashboard';
 import AdminRoleManager from '@/components/security/AdminRoleManager';
+import UserStrategiesTable from './UserStrategiesTable';
+import { StrategyDetailDialog } from './StrategyDetailDialog';
 
 interface UserData {
   id: string;
@@ -27,13 +29,33 @@ interface UserManagementTabsProps {
 }
 
 const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }: UserManagementTabsProps) => {
+  const [selectedStrategy, setSelectedStrategy] = useState<{
+    configId: string;
+    userId: string;
+    strategyName: string;
+    userName: string;
+  } | null>(null);
+
+  const handleViewStrategyDetails = (
+    configId: string,
+    userId: string,
+    strategyName: string,
+    userName: string
+  ) => {
+    setSelectedStrategy({ configId, userId, strategyName, userName });
+  };
+
   return (
     <div className="w-full">
       <Tabs defaultValue="users" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Gestione Utenti
+          </TabsTrigger>
+          <TabsTrigger value="strategies" className="flex items-center gap-2">
+            <LineChart className="h-4 w-4" />
+            Strategie Utenti
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
@@ -50,6 +72,10 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
           <UsersTable users={users} onUpdateUserRole={onUpdateUserRole} onDeleteUser={onDeleteUser} />
         </TabsContent>
 
+        <TabsContent value="strategies" className="mt-6">
+          <UserStrategiesTable onViewDetails={handleViewStrategyDetails} />
+        </TabsContent>
+
         <TabsContent value="security" className="mt-6">
           <SecurityDashboard />
         </TabsContent>
@@ -62,6 +88,17 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
           />
         </TabsContent>
       </Tabs>
+
+      {selectedStrategy && (
+        <StrategyDetailDialog
+          open={!!selectedStrategy}
+          onOpenChange={(open) => !open && setSelectedStrategy(null)}
+          configId={selectedStrategy.configId}
+          userId={selectedStrategy.userId}
+          strategyName={selectedStrategy.strategyName}
+          userDisplayName={selectedStrategy.userName}
+        />
+      )}
     </div>
   );
 };
