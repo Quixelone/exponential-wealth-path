@@ -26,6 +26,9 @@ const EducationalLanding = lazy(() => import("./pages/EducationalLanding"));
 const TradingSimulator = lazy(() => import("./pages/TradingSimulator"));
 const CourseViewer = lazy(() => import("./pages/CourseViewer"));
 const WheelStrategy = lazy(() => import("./pages/WheelStrategy"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading component for Suspense fallback
@@ -80,6 +83,9 @@ const App = () => {
                         <Route path="/education/simulation" element={<TradingSimulator />} />
                         <Route path="/education/course/:courseId" element={<CourseViewer />} />
                         <Route path="/wheel-strategy" element={<WheelStrategy />} />
+                        <Route path="/privacy" element={<Privacy />} />
+                        <Route path="/terms" element={<Terms />} />
+                        <Route path="/disclaimer" element={<Disclaimer />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
