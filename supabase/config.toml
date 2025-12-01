@@ -161,3 +161,8 @@ verify_jwt = false
 name = "restore-strategy-backup"
 source = "./supabase/functions/restore-strategy-backup"
 verify_jwt = true
+
+[[edge_runtime.function]]
+name = "admin-restore-backup"
+source = "./supabase/functions/admin-restore-backup"
+verify_jwt = true

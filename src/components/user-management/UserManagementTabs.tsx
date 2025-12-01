@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Shield, ShieldAlert, LineChart } from 'lucide-react';
+import { Users, Shield, ShieldAlert, LineChart, Database } from 'lucide-react';
 import UserStatsCards from './UserStatsCards';
 import UsersTable from './UsersTable';
 import SecurityDashboard from '@/components/security/SecurityDashboard';
 import AdminRoleManager from '@/components/security/AdminRoleManager';
 import UserStrategiesTable from './UserStrategiesTable';
 import { StrategyDetailDialog } from './StrategyDetailDialog';
+import { AdminBackupRestore } from './AdminBackupRestore';
 
 interface UserData {
   id: string;
@@ -48,7 +49,7 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
   return (
     <div className="w-full">
       <Tabs defaultValue="users" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Gestione Utenti
@@ -64,6 +65,10 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
           <TabsTrigger value="admin-roles" className="flex items-center gap-2">
             <ShieldAlert className="h-4 w-4" />
             Ruoli Admin
+          </TabsTrigger>
+          <TabsTrigger value="backup-restore" className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            Ripristino Backup
           </TabsTrigger>
         </TabsList>
         
@@ -86,6 +91,10 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
             onUpdateUserRole={onUpdateUserRole}
             onRefresh={onRefresh}
           />
+        </TabsContent>
+
+        <TabsContent value="backup-restore" className="mt-6">
+          <AdminBackupRestore />
         </TabsContent>
       </Tabs>
 
