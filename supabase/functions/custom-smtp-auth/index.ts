@@ -1,17 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { smtpAuthSchema } from '../_shared/validation.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-interface SMTPAuthRequest {
-  email: string;
-  password?: string;
-  type: 'signup' | 'recovery' | 'email_change' | 'magic_link';
-  redirectTo?: string;
-}
 
 // Simple in-memory rate limiter
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -33,15 +27,6 @@ function checkRateLimit(ip: string): boolean {
   
   record.count++;
   return true;
-}
-
-function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email) && email.length <= 255;
-}
-
-function validatePassword(password: string): boolean {
-  return password.length >= 8 && password.length <= 100;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -73,13 +58,17 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { email, password, type, redirectTo }: SMTPAuthRequest = await req.json();
-
-    // Input validation
-    if (!email || !validateEmail(email)) {
-      console.error('❌ Invalid email format');
+    const body = await req.json();
+    
+    // Validate input with Zod
+    const validation = smtpAuthSchema.safeParse(body);
+    if (!validation.success) {
+      console.error('❌ Validation error:', validation.error.flatten());
       return new Response(
-        JSON.stringify({ error: 'Invalid email format' }),
+        JSON.stringify({ 
+          error: 'Invalid input', 
+          details: validation.error.flatten().fieldErrors 
+        }),
         {
           status: 400,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -87,17 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    if (type === 'signup' && password && !validatePassword(password)) {
-      console.error('❌ Invalid password format');
-      return new Response(
-        JSON.stringify({ error: 'Password must be between 8 and 100 characters' }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
-    }
-
+    const { email, password, type, redirectTo } = validation.data;
     console.log(`🔐 Processing ${type} request for email: ${email} from IP: ${ip}`);
 
     let result;

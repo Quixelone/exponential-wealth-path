@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { fetchBtcPriceSchema } from '../_shared/validation.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,14 +13,22 @@ serve(async (req) => {
   }
 
   try {
-    const { date } = await req.json(); // formato: YYYY-MM-DD
+    const body = await req.json();
     
-    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    // Validate input with Zod
+    const validation = fetchBtcPriceSchema.safeParse(body);
+    if (!validation.success) {
+      console.error('Validation error:', validation.error.flatten());
       return new Response(
-        JSON.stringify({ error: 'Invalid date format. Use YYYY-MM-DD' }),
+        JSON.stringify({ 
+          error: 'Invalid input', 
+          details: validation.error.flatten().fieldErrors 
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    const { date } = validation.data;
 
     // Check if date is in the future or today
     const requestedDate = new Date(date);
