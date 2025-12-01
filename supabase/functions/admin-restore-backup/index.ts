@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
-import { pako } from 'https://esm.sh/pako@2.1.0';
+import pako from 'https://esm.sh/pako@2.1.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
