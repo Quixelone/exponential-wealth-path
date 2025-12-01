@@ -11,16 +11,10 @@ export const LandingFooter = () => {
       { label: 'Testimonianze', href: '#testimonials' },
       { label: 'FAQ', href: '#faq' },
     ],
-    company: [
-      { label: 'Chi Siamo', href: '/about' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Carriere', href: '/careers' },
-      { label: 'Contatti', href: '/contact' },
-    ],
     legal: [
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Termini di Servizio', href: '/terms' },
-      { label: 'Cookie Policy', href: '/cookies' },
+      { label: 'Disclaimer', href: '/disclaimer' },
     ],
   };
 
@@ -34,7 +28,7 @@ export const LandingFooter = () => {
   return (
     <footer className="bg-muted/30 border-t border-border">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-5 gap-8 mb-8">
+        <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4 cursor-pointer" onClick={() => navigate('/')}>
@@ -77,23 +71,6 @@ export const LandingFooter = () => {
                         document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
                       }
                     }}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company Links */}
-          <div>
-            <h3 className="font-semibold mb-3">Azienda</h3>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors text-sm"
                   >
                     {link.label}
                   </a>
