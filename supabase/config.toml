@@ -179,3 +179,23 @@ verify_jwt = false
 name = "check-expirations"
 source = "./supabase/functions/check-expirations"
 verify_jwt = false
+
+[[edge_runtime.function]]
+name = "telegram-generate-link-code"
+source = "./supabase/functions/telegram-generate-link-code"
+verify_jwt = false
+
+[[edge_runtime.function]]
+name = "telegram-verify-connection"
+source = "./supabase/functions/telegram-verify-connection"
+verify_jwt = false
+
+[[edge_runtime.function]]
+name = "telegram-send-test"
+source = "./supabase/functions/telegram-send-test"
+verify_jwt = false
+
+[[edge_runtime.function]]
+name = "telegram-disconnect"
+source = "./supabase/functions/telegram-disconnect"
+verify_jwt = false

@@ -120,13 +120,115 @@ serve(async (req) => {
     // Handle /start command
     if (update.message?.text === '/start') {
       const chatId = update.message.chat.id;
-      const userId = update.message.from.id;
 
       await sendMessage(chatId, 
-        `🤖 *Benvenuto nel Bot Wheel Strategy!*\n\n` +
-        `Il tuo Chat ID è: \`${chatId}\`\n\n` +
-        `Copia questo ID nelle impostazioni dell'app per ricevere notifiche sulle tue opzioni.`
+        `🤖 *Benvenuto in BTC Wheel Pro!*\n\n` +
+        `Per collegare il tuo account, usa il comando:\n` +
+        `\`/connect CODICE\`\n\n` +
+        `Genera il codice dall'app nella sezione Impostazioni → Notifiche.`
       );
+    }
+
+    // Handle /connect command
+    if (update.message?.text?.startsWith('/connect ')) {
+      const chatId = update.message.chat.id;
+      const code = update.message.text.split(' ')[1]?.trim();
+
+      if (!code || code.length !== 6) {
+        await sendMessage(chatId, '❌ Codice non valido. Il codice deve essere di 6 cifre.');
+        return new Response('OK', { status: 200, headers: corsHeaders });
+      }
+
+      console.log(`🔗 Connect attempt: code=${code}, chatId=${chatId}`);
+
+      // Find the link code
+      const { data: linkCode, error: codeError } = await supabase
+        .from('telegram_link_codes')
+        .select('*')
+        .eq('code', code)
+        .is('used_at', null)
+        .gt('expires_at', new Date().toISOString())
+        .single();
+
+      if (codeError || !linkCode) {
+        console.error('Code not found or expired:', codeError);
+        await sendMessage(chatId, '❌ Codice non valido o scaduto.\n\nGenera un nuovo codice dall\'app.');
+        return new Response('OK', { status: 200, headers: corsHeaders });
+      }
+
+      // Mark code as used
+      await supabase
+        .from('telegram_link_codes')
+        .update({ used_at: new Date().toISOString() })
+        .eq('id', linkCode.id);
+
+      // Update or create notification settings
+      const { error: upsertError } = await supabase
+        .from('notification_settings')
+        .upsert({
+          user_id: linkCode.user_id,
+          telegram_chat_id: chatId.toString(),
+          preferred_method: 'telegram',
+          notifications_enabled: true,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (upsertError) {
+        console.error('Error saving chat_id:', upsertError);
+        await sendMessage(chatId, '❌ Errore durante il collegamento. Riprova più tardi.');
+        return new Response('OK', { status: 200, headers: corsHeaders });
+      }
+
+      console.log(`✅ Telegram connected: user=${linkCode.user_id}, chatId=${chatId}`);
+      
+      await sendMessage(chatId, 
+        `✅ *Account collegato con successo!*\n\n` +
+        `Riceverai le notifiche qui quando:\n` +
+        `• Le tue opzioni scadono\n` +
+        `• È richiesta una conferma\n` +
+        `• Ci sono aggiornamenti importanti\n\n` +
+        `Usa /help per vedere tutti i comandi disponibili.`
+      );
+    }
+
+    // Handle /help command
+    if (update.message?.text === '/help') {
+      const chatId = update.message.chat.id;
+      
+      await sendMessage(chatId,
+        `📖 *Comandi disponibili:*\n\n` +
+        `/start - Avvia il bot\n` +
+        `/connect CODICE - Collega il tuo account\n` +
+        `/help - Mostra questo messaggio\n` +
+        `/status - Verifica stato connessione\n\n` +
+        `Per assistenza: support@btcwheelpro.com`
+      );
+    }
+
+    // Handle /status command
+    if (update.message?.text === '/status') {
+      const chatId = update.message.chat.id;
+      
+      // Check if this chatId is linked
+      const { data: settings } = await supabase
+        .from('notification_settings')
+        .select('notifications_enabled')
+        .eq('telegram_chat_id', chatId.toString())
+        .single();
+
+      if (settings) {
+        await sendMessage(chatId,
+          `✅ *Account collegato*\n\n` +
+          `Notifiche: ${settings.notifications_enabled ? '🔔 Attive' : '🔕 Disattivate'}`
+        );
+      } else {
+        await sendMessage(chatId,
+          `❌ *Account non collegato*\n\n` +
+          `Usa /connect CODICE per collegare il tuo account.`
+        );
+      }
     }
 
     return new Response('OK', { 

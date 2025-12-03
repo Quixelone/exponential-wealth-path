@@ -1602,6 +1602,33 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_link_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       telegram_notifications_queue: {
         Row: {
           created_at: string
@@ -1987,6 +2014,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      cleanup_expired_telegram_codes: { Args: never; Returns: undefined }
       delete_user_safely: { Args: { target_user_id: string }; Returns: boolean }
       get_backup_stats: { Args: { user_uuid: string }; Returns: Json }
       has_role: {
