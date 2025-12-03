@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { format, addDays } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { Check, X } from 'lucide-react';
+import { useOptionValidation } from '@/hooks/useOptionValidation';
+import { ValidationFeedback } from '@/components/wheel-strategy/ValidationFeedback';
 
 interface OptionTradeData {
   option_type: 'SELL_PUT' | 'COVERED_CALL';
@@ -48,6 +50,7 @@ export default function NewOptionForm({
   const [capital, setCapital] = useState(defaultCapital);
   const [apy, setApy] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [highWarningsAcknowledged, setHighWarningsAcknowledged] = useState(false);
 
   // Calcoli derivati
   const calculations = useMemo(() => {
@@ -63,6 +66,19 @@ export default function NewOptionForm({
       premiumPercentage,
     };
   }, [capital, apy, duration, selectedStrike]);
+
+  // Validazione dati opzione
+  const validation = useOptionValidation({
+    strikePrice: selectedStrike || 0,
+    apy,
+    premium: calculations.premiumUsdt,
+    capital,
+    expirationDate: format(calculations.expirationDate, 'yyyy-MM-dd'),
+    optionType,
+    durationDays: duration
+  }, currentBtcPrice);
+
+  const hasHighWarnings = validation.warnings.some(w => w.severity === 'high');
 
   const formatUsd = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -104,7 +120,11 @@ export default function NewOptionForm({
     }
   };
 
-  const isFormValid = selectedStrike && apy > 0 && capital > 0;
+  const isFormValid = selectedStrike && 
+    apy > 0 && 
+    capital > 0 && 
+    validation.isValid && 
+    (!hasHighWarnings || highWarningsAcknowledged);
 
   return (
     <div className="bg-[#0a0b0d] min-h-full p-4 space-y-5">
@@ -208,6 +228,14 @@ export default function NewOptionForm({
           />
         </div>
       </div>
+
+      {/* Validation Feedback */}
+      {(validation.errors.length > 0 || validation.warnings.length > 0) && (
+        <ValidationFeedback
+          validation={validation}
+          onHighWarningsAcknowledged={setHighWarningsAcknowledged}
+        />
+      )}
 
       {/* Preview Card */}
       <div className="bg-[#12151a] rounded-xl p-4 space-y-3 border border-[#1a1d24]">

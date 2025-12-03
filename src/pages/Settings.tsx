@@ -13,7 +13,7 @@ import NotificationTester from '@/components/NotificationTester';
 import SettingsHeader from '@/components/settings/SettingsHeader';
 import { BackupManager } from '@/components/configuration/BackupManager';
 import { BrokerAPIManager } from '@/components/settings/BrokerAPIManager';
-import TelegramSetup from '@/components/settings/TelegramSetup';
+import { NotificationSetup } from '@/components/settings/NotificationSetup';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -299,7 +299,7 @@ const Settings = () => {
         </TabsList>
 
         <TabsContent value="telegram">
-          <TelegramSetup />
+          <NotificationSetup userId={user.id} />
         </TabsContent>
 
         <TabsContent value="subscription">
