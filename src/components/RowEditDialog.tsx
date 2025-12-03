@@ -384,60 +384,58 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   // Desktop: usa Dialog
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0">
-        <div className="h-full flex flex-col">
-          <DialogHeader className="flex-shrink-0 px-6 pt-6">
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <Calendar className="h-6 w-6 text-primary" />
-              Modifica Giorno {item.day}
-            </DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              {formatDate(item.date)} - Modifica i parametri di rendimento e PAC per questo giorno specifico.
-            </DialogDescription>
-          </DialogHeader>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Calendar className="h-6 w-6 text-primary" />
+            Modifica Giorno {item.day}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            {formatDate(item.date)} - Modifica i parametri di rendimento e PAC per questo giorno specifico.
+          </DialogDescription>
+        </DialogHeader>
 
-          <div className="space-y-4 overflow-y-auto flex-1 px-6" style={{ maxHeight: 'calc(85vh - 180px)' }}>
-            {/* Desktop: info prima, poi campi */}
-            <CapitalInfo />
-            
-            <Separator />
-            
-            <InputFields />
+        <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
+          {/* Desktop: info prima, poi campi */}
+          <CapitalInfo />
+          
+          <Separator />
+          
+          <InputFields />
 
-            <Separator />
+          <Separator />
 
-            <ResultsPreview />
-          </div>
-        
-          <div className="flex-shrink-0 border-t border-border pt-4 pb-4 mt-2 bg-background px-6">
-            {originalConfigId && originalConfigName && (
-              <div className="mb-3 p-2 bg-primary/5 border border-primary/20 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  Strategia attiva: <span className="font-medium text-primary">{originalConfigName}</span>
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Le modifiche saranno applicate alla configurazione. Usa il pulsante "Salva" nella configurazione per salvare su Supabase.
-                </p>
-              </div>
-            )}
-            
-            <div className="flex gap-3 justify-end">
-              <Button 
-                variant="outline" 
-                onClick={handleCancel}
-              >
-                <X className="h-4 w-4 mr-2" />
-                Annulla
-              </Button>
-              <Button 
-                onClick={handleSave} 
-                disabled={!hasChanges}
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                {hasChanges ? 'Applica e Salva' : 'Nessuna Modifica'}
-              </Button>
+          <ResultsPreview />
+        </div>
+      
+        <div className="border-t border-border pt-4 mt-2">
+          {originalConfigId && originalConfigName && (
+            <div className="mb-3 p-2 bg-primary/5 border border-primary/20 rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                Strategia attiva: <span className="font-medium text-primary">{originalConfigName}</span>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Le modifiche saranno applicate alla configurazione. Usa il pulsante "Salva" nella configurazione per salvare su Supabase.
+              </p>
             </div>
+          )}
+          
+          <div className="flex gap-3 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={handleCancel}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Annulla
+            </Button>
+            <Button 
+              onClick={handleSave} 
+              disabled={!hasChanges}
+              className="bg-primary hover:bg-primary/90"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {hasChanges ? 'Applica e Salva' : 'Nessuna Modifica'}
+            </Button>
           </div>
         </div>
       </DialogContent>
