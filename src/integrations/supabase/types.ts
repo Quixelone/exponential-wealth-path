@@ -322,6 +322,69 @@ export type Database = {
           },
         ]
       }
+      btc_positions: {
+        Row: {
+          avg_cost_basis_usd: number | null
+          btc_quantity: number
+          config_id: string
+          created_at: string | null
+          id: string
+          last_fill_date: string | null
+          last_fill_price_usd: number | null
+          last_fill_type: string | null
+          total_assignments_count: number | null
+          total_premium_earned_usdt: number | null
+          total_trades_count: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avg_cost_basis_usd?: number | null
+          btc_quantity?: number
+          config_id: string
+          created_at?: string | null
+          id?: string
+          last_fill_date?: string | null
+          last_fill_price_usd?: number | null
+          last_fill_type?: string | null
+          total_assignments_count?: number | null
+          total_premium_earned_usdt?: number | null
+          total_trades_count?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avg_cost_basis_usd?: number | null
+          btc_quantity?: number
+          config_id?: string
+          created_at?: string | null
+          id?: string
+          last_fill_date?: string | null
+          last_fill_price_usd?: number | null
+          last_fill_type?: string | null
+          total_assignments_count?: number | null
+          total_premium_earned_usdt?: number | null
+          total_trades_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "btc_positions_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "investment_configs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "btc_positions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       btc_prices: {
         Row: {
           created_at: string
@@ -1075,6 +1138,96 @@ export type Database = {
           },
         ]
       }
+      options_trades: {
+        Row: {
+          apy_equivalent: number | null
+          btc_received: number | null
+          capital_employed_usdt: number
+          closed_at: string | null
+          config_id: string
+          confirmation_source: string | null
+          created_at: string | null
+          duration_days: number
+          expiration_date: string
+          id: string
+          is_assigned: boolean | null
+          opened_at: string
+          option_type: string
+          premium_percentage: number
+          premium_usdt: number
+          settlement_price_usd: number | null
+          status: string
+          strike_price_usd: number
+          updated_at: string | null
+          user_confirmed: boolean | null
+          user_confirmed_at: string | null
+          user_id: string
+        }
+        Insert: {
+          apy_equivalent?: number | null
+          btc_received?: number | null
+          capital_employed_usdt: number
+          closed_at?: string | null
+          config_id: string
+          confirmation_source?: string | null
+          created_at?: string | null
+          duration_days?: number
+          expiration_date: string
+          id?: string
+          is_assigned?: boolean | null
+          opened_at?: string
+          option_type: string
+          premium_percentage: number
+          premium_usdt: number
+          settlement_price_usd?: number | null
+          status?: string
+          strike_price_usd: number
+          updated_at?: string | null
+          user_confirmed?: boolean | null
+          user_confirmed_at?: string | null
+          user_id: string
+        }
+        Update: {
+          apy_equivalent?: number | null
+          btc_received?: number | null
+          capital_employed_usdt?: number
+          closed_at?: string | null
+          config_id?: string
+          confirmation_source?: string | null
+          created_at?: string | null
+          duration_days?: number
+          expiration_date?: string
+          id?: string
+          is_assigned?: boolean | null
+          opened_at?: string
+          option_type?: string
+          premium_percentage?: number
+          premium_usdt?: number
+          settlement_price_usd?: number | null
+          status?: string
+          strike_price_usd?: number
+          updated_at?: string | null
+          user_confirmed?: boolean | null
+          user_confirmed_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "options_trades_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "investment_configs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "options_trades_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pac_payments: {
         Row: {
           config_id: string
@@ -1401,6 +1554,51 @@ export type Database = {
           created_at?: string | null
           id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      strike_prices_cache: {
+        Row: {
+          apy_percentage: number
+          btc_price_at_fetch: number
+          created_at: string | null
+          duration_days: number
+          fetch_date: string
+          fetch_time: string | null
+          id: string
+          is_active: boolean | null
+          option_type: string
+          rise_fall_percentage: number
+          source: string | null
+          strike_price_usd: number
+        }
+        Insert: {
+          apy_percentage: number
+          btc_price_at_fetch: number
+          created_at?: string | null
+          duration_days: number
+          fetch_date: string
+          fetch_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          option_type: string
+          rise_fall_percentage: number
+          source?: string | null
+          strike_price_usd: number
+        }
+        Update: {
+          apy_percentage?: number
+          btc_price_at_fetch?: number
+          created_at?: string | null
+          duration_days?: number
+          fetch_date?: string
+          fetch_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          option_type?: string
+          rise_fall_percentage?: number
+          source?: string | null
+          strike_price_usd?: number
         }
         Relationships: []
       }
@@ -1761,6 +1959,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_avg_cost_basis: {
+        Args: { p_config_id: string }
+        Returns: number
+      }
+      calculate_unrealized_pnl: {
+        Args: { p_config_id: string; p_current_btc_price: number }
+        Returns: {
+          avg_cost: number
+          btc_quantity: number
+          current_value: number
+          unrealized_pnl: number
+          unrealized_pnl_percentage: number
+        }[]
+      }
       check_admin_level: {
         Args: {
           _required_role?: Database["public"]["Enums"]["app_role"]
