@@ -3,9 +3,12 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowUp, ArrowDown, TrendingUp, Activity, Target, AlertCircle, RefreshCw, Send } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ArrowUp, ArrowDown, TrendingUp, Activity, Target, AlertCircle, RefreshCw, Send, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import NewOptionForm from './NewOptionForm';
 
 interface TechnicalIndicators {
   rsi: number;
@@ -48,12 +51,14 @@ interface AnalysisData {
 }
 
 export default function WheelStrategyDashboard() {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [data, setData] = useState<AnalysisData | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [hasTelegram, setHasTelegram] = useState(false);
   const [hasRecentAnalysis, setHasRecentAnalysis] = useState(false);
+  const [showNewOptionDialog, setShowNewOptionDialog] = useState(false);
 
   const fetchAnalysis = async () => {
     try {
@@ -127,6 +132,22 @@ export default function WheelStrategyDashboard() {
     }
   };
 
+  const handleOptionSubmit = async (optionData: any) => {
+    try {
+      const { error } = await supabase
+        .from('options_trades')
+        .insert(optionData);
+
+      if (error) throw error;
+
+      toast.success('Opzione salvata con successo!');
+      setShowNewOptionDialog(false);
+    } catch (error: any) {
+      console.error('Error saving option:', error);
+      toast.error('Errore nel salvataggio dell\'opzione');
+    }
+  };
+
   useEffect(() => {
     fetchAnalysis();
     checkTelegramConfig();
@@ -176,6 +197,10 @@ export default function WheelStrategyDashboard() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button onClick={() => setShowNewOptionDialog(true)} disabled={!data}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nuova Opzione
+          </Button>
           <Button onClick={fetchAnalysis} variant="outline" disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Aggiorna
@@ -197,6 +222,27 @@ export default function WheelStrategyDashboard() {
           )}
         </div>
       </div>
+
+      {/* Dialog Nuova Opzione */}
+      <Dialog open={showNewOptionDialog} onOpenChange={setShowNewOptionDialog}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Nuova Opzione</DialogTitle>
+            <DialogDescription>Inserisci i dettagli della nuova opzione</DialogDescription>
+          </DialogHeader>
+          {data && user && (
+            <NewOptionForm
+              configId={user.id} 
+              userId={user.id}
+              availableStrikes={data.strikes.map(s => s.strike)}
+              defaultCapital={10000}
+              currentBtcPrice={data.price}
+              onSubmit={handleOptionSubmit}
+              onCancel={() => setShowNewOptionDialog(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Price & Recommendation */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
