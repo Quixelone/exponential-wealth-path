@@ -40,10 +40,10 @@ export function AdminBackupRestore() {
   const [restoreResult, setRestoreResult] = useState<RestoreResult | null>(null);
 
   const handleRestore = async () => {
-    if (!backupId || !configId) {
+    if (!backupId) {
       toast({
-        title: 'Campi mancanti',
-        description: 'Inserisci Backup ID e Config ID',
+        title: 'Campo mancante',
+        description: 'Inserisci almeno il Backup ID',
         variant: 'destructive',
       });
       return;
@@ -116,13 +116,16 @@ export function AdminBackupRestore() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="configId">Config ID *</Label>
+            <Label htmlFor="configId">Config ID (opzionale se strategia eliminata)</Label>
             <Input
               id="configId"
               placeholder="es: d4be9c9d-e171-4039-89ce-8c0b68b103e8"
               value={configId}
               onChange={(e) => setConfigId(e.target.value)}
             />
+            <p className="text-xs text-muted-foreground">
+              Lascia vuoto per ricreare automaticamente la strategia dal backup
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -140,7 +143,7 @@ export function AdminBackupRestore() {
 
           <Button
             onClick={handleConfirm}
-            disabled={!backupId || !configId || restoring}
+            disabled={!backupId || restoring}
             className="w-full"
           >
             {restoring ? (
