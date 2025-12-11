@@ -57,8 +57,8 @@ Deno.serve(async (req) => {
 
     console.log(`🔧 Admin restore initiated by ${user.email} for backup ${backup_id}`);
 
-    if (!backup_id || !config_id) {
-      return new Response(JSON.stringify({ error: 'backup_id and config_id required' }), {
+    if (!backup_id) {
+      return new Response(JSON.stringify({ error: 'backup_id is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -78,56 +78,106 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Verify config belongs to correct user
+    // Use config_id from request or from backup
+    const targetConfigId = config_id || backup.config_id;
+
+    // Check if config exists
     const { data: config, error: configError } = await supabaseAdmin
       .from('investment_configs')
       .select('user_id, name')
-      .eq('id', config_id)
+      .eq('id', targetConfigId)
       .single();
 
+    // If config doesn't exist, we need to recreate it
+    let configName = config?.name || 'Strategia ripristinata';
+    let configUserId = config?.user_id || backup.user_id;
+    let recreatedConfig = false;
+
     if (configError || !config) {
-      return new Response(JSON.stringify({ error: 'Configuration not found' }), {
-        status: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      console.log(`⚠️ Config ${targetConfigId} not found, will recreate from backup`);
+      
+      // Decompress backup to get config data
+      let backupDataForRecreate;
+      if (backup.backup_data.compressed) {
+        const compressedData = Uint8Array.from(atob(backup.backup_data.data), c => c.charCodeAt(0));
+        const decompressed = pako.inflate(compressedData, { to: 'string' });
+        backupDataForRecreate = JSON.parse(decompressed);
+      } else {
+        backupDataForRecreate = backup.backup_data.data || backup.backup_data;
+      }
+
+      if (!backupDataForRecreate?.config) {
+        return new Response(JSON.stringify({ error: 'Backup does not contain valid config data' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Recreate the config
+      const { id: _id, created_at: _created, updated_at: _updated, ...configData } = backupDataForRecreate.config;
+      
+      const { data: newConfig, error: createError } = await supabaseAdmin
+        .from('investment_configs')
+        .insert({
+          id: targetConfigId,
+          user_id: backup.user_id,
+          ...configData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('❌ Error recreating config:', createError);
+        return new Response(JSON.stringify({ error: `Failed to recreate config: ${createError.message}` }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      configName = newConfig.name;
+      configUserId = newConfig.user_id;
+      recreatedConfig = true;
+      console.log(`✅ Config recreated: ${configName}`);
     }
 
-    if (target_user_id && config.user_id !== target_user_id) {
+    if (target_user_id && configUserId !== target_user_id) {
       return new Response(JSON.stringify({ error: 'Config does not belong to target user' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Create snapshot if requested
-    if (create_snapshot) {
+    // Create snapshot if requested and config already existed
+    if (create_snapshot && !recreatedConfig) {
       console.log(`📸 Creating snapshot before restore...`);
       
       const { data: currentConfig } = await supabaseAdmin
         .from('investment_configs')
         .select('*')
-        .eq('id', config_id)
+        .eq('id', targetConfigId)
         .single();
 
       const { data: currentReturns } = await supabaseAdmin
         .from('daily_returns')
         .select('*')
-        .eq('config_id', config_id);
+        .eq('config_id', targetConfigId);
 
       const { data: currentOverrides } = await supabaseAdmin
         .from('daily_pac_overrides')
         .select('*')
-        .eq('config_id', config_id);
+        .eq('config_id', targetConfigId);
 
       const { data: currentTrades } = await supabaseAdmin
         .from('actual_trades')
         .select('*')
-        .eq('config_id', config_id);
+        .eq('config_id', targetConfigId);
 
       const { data: currentPayments } = await supabaseAdmin
         .from('pac_payments')
         .select('*')
-        .eq('config_id', config_id);
+        .eq('config_id', targetConfigId);
 
       const snapshotData = {
         config: currentConfig,
@@ -138,8 +188,8 @@ Deno.serve(async (req) => {
       };
 
       await supabaseAdmin.from('strategy_backups').insert({
-        user_id: config.user_id,
-        config_id: config_id,
+        user_id: configUserId,
+        config_id: targetConfigId,
         backup_date: new Date().toISOString().split('T')[0],
         backup_data: {
           data: snapshotData,
@@ -160,32 +210,35 @@ Deno.serve(async (req) => {
       const decompressed = pako.inflate(compressedData, { to: 'string' });
       backupData = JSON.parse(decompressed);
     } else {
-      backupData = backup.backup_data.data;
+      backupData = backup.backup_data.data || backup.backup_data;
     }
 
-    // Delete existing data
-    console.log(`🗑️ Deleting existing data...`);
-    await supabaseAdmin.from('daily_returns').delete().eq('config_id', config_id);
-    await supabaseAdmin.from('daily_pac_overrides').delete().eq('config_id', config_id);
-    await supabaseAdmin.from('actual_trades').delete().eq('config_id', config_id);
-    await supabaseAdmin.from('pac_payments').delete().eq('config_id', config_id);
+    // Delete existing data (only if not just recreated)
+    if (!recreatedConfig) {
+      console.log(`🗑️ Deleting existing data...`);
+      await supabaseAdmin.from('daily_returns').delete().eq('config_id', targetConfigId);
+      await supabaseAdmin.from('daily_pac_overrides').delete().eq('config_id', targetConfigId);
+      await supabaseAdmin.from('actual_trades').delete().eq('config_id', targetConfigId);
+      await supabaseAdmin.from('pac_payments').delete().eq('config_id', targetConfigId);
 
-    // Restore data
-    console.log(`📥 Restoring data...`);
-
-    // Update config
-    if (backupData.config) {
-      const { created_at, updated_at, ...configData } = backupData.config;
-      await supabaseAdmin
-        .from('investment_configs')
-        .update({ ...configData, updated_at: new Date().toISOString() })
-        .eq('id', config_id);
+      // Update config
+      console.log(`📥 Restoring config data...`);
+      if (backupData.config) {
+        const { id: _id, created_at, updated_at, user_id: _userId, ...configUpdateData } = backupData.config;
+        await supabaseAdmin
+          .from('investment_configs')
+          .update({ ...configUpdateData, updated_at: new Date().toISOString() })
+          .eq('id', targetConfigId);
+      }
     }
+
+    // Restore related data
+    console.log(`📥 Restoring related data...`);
 
     // Restore daily returns
     if (backupData.daily_returns?.length > 0) {
       const returns = backupData.daily_returns.map((r: any) => ({
-        config_id: config_id,
+        config_id: targetConfigId,
         day: r.day,
         return_rate: r.return_rate,
       }));
@@ -196,7 +249,7 @@ Deno.serve(async (req) => {
     // Restore PAC overrides
     if (backupData.daily_pac_overrides?.length > 0) {
       const overrides = backupData.daily_pac_overrides.map((o: any) => ({
-        config_id: config_id,
+        config_id: targetConfigId,
         day: o.day,
         pac_amount: o.pac_amount,
       }));
@@ -210,7 +263,7 @@ Deno.serve(async (req) => {
         const { id, created_at, updated_at, ...tradeData } = t;
         return {
           ...tradeData,
-          config_id: config_id,
+          config_id: targetConfigId,
         };
       });
       await supabaseAdmin.from('actual_trades').insert(trades);
@@ -223,7 +276,7 @@ Deno.serve(async (req) => {
         const { id, created_at, updated_at, ...paymentData } = p;
         return {
           ...paymentData,
-          config_id: config_id,
+          config_id: targetConfigId,
         };
       });
       await supabaseAdmin.from('pac_payments').insert(payments);
@@ -232,6 +285,7 @@ Deno.serve(async (req) => {
 
     const summary = {
       success: true,
+      recreated: recreatedConfig,
       restored: {
         daily_returns: backupData.daily_returns?.length || 0,
         daily_pac_overrides: backupData.daily_pac_overrides?.length || 0,
@@ -239,7 +293,8 @@ Deno.serve(async (req) => {
         pac_payments: backupData.pac_payments?.length || 0,
       },
       backup_date: backup.backup_date,
-      config_name: config.name,
+      config_id: targetConfigId,
+      config_name: configName,
     };
 
     console.log(`🎉 Restore completed:`, summary);
