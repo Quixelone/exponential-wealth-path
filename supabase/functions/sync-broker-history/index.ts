@@ -11,6 +11,64 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SYNC-BROKER-HISTORY] ${step}${detailsStr}`);
 };
 
+// Decryption utilities - inline to avoid import issues in edge functions
+async function getEncryptionKey(): Promise<CryptoKey> {
+  const encryptionKeyBase64 = Deno.env.get('BROKER_ENCRYPTION_KEY');
+  if (!encryptionKeyBase64) {
+    throw new Error('BROKER_ENCRYPTION_KEY not configured');
+  }
+  
+  let keyBytes: Uint8Array;
+  try {
+    keyBytes = Uint8Array.from(atob(encryptionKeyBase64), c => c.charCodeAt(0));
+  } catch {
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(encryptionKeyBase64);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', keyData);
+    keyBytes = new Uint8Array(hashBuffer);
+  }
+  
+  if (keyBytes.length !== 32) {
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(encryptionKeyBase64);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', keyData);
+    keyBytes = new Uint8Array(hashBuffer);
+  }
+  
+  return await crypto.subtle.importKey(
+    'raw',
+    keyBytes,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function decryptValue(encryptedBase64: string, cryptoKey: CryptoKey): Promise<string> {
+  const combined = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+  const iv = combined.slice(0, 12);
+  const encryptedData = combined.slice(12);
+  
+  const decryptedData = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    cryptoKey,
+    encryptedData
+  );
+  
+  const decoder = new TextDecoder();
+  return decoder.decode(decryptedData);
+}
+
+function isEncrypted(value: string): boolean {
+  if (!value || value.length < 40) return false;
+  try {
+    const decoded = atob(value);
+    return decoded.length >= 28;
+  } catch {
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -55,6 +113,30 @@ serve(async (req) => {
 
     logStep('Retrieved connection', { broker: connection.broker_name });
 
+    // Decrypt credentials
+    let apiKey = connection.api_key;
+    let apiSecret = connection.api_secret;
+    let apiPassphrase = connection.api_passphrase;
+
+    // Check if values are encrypted and decrypt them
+    if (isEncrypted(apiKey)) {
+      logStep('Decrypting credentials');
+      try {
+        const cryptoKey = await getEncryptionKey();
+        apiKey = await decryptValue(apiKey, cryptoKey);
+        apiSecret = await decryptValue(apiSecret, cryptoKey);
+        if (apiPassphrase && isEncrypted(apiPassphrase)) {
+          apiPassphrase = await decryptValue(apiPassphrase, cryptoKey);
+        }
+        logStep('Credentials decrypted successfully');
+      } catch (decryptError: any) {
+        logStep('Decryption error', { error: decryptError.message });
+        throw new Error('Failed to decrypt broker credentials');
+      }
+    } else {
+      logStep('Credentials not encrypted (legacy data)');
+    }
+
     // Get user's config
     const { data: config } = await supabaseClient
       .from('investment_configs')
@@ -66,12 +148,16 @@ serve(async (req) => {
       throw new Error('No investment config found for user');
     }
 
-    // Simulate fetching history from broker API
+    // Simulate fetching history from broker API using decrypted credentials
     // In production, this would make actual API calls to the broker
-    logStep('Simulating history fetch from broker', { broker: connection.broker_name });
+    logStep('Fetching history from broker', { 
+      broker: connection.broker_name,
+      hasApiKey: !!apiKey,
+      hasApiSecret: !!apiSecret 
+    });
 
     // Mock data - in production this would come from real API
-    const mockTransactions = [];
+    const mockTransactions: any[] = [];
     let synced = 0;
     let skipped = 0;
 

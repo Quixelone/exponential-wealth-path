@@ -48,7 +48,7 @@ export const useBrokerConnections = () => {
     }
   };
 
-  // Save new connection
+  // Save new connection with encrypted credentials via edge function
   const saveConnection = useMutation({
     mutationFn: async (connection: Partial<BrokerConnection>) => {
       if (!user) throw new Error('User not authenticated');
@@ -59,24 +59,21 @@ export const useBrokerConnections = () => {
         throw new Error(testResult.error || 'Connection test failed');
       }
 
-      // Then save to database
-      const { data, error } = await supabase
-        .from('broker_connections')
-        .upsert({
-          user_id: user.id,
+      // Save via edge function which handles encryption
+      const { data, error } = await supabase.functions.invoke('save-broker-connection', {
+        body: {
           broker_name: connection.broker_name,
-          api_key: connection.api_key!,
-          api_secret: connection.api_secret!,
+          api_key: connection.api_key,
+          api_secret: connection.api_secret,
           api_passphrase: connection.api_passphrase,
-          is_active: true,
-          connection_status: 'connected',
           auto_sync_enabled: connection.auto_sync_enabled ?? true,
           sync_frequency: connection.sync_frequency ?? 'daily',
-        })
-        .select()
-        .single();
+        },
+      });
 
       if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Failed to save connection');
+      
       return data;
     },
     onSuccess: () => {
