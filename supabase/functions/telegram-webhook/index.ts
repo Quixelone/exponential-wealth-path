@@ -67,10 +67,18 @@ serve(async (req) => {
 
         console.log(`📝 Processing confirmation: tradeId=${tradeId}, isAssigned=${isAssigned}`);
 
-        // Get the trade to check pre-analysis
+        // Validate UUID format to prevent injection
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(tradeId)) {
+          console.warn(`Invalid trade ID format: ${tradeId}`);
+          await answerCallbackQuery(callbackId, '❌ ID trade non valido');
+          return new Response('OK', { status: 200 });
+        }
+
+        // Get the trade to verify ownership
         const { data: trade, error: fetchError } = await supabase
           .from('options_trades')
-          .select('*')
+          .select('id, user_id, strike_price_usd, premium_usdt')
           .eq('id', tradeId)
           .single();
 
@@ -80,7 +88,21 @@ serve(async (req) => {
           return new Response('OK', { status: 200 });
         }
 
-        // Update the trade
+        // Verify the callback is from the trade owner by checking their linked telegram_chat_id
+        const { data: ownerSettings, error: settingsError } = await supabase
+          .from('notification_settings')
+          .select('user_id')
+          .eq('telegram_chat_id', chatId?.toString() || '')
+          .eq('user_id', trade.user_id)
+          .single();
+
+        if (settingsError || !ownerSettings) {
+          console.warn(`Unauthorized callback attempt: chatId=${chatId}, tradeId=${tradeId}, tradeOwner=${trade.user_id}`);
+          await answerCallbackQuery(callbackId, '❌ Non autorizzato');
+          return new Response('OK', { status: 200 });
+        }
+
+        // Update the trade - ownership verified
         const newStatus = isAssigned ? 'CLOSED_ASSIGNED' : 'CLOSED_NOT_ASSIGNED';
         const { error: updateError } = await supabase
           .from('options_trades')
