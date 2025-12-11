@@ -48,9 +48,35 @@ export default function NewOptionForm({
   const [selectedStrike, setSelectedStrike] = useState<number | null>(availableStrikes[0] || null);
   const [duration, setDuration] = useState(1);
   const [capital, setCapital] = useState(defaultCapital);
+  const [capitalInput, setCapitalInput] = useState(defaultCapital.toString());
   const [apy, setApy] = useState(0);
+  const [apyInput, setApyInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [highWarningsAcknowledged, setHighWarningsAcknowledged] = useState(false);
+
+  // Handler per input decimali con supporto virgola italiana
+  const handleDecimalInput = (
+    value: string,
+    setInputState: (v: string) => void,
+    setNumericState: (v: number) => void
+  ) => {
+    // Sostituisci virgola con punto per locale italiano
+    let normalizedValue = value.replace(',', '.');
+    
+    // Permetti solo numeri, un punto decimale e stringa vuota
+    if (/^[0-9]*\.?[0-9]*$/.test(normalizedValue) || normalizedValue === '') {
+      setInputState(normalizedValue);
+      
+      if (normalizedValue === '' || normalizedValue === '.') {
+        setNumericState(0);
+      } else {
+        const numValue = parseFloat(normalizedValue);
+        if (!isNaN(numValue)) {
+          setNumericState(numValue);
+        }
+      }
+    }
+  };
 
   // Calcoli derivati
   const calculations = useMemo(() => {
@@ -209,9 +235,10 @@ export default function NewOptionForm({
         <div className="space-y-2">
           <label className="text-sm text-gray-400 font-['DM_Sans']">Capitale (USDT)</label>
           <input
-            type="number"
-            value={capital}
-            onChange={(e) => setCapital(Number(e.target.value))}
+            type="text"
+            inputMode="decimal"
+            value={capitalInput}
+            onChange={(e) => handleDecimalInput(e.target.value, setCapitalInput, setCapital)}
             className="w-full bg-[#1a1d24] border border-[#2a2d34] rounded-lg px-4 py-3 text-white font-['JetBrains_Mono'] text-sm focus:outline-none focus:border-[#f7931a] transition-colors"
             placeholder="10000"
           />
@@ -219,10 +246,10 @@ export default function NewOptionForm({
         <div className="space-y-2">
           <label className="text-sm text-gray-400 font-['DM_Sans']">APY %</label>
           <input
-            type="number"
-            value={apy || ''}
-            onChange={(e) => setApy(Number(e.target.value))}
-            step="0.1"
+            type="text"
+            inputMode="decimal"
+            value={apyInput}
+            onChange={(e) => handleDecimalInput(e.target.value, setApyInput, setApy)}
             className="w-full bg-[#1a1d24] border border-[#2a2d34] rounded-lg px-4 py-3 text-white font-['JetBrains_Mono'] text-sm focus:outline-none focus:border-[#f7931a] transition-colors"
             placeholder="45.5"
           />
