@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { format, addDays } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { Check, X } from 'lucide-react';
@@ -54,9 +54,26 @@ export default function NewOptionForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [highWarningsAcknowledged, setHighWarningsAcknowledged] = useState(false);
 
-  // Handler per input - SOLO aggiorna la stringa, NON lo stato numerico durante la digitazione
-  // Questo evita freeze su mobile causati da ricalcoli costosi
-  const handleCapitalInputChange = useCallback((value: string) => {
+  // Refs per evitare problemi di focus/re-render su mobile
+  const apyInputRef = useRef<HTMLInputElement>(null);
+  const capitalInputRef = useRef<HTMLInputElement>(null);
+  
+  // Sync input values con refs per mobile - evita che React sovrascriva l'input
+  useEffect(() => {
+    if (apyInputRef.current && document.activeElement !== apyInputRef.current) {
+      apyInputRef.current.value = apyInput;
+    }
+  }, [apyInput]);
+
+  useEffect(() => {
+    if (capitalInputRef.current && document.activeElement !== capitalInputRef.current) {
+      capitalInputRef.current.value = capitalInput;
+    }
+  }, [capitalInput]);
+
+  // Handler per input - SOLO aggiorna la stringa locale, NON lo stato numerico durante la digitazione
+  const handleCapitalInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
     // Normalizza virgola in punto per locale italiano
     const normalizedValue = value.replace(',', '.');
     // Permetti solo numeri, un punto decimale e stringa vuota
@@ -65,7 +82,8 @@ export default function NewOptionForm({
     }
   }, []);
 
-  const handleApyInputChange = useCallback((value: string) => {
+  const handleApyInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
     // Normalizza virgola in punto per locale italiano
     const normalizedValue = value.replace(',', '.');
     // Permetti solo numeri, un punto decimale e stringa vuota
@@ -252,10 +270,11 @@ export default function NewOptionForm({
         <div className="space-y-2">
           <label className="text-sm text-gray-400 font-['DM_Sans']">Capitale (USDT)</label>
           <input
+            ref={capitalInputRef}
             type="text"
             inputMode="decimal"
-            value={capitalInput}
-            onChange={(e) => handleCapitalInputChange(e.target.value)}
+            defaultValue={capitalInput}
+            onChange={handleCapitalInputChange}
             onBlur={handleCapitalBlur}
             className="w-full bg-[#1a1d24] border border-[#2a2d34] rounded-lg px-4 py-3 text-white font-['JetBrains_Mono'] text-sm focus:outline-none focus:border-[#f7931a] transition-colors"
             placeholder="10000"
@@ -264,10 +283,11 @@ export default function NewOptionForm({
         <div className="space-y-2">
           <label className="text-sm text-gray-400 font-['DM_Sans']">APY %</label>
           <input
+            ref={apyInputRef}
             type="text"
             inputMode="decimal"
-            value={apyInput}
-            onChange={(e) => handleApyInputChange(e.target.value)}
+            defaultValue={apyInput}
+            onChange={handleApyInputChange}
             onBlur={handleApyBlur}
             className="w-full bg-[#1a1d24] border border-[#2a2d34] rounded-lg px-4 py-3 text-white font-['JetBrains_Mono'] text-sm focus:outline-none focus:border-[#f7931a] transition-colors"
             placeholder="45.5"
