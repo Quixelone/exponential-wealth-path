@@ -209,7 +209,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             <Label className="text-sm text-muted-foreground">Regola con il cursore</Label>
             <Slider
               value={[returnRate]}
-              onValueChange={(value) => {
+              onValueCommit={(value) => {
                 setReturnRate(value[0]);
                 setReturnRateInput(value[0].toString());
               }}
