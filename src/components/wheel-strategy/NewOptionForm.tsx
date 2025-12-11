@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { format, addDays } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { Check, X } from 'lucide-react';
@@ -54,29 +54,46 @@ export default function NewOptionForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [highWarningsAcknowledged, setHighWarningsAcknowledged] = useState(false);
 
-  // Handler per input decimali con supporto virgola italiana
-  const handleDecimalInput = (
-    value: string,
-    setInputState: (v: string) => void,
-    setNumericState: (v: number) => void
-  ) => {
-    // Sostituisci virgola con punto per locale italiano
-    let normalizedValue = value.replace(',', '.');
-    
+  // Handler per input - SOLO aggiorna la stringa, NON lo stato numerico durante la digitazione
+  // Questo evita freeze su mobile causati da ricalcoli costosi
+  const handleCapitalInputChange = useCallback((value: string) => {
+    // Normalizza virgola in punto per locale italiano
+    const normalizedValue = value.replace(',', '.');
     // Permetti solo numeri, un punto decimale e stringa vuota
     if (/^[0-9]*\.?[0-9]*$/.test(normalizedValue) || normalizedValue === '') {
-      setInputState(normalizedValue);
-      
-      if (normalizedValue === '' || normalizedValue === '.') {
-        setNumericState(0);
-      } else {
-        const numValue = parseFloat(normalizedValue);
-        if (!isNaN(numValue)) {
-          setNumericState(numValue);
-        }
-      }
+      setCapitalInput(normalizedValue);
     }
-  };
+  }, []);
+
+  const handleApyInputChange = useCallback((value: string) => {
+    // Normalizza virgola in punto per locale italiano
+    const normalizedValue = value.replace(',', '.');
+    // Permetti solo numeri, un punto decimale e stringa vuota
+    if (/^[0-9]*\.?[0-9]*$/.test(normalizedValue) || normalizedValue === '') {
+      setApyInput(normalizedValue);
+    }
+  }, []);
+
+  // Aggiorna lo stato numerico solo al blur per evitare freeze su mobile
+  const handleCapitalBlur = useCallback(() => {
+    const numValue = parseFloat(capitalInput);
+    if (isNaN(numValue) || numValue < 0) {
+      setCapitalInput(capital.toString());
+    } else {
+      setCapital(numValue);
+      setCapitalInput(numValue.toString());
+    }
+  }, [capitalInput, capital]);
+
+  const handleApyBlur = useCallback(() => {
+    const numValue = parseFloat(apyInput);
+    if (isNaN(numValue) || numValue < 0) {
+      setApyInput(apy > 0 ? apy.toString() : '');
+    } else {
+      setApy(numValue);
+      setApyInput(numValue.toString());
+    }
+  }, [apyInput, apy]);
 
   // Calcoli derivati
   const calculations = useMemo(() => {
@@ -238,7 +255,8 @@ export default function NewOptionForm({
             type="text"
             inputMode="decimal"
             value={capitalInput}
-            onChange={(e) => handleDecimalInput(e.target.value, setCapitalInput, setCapital)}
+            onChange={(e) => handleCapitalInputChange(e.target.value)}
+            onBlur={handleCapitalBlur}
             className="w-full bg-[#1a1d24] border border-[#2a2d34] rounded-lg px-4 py-3 text-white font-['JetBrains_Mono'] text-sm focus:outline-none focus:border-[#f7931a] transition-colors"
             placeholder="10000"
           />
@@ -249,7 +267,8 @@ export default function NewOptionForm({
             type="text"
             inputMode="decimal"
             value={apyInput}
-            onChange={(e) => handleDecimalInput(e.target.value, setApyInput, setApy)}
+            onChange={(e) => handleApyInputChange(e.target.value)}
+            onBlur={handleApyBlur}
             className="w-full bg-[#1a1d24] border border-[#2a2d34] rounded-lg px-4 py-3 text-white font-['JetBrains_Mono'] text-sm focus:outline-none focus:border-[#f7931a] transition-colors"
             placeholder="45.5"
           />

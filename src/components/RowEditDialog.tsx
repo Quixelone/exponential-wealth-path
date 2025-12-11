@@ -114,18 +114,15 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleReturnRateInputChange = (value: string) => {
-    setReturnRateInput(value);
-    if (value === '' || value === '0' || value === '-0' || value.endsWith('.') || value.endsWith(',')) {
-      return;
-    }
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue)) {
-      setReturnRate(numValue);
-    }
-  };
+  // Solo aggiorna l'input string - NON lo stato numerico durante la digitazione
+  const handleReturnRateInputChange = useCallback((value: string) => {
+    // Normalizza virgola in punto per input italiano
+    const normalizedValue = value.replace(',', '.');
+    setReturnRateInput(normalizedValue);
+  }, []);
 
-  const handleReturnRateInputBlur = () => {
+  // Aggiorna lo stato numerico solo al blur per evitare freeze su mobile
+  const handleReturnRateInputBlur = useCallback(() => {
     const numValue = parseFloat(returnRateInput);
     if (isNaN(numValue)) {
       setReturnRateInput(returnRate.toString());
@@ -133,20 +130,17 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
       setReturnRate(numValue);
       setReturnRateInput(numValue.toString());
     }
-  };
+  }, [returnRateInput, returnRate]);
 
-  const handlePacAmountInputChange = (value: string) => {
-    setPacAmountInput(value);
-    if (value === '' || value === '0' || value.endsWith('.') || value.endsWith(',')) {
-      return;
-    }
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue >= 0) {
-      setPacAmount(numValue);
-    }
-  };
+  // Solo aggiorna l'input string - NON lo stato numerico durante la digitazione
+  const handlePacAmountInputChange = useCallback((value: string) => {
+    // Normalizza virgola in punto per input italiano
+    const normalizedValue = value.replace(',', '.');
+    setPacAmountInput(normalizedValue);
+  }, []);
 
-  const handlePacAmountInputBlur = () => {
+  // Aggiorna lo stato numerico solo al blur per evitare freeze su mobile
+  const handlePacAmountInputBlur = useCallback(() => {
     const numValue = parseFloat(pacAmountInput);
     if (isNaN(numValue) || numValue < 0) {
       setPacAmountInput(pacAmount.toFixed(2));
@@ -154,7 +148,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
       setPacAmount(numValue);
       setPacAmountInput(numValue.toFixed(2));
     }
-  };
+  }, [pacAmountInput, pacAmount]);
 
   const handleCancel = () => {
     setReturnRate(item.dailyReturn);
