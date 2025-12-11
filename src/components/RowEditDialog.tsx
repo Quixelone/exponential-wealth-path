@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
@@ -47,10 +47,6 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   
   const [originalConfigId, setOriginalConfigId] = useState<string | null>(null);
   const [originalConfigName, setOriginalConfigName] = useState<string>('');
-
-  // Refs per evitare problemi di focus/re-render su mobile
-  const returnRateInputRef = useRef<HTMLInputElement>(null);
-  const pacAmountInputRef = useRef<HTMLInputElement>(null);
 
   const stableOnUpdateDailyReturn = useCallback(onUpdateDailyReturn, [onUpdateDailyReturn]);
   const stableOnUpdatePAC = useCallback(onUpdatePAC, [onUpdatePAC]);
@@ -103,22 +99,23 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     }
   }, [returnRate, pacAmount, item]);
 
-  // Sync input values con refs per mobile - evita che React sovrascriva l'input
-  useEffect(() => {
-    if (returnRateInputRef.current && document.activeElement !== returnRateInputRef.current) {
-      returnRateInputRef.current.value = returnRateInput;
-    }
-  }, [returnRateInput]);
+  if (!item) return null;
 
-  useEffect(() => {
-    if (pacAmountInputRef.current && document.activeElement !== pacAmountInputRef.current) {
-      pacAmountInputRef.current.value = pacAmountInput;
-    }
-  }, [pacAmountInput]);
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('it-IT', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
 
-  // Handler per input - legge direttamente dal ref per evitare re-render su mobile
-  const handleReturnRateInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const handleSave = () => {
+    applyChanges();
+    onOpenChange(false);
+  };
+
+  // Solo aggiorna l'input string - NON lo stato numerico durante la digitazione
+  const handleReturnRateInputChange = useCallback((value: string) => {
     // Normalizza virgola in punto per input italiano
     const normalizedValue = value.replace(',', '.');
     setReturnRateInput(normalizedValue);
@@ -135,9 +132,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     }
   }, [returnRateInput, returnRate]);
 
-  // Handler per input PAC - legge direttamente dal ref per evitare re-render su mobile
-  const handlePacAmountInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  // Solo aggiorna l'input string - NON lo stato numerico durante la digitazione
+  const handlePacAmountInputChange = useCallback((value: string) => {
     // Normalizza virgola in punto per input italiano
     const normalizedValue = value.replace(',', '.');
     setPacAmountInput(normalizedValue);
@@ -154,31 +150,13 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     }
   }, [pacAmountInput, pacAmount]);
 
-  const handleCancel = useCallback(() => {
-    if (item) {
-      setReturnRate(item.dailyReturn);
-      setPacAmount(item.pacAmount);
-      setReturnRateInput(item.dailyReturn.toString());
-      setPacAmountInput(item.pacAmount.toFixed(2));
-      setHasChanges(false);
-    }
+  const handleCancel = () => {
+    setReturnRate(item.dailyReturn);
+    setPacAmount(item.pacAmount);
+    setReturnRateInput(item.dailyReturn.toString());
+    setPacAmountInput(item.pacAmount.toFixed(2));
+    setHasChanges(false);
     onOpenChange(false);
-  }, [item, onOpenChange]);
-
-  const handleSave = useCallback(() => {
-    applyChanges();
-    onOpenChange(false);
-  }, [applyChanges, onOpenChange]);
-
-  // Early return DOPO tutti gli hooks
-  if (!item) return null;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('it-IT', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
   };
 
   const newCapitalAfterPAC = item.capitalBeforePAC + pacAmount;
@@ -204,12 +182,11 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             <div>
               <Label htmlFor="return-input" className="text-sm">Percentuale (%)</Label>
               <Input
-                ref={returnRateInputRef}
                 id="return-input"
                 type="text"
                 inputMode="decimal"
-                defaultValue={returnRateInput}
-                onChange={handleReturnRateInputChange}
+                value={returnRateInput}
+                onChange={(e) => handleReturnRateInputChange(e.target.value)}
                 onBlur={handleReturnRateInputBlur}
                 placeholder="Es: 0.500"
                 className="font-mono touch-target text-base"
@@ -229,7 +206,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             <Label className="text-sm text-muted-foreground">Regola con il cursore</Label>
             <Slider
               value={[returnRate]}
-              onValueCommit={(value) => {
+              onValueChange={(value) => {
                 setReturnRate(value[0]);
                 setReturnRateInput(value[0].toString());
               }}
@@ -264,12 +241,11 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             <div>
               <Label htmlFor="pac-input" className="text-sm">Importo ({currency})</Label>
               <Input
-                ref={pacAmountInputRef}
                 id="pac-input"
                 type="text"
                 inputMode="decimal"
-                defaultValue={pacAmountInput}
-                onChange={handlePacAmountInputChange}
+                value={pacAmountInput}
+                onChange={(e) => handlePacAmountInputChange(e.target.value)}
                 onBlur={handlePacAmountInputBlur}
                 placeholder="Es: 100.00"
                 className="font-mono touch-target text-base"
