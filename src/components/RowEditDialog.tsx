@@ -99,21 +99,6 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     }
   }, [returnRate, pacAmount, item]);
 
-  if (!item) return null;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('it-IT', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  const handleSave = () => {
-    applyChanges();
-    onOpenChange(false);
-  };
-
   // Solo aggiorna l'input string - NON lo stato numerico durante la digitazione
   const handleReturnRateInputChange = useCallback((value: string) => {
     // Normalizza virgola in punto per input italiano
@@ -150,13 +135,31 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     }
   }, [pacAmountInput, pacAmount]);
 
-  const handleCancel = () => {
-    setReturnRate(item.dailyReturn);
-    setPacAmount(item.pacAmount);
-    setReturnRateInput(item.dailyReturn.toString());
-    setPacAmountInput(item.pacAmount.toFixed(2));
-    setHasChanges(false);
+  const handleCancel = useCallback(() => {
+    if (item) {
+      setReturnRate(item.dailyReturn);
+      setPacAmount(item.pacAmount);
+      setReturnRateInput(item.dailyReturn.toString());
+      setPacAmountInput(item.pacAmount.toFixed(2));
+      setHasChanges(false);
+    }
     onOpenChange(false);
+  }, [item, onOpenChange]);
+
+  const handleSave = useCallback(() => {
+    applyChanges();
+    onOpenChange(false);
+  }, [applyChanges, onOpenChange]);
+
+  // Early return DOPO tutti gli hooks
+  if (!item) return null;
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('it-IT', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
   };
 
   const newCapitalAfterPAC = item.capitalBeforePAC + pacAmount;
