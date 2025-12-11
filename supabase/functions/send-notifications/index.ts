@@ -338,33 +338,39 @@ async function sendEmailNotification(email: string, userName: string, message: s
       return false;
     }
 
-    const { Resend } = await import('npm:resend@2.0.0');
-    const resend = new Resend(resendApiKey);
-
-    const emailResponse = await resend.emails.send({
-      from: 'Finanza Creativa <notifiche@resend.dev>',
-      to: [email],
-      subject: '🔔 Promemoria Pagamento - Finanza Creativa',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #2563eb; text-align: center;">💰 Promemoria Pagamento</h2>
-          <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p style="white-space: pre-line; font-size: 16px; line-height: 1.6; color: #334155;">
-              ${message.replace(/\n/g, '<br>')}
-            </p>
+    // Use fetch API directly to avoid npm import issues
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Finanza Creativa <notifiche@resend.dev>',
+        to: [email],
+        subject: '🔔 Promemoria Pagamento - Finanza Creativa',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #2563eb; text-align: center;">💰 Promemoria Pagamento</h2>
+            <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p style="white-space: pre-line; font-size: 16px; line-height: 1.6; color: #334155;">
+                ${message.replace(/\n/g, '<br>')}
+              </p>
+            </div>
+            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+              <p style="color: #64748b; font-size: 14px;">
+                Questa è una notifica automatica di Finanza Creativa.<br>
+                Se non vuoi più ricevere questi promemoria, puoi disattivarli nelle impostazioni.
+              </p>
+            </div>
           </div>
-          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-            <p style="color: #64748b; font-size: 14px;">
-              Questa è una notifica automatica di Finanza Creativa.<br>
-              Se non vuoi più ricevere questi promemoria, puoi disattivarli nelle impostazioni.
-            </p>
-          </div>
-        </div>
-      `,
+        `,
+      }),
     });
 
-    if (emailResponse.error) {
-      console.error('Email send failed:', emailResponse.error);
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Email send failed:', error);
       return false;
     }
 
