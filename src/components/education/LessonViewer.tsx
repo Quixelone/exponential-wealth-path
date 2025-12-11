@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { Lesson } from '@/hooks/useEducation';
 import { toast } from 'sonner';
-
+import DOMPurify from 'dompurify';
 interface LessonViewerProps {
   lesson: Lesson;
   onComplete: (timeSpent: number) => void;
@@ -53,7 +53,12 @@ const LessonViewer = ({ lesson, onComplete, onBack }: LessonViewerProps) => {
           {lesson.content && (
             <div 
               className="prose dark:prose-invert max-w-none"
-              dangerouslySetInnerHTML={{ __html: lesson.content }}
+              dangerouslySetInnerHTML={{ 
+                __html: DOMPurify.sanitize(lesson.content, {
+                  ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote', 'a', 'span', 'div'],
+                  ALLOWED_ATTR: ['href', 'class', 'target', 'rel']
+                })
+              }}
             />
           )}
 
