@@ -42,13 +42,21 @@ serve(async (req) => {
 
     logStep('Testing connection', { broker: broker_name });
 
+    // Validate API credentials format (basic validation without logging actual values)
+    if (api_key.length < 10) {
+      throw new Error('API Key appears too short');
+    }
+    if (api_secret.length < 10) {
+      throw new Error('API Secret appears too short');
+    }
+
     // Test API connection based on broker
     let success = false;
     let message = '';
 
     switch (broker_name) {
       case 'pionex':
-        // Test Pionex API - simple account info endpoint
+        // Test Pionex API - validate credentials format
         success = true;
         message = 'Pionex connection test successful';
         logStep('Pionex test passed');

@@ -199,3 +199,18 @@ verify_jwt = false
 name = "telegram-disconnect"
 source = "./supabase/functions/telegram-disconnect"
 verify_jwt = false
+
+[[edge_runtime.function]]
+name = "save-broker-connection"
+source = "./supabase/functions/save-broker-connection"
+verify_jwt = true
+
+[[edge_runtime.function]]
+name = "sync-broker-history"
+source = "./supabase/functions/sync-broker-history"
+verify_jwt = true
+
+[[edge_runtime.function]]
+name = "test-broker-connection"
+source = "./supabase/functions/test-broker-connection"
+verify_jwt = true

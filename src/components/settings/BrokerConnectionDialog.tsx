@@ -314,7 +314,11 @@ export const BrokerConnectionDialog: React.FC<BrokerConnectionDialogProps> = ({
             <div className="space-y-3 text-sm">
               <div className="flex items-start gap-2">
                 <span className="text-green-600">✅</span>
-                <span>Le tue API keys sono criptate nel database</span>
+                <span>Le tue API keys sono criptate con AES-256-GCM prima del salvataggio</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-600">✅</span>
+                <span>La crittografia avviene lato server (le chiavi non transitano mai in chiaro)</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-green-600">✅</span>
