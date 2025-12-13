@@ -342,33 +342,24 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     </div>
   );
 
-  // Mobile: usa Drawer (bottom sheet)
+  // Mobile: usa Drawer (bottom sheet) con altezza ridotta per tastiera
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[85vh]">
-          <DrawerHeader className="pb-2">
+        <DrawerContent className="max-h-[60vh]">
+          <DrawerHeader className="pb-1 flex-shrink-0">
             <DrawerTitle className="flex items-center gap-2 text-base">
               <Calendar className="h-5 w-5 text-primary" />
-              Modifica Giorno {item.day}
+              Giorno {item.day} - {formatDate(item.date)}
             </DrawerTitle>
-            <DrawerDescription className="text-xs text-muted-foreground">
-              {formatDate(item.date)}
-            </DrawerDescription>
           </DrawerHeader>
           
-          <div className="px-4 pb-2 space-y-3 overflow-y-auto flex-1" style={{ maxHeight: 'calc(85vh - 200px)' }}>
-            {/* Su mobile: campi input PRIMA per essere visibili con tastiera */}
+          <div className="px-4 pb-2 space-y-3 overflow-y-auto" style={{ maxHeight: 'calc(60vh - 140px)' }}>
+            {/* Campi input per primi - visibili sopra tastiera */}
             {inputFieldsJSX}
-            
-            <Separator />
-            
-            {/* Info capitale e preview dopo */}
-            {capitalInfoJSX}
-            {resultsPreviewJSX}
           </div>
           
-          <DrawerFooter className="pt-2">
+          <DrawerFooter className="pt-2 flex-shrink-0 border-t">
             <ActionButtons />
           </DrawerFooter>
         </DrawerContent>
