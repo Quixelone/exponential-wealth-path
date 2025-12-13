@@ -209,14 +209,15 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             <Label className="text-sm text-muted-foreground">Regola con il cursore</Label>
             <Slider
               value={[returnRate]}
-              onValueCommit={(value) => {
+              onValueChange={(value) => {
+                // Aggiorna ENTRAMBI durante il drag per abilitare il pulsante
                 setReturnRate(value[0]);
-                setReturnRateInput(value[0].toString());
+                setReturnRateInput(value[0].toFixed(1));
               }}
               min={-10}
               max={10}
               step={0.1}
-              className="w-full"
+              className="w-full touch-none"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>-10%</span>
