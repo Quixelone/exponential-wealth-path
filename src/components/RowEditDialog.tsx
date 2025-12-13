@@ -167,8 +167,8 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
   const newFinalCapital = newCapitalAfterPAC + newDailyGain;
   const pacDifference = pacAmount - defaultPACAmount;
 
-  // Componente campi input - mostrato per primo su mobile
-  const InputFields = () => (
+  // JSX inline per evitare perdita focus durante la digitazione
+  const inputFieldsJSX = (
     <>
       {/* Modifica Rendimento */}
       <div className="space-y-3">
@@ -210,7 +210,6 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
             <Slider
               value={[returnRate]}
               onValueChange={(value) => {
-                // Aggiorna ENTRAMBI durante il drag per abilitare il pulsante
                 setReturnRate(value[0]);
                 setReturnRateInput(value[0].toFixed(1));
               }}
@@ -276,8 +275,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     </>
   );
 
-  // Componente info capitale
-  const CapitalInfo = () => (
+  const capitalInfoJSX = (
     <div className="grid grid-cols-2 gap-3 p-3 bg-muted/30 rounded-lg">
       <div>
         <Label className="text-xs font-medium text-muted-foreground">Capitale Iniziale</Label>
@@ -290,8 +288,7 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
     </div>
   );
 
-  // Preview risultati
-  const ResultsPreview = () => (
+  const resultsPreviewJSX = (
     <div className="space-y-2">
       <Label className="text-sm font-medium">Anteprima Risultati</Label>
       <div className="grid grid-cols-3 gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
@@ -362,13 +359,13 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
           
           <div className="px-4 pb-2 space-y-3 overflow-y-auto flex-1" style={{ maxHeight: 'calc(85vh - 200px)' }}>
             {/* Su mobile: campi input PRIMA per essere visibili con tastiera */}
-            <InputFields />
+            {inputFieldsJSX}
             
             <Separator />
             
             {/* Info capitale e preview dopo */}
-            <CapitalInfo />
-            <ResultsPreview />
+            {capitalInfoJSX}
+            {resultsPreviewJSX}
           </div>
           
           <DrawerFooter className="pt-2">
@@ -395,15 +392,15 @@ const RowEditDialog: React.FC<RowEditDialogProps> = ({
 
         <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
           {/* Desktop: info prima, poi campi */}
-          <CapitalInfo />
+          {capitalInfoJSX}
           
           <Separator />
           
-          <InputFields />
+          {inputFieldsJSX}
 
           <Separator />
 
-          <ResultsPreview />
+          {resultsPreviewJSX}
         </div>
       
         <div className="border-t border-border pt-4 mt-2">
