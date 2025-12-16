@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Shield, ShieldAlert, LineChart, Database } from 'lucide-react';
+import { Users, Shield, ShieldAlert, LineChart, Database, FileText } from 'lucide-react';
 import UserStatsCards from './UserStatsCards';
 import UsersTable from './UsersTable';
 import SecurityDashboard from '@/components/security/SecurityDashboard';
@@ -8,6 +8,7 @@ import AdminRoleManager from '@/components/security/AdminRoleManager';
 import UserStrategiesTable from './UserStrategiesTable';
 import { StrategyDetailDialog } from './StrategyDetailDialog';
 import { AdminBackupRestore } from './AdminBackupRestore';
+import { DocumentExporter } from '@/components/DocumentExporter';
 
 interface UserData {
   id: string;
@@ -49,7 +50,7 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
   return (
     <div className="w-full">
       <Tabs defaultValue="users" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Gestione Utenti
@@ -69,6 +70,10 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
           <TabsTrigger value="backup-restore" className="flex items-center gap-2">
             <Database className="h-4 w-4" />
             Ripristino Backup
+          </TabsTrigger>
+          <TabsTrigger value="specs" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Specs
           </TabsTrigger>
         </TabsList>
         
@@ -95,6 +100,10 @@ const UserManagementTabs = ({ users, onUpdateUserRole, onDeleteUser, onRefresh }
 
         <TabsContent value="backup-restore" className="mt-6">
           <AdminBackupRestore />
+        </TabsContent>
+
+        <TabsContent value="specs" className="mt-6">
+          <DocumentExporter />
         </TabsContent>
       </Tabs>
 
