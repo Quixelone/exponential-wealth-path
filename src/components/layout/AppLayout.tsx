@@ -102,9 +102,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
               isAdmin={isAdmin}
               onNavigate={guardedNavigate}
             />
-            <div className="pt-14 pb-20 px-4">
+            <main className="pt-16 pb-24 px-3 sm:px-4 min-h-[calc(100vh-4rem)] overflow-x-hidden">
               {children}
-            </div>
+            </main>
             <BottomNavigation 
               isAdmin={isAdmin}
               onNavigate={guardedNavigate}
