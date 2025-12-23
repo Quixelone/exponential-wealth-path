@@ -4,6 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Calendar, Target } from 'lucide-react';
 import { formatCurrency, Currency } from '@/lib/utils';
+import { useDeviceInfo } from '@/hooks/use-mobile';
 
 interface CurrentStrategyProgressProps {
   summary: any;
@@ -20,6 +21,8 @@ const CurrentStrategyProgress: React.FC<CurrentStrategyProgressProps> = ({
   dailyReturns = {},
   originalDailyReturnRate = 0
 }) => {
+  const { isMobile } = useDeviceInfo();
+
   if (!summary?.current || !summary?.final) {
     return null;
   }
@@ -44,98 +47,99 @@ const CurrentStrategyProgress: React.FC<CurrentStrategyProgressProps> = ({
 
   return (
     <Card className="modern-card">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Target className="h-5 w-5 text-primary" />
-          Andamento Strategia Attuale
-          <Badge variant="outline" className="ml-auto">
-            Giorno {current.day} di {final.day}
+      <CardHeader className={isMobile ? "p-3 pb-2" : "pb-4"}>
+        <CardTitle className={`flex items-center gap-2 ${isMobile ? "text-base" : "text-lg"}`}>
+          <Target className={isMobile ? "h-4 w-4 text-primary" : "h-5 w-5 text-primary"} />
+          <span className="truncate">Andamento Strategia</span>
+          <Badge variant="outline" className={`ml-auto shrink-0 ${isMobile ? "text-[10px] px-1.5 py-0.5" : ""}`}>
+            {current.day}/{final.day}
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className={`space-y-4 ${isMobile ? "p-3 pt-0" : "space-y-6"}`}>
         {/* Progresso Temporale */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Progresso Temporale
+            <span className={`font-medium flex items-center gap-1.5 ${isMobile ? "text-xs" : "text-sm"}`}>
+              <Calendar className={isMobile ? "h-3 w-3" : "h-4 w-4"} />
+              Progresso
             </span>
-            <span className="text-sm text-muted-foreground">
-              {timeProgress.toFixed(1)}%
+            <span className={`text-muted-foreground ${isMobile ? "text-xs" : "text-sm"}`}>
+              {timeProgress.toFixed(0)}%
             </span>
           </div>
           <Progress value={timeProgress} className="h-2" />
         </div>
 
         {/* Progresso Capitale */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Crescita Capitale</span>
-            <span className="text-sm text-muted-foreground">
-              {capitalProgress.toFixed(1)}%
+            <span className={`font-medium ${isMobile ? "text-xs" : "text-sm"}`}>Crescita Capitale</span>
+            <span className={`text-muted-foreground ${isMobile ? "text-xs" : "text-sm"}`}>
+              {capitalProgress.toFixed(0)}%
             </span>
           </div>
           <Progress value={capitalProgress} className="h-2" />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Attuale: {formatCurrency(current.finalCapital, currency)}</span>
-            <span>Obiettivo: {formatCurrency(final.finalCapital, currency)}</span>
+          <div className={`flex justify-between text-muted-foreground ${isMobile ? "text-[10px]" : "text-xs"}`}>
+            <span className="truncate mr-2">{formatCurrency(current.finalCapital, currency)}</span>
+            <span className="truncate">{formatCurrency(final.finalCapital, currency)}</span>
           </div>
         </div>
 
         {/* Progresso Investimenti */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Investimenti Versati</span>
-            <span className="text-sm text-muted-foreground">
-              {investmentProgress.toFixed(1)}%
+            <span className={`font-medium ${isMobile ? "text-xs" : "text-sm"}`}>Investimenti</span>
+            <span className={`text-muted-foreground ${isMobile ? "text-xs" : "text-sm"}`}>
+              {investmentProgress.toFixed(0)}%
             </span>
           </div>
           <Progress value={investmentProgress} className="h-2" />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Versato: {formatCurrency(current.totalInvested, currency)}</span>
-            <span>Totale: {formatCurrency(final.totalInvested, currency)}</span>
+          <div className={`flex justify-between text-muted-foreground ${isMobile ? "text-[10px]" : "text-xs"}`}>
+            <span className="truncate mr-2">{formatCurrency(current.totalInvested, currency)}</span>
+            <span className="truncate">{formatCurrency(final.totalInvested, currency)}</span>
           </div>
         </div>
 
         {/* Performance vs Aspettativa */}
-        <div className="pt-4 border-t">
+        <div className={`border-t ${isMobile ? "pt-3" : "pt-4"}`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {performanceVsExpected >= 0 ? (
-                <TrendingUp className="h-4 w-4 text-green-500" />
+                <TrendingUp className={`text-green-500 ${isMobile ? "h-3 w-3" : "h-4 w-4"}`} />
               ) : (
-                <TrendingDown className="h-4 w-4 text-red-500" />
+                <TrendingDown className={`text-red-500 ${isMobile ? "h-3 w-3" : "h-4 w-4"}`} />
               )}
-              <span className="text-sm font-medium">Performance vs Attesa</span>
+              <span className={`font-medium ${isMobile ? "text-xs" : "text-sm"}`}>vs Attesa</span>
             </div>
             <Badge 
               variant={performanceVsExpected >= 0 ? "default" : "destructive"}
-              className={performanceVsExpected >= 0 ? "bg-green-500 hover:bg-green-600" : ""}
+              className={`${performanceVsExpected >= 0 ? "bg-green-500 hover:bg-green-600" : ""} ${isMobile ? "text-[10px] px-1.5" : ""}`}
             >
-              {performanceVsExpected >= 0 ? '+' : ''}{performanceVsExpected.toFixed(2)}%
+              {performanceVsExpected >= 0 ? '+' : ''}{performanceVsExpected.toFixed(1)}%
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {performanceVsExpected >= 0 
-              ? "La strategia sta performando meglio del previsto"
-              : "La strategia è sotto le aspettative"
-            }
-          </p>
+          {!isMobile && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {performanceVsExpected >= 0 
+                ? "La strategia sta performando meglio del previsto"
+                : "La strategia è sotto le aspettative"
+              }
+            </p>
+          )}
         </div>
 
-
         {/* Rendimento Attuale */}
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+        <div className={`grid grid-cols-2 gap-3 border-t ${isMobile ? "pt-3" : "pt-4 gap-4"}`}>
           <div>
-            <div className="text-xs text-muted-foreground">Rendimento Attuale</div>
-            <div className="text-lg font-bold text-primary">
+            <div className={`text-muted-foreground ${isMobile ? "text-[10px]" : "text-xs"}`}>Rendimento Attuale</div>
+            <div className={`font-bold text-primary ${isMobile ? "text-base" : "text-lg"}`}>
               {current.totalReturn.toFixed(2)}%
             </div>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground">Rendimento Atteso</div>
-            <div className="text-lg font-bold">
+            <div className={`text-muted-foreground ${isMobile ? "text-[10px]" : "text-xs"}`}>Rendimento Atteso</div>
+            <div className={`font-bold ${isMobile ? "text-base" : "text-lg"}`}>
               {final.totalReturn.toFixed(2)}%
             </div>
           </div>
