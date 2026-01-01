@@ -32,17 +32,17 @@ export const LandingTestimonials = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-20 bg-muted/30">
+    <section id="testimonials" className="py-20 bg-slate-800/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold mb-4"
+            className="text-4xl md:text-5xl font-bold text-white mb-4"
           >
             Cosa Dicono i Nostri{' '}
-            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
               Studenti
             </span>
           </motion.h2>
@@ -51,13 +51,13 @@ export const LandingTestimonials = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-muted-foreground max-w-2xl mx-auto"
+            className="text-xl text-slate-400 max-w-2xl mx-auto"
           >
             Storie reali di persone che hanno trasformato la loro vita finanziaria
           </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={testimonial.name}
@@ -66,34 +66,34 @@ export const LandingTestimonials = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="p-6 h-full hover:shadow-xl transition-shadow relative">
-                <Quote className="absolute top-4 right-4 w-8 h-8 text-primary/20" />
+              <Card className="p-6 h-full bg-slate-800/50 backdrop-blur-sm border-slate-700/50 hover:border-slate-600/50 transition-all relative">
+                <Quote className="absolute top-4 right-4 w-8 h-8 text-purple-500/20" />
                 
                 {/* Rating */}
                 <div className="flex gap-1 mb-4">
                   {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
 
                 {/* Testimonial Text */}
-                <p className="text-muted-foreground mb-6 italic">"{testimonial.text}"</p>
+                <p className="text-slate-300 mb-6 italic leading-relaxed">"{testimonial.text}"</p>
 
                 {/* Profit Badge */}
-                <div className="inline-block px-3 py-1 rounded-full bg-green-500/20 text-green-600 text-sm font-semibold mb-4">
+                <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-sm font-semibold mb-4">
                   {testimonial.profit}
                 </div>
 
                 {/* Author */}
-                <div className="flex items-center gap-3 pt-4 border-t border-border">
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-700/50">
                   <Avatar>
-                    <AvatarFallback className="bg-primary text-primary-foreground">
+                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-violet-500 text-white">
                       {testimonial.avatar}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                    <div className="font-semibold text-white">{testimonial.name}</div>
+                    <div className="text-sm text-slate-400">{testimonial.role}</div>
                   </div>
                 </div>
               </Card>

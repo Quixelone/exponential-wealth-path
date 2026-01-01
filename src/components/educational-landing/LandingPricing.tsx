@@ -1,11 +1,10 @@
 import { motion } from "motion/react";
-import { Check, Zap, Sparkles, Crown } from "lucide-react";
+import { Check, Zap, Sparkles, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useParallax } from "@/hooks/useParallax";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PRICE_IDS } from "@/hooks/useSubscriptionGate";
@@ -58,7 +57,8 @@ export const LandingPricing = () => {
   const plans = [
     {
       name: "Free",
-      price: "0€",
+      price: "€0",
+      period: "",
       description: "Per iniziare",
       features: [
         "Accesso ai corsi base",
@@ -73,7 +73,7 @@ export const LandingPricing = () => {
     },
     {
       name: "Pro",
-      price: "29€",
+      price: "€9.99",
       period: "/mese",
       description: "Il più scelto",
       features: [
@@ -89,21 +89,22 @@ export const LandingPricing = () => {
       productId: 'prod_TVWGTAfnyka83R'
     },
     {
-      name: "Enterprise",
-      price: "99€",
-      period: "/mese",
-      description: "Massima potenza",
+      name: "Custom",
+      price: "Custom",
+      period: "",
+      description: "Per aziende",
       features: [
         "Tutto di Pro +",
         "Consulenza 1-on-1",
-        "API personalizzate",
+        "Formazione team",
         "Dashboard custom",
         "Supporto dedicato 24/7"
       ],
-      icon: Crown,
+      icon: MessageCircle,
       highlighted: false,
-      priceId: PRICE_IDS.enterprise,
-      productId: 'prod_TVWkIBXmcKVgqn'
+      priceId: null,
+      productId: null,
+      isCustom: true
     }
   ];
 
@@ -113,7 +114,7 @@ export const LandingPricing = () => {
   };
 
   return (
-    <section id="pricing" className="py-20 bg-muted/50">
+    <section id="pricing" className="py-20 bg-slate-900">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -121,64 +122,61 @@ export const LandingPricing = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Scegli il Tuo Piano
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Scegli il Piano{' '}
+            <span className="bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
+              Perfetto per Te
+            </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
             Inizia gratis e sblocca funzionalità premium quando sei pronto
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan, index) => {
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            const { ref, y } = useParallax();
-            
-            return (
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
-              ref={ref}
-              style={{ y }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className={`p-6 h-full relative ${
-                plan.highlighted ? 'border-2 border-primary shadow-xl' : ''
+              <Card className={`p-6 h-full relative bg-slate-800/50 backdrop-blur-sm border-slate-700/50 ${
+                plan.highlighted ? 'border-2 border-purple-500 shadow-xl shadow-purple-500/20' : ''
               } ${
-                isCurrentPlan(plan.productId) ? 'ring-2 ring-primary' : ''
+                isCurrentPlan(plan.productId) ? 'ring-2 ring-purple-400' : ''
               }`}>
                 {plan.highlighted && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-500 to-violet-500 border-0">
                     Più Popolare
                   </Badge>
                 )}
                 {isCurrentPlan(plan.productId) && (
-                  <Badge className="absolute -top-3 right-4" variant="secondary">
+                  <Badge className="absolute -top-3 right-4 bg-slate-700 border-slate-600 text-slate-200">
                     Piano Attuale
                   </Badge>
                 )}
 
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    plan.highlighted ? 'bg-primary/20' : 'bg-muted'
+                <div className="flex items-center gap-3 mb-6">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    plan.highlighted 
+                      ? 'bg-gradient-to-r from-purple-500 to-violet-500' 
+                      : 'bg-slate-700'
                   }`}>
-                    <plan.icon className={`w-6 h-6 ${
-                      plan.highlighted ? 'text-primary' : 'text-foreground'
-                    }`} />
+                    <plan.icon className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">{plan.name}</h3>
-                    <p className="text-sm text-muted-foreground">{plan.description}</p>
+                    <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                    <p className="text-sm text-slate-400">{plan.description}</p>
                   </div>
                 </div>
 
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold">{plan.price}</span>
+                    <span className="text-4xl font-bold text-white">{plan.price}</span>
                     {plan.period && (
-                      <span className="text-muted-foreground">{plan.period}</span>
+                      <span className="text-slate-400">{plan.period}</span>
                     )}
                   </div>
                 </div>
@@ -186,8 +184,8 @@ export const LandingPricing = () => {
                 <ul className="space-y-3 mb-6">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
+                      <Check className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-slate-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -196,16 +194,28 @@ export const LandingPricing = () => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full"
+                    className="w-full border-slate-600 text-slate-400"
                     disabled
                   >
                     Piano Attuale ✓
                   </Button>
+                ) : (plan as any).isCustom ? (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
+                    onClick={() => window.open('mailto:support@finanzacreativa.live', '_blank')}
+                  >
+                    Contattaci
+                  </Button>
                 ) : (
                   <Button
-                    variant={plan.highlighted ? "default" : "outline"}
                     size="lg"
-                    className="w-full"
+                    className={`w-full ${
+                      plan.highlighted 
+                        ? 'bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white' 
+                        : 'bg-slate-700 hover:bg-slate-600 text-white'
+                    }`}
                     onClick={() => {
                       if (plan.priceId) {
                         handleCheckout(plan.priceId, plan.name);
@@ -227,18 +237,17 @@ export const LandingPricing = () => {
                 )}
               </Card>
             </motion.div>
-            );
-          })}
+          ))}
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mt-12 text-muted-foreground"
+          className="text-center mt-12 text-slate-400"
         >
           <p>
-            <strong>Garanzia 30 giorni soddisfatti o rimborsati</strong> · 
+            <strong className="text-slate-300">Garanzia 30 giorni soddisfatti o rimborsati</strong> · 
             Cancella in qualsiasi momento · Nessuna commissione nascosta
           </p>
         </motion.div>
