@@ -4,11 +4,9 @@ import { motion } from 'motion/react';
 import { MessageSquare, Lightbulb, TrendingUp, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import profSatoshiHappy from '@/assets/educational-landing/prof-satoshi-happy.png';
-import { useParallax } from '@/hooks/useParallax';
 
 export const LandingProfSatoshi = () => {
   const navigate = useNavigate();
-  const { ref: mascotRef, y: mascotY } = useParallax({ speed: 0.3, direction: 'up' });
 
   const aiFeatures = [
     {
@@ -34,42 +32,33 @@ export const LandingProfSatoshi = () => {
   ];
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-20 bg-slate-800/30">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left - Mascot with parallax */}
+          {/* Left - Mascot */}
           <motion.div
-            ref={mascotRef}
-            style={{ y: mascotY }}
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="relative"
           >
-            <Card className="p-12 bg-gradient-to-br from-primary/10 to-purple-600/10 border-primary/20 overflow-hidden">
+            <Card className="p-12 bg-gradient-to-br from-purple-900/30 to-violet-900/30 border-purple-500/20 overflow-hidden">
               <div className="text-center">
                 <motion.img 
                   src={profSatoshiHappy} 
                   alt="Prof Satoshi - AI Bitcoin Trading Assistant" 
                   className="w-80 h-80 mx-auto object-contain mb-6"
-                  animate={{ 
-                    scale: [1, 1.05, 1],
-                  }}
-                  transition={{ 
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 />
-                <h3 className="text-3xl font-bold mb-4">Prof Satoshi</h3>
-                <p className="text-lg text-muted-foreground mb-6">
-                  Ciao! Sono il tuo assistente AI personale. Sono qui per guidarti nel mondo del trading Bitcoin 
-                  con spiegazioni chiare e consigli pratici.
+                <h3 className="text-3xl font-bold text-white mb-4">Prof Satoshi</h3>
+                <p className="text-lg text-slate-300 mb-6">
+                  Ciao! Sono il tuo assistente AI personale. Sono qui per guidarti nel mondo del trading Bitcoin.
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
-                  <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-sm">AI Powered</span>
-                  <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-600 text-sm">Sempre Disponibile</span>
-                  <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-600 text-sm">Personalizzato</span>
+                  <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm">AI Powered</span>
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-sm">24/7 Disponibile</span>
+                  <span className="px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 text-sm">Personalizzato</span>
                 </div>
               </div>
             </Card>
@@ -83,15 +72,14 @@ export const LandingProfSatoshi = () => {
             className="space-y-6"
           >
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Incontra{' '}
-                <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                  Prof Satoshi
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                Il Tuo{' '}
+                <span className="bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
+                  AI Tutor Personale
                 </span>
               </h2>
-              <p className="text-xl text-muted-foreground">
-                Il primo tutor AI specializzato in trading Bitcoin. Disponibile 24/7 per rispondere alle tue domande 
-                e accelerare il tuo apprendimento.
+              <p className="text-xl text-slate-400">
+                Il primo tutor AI specializzato in trading Bitcoin. Disponibile 24/7 per rispondere alle tue domande.
               </p>
             </div>
 
@@ -104,14 +92,14 @@ export const LandingProfSatoshi = () => {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="p-4 hover:shadow-lg transition-shadow">
+                  <Card className="p-4 bg-slate-800/50 border-slate-700/50 hover:border-slate-600/50 transition-all">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <feature.icon className="w-5 h-5 text-primary" />
+                      <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                        <feature.icon className="w-5 h-5 text-purple-400" />
                       </div>
                       <div>
-                        <h3 className="font-semibold mb-1">{feature.title}</h3>
-                        <p className="text-sm text-muted-foreground">{feature.description}</p>
+                        <h3 className="font-semibold text-white mb-1">{feature.title}</h3>
+                        <p className="text-sm text-slate-400">{feature.description}</p>
                       </div>
                     </div>
                   </Card>
@@ -122,9 +110,9 @@ export const LandingProfSatoshi = () => {
             <Button 
               size="lg" 
               onClick={() => navigate('/auth')}
-              className="bg-gradient-to-r from-primary to-purple-600 hover:opacity-90"
+              className="bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white"
             >
-              Inizia a Parlare con Prof Satoshi
+              Parla con Prof Satoshi
             </Button>
           </motion.div>
         </div>

@@ -7,6 +7,7 @@ import { LandingProfSatoshi } from '@/components/educational-landing/LandingProf
 import { LandingHowItWorks } from '@/components/educational-landing/LandingHowItWorks';
 import { LandingTestimonials } from '@/components/educational-landing/LandingTestimonials';
 import { LandingPricing } from '@/components/educational-landing/LandingPricing';
+import { LandingFinalCTA } from '@/components/educational-landing/LandingFinalCTA';
 import { LandingFooter } from '@/components/educational-landing/LandingFooter';
 import { useEffect } from 'react';
 
@@ -60,7 +61,7 @@ const EducationalLanding = () => {
         <meta name="twitter:description" content="Diventa un trader professionista in 90 giorni" />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-slate-900">
         <LandingNavbar />
         <main>
           <LandingHero />
@@ -70,6 +71,7 @@ const EducationalLanding = () => {
           <LandingHowItWorks />
           <LandingTestimonials />
           <LandingPricing />
+          <LandingFinalCTA />
         </main>
         <LandingFooter />
       </div>

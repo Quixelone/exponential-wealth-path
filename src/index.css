@@ -112,12 +112,18 @@
     --radius-2xl: 1.5rem;    /* 24px */
     --radius-full: 9999px;   /* Full rounded */
 
-    /* Gradient colors for various elements */
+/* Gradient colors for various elements */
     --gradient-primary: linear-gradient(135deg, #5D87FF 0%, #8763FF 100%);
     --gradient-success: linear-gradient(135deg, #39B069 0%, #49DA6C 100%);
     --gradient-warning: linear-gradient(135deg, #FFAE1F 0%, #FFC107 100%);
     --gradient-danger: linear-gradient(135deg, #FA896B 0%, #FF5722 100%);
     --gradient-info: linear-gradient(135deg, #39B8E5 0%, #03A9F4 100%);
+    
+    /* Landing page gradients */
+    --gradient-landing: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    --gradient-landing-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-cta: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    --gradient-card-dark: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
   }
 
   .dark {
