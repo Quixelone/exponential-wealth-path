@@ -285,23 +285,23 @@ const Strategies: React.FC = () => {
 
   const renderStrategiesContent = () => {
     return (
-      <div className="space-y-6 w-full max-w-full overflow-hidden">
+      <div className="space-y-6 w-full max-w-full overflow-x-hidden px-2 sm:px-0">
         {/* Header with back button */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 min-w-0">
           <Button 
             variant="ghost" 
             size="sm"
             onClick={() => navigate('/app')}
-            className="flex items-center gap-2"
+            className="shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
-            Dashboard
+            <span className="hidden sm:inline ml-2">Dashboard</span>
           </Button>
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <div className="space-y-1 min-w-0 flex-1">
+            <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent break-words">
               Gestione Strategie
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm sm:text-base">
               Configura e gestisci le tue strategie di investimento
             </p>
           </div>

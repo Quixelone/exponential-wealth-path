@@ -34,20 +34,20 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full max-w-full overflow-hidden">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 w-full max-w-full overflow-hidden px-1">
       {savedConfigs.map((config) => {
         const isCurrent = config.id === currentConfigId;
         
         return (
           <Card 
             key={config.id} 
-            className={`relative overflow-hidden transition-all duration-200 hover:shadow-md ${
+            className={`relative overflow-hidden transition-all duration-200 hover:shadow-md w-full min-w-0 ${
               isCurrent ? 'ring-2 ring-primary bg-primary/5' : ''
             }`}
           >
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-base font-semibold line-clamp-2 min-h-[2.5rem]">
+            <CardHeader className="pb-3 min-w-0">
+              <div className="flex items-start justify-between gap-2 min-w-0">
+                <CardTitle className="text-base font-semibold line-clamp-2 min-h-[2.5rem] break-words min-w-0">
                   {config.name}
                 </CardTitle>
                 {isCurrent && (
@@ -62,9 +62,9 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 min-w-0">
               {/* Key Metrics */}
-              <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="grid grid-cols-2 gap-3 text-xs min-w-0">
                 <div className="space-y-1">
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <Euro className="h-3 w-3" />
@@ -97,23 +97,23 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col gap-2 pt-2">
-                <div className="flex gap-2">
+              <div className="flex flex-col gap-2 pt-2 min-w-0">
+                <div className="flex gap-2 min-w-0">
                   <Button
                     onClick={() => onLoad(config)}
                     variant={isCurrent ? "secondary" : "default"}
                     size="sm"
-                    className="flex-1 h-8 text-xs inline-flex items-center justify-center flex-row flex-nowrap whitespace-nowrap"
+                    className="flex-1 h-8 text-xs"
                     disabled={loading || isCurrent}
                   >
-                    <Play className="h-3 w-3 mr-1 shrink-0" />
-                    <span>{isCurrent ? 'In uso' : 'Carica'}</span>
+                    <Play className="h-3 w-3 shrink-0" />
+                    {isCurrent ? 'In uso' : 'Carica'}
                   </Button>
                   <Button
                     onClick={() => onEdit(config)}
                     variant="outline"
                     size="sm"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 shrink-0"
                     disabled={loading}
                   >
                     <Edit className="h-3 w-3" />
@@ -125,11 +125,11 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
                     <Button
                       variant="destructive"
                       size="sm"
-                      className="w-full h-8 text-xs inline-flex items-center justify-center flex-row flex-nowrap whitespace-nowrap"
+                      className="w-full h-8 text-xs"
                       disabled={loading}
                     >
-                      <Trash2 className="h-3 w-3 mr-1 shrink-0" />
-                      <span>Elimina</span>
+                      <Trash2 className="h-3 w-3 shrink-0" />
+                      Elimina
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent className="sm:max-w-md">

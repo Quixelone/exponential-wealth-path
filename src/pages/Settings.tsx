@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Settings as SettingsIcon, CreditCard, Shield, ExternalLink, CheckCircle2, TrendingUp, AlertTriangle, XCircle, Zap, Check } from 'lucide-react';
+import { ArrowLeft, Settings as SettingsIcon, CreditCard, Shield, ExternalLink, CheckCircle2, TrendingUp, AlertTriangle, XCircle, Zap, Check, RefreshCw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NotificationTester from '@/components/NotificationTester';
 import SettingsHeader from '@/components/settings/SettingsHeader';
@@ -714,11 +714,34 @@ const Settings = () => {
           </TabsContent>
 
           <TabsContent value="preferences">
-            <div className="bg-card rounded-lg p-6 border shadow-sm">
-              <h3 className="text-lg font-semibold mb-4">Preferenze Notifiche</h3>
-              <p className="text-muted-foreground">
-                Le preferenze delle notifiche verranno implementate in futuro.
-              </p>
+            <div className="space-y-6">
+              <div className="bg-card rounded-lg p-6 border shadow-sm">
+                <h3 className="text-lg font-semibold mb-4">Preferenze Notifiche</h3>
+                <p className="text-muted-foreground">
+                  Le preferenze delle notifiche verranno implementate in futuro.
+                </p>
+              </div>
+              
+              <div className="bg-card rounded-lg p-6 border shadow-sm">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <RefreshCw className="h-5 w-5" />
+                  Manutenzione App
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  Se l'app non mostra le ultime modifiche o hai problemi di visualizzazione, svuota la cache.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    const { clearAppCache } = await import('@/utils/clearAppCache');
+                    toast.info('Svuotamento cache in corso...');
+                    await clearAppCache();
+                  }}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Svuota Cache e Ricarica
+                </Button>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
