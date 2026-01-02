@@ -97,16 +97,16 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col gap-2 pt-2 min-w-0">
-                <div className="flex gap-2 min-w-0">
+              <div className="flex flex-col gap-2 pt-2 min-w-0 w-full">
+                <div className="flex gap-2 min-w-0 w-full">
                   <Button
                     onClick={() => onLoad(config)}
                     variant={isCurrent ? "secondary" : "default"}
                     size="sm"
-                    className="flex-1 h-8 text-xs"
+                    className="flex-1 h-8 text-xs min-w-0"
                     disabled={loading || isCurrent}
+                    leftIcon={<Play className="h-3 w-3" />}
                   >
-                    <Play className="h-3 w-3 shrink-0" />
                     {isCurrent ? 'In uso' : 'Carica'}
                   </Button>
                   <Button
@@ -127,8 +127,8 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
                       size="sm"
                       className="w-full h-8 text-xs"
                       disabled={loading}
+                      leftIcon={<Trash2 className="h-3 w-3" />}
                     >
-                      <Trash2 className="h-3 w-3 shrink-0" />
                       Elimina
                     </Button>
                   </AlertDialogTrigger>
