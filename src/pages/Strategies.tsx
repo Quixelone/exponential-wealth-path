@@ -285,7 +285,7 @@ const Strategies: React.FC = () => {
 
   const renderStrategiesContent = () => {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 w-full max-w-full overflow-hidden">
         {/* Header with back button */}
         <div className="flex items-center gap-4">
           <Button 

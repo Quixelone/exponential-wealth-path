@@ -217,8 +217,8 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
         )}
 
         {currentConfigId && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex gap-2 items-center">
-            <Save className="h-4 w-4" />
+          <div className="mb-4 p-3 bg-success/10 border border-success/30 rounded-lg flex flex-wrap gap-2 items-center text-foreground">
+            <Save className="h-4 w-4 shrink-0 text-success" />
             <span className="text-sm font-medium">
               Configurazione attuale: "{currentConfigName}"
             </span>

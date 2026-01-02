@@ -114,7 +114,7 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
 
   return (
     <div className={cn(
-      "flex flex-col bg-dashboard-sidebar border-r border-dashboard-border transition-all duration-300 fixed left-0 top-0 h-full z-20",
+      "flex flex-col bg-card dark:bg-dashboard-sidebar border-r border-border dark:border-dashboard-border transition-all duration-300 fixed left-0 top-0 h-full z-20",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
@@ -129,7 +129,7 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
               alt="BTCWheel" 
               className="w-10 h-10 object-contain"
             />
-            <span className="font-bold text-lg text-white truncate">
+            <span className="font-bold text-lg text-foreground truncate">
               BTCWheel
             </span>
           </div>
@@ -146,8 +146,8 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
           size="sm"
           onClick={handleCollapseToggle}
           className={cn(
-            "hover:bg-dashboard-card text-white/70 hover:text-white transition-all duration-200",
-            collapsed ? "absolute -right-3 top-4 bg-dashboard-sidebar border border-dashboard-border shadow-md rounded-full w-6 h-6 p-0 z-10" : ""
+            "hover:bg-accent dark:hover:bg-dashboard-card text-muted-foreground hover:text-foreground transition-all duration-200",
+            collapsed ? "absolute -right-3 top-4 bg-card dark:bg-dashboard-sidebar border border-border dark:border-dashboard-border shadow-md rounded-full w-6 h-6 p-0 z-10" : ""
           )}
         >
           {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-4 w-4" />}
@@ -169,14 +169,14 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
               className="relative group animate-fade-in"
               style={{ animationDelay: `${index * 50}ms` }}
             >
-              <button
+                <button
                 onClick={() => handleNavigation(item.path)}
                 className={cn(
                   "w-full flex items-center rounded-xl transition-all duration-300 group relative overflow-hidden",
                   collapsed ? "p-3 justify-center" : "gap-3 px-4 py-3",
                   isActive
-                    ? "bg-dashboard-accent-green/20 text-dashboard-accent-green border-l-4 border-dashboard-accent-green" 
-                    : "hover:bg-dashboard-card text-white/70 hover:text-white"
+                    ? "bg-success/10 dark:bg-dashboard-accent-green/20 text-success dark:text-dashboard-accent-green border-l-4 border-success dark:border-dashboard-accent-green" 
+                    : "hover:bg-accent dark:hover:bg-dashboard-card text-muted-foreground hover:text-foreground"
                 )}
               >
                 {/* Icon */}
@@ -187,8 +187,8 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
                   <Icon className={cn(
                     "transition-all duration-300 flex-shrink-0 h-5 w-5",
                     isActive 
-                      ? "text-dashboard-accent-green" 
-                      : "text-white/60 group-hover:text-white"
+                      ? "text-success dark:text-dashboard-accent-green" 
+                      : "text-muted-foreground group-hover:text-foreground"
                   )} />
                 </div>
                 
@@ -198,7 +198,7 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
                     <div className="flex items-center gap-2 w-full">
                       <span className={cn(
                         "font-medium text-sm truncate transition-all duration-200",
-                        isActive ? "text-dashboard-accent-green font-semibold" : ""
+                        isActive ? "text-success dark:text-dashboard-accent-green font-semibold" : ""
                       )}>
                         {item.label}
                       </span>
@@ -214,10 +214,10 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
               
               {/* Tooltip for collapsed state */}
               {collapsed && (
-                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-dashboard-card text-white px-3 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 whitespace-nowrap shadow-xl border border-dashboard-border group-hover:translate-x-1">
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-popover text-popover-foreground px-3 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 whitespace-nowrap shadow-xl border border-border group-hover:translate-x-1">
                   <div className="font-medium">{item.label}</div>
-                  <div className="text-xs text-white/60 mt-0.5">{item.description}</div>
-                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-dashboard-card" />
+                  <div className="text-xs text-muted-foreground mt-0.5">{item.description}</div>
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-popover" />
                 </div>
               )}
             </div>
@@ -227,11 +227,11 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
 
       {/* Footer */}
       {!collapsed && (
-        <div className="p-4 border-t border-dashboard-border">
-          <div className="text-xs text-white/40 text-center">
+        <div className="p-4 border-t border-border dark:border-dashboard-border">
+          <div className="text-xs text-muted-foreground text-center">
             Made with ❤️ by BTCWheel
           </div>
-          <div className="text-xs text-white/30 text-center mt-1">
+          <div className="text-xs text-muted-foreground/60 text-center mt-1">
             © 2024 BTCWheel
           </div>
         </div>

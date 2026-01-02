@@ -61,7 +61,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
 
   return (
     <ModernTooltipProvider>
-      <div className="min-h-screen bg-dashboard-bg">
+      <div className="min-h-screen bg-background dark:bg-dashboard-bg">
         {/* Desktop Layout */}
         {!isMobile && !isTablet && (
           <div className="flex min-h-screen w-full">
@@ -102,7 +102,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
               isAdmin={isAdmin}
               onNavigate={guardedNavigate}
             />
-            <main className="pt-16 pb-24 px-3 sm:px-4 min-h-[calc(100vh-4rem)] overflow-x-hidden">
+            <main className="pt-16 pb-24 px-3 sm:px-4 min-h-[calc(100vh-4rem)] overflow-x-hidden w-full max-w-full">
               {children}
             </main>
             <BottomNavigation 
