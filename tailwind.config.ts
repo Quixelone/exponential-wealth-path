@@ -118,6 +118,19 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				// Dashboard Theme Colors
+				dashboard: {
+					bg: 'hsl(var(--dashboard-bg))',
+					sidebar: 'hsl(var(--dashboard-sidebar))',
+					card: 'hsl(var(--dashboard-card))',
+					border: 'hsl(var(--dashboard-border))',
+					'border-light': 'hsl(var(--dashboard-border-light))',
+					'accent-green': 'hsl(var(--dashboard-accent-green))',
+					'accent-teal': 'hsl(var(--dashboard-accent-teal))',
+					'accent-orange': 'hsl(var(--dashboard-accent-orange))',
+					'accent-blue': 'hsl(var(--dashboard-accent-blue))',
+					'accent-red': 'hsl(var(--dashboard-accent-red))',
 				}
 			},
 			'.dark': {

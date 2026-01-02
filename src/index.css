@@ -124,6 +124,20 @@
     --gradient-landing-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --gradient-cta: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
     --gradient-card-dark: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+    
+    /* Dashboard Theme Colors (Kubayar-inspired) */
+    --dashboard-bg: 248 11% 11%; /* #1A1825 */
+    --dashboard-sidebar: 246 15% 14%; /* #1F1D2B */
+    --dashboard-card: 244 14% 18%; /* #252836 */
+    --dashboard-border: 240 10% 25%; /* #3A3A4A */
+    --dashboard-border-light: 240 10% 35%; /* #525263 */
+    
+    /* Dashboard Accent Colors */
+    --dashboard-accent-green: 164 58% 57%; /* #50D1AA */
+    --dashboard-accent-teal: 174 72% 56%; /* #3ECFB2 */
+    --dashboard-accent-orange: 17 100% 65%; /* #FF7A50 */
+    --dashboard-accent-blue: 253 58% 60%; /* #6C5DD3 */
+    --dashboard-accent-red: 0 100% 71%; /* #FF6B6B */
   }
 
   .dark {

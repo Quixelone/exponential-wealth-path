@@ -61,7 +61,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
 
   return (
     <ModernTooltipProvider>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-dashboard-bg">
         {/* Desktop Layout */}
         {!isMobile && !isTablet && (
           <div className="flex min-h-screen w-full">

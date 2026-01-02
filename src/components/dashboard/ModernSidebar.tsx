@@ -3,19 +3,19 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   TrendingUp, 
-  Bell, 
   Settings, 
   Users, 
   ChevronLeft, 
   ChevronRight,
-  Menu,
   Bot,
   MessageCircle,
   BookOpen,
-  Target
+  Target,
+  Mail
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import btcWheelLogo from '@/assets/btc-wheel-logo.png';
 
 interface ModernSidebarProps {
   isAdmin?: boolean;
@@ -74,6 +74,13 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
       description: 'Corsi e formazione'
     },
     {
+      icon: Mail,
+      label: 'Messaggi',
+      path: '/messages',
+      description: 'Centro notifiche',
+      badge: 'NEW'
+    },
+    {
       icon: Settings,
       label: 'Impostazioni',
       path: '/settings',
@@ -107,36 +114,40 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
 
   return (
     <div className={cn(
-      "modern-sidebar flex flex-col bg-card border-r border-border transition-all duration-300 fixed left-0 top-0 h-full z-20",
+      "flex flex-col bg-dashboard-sidebar border-r border-dashboard-border transition-all duration-300 fixed left-0 top-0 h-full z-20",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
       <div className={cn(
-        "flex items-center border-b border-border transition-all duration-300",
+        "flex items-center border-b border-dashboard-border transition-all duration-300",
         collapsed ? "justify-center p-2" : "justify-between p-4"
       )}>
         {!collapsed && (
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-bold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent truncate">
-              Finanza Creativa
+            <img 
+              src={btcWheelLogo} 
+              alt="BTCWheel" 
+              className="w-10 h-10 object-contain"
+            />
+            <span className="font-bold text-lg text-white truncate">
+              BTCWheel
             </span>
           </div>
         )}
         {collapsed && (
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-            <TrendingUp className="h-5 w-5 text-white" />
-          </div>
+          <img 
+            src={btcWheelLogo} 
+            alt="BTCWheel" 
+            className="w-8 h-8 object-contain"
+          />
         )}
         <Button
           variant="ghost"
           size="sm"
           onClick={handleCollapseToggle}
           className={cn(
-            "hover:bg-accent transition-all duration-200",
-            collapsed ? "absolute -right-3 top-4 bg-card border border-border shadow-md rounded-full w-6 h-6 p-0 z-10" : ""
+            "hover:bg-dashboard-card text-white/70 hover:text-white transition-all duration-200",
+            collapsed ? "absolute -right-3 top-4 bg-dashboard-sidebar border border-dashboard-border shadow-md rounded-full w-6 h-6 p-0 z-10" : ""
           )}
         >
           {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-4 w-4" />}
@@ -145,8 +156,8 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
 
       {/* Navigation */}
       <nav className={cn(
-        "flex-1 space-y-2 transition-all duration-300",
-        collapsed ? "p-2" : "p-4"
+        "flex-1 space-y-1 transition-all duration-300",
+        collapsed ? "p-2" : "p-3"
       )}>
         {menuItems.map((item, index) => {
           const Icon = item.icon;
@@ -161,67 +172,52 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
               <button
                 onClick={() => handleNavigation(item.path)}
                 className={cn(
-                  "w-full flex items-center rounded-lg transition-all duration-300 group relative overflow-hidden",
-                  collapsed ? "p-3 justify-center" : "gap-3 p-3",
+                  "w-full flex items-center rounded-xl transition-all duration-300 group relative overflow-hidden",
+                  collapsed ? "p-3 justify-center" : "gap-3 px-4 py-3",
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
-                    : "hover:bg-accent hover:text-accent-foreground text-muted-foreground hover:shadow-md"
+                    ? "bg-dashboard-accent-green/20 text-dashboard-accent-green border-l-4 border-dashboard-accent-green" 
+                    : "hover:bg-dashboard-card text-white/70 hover:text-white"
                 )}
               >
-                {/* Glow effect for active item */}
-                {isActive && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent animate-pulse" />
-                )}
-                
-                {/* Icon with animations */}
+                {/* Icon */}
                 <div className={cn(
                   "relative z-10 transition-all duration-300",
-                  isActive ? "scale-110" : "group-hover:scale-110 group-hover:rotate-3"
+                  isActive ? "" : "group-hover:scale-110"
                 )}>
                   <Icon className={cn(
-                    "transition-all duration-300 flex-shrink-0",
-                    collapsed ? "h-5 w-5" : "h-5 w-5",
+                    "transition-all duration-300 flex-shrink-0 h-5 w-5",
                     isActive 
-                      ? "text-primary-foreground drop-shadow-lg" 
-                      : "text-muted-foreground group-hover:text-accent-foreground"
+                      ? "text-dashboard-accent-green" 
+                      : "text-white/60 group-hover:text-white"
                   )} />
-                  
-                  {/* Icon glow effect */}
-                  {isActive && (
-                    <div className="absolute inset-0 blur-md bg-primary-foreground/30 animate-pulse" />
-                  )}
                 </div>
                 
                 {/* Text content */}
                 {!collapsed && (
-                  <div className="flex flex-col items-start min-w-0 relative z-10">
-                    <span className={cn(
-                      "font-medium text-sm truncate transition-all duration-200",
-                      isActive && "font-semibold"
-                    )}>
-                      {item.label}
-                    </span>
-                    {!isActive && (
-                      <span className="text-xs opacity-70 truncate transition-opacity duration-200 group-hover:opacity-90">
-                        {item.description}
+                  <div className="flex flex-col items-start min-w-0 relative z-10 flex-1">
+                    <div className="flex items-center gap-2 w-full">
+                      <span className={cn(
+                        "font-medium text-sm truncate transition-all duration-200",
+                        isActive ? "text-dashboard-accent-green font-semibold" : ""
+                      )}>
+                        {item.label}
                       </span>
-                    )}
+                      {item.badge && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold bg-dashboard-accent-orange text-white rounded">
+                          {item.badge}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                )}
-                
-                {/* Active indicator bar */}
-                {isActive && !collapsed && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-foreground rounded-r-full animate-scale-in" />
                 )}
               </button>
               
-              {/* Enhanced tooltip for collapsed state */}
+              {/* Tooltip for collapsed state */}
               {collapsed && (
-                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-popover text-popover-foreground px-3 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 whitespace-nowrap shadow-xl border border-border group-hover:translate-x-1">
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-dashboard-card text-white px-3 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 whitespace-nowrap shadow-xl border border-dashboard-border group-hover:translate-x-1">
                   <div className="font-medium">{item.label}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{item.description}</div>
-                  {/* Tooltip arrow */}
-                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-popover" />
+                  <div className="text-xs text-white/60 mt-0.5">{item.description}</div>
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-dashboard-card" />
                 </div>
               )}
             </div>
@@ -231,9 +227,12 @@ const ModernSidebar: React.FC<ModernSidebarProps> = ({ isAdmin, onNavigate, onCo
 
       {/* Footer */}
       {!collapsed && (
-        <div className="p-4 border-t border-border">
-          <div className="text-xs text-muted-foreground text-center">
-            © 2024 Finanza Creativa
+        <div className="p-4 border-t border-dashboard-border">
+          <div className="text-xs text-white/40 text-center">
+            Made with ❤️ by BTCWheel
+          </div>
+          <div className="text-xs text-white/30 text-center mt-1">
+            © 2024 BTCWheel
           </div>
         </div>
       )}
