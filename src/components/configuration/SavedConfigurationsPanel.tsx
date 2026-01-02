@@ -187,7 +187,7 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
         </div>
       </CardHeader>
       <CardContent 
-        className="relative overflow-hidden"
+        className="relative overflow-hidden min-w-0"
         {...pullHandlers}
       >
         {/* Pull to refresh indicator */}
@@ -217,13 +217,13 @@ const SavedConfigurationsPanel: React.FC<SavedConfigurationsPanelProps> = ({
         )}
 
         {currentConfigId && (
-          <div className="mb-4 p-3 bg-success/10 border border-success/30 rounded-lg flex flex-wrap gap-2 items-center text-foreground">
+          <div className="mb-4 p-3 bg-success/10 border border-success/30 rounded-lg flex flex-wrap gap-2 items-center text-foreground min-w-0">
             <Save className="h-4 w-4 shrink-0 text-success" />
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium break-words min-w-0 flex-1">
               Configurazione attuale: "{currentConfigName}"
             </span>
             {hasUnsavedChanges && (
-              <Badge variant="destructive" className="ml-2">Modificato</Badge>
+              <Badge variant="destructive" className="shrink-0">Modificato</Badge>
             )}
           </div>
         )}

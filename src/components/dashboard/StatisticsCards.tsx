@@ -92,7 +92,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
         return (
           <Card
             key={index}
-            className={`bg-dashboard-card border-dashboard-border hover:border-dashboard-border-light overflow-hidden group animate-fade-in-up ${staggerClass} transition-all duration-300`}
+            className={`bg-card dark:bg-dashboard-card border-border dark:border-dashboard-border hover:border-primary/30 dark:hover:border-dashboard-border-light overflow-hidden group animate-fade-in-up ${staggerClass} transition-all duration-300`}
           >
             <CardContent className={isMobile ? "p-3" : "p-4"}>
               <div className="flex items-start justify-between mb-3">
@@ -111,10 +111,10 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ summary, currency }) 
               </div>
 
               <div className="space-y-1">
-                <h3 className={`font-medium text-white/60 ${isMobile ? "text-[11px]" : "text-xs"}`}>
+                <h3 className={`font-medium text-muted-foreground dark:text-white/60 ${isMobile ? "text-[11px]" : "text-xs"}`}>
                   {stat.title}
                 </h3>
-                <p className={`font-bold text-white ${isMobile ? "text-lg" : "text-xl lg:text-2xl"}`}>
+                <p className={`font-bold text-foreground dark:text-white ${isMobile ? "text-lg" : "text-xl lg:text-2xl"}`}>
                   {stat.value}
                 </p>
               </div>
