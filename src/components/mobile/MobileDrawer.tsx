@@ -5,7 +5,8 @@ import {
   TrendingUp, 
   Settings, 
   Users, 
-  X
+  X,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -16,6 +17,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from '@/components/ui/drawer';
+import { clearAppCache } from '@/utils/clearAppCache';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -121,7 +123,16 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, isAdmin, o
           })}
         </nav>
 
-        <div className="p-6 border-t border-border">
+        <div className="p-6 border-t border-border space-y-3">
+          <Button
+            onClick={clearAppCache}
+            variant="outline"
+            size="sm"
+            className="w-full inline-flex items-center justify-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4 shrink-0" />
+            Svuota Cache e Ricarica
+          </Button>
           <div className="text-xs text-muted-foreground text-center">
             © 2024 Finanza Creativa
           </div>

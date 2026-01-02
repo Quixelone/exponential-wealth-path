@@ -168,14 +168,14 @@ const Index = () => {
         />
 
         {/* Edit Strategy and Reload Buttons */}
-        <div className={`flex justify-center ${isMobile ? "flex-col gap-2" : "gap-3"}`}>
+        <div className={`flex justify-center ${isMobile ? "flex-col gap-2" : "flex-row gap-3"}`}>
           <Button
             onClick={() => navigate('/strategies')}
             variant="gradient"
             size={isMobile ? "default" : "lg"}
-            className={`flex items-center justify-center gap-2 ${isMobile ? "w-full min-h-[44px]" : ""}`}
+            className={isMobile ? "w-full min-h-[44px]" : ""}
+            leftIcon={<Settings className={isMobile ? "h-4 w-4" : "h-5 w-5"} />}
           >
-            <Settings className={isMobile ? "h-4 w-4" : "h-5 w-5"} />
             {isMobile ? "Modifica" : "Modifica Configurazione"}
           </Button>
 
@@ -183,12 +183,12 @@ const Index = () => {
             onClick={forceReloadFromDatabase}
             variant="info"
             size={isMobile ? "default" : "lg"}
-            className={`flex items-center justify-center gap-2 ${isMobile ? "w-full min-h-[44px]" : ""}`}
+            className={isMobile ? "w-full min-h-[44px]" : ""}
             disabled={supabaseLoading}
             loading={supabaseLoading}
             loadingText={isMobile ? "Caricamento..." : "Caricamento..."}
+            leftIcon={!supabaseLoading ? <RefreshCw className={isMobile ? "h-4 w-4" : "h-5 w-5"} /> : undefined}
           >
-            <RefreshCw className={`${isMobile ? "h-4 w-4" : "h-5 w-5"} ${supabaseLoading ? 'animate-spin' : ''}`} />
             {isMobile ? "Ricarica" : "Ricarica dal Database"}
           </Button>
         </div>

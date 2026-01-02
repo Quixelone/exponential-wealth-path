@@ -11,6 +11,7 @@ import MobileHeader from '@/components/mobile/MobileHeader';
 import MobileDrawer from '@/components/mobile/MobileDrawer';
 import BottomNavigation from '@/components/mobile/BottomNavigation';
 import UnsavedChangesAlert from '@/components/configuration/UnsavedChangesAlert';
+import AppUpdatePrompt from '@/components/system/AppUpdatePrompt';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -118,6 +119,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, hasUnsavedChanges = fal
           onContinue={confirmNavigation}
           onCancel={cancelNavigation}
         />
+        
+        <AppUpdatePrompt />
       </div>
     </ModernTooltipProvider>
   );

@@ -23,8 +23,10 @@ export default defineConfig(({ mode }) => {
   }));
   
   plugins.push(VitePWA({
-    registerType: 'autoUpdate',
+    registerType: 'prompt',
     workbox: {
+      skipWaiting: false,
+      clientsClaim: true,
       globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
       maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
       runtimeCaching: [
