@@ -43,14 +43,14 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
     : 'Nessuna sincronizzazione recente';
 
   return (
-    <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between">
+    <header className="h-16 bg-dashboard-card border-b border-dashboard-border px-6 flex items-center justify-between">
       {/* Left section */}
       <div className="flex items-center gap-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
           <Input
             placeholder="Cerca..."
-            className="pl-10 w-80 modern-input"
+            className="pl-10 w-80 bg-dashboard-sidebar border-dashboard-border text-white placeholder:text-white/40 focus:border-dashboard-accent-green"
           />
         </div>
       </div>
@@ -58,7 +58,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
       {/* Right section */}
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <Button variant="ghost" size="sm" className="hover:bg-accent">
+        <Button variant="ghost" size="sm" className="hover:bg-dashboard-sidebar text-white/70 hover:text-white">
           <Bell className="h-4 w-4" />
         </Button>
 
@@ -68,14 +68,14 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
         {/* Status badges */}
         <div className="flex gap-2">
           {isAdmin && (
-            <Badge variant="secondary" className="bg-primary/10 text-primary">
+            <Badge variant="secondary" className="bg-dashboard-accent-blue/20 text-dashboard-accent-blue border-0">
               Admin
             </Badge>
           )}
           {lastDatabaseSync && (
             <Badge 
               variant="outline" 
-              className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 flex items-center gap-1"
+              className="bg-dashboard-accent-green/10 text-dashboard-accent-green border-dashboard-accent-green/30 flex items-center gap-1"
               title={syncText}
             >
               <Database className="h-3 w-3" />
@@ -83,7 +83,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
             </Badge>
           )}
           {hasUnsavedChanges && (
-            <Badge variant="destructive" className="animate-pulse">
+            <Badge className="bg-dashboard-accent-orange/20 text-dashboard-accent-orange border-0 animate-pulse">
               Modifiche non salvate
             </Badge>
           )}
@@ -92,14 +92,14 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
         {/* User info */}
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <div className="text-sm font-medium">{displayName}</div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-sm font-medium text-white">{displayName}</div>
+            <div className="text-xs text-white/50">
               {userProfile?.role || 'Utente'}
             </div>
           </div>
           
-          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-            <User className="h-4 w-4 text-primary-foreground" />
+          <div className="w-8 h-8 bg-dashboard-accent-blue rounded-full flex items-center justify-center">
+            <User className="h-4 w-4 text-white" />
           </div>
         </div>
 
@@ -109,7 +109,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
             variant="ghost"
             size="sm"
             onClick={onSettings}
-            className="hover:bg-accent"
+            className="hover:bg-dashboard-sidebar text-white/70 hover:text-white"
           >
             <Settings className="h-4 w-4" />
           </Button>
@@ -119,7 +119,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
               variant="ghost"
               size="sm"
               onClick={(e) => onUserManagement(e)}
-              className="hover:bg-accent"
+              className="hover:bg-dashboard-sidebar text-white/70 hover:text-white"
             >
               <Users className="h-4 w-4" />
             </Button>
@@ -129,7 +129,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({
             variant="ghost"
             size="sm"
             onClick={onLogout}
-            className="hover:bg-destructive/10 hover:text-destructive"
+            className="hover:bg-dashboard-accent-red/20 text-white/70 hover:text-dashboard-accent-red"
           >
             <LogOut className="h-4 w-4" />
           </Button>
