@@ -34,7 +34,7 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full max-w-full overflow-hidden">
       {savedConfigs.map((config) => {
         const isCurrent = config.id === currentConfigId;
         
@@ -103,11 +103,11 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
                     onClick={() => onLoad(config)}
                     variant={isCurrent ? "secondary" : "default"}
                     size="sm"
-                    className="flex-1 h-8 text-xs"
+                    className="flex-1 h-8 text-xs inline-flex items-center justify-center flex-row flex-nowrap whitespace-nowrap"
                     disabled={loading || isCurrent}
                   >
-                    <Play className="h-3 w-3 mr-1" />
-                    {isCurrent ? 'In uso' : 'Carica'}
+                    <Play className="h-3 w-3 mr-1 shrink-0" />
+                    <span>{isCurrent ? 'In uso' : 'Carica'}</span>
                   </Button>
                   <Button
                     onClick={() => onEdit(config)}
@@ -125,11 +125,11 @@ const ResponsiveConfigCards: React.FC<ResponsiveConfigCardsProps> = ({
                     <Button
                       variant="destructive"
                       size="sm"
-                      className="w-full h-8 text-xs"
+                      className="w-full h-8 text-xs inline-flex items-center justify-center flex-row flex-nowrap whitespace-nowrap"
                       disabled={loading}
                     >
-                      <Trash2 className="h-3 w-3 mr-1" />
-                      Elimina
+                      <Trash2 className="h-3 w-3 mr-1 shrink-0" />
+                      <span>Elimina</span>
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent className="sm:max-w-md">
