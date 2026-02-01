@@ -29,6 +29,14 @@ interface TelegramUpdate {
   };
 }
 
+// Security: Validate UUID format to prevent malformed data injection
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_CALLBACK_DATA_LENGTH = 100;
+
+function isValidUUID(value: string): boolean {
+  return UUID_REGEX.test(value);
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -57,12 +65,27 @@ serve(async (req) => {
         return new Response('OK', { status: 200 });
       }
 
+      // Security: Validate callback data length
+      if (callbackData.length > MAX_CALLBACK_DATA_LENGTH) {
+        console.error('Callback data too long:', callbackData.length);
+        await answerCallbackQuery(callbackId, '❌ Dati non validi');
+        return new Response('OK', { status: 200 });
+      }
+
       // Parse callback data: confirm_not_assigned_[tradeId] or confirm_assigned_[tradeId]
       const notAssignedMatch = callbackData.match(/^confirm_not_assigned_(.+)$/);
       const assignedMatch = callbackData.match(/^confirm_assigned_(.+)$/);
 
       if (notAssignedMatch || assignedMatch) {
         const tradeId = notAssignedMatch ? notAssignedMatch[1] : assignedMatch![1];
+        
+        // Security: Validate tradeId is a valid UUID format
+        if (!isValidUUID(tradeId)) {
+          console.error('Invalid trade ID format:', tradeId);
+          await answerCallbackQuery(callbackId, '❌ ID operazione non valido');
+          return new Response('OK', { status: 200 });
+        }
+        
         const isAssigned = !!assignedMatch;
 
         console.log(`📝 Processing confirmation: tradeId=${tradeId}, isAssigned=${isAssigned}`);
