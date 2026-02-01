@@ -11,6 +11,38 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SYNC-BROKER-HISTORY] ${step}${detailsStr}`);
 };
 
+// Security: Sanitize error messages before storing to prevent API detail leakage
+function sanitizeErrorMessage(error: string): string {
+  if (!error) return 'Sync failed: unknown error';
+  
+  const lowerError = error.toLowerCase();
+  
+  if (lowerError.includes('invalid_timestamp') || lowerError.includes('timestamp')) {
+    return 'Sync failed: timestamp validation error';
+  }
+  if (lowerError.includes('auth') || lowerError.includes('unauthorized') || lowerError.includes('forbidden')) {
+    return 'Sync failed: authentication error';
+  }
+  if (lowerError.includes('rate limit') || lowerError.includes('too many requests')) {
+    return 'Sync failed: rate limit exceeded';
+  }
+  if (lowerError.includes('timeout') || lowerError.includes('timed out')) {
+    return 'Sync failed: connection timeout';
+  }
+  if (lowerError.includes('network') || lowerError.includes('connection')) {
+    return 'Sync failed: network error';
+  }
+  if (lowerError.includes('invalid') || lowerError.includes('malformed')) {
+    return 'Sync failed: invalid request format';
+  }
+  if (lowerError.includes('not found') || lowerError.includes('404')) {
+    return 'Sync failed: resource not found';
+  }
+  
+  // Generic fallback - never expose raw API responses
+  return 'Sync failed: please check broker connection';
+}
+
 // Decryption utilities - inline to avoid import issues in edge functions
 async function getEncryptionKey(): Promise<CryptoKey> {
   const encryptionKeyBase64 = Deno.env.get('BROKER_ENCRYPTION_KEY');
